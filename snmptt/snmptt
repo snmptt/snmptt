@@ -204,7 +204,7 @@ if ($DEBUGGING >= 1)
 	}
 	
 	# print out time
-	print "********** SNMPTT $snmptt_version started: ",localtime($g_start_time)," **********\n\n"
+	print "********** SNMPTT $snmptt_version started: ",scalar(localtime($g_start_time))," **********\n\n"
 }
 
 if ($syslog_system_enable == 1 && $daemon == 1)
