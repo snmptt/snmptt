@@ -1,5 +1,6 @@
 March 25th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_0.6
+- Fixed bug in snmptt - domain name strip not working correctly
 - Re-fixed bug in snmpttconvertmib that would cause the last trap
   (notification) converted from a v2 MIB file to contain an
   incorrect DESCRIPTION and possibly FORMAT line when the last
