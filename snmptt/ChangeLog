@@ -1,4 +1,5 @@
 April 22st, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Add getType test to snmptt-net-snmp-test
 - If DNS is enabled, NODES entries are resolved to IP addresses before
   comparing.  Will allow for aliases / CNAMES to match etc.
 - NODES match uses agent IP instead of host IP

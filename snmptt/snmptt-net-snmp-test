@@ -136,6 +136,9 @@ my $include_module;
 print "MIBS:$mibs_environment\n";
 print "best_guess: $SNMP::best_guess\n";
 
+print "\n\nTesting translateObj\n";
+print "********************\n";
+
 $test = '.1.3.6.1.2.1.1.1';
 $expect = 'sysDescr';
 $long_names = 0;
@@ -194,6 +197,19 @@ $long_names = 0;
 $include_module = 0;
 &translate($test, $expect, $long_names, $include_module);
 
+print "\n\nTesting getType\n";
+print "***************\n";
+
+$test = '.1.3.6.1.2.1.4.1';		# ipForwarding
+$expect = 'INTEGER';
+&my_getType($test, $expect,);
+
+$test = 'ipForwarding';		# ipForwarding
+$expect = 'INTEGER';
+&my_getType($test, $expect,);
+
+print "\n";
+
 sub translate
 {
   my $test = shift;
@@ -213,6 +229,21 @@ sub translate
   }
 }
   
-
+sub my_getType
+{
+  my $test = shift;
+  my $expect = shift;
+  print "\nTesting: $test\n";
+  $type = &SNMP::getType("$test");
+  if ($type eq $expect)
+  {
+    print "Test passed.  Result: $type\n";
+  }
+  else
+  {
+    print "Test FAILED!  Expected: $expect\n";
+    print "              Received: $type\n";
+  }
+}
 
 
