@@ -10,7 +10,7 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.3.3</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; November 12th, 2002
+<br>This file was last updated on:&nbsp; November 13th, 2002
 <p>&nbsp;<a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote>&nbsp;<a href="#What is it">What is it?</a>
@@ -768,6 +768,30 @@ file by adding the following line:
 5.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD -On.
 <b>The
 -On is required otherwise snmptt will NOT recognize the traps.</b>
+<br>&nbsp;
+<p><b><u><font size=+1>Windows NT Service:</font></u></b>
+<p>To configure SNMPTT as a service under Windows NT, follow these steps.&nbsp;
+More information can be obtained from the Windows NT Resource Kit.
+<p>1.&nbsp;&nbsp;&nbsp; Install the Windows NT resource kit
+<p>2.&nbsp;&nbsp;&nbsp; Copy the <b>srvany.exe</b> program to <b>c:\winnt\system32</b>
+from <b>c:\Program Files\Resource Kit *</b>
+<p>3.&nbsp;&nbsp;&nbsp; Install the SNMPTT service using:
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b> instsrv SNMPTT c:\winnt\system32\srvany.exe</b>
+<p>4.&nbsp;&nbsp;&nbsp; Configure the service:
+<br>&nbsp;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Launch <b>REGEDIT</b>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Go to <b>HKLM\SYSTEM\CurrentControlSet\SNMPTT</b>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Create a key called:&nbsp;
+<b>Parameters</b>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Inside of Parameters, create
+a Sting Value (REG_SZ) called <b>Application</b> with the value of: <b>c:\perl\bin\perl.exe</b>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Inside of Parameters, create
+a Sting Value (REG_SZ) called <b>AppParameters</b> with the value of: <b>c:\snmp\snmptt
+--daemon</b>
+<br>&nbsp;
+<br>5.&nbsp;&nbsp;&nbsp; Start the service from the control panel, or from
+a command prompt, type:&nbsp; <b>net start snmptt&nbsp;</b>
+<p>To remove the service, type:&nbsp; <b>instsrv SNMPTT remove</b>
 <br>&nbsp;
 <p><a NAME="Limitations"></a><b><font size=+2>Limitations</font></b>
 <p><b><font size=+1>Standalone mode only:</font></b>

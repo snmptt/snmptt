@@ -1,4 +1,7 @@
-November 11th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+November 13th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Changed default Windows drive from d: to c: in ini file
+
+November 12th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Added $c, $@, $O, $o, $ar, $R, $aR, $G, $S, $X, $N
 - Modified: $x
 - Modified: $S was name, now is Specific
