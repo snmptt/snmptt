@@ -1482,8 +1482,8 @@ Follow the instructions in the README file</li>
 </ol>
 
 <p><br><b>Q:&nbsp; I have enable net_snmp_perl_enable but the variable
-names are not being translated into text using $v<i>n</i>.&nbsp; How do
-I troubleshoot it?</b>
+names are not being translated into text using $v<i>n, $-n, $+n, $-* or
+$+*</i>.&nbsp; How do I troubleshoot it?</b>
 <br><b>Q:&nbsp; I have enabled translate_integers but the integer values
 are not being translated into text.&nbsp;&nbsp; How do I troubleshoot it?</b>
 <p>A:&nbsp; You must have the UCD-SNMP / NET-SNMP Perl module installed
@@ -1507,9 +1507,9 @@ snmptt.debug file from the second Value 0+ section, and type:
 <blockquote>snmptranslate -Td <i>oid</i></blockquote>
 This should return the OBJECT-TYPE for the variable if it exists in a MIB
 file
-<br>&nbsp;
-<br>&nbsp;
-<br>&nbsp;
+<p>If you are using UCD-SNMP v4.2.3, then the variables will not translate
+properly because SNMPTRAPD does not pass them correctly to SNMPTT.&nbsp;
+Upgrade to a newer version of snmptrapd.
 <br>&nbsp;
 <br>&nbsp;
 <br>&nbsp;
