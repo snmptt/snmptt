@@ -977,15 +977,24 @@ sub substitute
 	# Perform substitution on $_ variable
 
 	# Wildcards - $*, $+*, $-*
-	my $temp_wildcard1;
-	my $temp_wildcard2;
-	my $temp_wildcard3;
+	my $temp_wildcard1 = ();
+	my $temp_wildcard2 = ();
+	my $temp_wildcard3 = ();
 	for($i=1;$i <= $#entvar+1; $i++)
 	{
 	  $temp_wildcard1 = $temp_wildcard1 . "\$$i ";
 	  $temp_wildcard2 = $temp_wildcard2 . "\$\+$i ";
 	  $temp_wildcard3 = $temp_wildcard3 . "\$-$i ";
 	}
+
+	# Chop off last space
+	if (defined ( $temp_wildcard1) )
+	{
+	  chop ($temp_wildcard1);
+	  chop ($temp_wildcard2);
+	  chop ($temp_wildcard3);
+	}
+	
 	s(\$\*)($temp_wildcard1)g;
 	s(\$\+\*)($temp_wildcard2)g;
 	s(\$-\*)($temp_wildcard3)g;

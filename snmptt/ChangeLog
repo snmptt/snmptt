@@ -1,3 +1,6 @@
+March 9th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Remove trailing space after expanding wildcards
+
 March 7th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Improved syslog and event log support by allowing different syslog and
   NT Event Log levels based on the severity level defined in the snmptt.conf
