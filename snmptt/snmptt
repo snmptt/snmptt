@@ -406,6 +406,9 @@ sub processtrap
 	
 		# Flush out @event2
 		@event2 = ();
+
+		# Flush out @nodes list
+		@nodes = ();
 	
 		#	$event2[0]=$event{"$receivedtrap"}[0];	# 0: name of trap	
 		#	$event2[1]=$event{"$receivedtrap"}[1];	# 1: category
@@ -1279,6 +1282,32 @@ sub loadsnmpttini {
 	# 
 	# Defaults Start
 	# 
+<<<<<<< snmptt
+        $daemonmode 		= 0;
+	$daemonfork 		= 1;
+	$spooldirectory 	= '';
+	$sleep 			= 5;
+	$enablestdout 		= 0;
+	$enablelog 		= 1;
+	$logfile 		= '';
+	$enableunknowntraplog 	= 0;
+	$unknowntraplogfile 	= '';
+	$enablesyslog 		= 0;
+	$syslogfacility 	= 'local0';
+	$sysloglevel 		= 'warning';
+	$enableexec 		= 1;
+	$multiple_event 	= 0;
+	$enablemysqldbi 	= 0;
+	$mysqldbidatabase 	= '';
+	$mysqldbitable 		= '';
+	$mysqldbiusername 	= '';
+	$mysqldbipassword 	= '';
+	$enablesqlodbc 		= 0;
+	$sqlodbcdsn 		= '';
+	$sqlodbctable 		= '';
+	$sqlodbcusername 	= '';
+	$sqlodbcpassword 	= '';
+=======
         $daemonmode = 0;
 	$multiple_event = 0;
 	$fqdn_enable = 0;
@@ -1304,13 +1333,22 @@ sub loadsnmpttini {
 	$sql_win32_odbc_table = '';
 	$sql_win32_odbc_username = '';
 	$sql_win32_odbc_password = '';
+>>>>>>> 1.45
 	if ($debugcmdline == 0) {
-	  $DEBUGGING = 0
+	  $DEBUGGING 		= 0
 	}
 	if ($debugfilecmdline == 0) {
+<<<<<<< snmptt
+	  $DEBUGGINGFILE 	= ''
+=======
 	  $DEBUGGING_FILE = ''
+>>>>>>> 1.45
 	}
+<<<<<<< snmptt
+	@snmpttconffiles 	= '';
+=======
 	@snmptt_conf_files = '';
+>>>>>>> 1.45
 	#
 	# Defaults End
 	# 

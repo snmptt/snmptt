@@ -1,3 +1,7 @@
+January 20th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Fix bug with Nodes list not being flushed out when processing 
+  multiple traps at once.  Thanks to Christophe Belmont.
+
 January 6th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added fqdn_enable option to remove domain name from host name
   passed to SNMPTT.  Defaults to stripping the domain name (0)
