@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v0.2.1
+# SNMPTTCONVERTMIB v0.2.2
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -42,18 +42,13 @@ $defaultexecquote = "\"";		# double (") quotes
 # Set to 0 to disable
 $prepend_type = 1;
 
-# Set this to 1 to have append a $* to the end of the FORMAT and EXEC lines if there
-# is no --#SUMMARY information and the description line contains something, but does 
-# not have any variables in it.
-$default_wildcard = 1;
-
 #
 # OPTIONS END
 #
 #############################################################################
 #
 
-$snmpttconvertmib_version = "v0.2";
+$snmpttconvertmib_version = "v0.2.2";
 
 sub showversion
 {
@@ -79,6 +74,12 @@ $in = '';
 $out = '';
 $mibdir = '/usr/share/snmp/mibs/';
 $nodes = '';
+$no_description = 0;
+$no_format_summary = 0;
+$no_format_desc = 0;
+$format = 0;
+$format_desc = 0;
+$no_desc_wildcard = 0;
 
 GetOptions 	('version' => \$version, 
 		'debug:i' => \$debug,
@@ -87,8 +88,14 @@ GetOptions 	('version' => \$version,
 		'out=s' => \$out,
 		'net_snmp_perl' => \$net_snmp_perl,
 		'mibdir=s' => \$mibdir,
-		'nodes=s' => \$nodes);
-	
+		'nodes=s' => \$nodes,
+		'no_description' => \$no_description,
+		'no_format_summary' => \$no_format_summary,
+		'no_format_desc' => \$no_format_desc,
+		'format=n' => \$format,
+		'format_desc=n' => \$format_desc,
+		'no_desc_wildcard' => \$no_desc_wildcard);
+		
 if ($version == 1)
 {
 	&showversion;
@@ -110,11 +117,25 @@ Options:
     --mibdir=dir                         Directory for mib files when net_snmp_perl is enabled*
     --nodes=name or file                 If specified, will insert a NODES line after FORMAT or EXEC. 
                                          The host name(s) separated by spaces, or the name of the
-					 nodes file.  Use quotes for multiple host names.
+					 nodes file.  Use quotes for multiple entries.  See NODES section
+					 in readme.html for examples
+    --no_description			 Do not save the description
+    --no_format_summary			 Do not use the --#SUMMARY lines for FORMAT \/ EXEC
+    --no_format_desc			 Do not use the description line for FORMAT \/ EXEC.
+    --format=n				 FORMAT \/ EXEC order preference
+				         0 = --#SUMMARY or description
+					 1 = description or --#SUMMARY
+					 2 = --#SUMMARY and description
+					 3 = description and --#SUMMARY	
+    --format_desc=n			 How to convert the description line for FORMAT \/ EXEC
+    					 0 = First line of description
+					 n = n sentence(s) of description
+    --no_desc_wildcard			 To prevent \$* from being appended to the end of description text
+					 when used on the FORMAT \/ EXEC lines.  A wildcard is only used if 
+    					 the description line contained no variable definitions (\%n).
 					    
 * Note:  If net_snmp_perl is enabled, then the directory path for the MIB file directory is 
          required.  Not specifying a --mibdir will use the default of \/usr\/share\/snmp\/mibs\/.
-
 /;
 		
 	&showversion;
@@ -289,22 +310,18 @@ while ($currentline <= $#mibfile)
 				#print "SDESC\n";
 				
 				# If there is more text after the word DESCRIPTION, assume it's the start of 
-				# the description.  If it is, pull it out and place in $descriptionline1.
+				# the description.
 				if ($1 ne "")
 				{
 					# Pull out text and remove beginning and trailing white space
 					if ($1 =~ /\s*(.*)\s*/)
 					{
-						#print ("2\n");
 						# Remove any quotes
 						$_ = $1;
 						s(\")()g;
 						# "								
-						$descriptionline1 = $_;
-						$temp1 = 1;
-
 						push (@description, "$_\n");
-						#print "Line 1a: $_ \n";
+
 					}
 				}
 				
@@ -382,37 +399,21 @@ while ($currentline <= $#mibfile)
 						$line4 = $mibfile[$currentline];
 						next;
 					}
+
 					# If we did not find text after the word DESCRIPTION, then the NEXT
-					# line must be the first line of description.  Pull that out and place
-					# in $descriptionline1.
-					if ($temp1 == 0)
+					# line must be the first line of description.
+					
+					# Remove beginning and trailing white space
+					$line4 =~ (/\s*(.*)\s*/);
+					if ($1 ne "")
 					{
-						# Remove beginning and trailing white space
-						$line4 =~ (/\s*(.*)\s*/);
 						# Remove any quotes
 						$_ = $1;
 						s(\")()g;
-						# "								
-						$descriptionline1 = $_;
-						
+						# "
+													
 						push (@description, "$_\n");
-						#print "Line 1b: $_ \n";
-						$temp1 = 1;
-					}
-					else
-					{
-						# Remove beginning and trailing white space
-						$line4 =~ (/\s*(.*)\s*/);
-						if ($1 ne "")
-						{
-							# Remove any quotes
-							$_ = $1;
-							s(\")()g;
-							# "
-														
-							push (@description, "$_\n");
-							#print "c:$_\n";
-						}
+						#print "c:$_\n";
 					}
 
 					$currentline++; # Increment to the next line
@@ -500,20 +501,46 @@ while ($currentline <= $#mibfile)
 			
 			$trapsummary = $_;
 			
-			# Use trapsummary line
-			if ($trapsummary ne "")
-			{
-				print OUTPUTFILE "FORMAT $trapsummary\n";
-				if ($defaultexec ne '')
-				{
-					print OUTPUTFILE "$defaultexec $defaultexecquote$trapsummary$defaultexecquote\n"
-				}		
+			$descriptionline1 = '';
+
+			# Build description line for FORMAT / EXEC
+			if ($format_desc == 0)		# First line of description
+			{			  
+			  $descriptionline1 = $description[0];
+			  chomp ($descriptionline1);
 			}
-			# If trapsummary blank, use descriptionline1 line
-			elsif ($descriptionline1 ne "")
+			else				# n sentence(s) of description
 			{
+			  # Build single line copy of description
+			  my $description_temp;
+			  foreach my $a (@description)
+			  {
+			    my $b = $a;
+			    chomp($b);
+			    $description_temp = $description_temp . $b . " ";
+			  }
+			  chop $description_temp;
 
+			  # Split up based on sentences
+			  my @description_temp2 = split /\./, $description_temp;
+			  
+			  # Remove white space around each sentence and add a trailing .
+			  for (my $i=0 ; $i <= $#description_temp2; $i++)
+			  {
+			    $description_temp2[$i] =~ /\s*(.*)\s*/;
+			    $description_temp2[$i] = $1 . ".";
+			  }
 
+			  # Build description line based on the number of sentences requested.
+			  for (my $i=1 ; $i <= $format_desc; $i++)
+			  {
+			    $descriptionline1 = $descriptionline1 . $description_temp2[$i-1] . " " ;
+			  }
+			  chop $descriptionline1;	# Remove last space
+			}
+			
+			if ($descriptionline1 ne "")
+			{
 				if ($descriptionline1 =~ /%[a-zA-Z]/)
 				{
 					# Sometimes the variables are in the first line of the description
@@ -527,43 +554,86 @@ while ($currentline <= $#mibfile)
 					}
 					$descriptionline1 = $_;
 					$descriptionlinehadvariables = 1;
-
-					print OUTPUTFILE "FORMAT $descriptionline1\n";
-					if ($defaultexec ne '')
-					{
-						print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1$defaultexecquote\n"
-					}
 				}
 				else
 				{
-				  if ($default_wildcard == 1)
+				  if ($no_desc_wildcard == 0)
 				  {
-				     print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
-				     if ($defaultexec ne '')
-				     {
-				       print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1 \$*$defaultexecquote\n";
-				     }
-				   }
-				   else
-				   {
-				     print OUTPUTFILE "FORMAT $descriptionline1\n";
-				     if ($defaultexec ne '')
-				     {
-				       print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1$defaultexecquote\n";
-				     }
-				   }
-				   
+				    $descriptionline1 = "$descriptionline1 \$*";
+				  }				   
 				}
 			}
-			# If descriptionline1 is also blank, just use $*
+			
+			$formatexec = '';
+			
+			if ($format == 0)	# --#SUMMARY or description
+			{
+			  if ($trapsummary ne '' && $no_format_summary == 0)
+			  {
+			    $formatexec = $trapsummary;
+			  }
+			  elsif ($descriptionline1 ne '' && $no_format_desc == 0)
+			  {
+			    $formatexec = $descriptionline1;
+			  }
+			}
+			elsif ($format == 1)	# description or --#SUMMARY
+			{
+			  if ($descriptionline1 ne '' && $no_format_desc == 0)
+			  {
+			    $formatexec = $descriptionline1;
+			  }
+			  elsif ($trapsummary ne '' && $no_format_summary == 0)
+			  {
+			    $formatexec = $trapsummary;
+			  }
+			}
+			elsif ($format == 2)	# --#SUMMARY and description
+			{
+			  if ($trapsummary ne '' && $no_format_summary == 0)
+			  {
+			    $formatexec = $trapsummary;
+			  }
+			  if ($descriptionline1 ne '' && $no_format_desc == 0)
+			  {
+			    if ($formatexec =~ /\.$/)	# If it already ends in a .
+			    {
+			      $formatexec = $formatexec . " " . $descriptionline1;
+			    }
+			    else
+			    {
+			      $formatexec = $formatexec . ". " . $descriptionline1;
+			    }
+			  }
+			}
+			elsif ($format == 3)	# description and --#SUMMARY
+			{
+			  if ($descriptionline1 ne '' && $no_format_desc == 0)
+			  {
+			    $formatexec = $descriptionline1;
+			  }
+			  if ($trapsummary ne '' && $no_format_summary == 0)
+			  {
+			    $formatexec = $formatexec . " " . $trapsummary;
+			  }
+			}
+			  
+			if ($formatexec ne '')
+			{
+			  print OUTPUTFILE "FORMAT $formatexec\n";
+			  if ($defaultexec ne '')
+			  {
+			    print OUTPUTFILE "$defaultexec $defaultexecquote$formatexec$defaultexecquote\n"
+			  }		
+			}
 			else
 			{
-				print OUTPUTFILE "FORMAT \$*\n";
-				if ($defaultexec ne '')
-				{
-					print OUTPUTFILE "$defaultexec $defaultexecquote\$*$defaultexecquote\n"
-				}
-				#print OUTPUTFILE "EXEC \$*\n";
+			  print OUTPUTFILE "FORMAT \$*\n";
+			  if ($defaultexec ne '')
+			  {
+			    print OUTPUTFILE "$defaultexec $defaultexecquote\$*$defaultexecquote\n"
+			  }
+			  #print OUTPUTFILE "EXEC \$*\n";
 			}
 	
 			if ($nodes ne '')
@@ -571,14 +641,17 @@ while ($currentline <= $#mibfile)
 				print OUTPUTFILE "NODES $nodes\n";
 			}	
 			
-			print OUTPUTFILE "SDESC\n";
-			#print OUTPUTFILE "$descriptionline1\n";
-			for ($i=0; $i <= $#description; $i++)
-			{
-				print OUTPUTFILE "$description[$i]";
+			if ($no_description == 0)
+			{			  
+			  print OUTPUTFILE "SDESC\n";
+			  #print OUTPUTFILE "$descriptionline1\n";
+			  for ($i=0; $i <= $#description; $i++)
+			  {
+			    print OUTPUTFILE "$description[$i]";
+			  }
+			  print OUTPUTFILE "EDESC\n";
 			}
-			print OUTPUTFILE "EDESC\n";
-	
+
 			$currentline--;
 		}
 		
@@ -625,8 +698,18 @@ foreach $key (sort keys %SNMP::MIB)
 {
   if ($SNMP::MIB{$key}{type} eq 'TRAP' || $SNMP::MIB{$key}{type} eq 'NOTIF')
   {
-    print "#\n#\n#\n";
-    print "EVENT $SNMP::MIB{$key}{label} $key \"Status Events\" Normal\n";
+    #print "#\n#\n#\n";
+    
+    if ($SNMP::MIB{$key}{type} eq 'TRAP')
+    {
+      print "TRAP-TYPE: $SNMP::MIB{$key}{label}\n";		# If trapsummary blank, use trapsummary line for FORMAT and EXEC
+    }
+    else
+    {
+      print "NOTIFICATION-TYPE: $SNMP::MIB{$key}{label}\n";	# If trapsummary blank, use trapsummary line for FORMAT and EXEC
+    }
+    
+    #print "EVENT $SNMP::MIB{$key}{label} $key \"Status Events\" Normal\n";
 
     # Determine FORMAT line
 
@@ -834,20 +917,46 @@ foreach $key (sort keys %SNMP::MIB)
 			
 			$trapsummary = $_;
 			
-			# Use trapsummary line
-			if ($trapsummary ne "")
-			{
-				print OUTPUTFILE "FORMAT $trapsummary\n";
-				if ($defaultexec ne '')
-				{
-					print OUTPUTFILE "$defaultexec $defaultexecquote$trapsummary$defaultexecquote\n"
-				}		
+			$descriptionline1 = '';
+
+			# Build description line for FORMAT / EXEC
+			if ($format_desc == 0)		# First line of description
+			{			  
+			  $descriptionline1 = $description[0];
+			  chomp ($descriptionline1);
 			}
-			# If trapsummary blank, use descriptionline1 line
-			elsif ($descriptionline1 ne "")
+			else				# n sentence(s) of description
 			{
+			  # Build single line copy of description
+			  my $description_temp;
+			  foreach my $a (@description)
+			  {
+			    my $b = $a;
+			    chomp($b);
+			    $description_temp = $description_temp . $b . " ";
+			  }
+			  chop $description_temp;
 
+			  # Split up based on sentences
+			  my @description_temp2 = split /\./, $description_temp;
+			  
+			  # Remove white space around each sentence and add a trailing .
+			  for (my $i=0 ; $i <= $#description_temp2; $i++)
+			  {
+			    $description_temp2[$i] =~ /\s*(.*)\s*/;
+			    $description_temp2[$i] = $1 . ".";
+			  }
 
+			  # Build description line based on the number of sentences requested.
+			  for (my $i=1 ; $i <= $format_desc; $i++)
+			  {
+			    $descriptionline1 = $descriptionline1 . $description_temp2[$i-1] . " " ;
+			  }
+			  chop $descriptionline1;	# Remove last space
+			}
+			
+			if ($descriptionline1 ne "")
+			{
 				if ($descriptionline1 =~ /%[a-zA-Z]/)
 				{
 					# Sometimes the variables are in the first line of the description
@@ -861,61 +970,108 @@ foreach $key (sort keys %SNMP::MIB)
 					}
 					$descriptionline1 = $_;
 					$descriptionlinehadvariables = 1;
-
-					print OUTPUTFILE "FORMAT $descriptionline1\n";
-					if ($defaultexec ne '')
-					{
-						print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1$defaultexecquote\n"
-					}
 				}
 				else
 				{
-				  if ($default_wildcard == 1)
+				  if ($no_desc_wildcard == 0)
 				  {
-				    print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
-				    if ($defaultexec ne '')
-				    {
-				      print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1 \$*$defaultexecquote\n";
-				    }
-				  }
-				  else
-				  {
-				    print OUTPUTFILE "FORMAT $descriptionline1\n";
-				    if ($defaultexec ne '')
-				    {
-				      print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1$defaultexecquote\n";
-				    }
-				  }
+				    $descriptionline1 = "$descriptionline1 \$*";
+				  }				   
 				}
 			}
-			# If descriptionline1 is also blank, just use $*
+			
+			$formatexec = '';
+			
+			if ($format == 0)	# --#SUMMARY or description
+			{
+			  if ($trapsummary ne '' && $no_format_summary == 0)
+			  {
+			    $formatexec = $trapsummary;
+			  }
+			  elsif ($descriptionline1 ne '' && $no_format_desc == 0)
+			  {
+			    $formatexec = $descriptionline1;
+			  }
+			}
+			elsif ($format == 1)	# description or --#SUMMARY
+			{
+			  if ($descriptionline1 ne '' && $no_format_desc == 0)
+			  {
+			    $formatexec = $descriptionline1;
+			  }
+			  elsif ($trapsummary ne '' && $no_format_summary == 0)
+			  {
+			    $formatexec = $trapsummary;
+			  }
+			}
+			elsif ($format == 2)	# --#SUMMARY and description
+			{
+			  if ($trapsummary ne '' && $no_format_summary == 0)
+			  {
+			    $formatexec = $trapsummary;
+			  }
+			  if ($descriptionline1 ne '' && $no_format_desc == 0)
+			  {
+			    if ($formatexec =~ /\.$/)	# If it already ends in a .
+			    {
+			      $formatexec = $formatexec . " " . $descriptionline1;
+			    }
+			    else
+			    {
+			      $formatexec = $formatexec . ". " . $descriptionline1;
+			    }
+			  }
+			}
+			elsif ($format == 3)	# description and --#SUMMARY
+			{
+			  if ($descriptionline1 ne '' && $no_format_desc == 0)
+			  {
+			    $formatexec = $descriptionline1;
+			  }
+			  if ($trapsummary ne '' && $no_format_summary == 0)
+			  {
+			    $formatexec = $formatexec . " " . $trapsummary;
+			  }
+			}
+			  
+			if ($formatexec ne '')
+			{
+			  print OUTPUTFILE "FORMAT $formatexec\n";
+			  if ($defaultexec ne '')
+			  {
+			    print OUTPUTFILE "$defaultexec $defaultexecquote$formatexec$defaultexecquote\n"
+			  }		
+			}
 			else
 			{
-				print OUTPUTFILE "FORMAT \$*\n";
-				if ($defaultexec ne '')
-				{
-					print OUTPUTFILE "$defaultexec $defaultexecquote\$*$defaultexecquote\n"
-				}
-				#print OUTPUTFILE "EXEC \$*\n";
+			  print OUTPUTFILE "FORMAT \$*\n";
+			  if ($defaultexec ne '')
+			  {
+			    print OUTPUTFILE "$defaultexec $defaultexecquote\$*$defaultexecquote\n"
+			  }
+			  #print OUTPUTFILE "EXEC \$*\n";
 			}
 	
 			if ($nodes ne '')
 			{
 				print OUTPUTFILE "NODES $nodes\n";
+			}	
+			
+			if ($no_description == 0)
+			{			  
+			  print OUTPUTFILE "SDESC\n";
+			  #print OUTPUTFILE "$descriptionline1\n";
+			  for ($i=0; $i <= $#description; $i++)
+			  {
+			    print OUTPUTFILE "$description[$i]";
+			  }
+			  print OUTPUTFILE "EDESC\n";
 			}
-						
-			print OUTPUTFILE "SDESC\n";
-			#print OUTPUTFILE "$descriptionline1\n";
-			for ($i=0; $i <= $#description; $i++)
-			{
-				print OUTPUTFILE "$description[$i]";
-			}
-			print OUTPUTFILE "EDESC\n";
-	
+
 			$currentline--;
 		}
-		
-		print "OID: $trapoid\n";
+
+		print "OID: $trapoid\n\n";
 		#print "\@description is ", $#description,"\n";
 		#print "going to next trap\n\n";
 	}

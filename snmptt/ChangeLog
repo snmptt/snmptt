@@ -1,3 +1,9 @@
+March 28th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Snmpttconvertmib:  Add new options to include both summary and
+  description lines in the FORMAT and EXEC lines.  Allows either or
+  both.  Also allows x number of sentences from the description to be
+  used on the FORMAT and EXEC lines.
+
 March 27th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - NODES can now contain CIDR address and network ranges.  The NODES line
   can now contain a mix of host names, IP addresses / network ranges 
