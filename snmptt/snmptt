@@ -524,7 +524,7 @@ sub processtrap
 
 			}
 
-			print "  multiple_event = $multiple_event, multiple_event_passes = " . "$multiple_event_passes\n";			
+			# print "  multiple_event = $multiple_event, multiple_event_passes = " . "$multiple_event_passes\n";			
 			# Trap received exists in our list of trap definitions
 			if ($DEBUGGING >= 1)
 			{
@@ -1055,14 +1055,35 @@ sub readtrap
 		
 	}
 	
-	# Strip domain name from hostname in @var[0] if fqdn_enable is set to 0 (disabled)
-	if ($fqdn_enable == 0)
+	# Strip domain name from hostname in @var[0] if strip_domain is set to 1 (enabled)
+	if ($strip_domain == 1)
 	{
 	  if (@var[0] =~ /\./)      # Contain a . ?
 	  {
 	    @var[0] = @var[0] =~ /^([^\.]+?)\./;
 	  }
 	}
+
+	if ($strip_domain == 2)
+	{
+	  if (defined (@strip_domain_list))
+	  {
+	    foreach $strip_domain_list_temp (@strip_domain_list)
+	    {
+	      if ($strip_domain_list_temp =~ /^\..*/) # If domain from list starts with a '.' then remove it first
+	      {
+		($strip_domain_list_temp) = $strip_domain_list_temp =~ /^\.(.*)/;
+	      }
+
+	      if (@var[0] =~ /^.+\.$strip_domain_list_temp/)      # host is something . domain name?	      
+	      {
+		@var[0] = @var[0] =~ /(.*)\.$strip_domain_list_temp/;	# strip the domain name
+		last;  # Only process once 
+	      }
+	    }
+	  }
+	}
+	
 	
 	if ($DEBUGGING >= 1)
 	{
@@ -1318,8 +1339,9 @@ sub loadsnmpttini {
 	}
 	
 	$multiple_event = $cfg->val('General', 'multiple_event');
-	$fqdn_enable = $cfg->val('General', 'fqdn_enable');
-
+	$strip_domain = $cfg->val('General', 'strip_domain');
+	@strip_domain_list = $cfg->val('General', 'strip_domain_list');
+	
 	# DaemonMode
 	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
 	$spool_directory = $cfg->val('DaemonMode', 'spool_directory');
@@ -1369,7 +1391,7 @@ sub loadsnmpttini {
 	# Defaults Start
 	# 
 	if (! defined ($multiple_event)) { $multiple_event = 0} ;
-	if (! defined ($fqdn_enable)) { $fqdn_enable = 0} ;
+	if (! defined ($strip_domain)) { $strip_domain = 0} ;
 	if (! defined ($use_trap_time)) { $use_trap_time = 1} ;
 	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($spool_directory)) { $spool_directory = ''} ;

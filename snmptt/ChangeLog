@@ -1,3 +1,10 @@
+February 12th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Changed fqdn_enable ini parameter to strip_domain.  Strip_domain
+  can now be 0, 1 or 2.  0 = do not strip domain name.  1 = strip
+  domain name.  2 = strip domain name based on list of domains contained
+  in strip_domain_list ini parameter
+- Added strip_domain_list paramater to ini file
+
 January 23rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Spool file list sorted before processing to ensure traps are 
   processed in the order they are received when in daemon mode.

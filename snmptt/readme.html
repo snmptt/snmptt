@@ -36,7 +36,7 @@ file Notes</a>
 <br>&nbsp;<a href="#Installation - Unix">Installation - Unix</a>
 <br>&nbsp;<a href="#Installation - Windows">Installation - Windows</a>
 <br>&nbsp;<a href="#Limitations">Limitations</a>
-<br>&nbsp;<a href="#Feedback">Feedback</a></blockquote>
+<br>&nbsp;<a href="#Feedback">Feedback &amp; Bugs</a></blockquote>
 &nbsp;<a href="#SNMP Trap Translator Convert">SNMP Trap Translator Convert</a>
 <p>&nbsp;<a href="#SNMP Trap Translator Convert MIB">SNMP Trap Translator
 Convert MIB</a>
@@ -175,9 +175,9 @@ Fixed bug with Nodes list not being flushed out for each processed trap
 when running in daemon mode</li>
 
 <li>
-Added <b>fqdn_enable</b> configuration option to enable / disable the removal
-of the domain name from the host name passed to SNMPTT.&nbsp; Defaults
-to disabled (strip domain name)</li>
+Added <b>strip_domain</b> and <b>strip_domain_list</b> configuration options
+to enable / disable the removal of the domain name from the host name passed
+to SNMPTT.&nbsp; Defaults to disabled (do not&nbsp; strip domain name)</li>
 
 <li>
 SNMPTTCONVERTMIB now prepends the contents of the --#TYPE line (if present)
@@ -266,10 +266,6 @@ Initial release</li>
 <p><b><font size=+1>v0.4 to v0.5</font></b>
 <p>To upgrade from v0.1, v0.2 to v0.3 to v0.4, you should:
 <ol>
-<li>
-Set <b>fqdn_enable</b> to <b>1 </b>to have SNMPTT operate the same as v0.4,
-or leave as 0 (recommended default) and test</li>
-
 <li>
 Set <b>use_trap_time</b> to<b> 0</b> to have SNMPTT operate the same as
 v0.4, or leave as 1 (recommended default) and test</li>
@@ -592,7 +588,7 @@ variables:
 <br>$S&nbsp; - Specific trap number (0 if generic trap)
 <br>$N&nbsp; - Event name defined
 <br>$O, $o - Trap OID in number format
-<br>$R, $r&nbsp; - Hostname
+<br>$R, $r&nbsp; - Hostname (*)
 <br>$aR, $ar - IP address
 <br>$s&nbsp; - Severity
 <br>$T&nbsp; - Uptime:&nbsp; Time since network entity was initialized
@@ -608,8 +604,17 @@ Example:
 <p>Note: The trap OID, severity, category and hostname will always be prepended
 to the FORMAT string in both the text log and syslog.&nbsp; The text log
 will also have the date prepended at the beginning.
-<br>&nbsp;</blockquote>
-<b>EXEC:</b>
+<p>* Note:
+<blockquote>If you are using DNS, the host name may resolve to the Fully
+Qualified Domain Name (FQDN) by snmptrapd.&nbsp; For example: barney.bedrock.com.
+<p>Adding an entry for the host in your /etc/hosts file or c:\%systemroot%\system32\drivers\etc\hosts
+may result in snmptrapd sending the short name instead (barney).&nbsp;
+You can also enable the <b>strip_domain</b> / <b>strip_domain_list</b>
+options to have SNMPTT strip the domain of any FQDN host.&nbsp; See the
+.ini file for details.</blockquote>
+</blockquote>
+<b></b>
+<p><br><b>EXEC:</b>
 <blockquote>[<b>EXEC</b> command_string]
 <p>Optional string containing command to execute when trap is received
 and arguments to pass to the program.
@@ -644,13 +649,17 @@ where snmptt-nodes contains:
 <br>192.168.2.1
 <br>betty
 <br>wilma</blockquote>
-Note:&nbsp;&nbsp; The names are NOT case sensitive, comment lines are permitted
+Notes:
+<blockquote>The names are NOT case sensitive, comment lines are permitted
 by starting the line with a # and IP addresses can also be used.
-<p>Note:&nbsp;&nbsp; If you are using DNS, the names may resolve to the
-Fully Qualified Domain Name (FQDN) by snmptrapd.&nbsp; For example: barney.bedrock.com.
+<p>If you are using DNS, the names may resolve to the Fully Qualified Domain
+Name (FQDN) by snmptrapd.&nbsp; For example: barney.bedrock.com.
 <p>Adding an entry for the host in your /etc/hosts file or c:\%systemroot%\system32\drivers\etc\hosts
-should result in snmptrapd sending the short name instead (barney).
-<br>&nbsp;</blockquote>
+may result in snmptrapd sending the short name instead (barney).&nbsp;
+You can also enable the <b>strip_domain</b> / <b>strip_domain_list</b>
+options to have SNMPTT strip the domain of any FQDN host.&nbsp; See the
+.ini file for details.</blockquote>
+</blockquote>
 <b>SDESC</b>
 <blockquote>[<b>SDESC</b>]
 <p>Optional start of a description.&nbsp; All text between this line and
@@ -865,13 +874,13 @@ I do not know how large this buffer is.
 a program that does not return, SNMPTT will be left waiting.&nbsp; In standalone
 mode, this would cause snmptrapd to wait forever also.
 <br>&nbsp;
-<p><a NAME="Feedback"></a><b><font size=+2>Feedback</font></b>
+<p><a NAME="Feedback"></a><b><font size=+2>Feedback &amp; Bugs</font></b>
 <p>Please send me any comments - good or bad - to alex_b@users.sourceforge.net.&nbsp;
 If you have any problems including converting trap files, please send me
 an email and include the file you are trying to convert and I will try
 to take a look at it.
-<p>Please also send any patches or improvments so I can add them in to
-the CVS tree.
+<p>Please also send any bug reports, patches or improvements so I can fix
+/ add them and add it to the next release.
 <br>&nbsp;
 <p><a NAME="SNMP Trap Translator Convert"></a><b><font size=+3>SNMP Trap
 Translator Convert v0.1</font></b>
