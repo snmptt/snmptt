@@ -11,7 +11,7 @@
 <body>
 <br>
 <b><font size="+3">SNMP Trap Translator v0.8.1</font></b><br>
-<b>(SNMPTT)</b> <br>
+<b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b> <br>
 This file was last updated on:&nbsp; October 27th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
@@ -25,6 +25,7 @@ This file was last updated on:&nbsp; October 27th, 2003
   <b>&nbsp;&nbsp; </b><a href="#Installation-Overview">Overview</a><br>
   <b>&nbsp;&nbsp; </b><a href="#Installation-Unix">Unix</a> <br>
   <b>&nbsp;&nbsp; </b><a href="#Installation-Windows">Windows</a><br>
+  <b>&nbsp;&nbsp; </b><a href="#SecuringSNMPTT">Securing SNMPTT</a><br>
   <a href="#Configuration-Options">Configuration Options - snmptt.ini</a>
   <br>
   <a href="#LoggingStandard">Logging</a> <br>
@@ -90,30 +91,109 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA&nbsp;
 02111-1307&nbsp; USA <br>
 &nbsp; </p>
 <p><a name="What-is-it"></a><b><font size="+2">What is it?</font></b> </p>
-<p>SNMPTT (SNMP Trap Translator) is an SNMP trap handler written in
-Perl
-for use with the Net-SNMP / UCD-SNMP snmptrapd program (<a
- href="http://www.net-snmp.org">http://www.net-snmp.org)</a>. </p>
-<p>The Net-SNMP package has the ability to log SNMP traps to
-syslog.&nbsp; The format of the log is basically variable = value,
-variable = value, variable = value etc.&nbsp; A more descriptive /
-friendly trap message can be created using SNMPTT's variable
-substitution. </p>
-<p>For example, receiving the trap .1.3.6.1.4.1.232.0.3017 from a
-Compaq server running the Compaq Insight Agents could result in the
-following message from SNMPTT: </p>
-<p>&nbsp;&nbsp;&nbsp; "Compaq Drive Array Spare Drive on controller 3,
-bus 0, bay 3 status
-is Failed." </p>
-<p>Variable substation works by defining a string such as: </p>
-<p>&nbsp;&nbsp;&nbsp; "Compaq Drive Array Spare Drive on controller $4,
-bus $5, bay $6
-status is $3." </p>
-<p>Each $<i>number</i> is replaced with the corresponding enterprise
-variable received in the trap and is defined for each trap in the
-configuration file.&nbsp; The order of the variables are defined in the
-MIB or TRAP file which can be obtained from the vendor. <br>
-&nbsp; </p>
+SNMPTT (SNMP Trap Translator) is an SNMP trap handler written in
+Perl for use with the Net-SNMP / UCD-SNMP <a
+ href="http://www.net-snmp.org/man/snmptrapd.html" target="net-snmp">snmptrapd</a>
+program (<a href="http://www.net-snmp.org" target="net-snmp">www.net-snmp.org</a>).
+SNMPTT supports Linux, Unix and Windows.
+<p>Many network devices including but not limited to network switches,
+routers, remote access servers, UPSs, printers and operating systems
+such as Unix and Windows NT have the ability to send notifications to
+an SNMP manager running on a network management station. The
+notifications can be either SNMP Traps, or SNMP Inform messages.
+</p>
+<p>
+The notification can contain a wide array of information such as port
+failures, link failures, access violations, power outages, paper jams,
+hard drive failures etc. The MIB (Management Information Base)
+available from the vendor determines the notifications supported by
+each device.
+</p>
+<p>
+The MIB file contains TRAP-TYPE (SMIv1) or NOTIFICATION-TYPE (SMIv2)
+definitions, which define the variables that are passed to the
+management station when a particular event occurs.
+</p>
+<p>
+The Net-SNMP program <b>snmptrapd</b> is an application that receives
+and logs SNMP trap and inform messages via TCP/IP. Following is a
+sample syslog entry for a Compaq cpqDa3LogDrvStatusChange trap that
+notifies that the drive array is rebuilding:
+</p>
+<p style="margin-left: 30px;">
+Feb 12 13:37:10 server11 snmptrapd[25409]: 192.168.110.192: Enterprise
+Specific Trap (3008) Uptime: 306 days, 23:13:24.29, .1.3.6.1.2.1.1.5.0
+= SERVER08, .1.3.6.1.4.1.232.11.2.11.1.0 = 0,
+.1.3.6.1.4.1.232.3.2.3.1.1.4.8.1 = rebuilding(7)
+</p>
+<p style="margin-left: 30px;">
+or
+</p>
+<p style="margin-left: 30px;">
+Feb 12 13:37:10 server11 snmptrapd[25409]: 192.168.110.192: Enterprise
+Specific Trap (3008) Uptime: 306 days, 23:13:24.29, sysName.0 =
+SERVER08, cpqHoTrapFlags.0 = 0, cpqDaLogDrvStatus.8.1 = rebuilding(7)
+</p>
+<p>
+The output from snmptrapd can be changed via the -O option to display
+numeric or symbolic OIDs and other display options, but it generally
+follows the format of variable name = value, variable name = value etc.
+</p>
+<p>
+A more descriptive / friendly trap message can be created using
+SNMPTT's variable substitution. Following is the same trap, logged with
+SNMPTT:
+</p>
+<p style="margin-left: 30px;">
+Feb 12 13:37:13 server11 TRAPD: .1.3.6.1.4.1.232.0.3008 Normal
+"XLOGONLY" server08 - Logical Drive Status Change: Status is now
+rebuilding
+</p>
+<p>
+The definition for the cpqDa3LogDrvStatusChange trap in the SNMPTT
+configuration file would be defined as follows:
+</p>
+<p style="margin-left: 30px;">FORMAT Logical Drive Status Change:
+Status is now $3.
+</p>
+<p>
+The $3 represents the third variable as defined in the MIB file, which
+for this particular trap, is the cpqDaLogDrvStatus variable.
+</p>
+<p>
+Another example of an SNMPTT configuration entry is:
+</p>
+<p style="margin-left: 30px;">
+FORMAT Compaq Drive Array Spare Drive on controller $4, bus $5, bay $6
+status is $3.
+</p>
+<p>
+Which could result in the following output:
+</p>
+<p style="margin-left: 30px;">
+"Compaq Drive Array Spare Drive on controller 3, bus 0, bay 3 status is
+Failed."
+</p>
+<p>
+Snmptt can log to any of the following destinations: text log, syslog,
+NT Event log or a SQL database. External programs can also be run to
+pass the translated trap to an email client, paging software etc.
+</p>
+<p>
+In addition to variable substitution, SNMPTT allows complex
+configurations allowing:
+</p>
+<ul class="SectionBody">
+  <li class="SectionBody">the ability to accept or reject a trap based
+on the host name, ip address, network range, or variable values inside
+of the trap enterprise variables</li>
+  <li class="SectionBody">execute external programs to send pages,
+emails etc</li>
+  <li class="SectionBody">perform regular expression search and replace
+on the translated message such as translating the variable value
+"Building alarm 4" to "Moisture detection alarm"</li>
+</ul>
+<br>
 <p><a name="Downloading"></a><b><font size="+2">Downloading</font></b> </p>
 <p>SNMPTT can be downloaded from <a
  href="http://www.sourceforge.net/projects/snmptt">http://www.sourceforge.net/projects/snmptt</a>
@@ -709,6 +789,8 @@ the snmptt.conf file and set any desired options</li>
 snmptt machine</li>
   <li>Initiate a trap on your network device and check the snmptt log
 files for the result</li>
+  <li>Secure the SNMPTT installation<br>
+  </li>
 </ol>
 <p><br>
 <a name="Installation-Unix"></a><b><font size="+2">Installation -
@@ -777,7 +859,13 @@ section for more info.</span><br>
 </div>
 <p>&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
 file to include the line: <b>printNumericOids 1.&nbsp; </b>This
-setting will take effect no matter what is used on the command line. </p>
+setting will take effect no matter what is used on the command line.<br>
+</p>
+<p>7.&nbsp; See the <a
+ href="file:///H:/cvs/snmptt/readme.html#SecuringSNMPTT">Securing SNMPTT</a>
+section.<br>
+<br>
+</p>
 <p><a name="Installation-Windows"></a><b><font size="+2">Installation -
 Windows</font></b> </p>
 <p>1.&nbsp; <b><u>Read this entire file to understand how snmptt works</u></b>
@@ -815,7 +903,12 @@ section for more info.<br>
 </span><br>
 &nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
 file to include the line: <b>printNumericOids 1.&nbsp; </b>This
-setting will take effect no matter what is used on the command line.
+setting will take effect no matter what is used on the command line.<br>
+<br>
+6.&nbsp; See the <a
+ href="file:///H:/cvs/snmptt/readme.html#SecuringSNMPTT">Securing SNMPTT</a>
+section.<br>
+<br>
 <p><b><u><font size="+1">Windows NT EventLog:</font></u></b> </p>
 <p>If you have enabled Windows Event Log support, then you must install
 an Event Message File to prevent "Event Message Not Found" messages
@@ -891,6 +984,71 @@ of: <b>c:\snmp\snmptt --daemon</b> </p>
 <p>5.&nbsp;&nbsp;&nbsp; Start the service from the control panel, or
 from a command prompt, type:&nbsp; <b>net start snmptt</b> </p>
 To remove the service, type:&nbsp; <b>instsrv SNMPTT remove</b> <br>
+<p><br>
+<br>
+<a name="SecuringSNMPTT"></a><b><font size="+2">Securing SNMPTT</font></b><br>
+<br>
+As with most software, SNMPTT should be run without root or
+administrator privileges.&nbsp; Running with a non privileged account
+can help restrict what actions can occur when using features such as <span
+ style="font-weight: bold;">EXEC </span>and <span
+ style="font-weight: bold;">REGEX</span>.<br>
+<br>
+For Linux and Unix, a user called '<span style="font-weight: bold;">snmptt</span>'
+should be created and the <span style="font-weight: bold;">snmptt.ini</span>
+option <span style="font-weight: bold;">daemon_uid</span> set to the
+numerical user id (eg: 500) or textual user id (snmptt).<br>
+<br>
+Before forking to the background in daemon mode, SNMPTT will change to
+the defined user id.&nbsp; If the system syslog (<span
+ style="font-weight: bold;">syslog_system_enable</span>) is enabled, a
+message will be logged stating the user id has been changed.&nbsp; All
+processing from that point on will be as the new user id.&nbsp; This
+can be verified by checking the user id in the syslog for traps and
+system messages.&nbsp; For example, if the user id was changed to 500,
+the syslog would contain entries with <span style="font-weight: bold;">snmptt[500]</span>.&nbsp;
+When running as root, entries will contain <span
+ style="font-weight: bold;">snmptt[0]</span>.<br>
+<br>
+For Windows, a local or domain user account called '<span
+ style="font-weight: bold;">snmptt</span>' should be created.&nbsp; If
+running as an NT service, the service should be configured to use the <span
+ style="font-weight: bold;">snmptt </span>user account.&nbsp;
+Otherwise the system should be logged in locally with the <span
+ style="font-weight: bold;">snmptt</span> account before launching
+SNMPTT in daemon mode.<br>
+<br>
+The script <span style="font-weight: bold;">snmptthandler </span>which
+is called from Net-SNMP's <span style="font-weight: bold;">snmptrapd </span>will
+be executed in the same security context as <span
+ style="font-weight: bold;">snmptrapd</span>.&nbsp; <br>
+<br>
+The <span style="font-weight: bold;">snmptt </span>user should be
+configured with the following permissions:<br>
+</p>
+<ul>
+  <li>read / delete access to spool directory to be able to read new
+traps, and delete processed traps<br>
+  </li>
+  <li>read access to configuration files (snmptt.ini and all
+snmptt.conf files)</li>
+  <li>write access to log files (snmptt.log, snmptt.debug if enabled)</li>
+  <li>any other permissions required for EXEC statements to execute<br>
+  </li>
+</ul>
+If <span style="font-weight: bold;">snmptrapd </span>is run as a non
+root / administrator, it should be configured with the following
+permissions:<br>
+<ul>
+  <li>write access to spool directory</li>
+</ul>
+Note:&nbsp; It is recommended that only the user running <span
+ style="font-weight: bold;">snmptrapd </span>and the <span
+ style="font-weight: bold;">snmptt </span>user be given permission to
+the spool folder.&nbsp; This will prevent other users from placing
+files into the spool folder such as non-trap related files, or the <span
+ style="font-weight: bold;">!reload</span> file which causes SNMPTT to
+reload.
 <p><br>
 </p>
 <p><a name="Configuration-Options"></a><b><font size="+2">Configuration
@@ -1708,7 +1866,6 @@ can be set to <span style="font-weight: bold;">1</span> to have the
 nodes files loaded each time an EVENT is processed.<br>
       <p>See the section '<a href="#DNS">Name Resolution / DNS</a>'
 for important DNS information.</p>
-      <p></p>
     </blockquote>
   </blockquote>
   <a name="SNMPTT.CONF-MATCH"></a><b>MATCH:</b> <br>
@@ -2064,7 +2221,6 @@ $temp . " " . (int(rand 49) +1); } return $temp; } )ie</span><br
   <br>
 FORMAT line after:&nbsp; <span style="font-weight: bold;">Better get a
 lotto ticket!!&nbsp; Here is a lotto number to try: 36 27 38 32 29 6</span></div>
-  <div style="margin-left: 40px;"></div>
   <br>
   <div style="margin-left: 40px;"><br>
 Note:&nbsp; The REGEX expression is executed on the final
@@ -2301,7 +2457,6 @@ with other software<br>
 hosts and services and alerts you when things go wrong.&nbsp; The name
 changed from Netsaint to Nagios in July of 2002.<br>
 </p>
-<p></p>
 <p style="font-weight: bold;">This section will outline the basic steps
 to integrate SNMPTT with Nagios.&nbsp; It will not attempt to explain
 how Nagios works.&nbsp; There is very good documentation available on
@@ -2340,7 +2495,6 @@ state until you manually force a service check.</span>&nbsp; See <big><small><sp
  style="font-weight: bold;">Clearing received traps in Nagios</span>
 below.<br>
 </small><span style="font-weight: bold;"></span></big></p>
-<p></p>
 <p><big><span style="font-weight: bold;">Nagios Volatile Services</span></big><br>
 </p>
 <p>When defining the service for receiving the SNMPTT translated trap,
@@ -2501,12 +2655,10 @@ contact group to notify</td>
     </tr>
   </tbody>
 </table>
-<p></p>
 <p>Following is a sample service entry for Netsaint.<br>
 </p>
 <p style="margin-left: 40px;"><span style="font-weight: bold;">service[server01]=TRAP;1;none;1;1;1;cg_core;31536000;24x7;0;1;1;;check-host-alive</span><br>
 </p>
-<p></p>
 See the Netsaint documentation and the Nagios table above for an
 explanation of the various fields.<br>
 <br>
@@ -2726,7 +2878,6 @@ DESC sestion if available such as:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4: failure<br>
 &nbsp;&nbsp; Descr="Current status of the entire library system"<br>
 </div>
-<p></p>
 <p><b><font size="+2"><br>
 Converting a MIB file</font></b> </p>
 <p>See the <span style="font-weight: bold;">snmpttconvertmib </span>help
@@ -2790,7 +2941,6 @@ installed and you want more descriptive variable descriptions, add <span
  style="font-weight: bold;">--net_snmp_perl</span> to the command line.<br>
 </div>
 <blockquote style="margin-left: 80px;"><b> </b></blockquote>
-<b></b>
 <p><b><font size="+2">How it works</font></b> <br>
 &nbsp;<br>
 Some MIB files contain <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b>
@@ -2813,11 +2963,11 @@ ensure the correct MIB file is accessed.<br>
 <p>The mib file is also searched for lines containing <b>TRAP-TYPE </b>or<font
  size="+1">NOTIFICATION-TYPE</font>.&nbsp; If it finds one that appears
 to be a valid trap definition, it reads in the following lines until a
-::= is found while looking for the <b></b><b>DESCRIPTION</b>
+::= is found while looking for the <b>DESCRIPTION</b>
 section.&nbsp; It then looks for the <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b>
 line if enabled.<br>
 </p>
-<p><b></b><b>SNMPTRANSLATE</b> is used with the following syntax to
+<p><b>SNMPTRANSLATE</b> is used with the following syntax to
 find
 the <b>OID</b> of the trap: </p>
 <p><b>snmptranslate -IR -Ts <i>mib-name::</i><i>trapname</i> -m <span
@@ -2825,7 +2975,6 @@ the <b>OID</b> of the trap: </p>
 <p>Note: If&nbsp; Net-SNMP 5.0.2 or newer is detected, the command line
 also includes the -On switch.&nbsp; See the <a
  href="file:///h:/cvs/snmptt/readme.html#FAQ-Troubleshooting">FAQ</a>.</p>
-<p></p>
 <p><span style="font-weight: bold;">* </span>If <b>--#SUMMARY</b> and
 <b>--#ARGUMENTS</b>
 are found, the <b>%<i>letter</i></b> variables are replaced with <b>$<i>number</i></b>
