@@ -134,9 +134,14 @@ while (defined($line = <>))
 	# IP address).  If there is no variable name on the line (only
 	# one string), then add a variable string called 'variable' so 
 	# it is handled correctly in the next section.
+	# This happens with ucd-snmp v4.2.3 but not v4.2.1 or v4.2.5.
+	# This appears to be a bug in ucd-snmp v4.2.3.  This works around
+	# the problem although v4.2.3 should NOT be used with SNMPTT as 
+	# it prevents SNMP V2 traps from being handled correctly.
         if (@temp[1] eq "")
         {
-                print "only one string detected\n";
+                print "Data passed from snmptrapd is incorrect.  UCD-SNMP 
+			v4.2.3 is known to cause this\n";
                 @temp[1] = @temp[0];
                 @temp[0] = "variable";
         }
@@ -161,25 +166,38 @@ if (DEBUGGING >= 2)
 @var[0] = @tempvar[0];		# hostname
 @var[1] = @tempvar[1];		# ip address
 @var[2] = @tempvar[3];		# uptime
-@var[3] = @tempvar[5];		# trapname / OID
+@var[3] = @tempvar[5];		# trapname / OID - assume first value after uptime is
+				# the trap OID (value for .1.3.6.1.6.3.1.1.4.1.0)
 
-# Enterprise variables passed (remainder minus last three)
+@var[4] = "";	# Clear ip address from trap agent
+@var[5] = "";	# Clear trap community string
+@var[6] = "";	# Clear enterprise
+
+# Cycle through remaining variables searching for for agent IP (.1.3.6.1.6.3.18.1.3.0),
+# community name (.1.3.6.1.6.3.18.1.4.0) and enterpise (.1.3.6.1.6.3.1.1.4.3.0)
+# All others found are regular passed variables
 $j=0;
-for ($i=7;$i <= $#tempvar-6;$i+=2)
+for ($i=6;$i <= $#tempvar; $i+=2)
 {
-	@entvar[$j] = @tempvar[$i];
-	$j++;
+	if (@tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.3.0$/)		# ip address from trap agent
+	{
+		@var[4] = @tempvar[$i+1];
+	}
+	elsif (@tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.4.0$/)	# trap community string
+	{
+		@var[5] = @tempvar[$i+1];
+	}
+	elsif (@tempvar[$i] =~ /^.1.3.6.1.6.3.1.1.4.3.0$/)	# enterprise
+	{
+		@var[6] = @tempvar[$i+1];
+	}
+	else	# application specific variables
+	{
+		@entvar[$j] = @tempvar[$i+1];
+		$j++;
+	}
+	
 }
-
-# Remaining standard variables
-# Note:  It is assumed that the last three var binds will be the ip address,
-# trap community string and enterprise.  The C source shows this is true for
-# SNMP v1 traps (which get converted to SNMP v2 traps), so I am currently 
-# assuming that REAL SNMP v2 traps also have this format
-
-@var[4] = @tempvar[$#tempvar-4];	# ip address from trap agent
-@var[5] = @tempvar[$#tempvar-2];	# trap community string
-@var[6] = @tempvar[$#tempvar];		# enterprise
 
 if (DEBUGGING >= 1)
 {

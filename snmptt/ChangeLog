@@ -6,9 +6,11 @@ June 15th, 2002: Alex Burger <alex_b@users.sourceforge.net>
   v4.2.5.  SNMPTT can work around it but v4.2.3 should NOT be
   used with SNMPTT especially if SNMP V2 traps are being used.
 
-- SNMP V2 traps have problem as SNMPTT assumes that the agent 
-  IP address, community name and enterprise will always 
-  be passed last from SNMPTRAPD.  This needs further investigation.
+- Fixed bug when receiving SNMP V2 traps.  SNMPTT was assuming
+  the last three variables were the agent IP, community name
+  and enterprise, which was incorrect.  It now looks for 
+  specific OIDs.  UCD-SNMP V4.2.3 should not be used due
+  to the bug mentioned above.
 
 June 13th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Bug fix with $s - Severity.  Thanks to Hugues Mertens
