@@ -1,3 +1,6 @@
+February 27th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed error messages for SQL and NT event ID numbers.  Udpated docs
+
 February 25th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Updated keep_unlogged_traps option to have SNMPTT erase the spooled trap
   file only after it successfully logs to at least one or all log systems. 

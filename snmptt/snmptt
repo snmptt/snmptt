@@ -808,17 +808,17 @@ sub processtrap
 					\'$event2[1]\',\'$event2[2]\',\'@var[2]\',\'".$trap_date_time."\',
 					\'$message\')" ) ) )
 					{
-					  warn "DBI DBD:ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr."\n";
+					  warn "DBI DBD::ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr."\n";
 
 					  if ($syslog_system_enable == 1)
 					  {
-					    syslog_system("DBI DBD:ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr);
+					    syslog_system("DBI DBD::ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr);
 					  }
 					  
 					  if ($eventlog_system_enable == 1)
 					  {
-					    eventlog_system("DBI DBD:ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr,
-					    		15,$eventlog_error);
+					    eventlog_system("DBI DBD::ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr,
+					    		16,$eventlog_error);
 					  }
 
 					}
@@ -846,7 +846,7 @@ sub processtrap
 				  
 				  if ($eventlog_system_enable == 1)
 				  {
-				    eventlog_system("SQL error: Unable to perform INSERT INTO: ".Win32::ODBC::Error(),
+				    eventlog_system("Win32::ODBC error: Unable to perform INSERT INTO: ".Win32::ODBC::Error(),
 				    17,$eventlog_error);
 				  }
 				}

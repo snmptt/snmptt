@@ -10,7 +10,7 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.5.1</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; February 25th, 2003
+<br>This file was last updated on:&nbsp; February 27th, 2003
 <p>&nbsp;<a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote>&nbsp;<a href="#What is it">What is it?</a>
@@ -418,8 +418,8 @@ The following errors are logged:
 <br>Finished loading <i>x</i> lines from <i>snmpttconfigfile</i> <b>(*)</b>
 <br>MySQL error: Unable to connect to database
 <br>Can not open log file <i>logfile</i>
-<br>MySQL error: Unable to prepare query
-<br>MySQL error: Unable to execute query
+<br>MySQL error: Unable to perform INSERT INTO
+<br>DBI DBD::ODBC error: Unable to perform INSERT INTO
 <p><b>* (daemon mode only)</b></blockquote>
 <a NAME="LoggingEventLog"></a><b><font size=+2>Logging - EventLog</font></b>
 <p>Translated traps can also be sent to the NT EventLog.&nbsp; All traps
@@ -448,9 +448,9 @@ The following errors are logged:
 <br>EventID 12: MySQL error: Unable to connect to database
 <br>EventID 13: SQL error: Unable to connect to DSN <i>dsn</i>
 <br>EventID 14: Can not open log file <i>logfile</i>
-<br>EventID 15: MySQL error: Unable to prepare query
-<br>EventID 16: MySQL error: Unable to execute query
-<br>EventID 17: SQL error: Unable to perform INSERT INTO
+<br>EventID 15: MySQL error: Unable to perform INSERT INTO
+<br>EventID 16: DBI DBD::ODBC error: Unable to perform INSERT INTO
+<br>EventID 17: Win32::ODBC error: Unable to perform INSERT INTO
 <p><b>* (daemon mode only)</b></blockquote>
 Note:
 <blockquote>To prevent "Event Message Not Found" messages in the Event
@@ -1296,7 +1296,8 @@ statements etc.&nbsp; This is why snmptranslate is used.
 variables are replaced with <b>$<i>number</i></b> variables based on the
 values lists in the <b>--#ARGUMENTS</b> section incremented by 1 (ARGUMENTS
 starts with 0, SNMPTT starts with 1).&nbsp; This will be used to define
-the <b>FORMAT</b> and <b>EXEC</b> lines.
+the
+<b>FORMAT</b> and <b>EXEC</b> lines.
 <p>If there is no <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, but
 the first line of the <b>DESCRIPTION</b> contains <b>%<i>letter</i></b>
 variables, then that line will be used to define the <b>FORMAT</b> and
