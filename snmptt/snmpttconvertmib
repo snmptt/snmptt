@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v0.3.1
+# SNMPTTCONVERTMIB v0.3.2
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -48,7 +48,7 @@ $prepend_type = 1;
 #############################################################################
 #
 
-$snmpttconvertmib_version = "v0.3.1";
+$snmpttconvertmib_version = "v0.3.2";
 
 sub showversion
 {
@@ -146,13 +146,12 @@ if (($input eq "") || ($output eq ""))
 
 if ($net_snmp_perl == 1)
 {  
-  print "\n\n*****  Using UCD-SNMP / NET-SNMP Perl module *****\n\n";
+  print "\n\n*****  UCD-SNMP / NET-SNMP Perl module enabled *****\n\n";
 }
-else
-{
-  print "\n\n*****  Processing MIB file WITHOUT using UCD-SNMP / NET-SNMP Perl module *****\n\n";
-  check_snmptranslate_version();
-}
+
+print "\n\n*****  Processing MIB file *****\n\n";
+check_snmptranslate_version();
+
 
 print "severity: $severity\n";
 print "\nFile to load is:	$input\n";
@@ -736,7 +735,7 @@ if (1)
           }
 	  
 	  # If net_snmp_perl is enabled, lookup each variable
-	  if (@variables ne "" && $no_variables == 0 && $net_snmp_perl == 1)
+	  if (@variables && $no_variables == 0 && $net_snmp_perl == 1)
 	  {
 	    print OUTPUTFILE "Variables:\n";
 	    for ($i=0; $i <= $#variables; $i++)
@@ -761,8 +760,10 @@ if (1)
 		  print OUTPUTFILE "       " . $c . ": $temphash{$c}\n";
 		}
 	      }
-	      
-	      print OUTPUTFILE "     Descr=\"" . $SNMP::MIB{$variables[$i]}{description} . "\"\n";
+	      if ($SNMP::MIB{$variables[$i]}{description})
+	      {
+		print OUTPUTFILE "     Descr=\"" . $SNMP::MIB{$variables[$i]}{description} . "\"\n";
+	      }
 	    }
 	  }
 	  
