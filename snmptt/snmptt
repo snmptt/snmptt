@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v0.3
+# SNMPTT v0.3.1
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -134,7 +134,7 @@ $DEBUGGINGFILE = '';				# STDOUT
 
 sub showversion
 {
-	print "\nSNMPTT v0.3\n";
+	print "\nSNMPTT v0.3.1\n";
 	print "(c) 2002 Alex Burger\n";
 	print "http://snmptt.sourceforge.net\n\n";
 }
@@ -669,7 +669,7 @@ sub substitute
 	
 	# $x - Current time
 	$now = scalar(localtime);
-	s(\$r)($now)g;
+	s(\$x)($now)g;
 	
 	# $* - Expand all variable-bindings
 	s(\$\*)(@entvar)g;
