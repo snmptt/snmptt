@@ -1882,7 +1882,7 @@ sub readtrap
 
 	if ($DEBUGGING >= 2) 
 	{	  
-	  print "Reading trap\n";
+	  print "Reading trap.  Current time: " . scalar(localtime()). "\n";
 	}
 	
 	if ( $daemon == 1)
