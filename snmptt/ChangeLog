@@ -1,4 +1,6 @@
 April 15th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added ability to reload configuration files by adding a
+  file called '!reload' to the spool directory
 - Added support for symbolic OIDs from snmptrapd
 
 April 12th, 2003: Alex Burger <alex_b@users.sourceforge.net>

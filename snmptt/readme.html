@@ -176,39 +176,37 @@ translate_trap_oid </span>or <span style="font-weight: bold;">translate_oids.<br
 <p><b><font size="+1">0.7 - ??</font></b><b><font size="+1">, 2003</font></b></p>
 <ul>
   <li>Added the ability for traps passed from <span
- style="font-weight: bold;">snmptrapd </span>to contain symbolic OIDs
-such as <span style="font-weight: bold;">linkDown</span> and <span
+ style="font-weight: bold;">snmptrapd </span>or loaded from the <span
+ style="font-weight: bold;">snmptt.conf</span> files to contain symbolic
+OIDs such as <span style="font-weight: bold;">linkDown</span> and <span
  style="font-weight: bold;">IF-MIB::linkUp</span>.&nbsp; This feature
-requires the UCD-SNMP / NET-SNMP Perl module</li>
-  <li>Added the ability to read <span style="font-weight: bold;">snmptt.conf</span>
-files that contain symbolic trap OIDs such as <span
- style="font-weight: bold;">linkDown</span> and <span
- style="font-weight: bold;">IF-MIB::linkUp</span>.&nbsp; This feature
-requires the UCD-SNMP / NET-SNMP Perl module</li>
+requires the UCD-SNMP / NET-SNMP Perl module<br>
+  </li>
   <li> Added the configuration options <b>translate_trap_oid</b> and <span
- style="font-weight: bold;">translate_oids </span>to allow the trap
-OID and OID values contained in the trap variables to be converted from
+ style="font-weight: bold;">translate_oids </span>to have the trap OID
+and OID values contained in the trap variables to be converted from
 numerical OID to symbolic form before logging.&nbsp; This feature
 requires the UCD-SNMP / NET-SNMP Perl module</li>
+  <li>Added support for logging of traps using PostgreSQL via DBI /
+DBD::PgPP</li>
   <li>Added REGEX keyword support to allow user definable search and
 replace on FORMAT / EXEC lines<br>
-  </li>
-  <li>Fixed bug that prevented quoted text from being logged correctly
-to SQL databases</li>
-  <li>Back ticks (`) in recived trap is now replaced with forward ticks
-(')<br>
-  </li>
-  <li>Fixed bug that would prevent the translation of integer values to
-enumeration tags and variable name substitutions when using Net-SNMP
-5.0.x<br>
   </li>
   <li>NODES entry can now contain a CIDR address (eg: 192.168.10.0/23),
 or a network range (192.168.10.0-192.168.11.255)<br>
   </li>
   <li>NODES entry can now contain a mix of host names, IP addresses,
 CIDR addresses, network ranges and filenames</li>
-  <li> Added support for logging of traps using PostgreSQL via DBI /
-DBD::PgPP</li>
+  <li>Added the ability to force a reload of the configuration files
+while running in daemon mode by adding a file called <span
+ style="font-weight: bold;">!reload</span> to the spool directory</li>
+  <li>Back ticks (`) in recived trap are now replaced with forward
+ticks (')</li>
+  <li>Fixed bug that prevented quoted text from being logged correctly
+to SQL databases</li>
+  <li>Fixed bug that would prevent the translation of integer values to
+enumeration tags and variable name substitutions when using Net-SNMP
+5.0.x</li>
   <li>Snmpttconvertmib</li>
   <ul>
     <li>FORMAT / EXEC line can now contain any of the following:</li>
@@ -464,6 +462,7 @@ Unable to open spool dir <i>x</i> <b>(*)</b> <br>
 Unable to read spool dir <i>x</i> <b>(*)</b> <br>
 Could not open trap file <i>x</i> <b>(*)</b> <br>
 Unable to delete trap file <i>x</i> from spool dir <b>(*)</b> <br>
+Unable to delete !reload file spool dir <b>(*)</b><br>
 Reloading configuration file(s) <b>(*)</b> <br>
 SNMPTT (version) shutdown <b>(*)</b> <br>
 Loading <i>snmpttconfigfile</i> <b>(*)</b> <br>
@@ -499,6 +498,7 @@ EventID 4: Unable to open spool dir <i>x</i> <b>(*)</b> <br>
 EventID 5: Unable to read spool dir <i>x</i> <b>(*)</b> <br>
 EventID 6: Could not open trap file <i>x</i> <b>(*)</b> <br>
 EventID 7: Unable to delete trap file <i>x</i> from spool dir <b>(*)</b> <br>
+EventID 20: Unable to delete !reload file spool dir <b>(*)</b><br>
 EventID 8: Reloading configuration file(s) <b>(*)</b> <br>
 EventID 1: SNMPTT (version) shutdown <b>(*)</b> <br>
 EventID 9: Loading <i>snmpttconfigfile</i> <b>(*)</b> <br>
@@ -751,9 +751,19 @@ result in inaccurate time stamps in log files due to the length of time
 SNMPTT sleeps between spool directory polling. </p>
 <p>Note:&nbsp; When running on a <b>non</b> Windows platform, SNMPTT
 will fork to the background if <b>daemon_fork</b> is set to 1. <br>
-&nbsp; </p>
-<p><a name="Command-line-arguments"></a><b><font size="+2">Command line
-arguments</font></b> </p>
+</p>
+<p>Sending the HUP signal to SNMPTT when running as a daemon will cause
+it to reload the configuration file including the .ini file and any
+snmptt.conf files listed in the .ini file.&nbsp; A reload can also be
+forced by adding a file to the spool directory called <span
+ style="font-weight: bold;">!reload</span>.&nbsp; The filename is <span
+ style="font-weight: bold;">not </span>case sensitive.&nbsp; If this
+file is detected, it will flag a reload to occur and will delete the
+file.&nbsp; This would be the only way to cause a reload when using
+Windows.<br>
+</p>
+<p>&nbsp; <a name="Command-line-arguments"></a><b><font size="+2">Command
+line arguments</font></b> </p>
 <p>The following command line arguments are supported: </p>
 <p>Usage: <br>
 &nbsp;&nbsp;&nbsp; snmptt [&lt;options&gt;] <br>

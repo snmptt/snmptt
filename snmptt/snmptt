@@ -404,7 +404,30 @@ if ($daemon == 1)
 		  {
 		    next if ($file eq ".");
 		    next if ($file eq "..");
-		    
+
+		    if (lc($file) eq "!reload")
+		    {
+		      $timetoreload = 1;
+		      unless (unlink($file))		      
+		      {
+			if ($DEBUGGING >= 1)
+			{
+			  print "Unable to delete !reload file from spool dir:$!\n";
+			}
+			warn "Unable to delete !reload file from spool dir:$!\n";
+			
+			if ($syslog_system_enable == 1)
+			{
+			  syslog_system("Unable to delete !reload file from spool dir");
+			}
+			if ($eventlog_system_enable == 1)
+			{
+			  eventlog_system("Unable to delete !reload file from spool dir",20,$eventlog_error);
+			}
+		      }
+		      next;
+		    }
+
 		    if ($DEBUGGING >= 1)
 		    {
 		      print "Processing file: $file\n";
@@ -444,7 +467,6 @@ if ($daemon == 1)
 		      if ($keep_unlogged_traps == 0 || $trap_successfully_logged == 1)
 		      {
 			unless (unlink($file))
-			
 			{
 			  if ($DEBUGGING >= 1)
 			  {
