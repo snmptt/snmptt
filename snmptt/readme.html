@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.1</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; April 22nd, 2003
+This file was last updated on:&nbsp; April 25th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -181,8 +181,7 @@ traps using symbolic form, or you enable the options <span
  size="+1">, 2003</font></b></p>
 <ul>
   <li>Agent IP address is now used instead of 'host' IP address for
-NODES matches, the 'hostname' column in database logs and the $A
-variable</li>
+NODES matches, the 'hostname' column in database logs and the $A variable</li>
   <li>Variable $A now prints the agent host name.&nbsp; $aA prints the
 agent IP address.</li>
   <li>Variable $E now prints the enterprise in symbolic form.&nbsp; $e
@@ -213,8 +212,15 @@ and $e is always the numerical enterprise OID</li>
   </li>
   <li>Added <span style="font-weight: bold;">MATCH </span>keyword
 support to allow trap matching based on values contained inside the trap
-enterprise variables<br>
-  </li>
+enterprise variables</li>
+  <li>Snmpttconvertmib</li>
+  <ul>
+    <li>Now prints the variables contained in each trap unless
+--no_variables is set.&nbsp; When using --net_snmp_perl it will also
+resolve the Syntax (INTEGER, OCTETSTR etc) and Description.&nbsp; If
+it's an INTEGER, will also print out the enumeration tags if any exist.<br>
+    </li>
+  </ul>
 </ul>
 <p><br>
 <b><font size="+1">0.7</font></b><b><font size="+1"> - April 17th</font></b><b><font
@@ -1472,12 +1478,11 @@ agent (agent).<br>
 <br>
 If the configuration setting <span style="font-weight: bold;">dns_enabled</span>
 is set to 0 (dns disabled), then the host name of the AGENT will not be
-available for the $A variable, NODES matches, and the hostname column
-in SQL databases.&nbsp; The only exception to this is if the (host) IP
+available for the $A variable, NODES matches, and the hostname column in
+SQL databases.&nbsp; The only exception to this is if the (host) IP
 address matches the (agent) IP address and snmptrapd is configured to
-resolve host names.&nbsp; In that case, the host name of the (host)
-will be used for the (agent) host name as they are obviously the same
-host.<br>
+resolve host names.&nbsp; In that case, the host name of the (host) will
+be used for the (agent) host name as they are obviously the same host.<br>
 <br>
 If the configuration setting <span style="font-weight: bold;">dns_enabled</span>
 is set to 1 (dns enabled), then the host name of both the host and the
@@ -1485,8 +1490,8 @@ AGENT will be resolved via DNS.&nbsp; NODES entries will also be
 resolved to IP addresses before performing matches.<br>
 <br>
 The host name may resolve to the Fully Qualified Domain Name
-(FQDN).&nbsp; For example: barney.bedrock.com.&nbsp; Adding an entry
-for the host in your /etc/hosts file or
+(FQDN).&nbsp; For example: barney.bedrock.com.&nbsp; Adding an entry for
+the host in your /etc/hosts file or
 %systemroot%\system32\drivers\etc\hosts may result in the short name
 being used instead (barney).&nbsp; You can also enable the <b>strip_domain</b>
 / <b>strip_domain_list</b> options to have SNMPTT strip the domain of
@@ -1496,8 +1501,8 @@ To allow IP addresses to be resolved to host names, PTR records must
 exist in DNS or the local hosts file must contain all hosts.<br>
 <br>
 <span style="font-weight: bold; text-decoration: underline;">It is
-recommended that either DNS be installed on the machine running SNMPTT
-/ snmptrapd or a local hosts file be configured will all devices</span>.&nbsp;
+recommended that either DNS be installed on the machine running SNMPTT /
+snmptrapd or a local hosts file be configured will all devices</span>.&nbsp;
 DNS should be configured as a secondary (authoritive) for the domains
 that it will receive traps from.&nbsp; This will reduce network
 resolution traffic, speed up resolution, and remove the dependency of

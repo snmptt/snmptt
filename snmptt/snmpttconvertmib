@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v0.3
+# SNMPTTCONVERTMIB v0.3.1
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -48,7 +48,7 @@ $prepend_type = 1;
 #############################################################################
 #
 
-$snmpttconvertmib_version = "v0.3";
+$snmpttconvertmib_version = "v0.3.1";
 
 sub showversion
 {
@@ -75,6 +75,7 @@ $out = '';
 $mibdir = '/usr/share/snmp/mibs/';
 $nodes = '';
 $no_description = 0;
+$no_variables = 0;
 $no_format_summary = 0;
 $no_format_desc = 0;
 $format = 0;
@@ -94,6 +95,7 @@ GetOptions 	('version' => \$version,
 		'mibdir=s' => \$mibdir,
 		'nodes=s' => \$nodes,
 		'no_description' => \$no_description,
+		'no_variables' => \$no_variables,
 		'no_format_summary' => \$no_format_summary,
 		'no_format_desc' => \$no_format_desc,
 		'no_severity' => \$no_severity,
@@ -127,6 +129,7 @@ Options:
 			 name of the nodes file.  Use quotes for multiple
 			 entries.  See NODES section in readme.html for examples
   --no_description	 Do not save the description
+  --no_variables	 Do not save the variable list in the description
   --no_format_summary	 Do not use the --#SUMMARY lines for FORMAT \/ EXEC
   --no_format_desc	 Do not use the description line for FORMAT \/ EXEC
   --no_severity 	 Do not use the --#SEVERITY line for EVENT line.  Default
@@ -195,8 +198,9 @@ if (($input eq "") || ($output eq ""))
 if ($net_snmp_perl == 1)
 {
   require SNMP;
-  $SNMP::save_descriptions = 0;	# Don't need them - process by hand
-  # to be able to pull out the SUMMARY lines
+  $SNMP::save_descriptions = 1;	# Need them only for looking up variable descriptions. 
+                                # Do TRAP definition by hand to be able to pull out 
+				# the SUMMARY lines
   &SNMP::addMibDirs($mibdir);
   &SNMP::setMib($input);
   
@@ -273,6 +277,7 @@ if ($net_snmp_perl == 0)
       }
       
       $enterprisefound =0;
+      @variables = ();
       
       # If the TRAP-TYPE / NOTIFICATION-TYPE line starts with white space, it's probably a import line, so ignore
       if ( $line =~ /^\s+TRAP-TYPE.*/ || $line =~ /^\s+NOTIFICATION-TYPE.*/  ||
@@ -330,7 +335,47 @@ if ($net_snmp_perl == 0)
           $enterprise = $1;
           $enterprisefound =1;
         }
-        
+
+        if ($line3 =~ /VARIABLES(.*)/s)
+        {
+	  # If there is more text after the word VARIABLES, assume it's the start of
+	  # the variable list
+	  my $templine = "";
+	  if ($1 ne "")
+          {
+            $templine = $templine . $1;
+	  }
+	  
+	  if ($templine =~ /(.*)\}$/)	# Ends with a }, so we're done
+	  {
+	    # DONE!
+	  }
+	  else
+	  {
+	    $currentline++; # Increment to the next line
+	    my $line4 = $mibfile[$currentline];
+	    my $keepdigging = 1;
+	    while ($keepdigging == 1)
+	    {
+	      if ($line4 =~ /(.*)\}$/)	# Ends with a }, so we're done
+	      {
+		$templine = $templine . $line4;
+		$keepdigging = 0;
+	      }
+	      else
+	      {
+		$templine = $templine . $line4;
+		$currentline++; # Increment to the next line
+		$line4 = $mibfile[$currentline];
+	      }
+	    }
+	  }
+	  $templine =~ s/\s//g;	# Remove any white space
+	  $templine =~ /\{(.*)\}/;
+	  @variables = split /\,/, $1;
+	  print "Variables: @variables\n";
+	}
+	
         if ($line3 =~ /DESCRIPTION(.*)/s)
         {
           $temp1 = 0;
@@ -702,6 +747,15 @@ if ($net_snmp_perl == 0)
           {
             print OUTPUTFILE "$description[$i]";
           }
+
+	  if (@variables ne "" && $no_variables == 0)
+	  {
+	    print OUTPUTFILE "Variables:\n";
+	    for ($i=0; $i <= $#variables; $i++)
+	    {
+	      print OUTPUTFILE "  " . ($i+1) . ": " . $variables[$i] . "\n";
+	    }
+	  }
           print OUTPUTFILE "EDESC\n";
         }
         
@@ -776,6 +830,7 @@ else
           $line3 = $mibfile[$currentline];
           
           $end_of_definition = 0;
+	  @variables = ();
           
           while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ )
           && !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) && ($end_of_definition == 0) )
@@ -790,6 +845,46 @@ else
 	    $trapsummary = "";
 	    @description = ();
 	    $trap_severity = $severity;
+
+            if ($line3 =~ /VARIABLES(.*)/s)
+            {
+	      # If there is more text after the word VARIABLES, assume it's the start of
+	      # the variable list
+	      my $templine = "";
+	      if ($1 ne "")
+	      {
+		$templine = $templine . $1;
+	      }
+	      
+	      if ($templine =~ /(.*)\}$/)	# Ends with a }, so we're done
+	      {
+		# DONE!
+	      }
+	      else
+	      {
+		$currentline++; # Increment to the next line
+		my $line4 = $mibfile[$currentline];
+		my $keepdigging = 1;
+		while ($keepdigging == 1)
+		{
+		  if ($line4 =~ /(.*)\}$/)	# Ends with a }, so we're done
+		  {
+		    $templine = $templine . $line4;
+		    $keepdigging = 0;
+		  }
+		  else
+		  {
+		    $templine = $templine . $line4;
+		    $currentline++; # Increment to the next line
+		    $line4 = $mibfile[$currentline];
+		  }
+		}
+	      }
+	      $templine =~ s/\s//g;	# Remove any white space
+	      $templine =~ /\{(.*)\}/;
+	      @variables = split /\,/, $1;
+	      print "Variables: @variables\n";
+	    }
 	    
             if ($line3 =~ /DESCRIPTION(.*)/s)
             {
@@ -1143,6 +1238,28 @@ else
               {
                 print OUTPUTFILE "$description[$i]";
               }
+	      if (@variables ne "" && $no_variables == 0)
+	      {
+		print OUTPUTFILE "Variables:\n";
+		for ($i=0; $i <= $#variables; $i++)
+		{
+		  print OUTPUTFILE "  " . ($i+1) . ": " . $variables[$i] . "\n";
+		  print OUTPUTFILE "     Syntax=\"" . $SNMP::MIB{$variables[$i]}{type} . "\"\n";
+		  if (uc $SNMP::MIB{$variables[$i]}{type} =~ /INTEGER/)
+		  {
+		    my $b = $SNMP::MIB{$variables[$i]}{enums};
+		    my %hash = %$b;
+		    my $i = 1;
+		    foreach $c (keys %hash)
+		    {
+		      print OUTPUTFILE "       " . $i . ": $c\n";
+		      $i++;
+		    }
+		  }
+
+		  print OUTPUTFILE "     Descr=\"" . $SNMP::MIB{$variables[$i]}{description} . "\"\n";
+		}
+	      }
               print OUTPUTFILE "EDESC\n";
             }
             

@@ -1,3 +1,9 @@
+April 25th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Snmpttconvertmib:  Now prints the variables contained in each
+  trap unless --no_variables is set.  When using --net_snmp_perl
+  it will also resolve the Syntax (INTEGER, OCTETSTR etc) and 
+  description.  If it's an INTEGER, will also print out the enums.  
+
 April 23rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added my_getType and my_mapEnum functions.  Both attempt to use the
   numeric OID first.  If that fails, then it converts the OID to a short
