@@ -119,8 +119,9 @@ $DEBUGGINGFILE = '';				# STDOUT
 
 sub showversion
 {
-	printf "\nSNMPTT v0.2.2\n";
-	printf "(c) 2002 Alex Burger\n\n";
+	print "\nSNMPTT v0.2.2\n";
+	print "(c) 2002 Alex Burger\n";
+	print "http://snmptt.sourceforge.net\n\n";
 }
 
 ##############################################################################
