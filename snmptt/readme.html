@@ -35,7 +35,7 @@ for use with the NET-SNMP / UCD-SNMP snmptrapd program (<a href="http://www.net-
 The format of the log is basically variable = value, variable = value,
 variable = value etc.&nbsp; A more descriptive / friendly trap message
 can be created using SNMPTT's variable subtitution.
-<p>For example, receiving the trap .1.3.6.1.4.1.232.0.3017 trap from a
+<p>For example, receiving the trap .1.3.6.1.4.1.232.0.3017 from a
 Compaq server running the Compaq Insight Agents could result in the following
 message from SNMPTT:
 <p>"Compaq Drive Array Spare Drive on controller 3, bus 0, bay 3 status
@@ -92,11 +92,11 @@ included in the NET-SNMP package.
 <p><b><font size=+2>Logging</font></b>
 <p>Translated traps can be sent to a log file.&nbsp; The format of the
 log entry is:
-<p>date trap-oid severity category hostname translated-trap
+<p><b>date trap-oid severity category hostname translated-trap</b>
 <p>Translated traps can also be sent to syslog.&nbsp; The format of the
 entries will be similar to above without the date (as syslogd logs the
 date):
-<p>trap-oid severity category hostname translated-trap
+<p><b>trap-oid severity category hostname translated-trap</b>
 <p>The syslog facility and level is configurable.
 <p>Logging of non recognized traps is also possible.&nbsp; This would be
 used mainly for troubleshooting purposes.
@@ -106,15 +106,15 @@ used mainly for troubleshooting purposes.
 The command line is defined in the configuration file.&nbsp; For example,
 to send a page using QPAGE (<a href="http://www.qpage.org">http://www.qpage.org</a>),
 the following command line could be used:
-<p>qpage -f TRAP notifygroup1 "$r $x Compaq Drive Array Spare Drive on
-controller $4, bus $5, bay $6 status is $3."
+<p><b>qpage -f TRAP notifygroup1 "$r $x Compaq Drive Array Spare Drive on
+controller $4, bus $5, bay $6 status is $3."</b>
 <p>$r is translated to the hostname, and $x is the current time (described
 in detail below)
 <br>&nbsp;
 <p><b><font size=+2>Configuration Options</font></b>
 <p>As mentioned in the INSTALLATION section below, configuration options
 are set by editing the options between OPTIONS START and OPTIONS END in
-snmptt.
+the snmptt script.
 <br>&nbsp;
 <p><b><font size=+2>Command line arguments</font></b>
 <p>The following command line arguments are supported:
