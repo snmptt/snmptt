@@ -1,3 +1,8 @@
+September 4rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Finished fix for translate_value_oids_sub.  Both while loops now
+  have a break out to prevent an infinit loop, although it should
+  not occur..
+
 September 3rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added support for i, g and e modifiers for REGEX
 - Fix translate_value_oids_sub.  If string contained multiple OIDs,

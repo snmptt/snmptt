@@ -2953,8 +2953,11 @@ sub translate_value_oids_sub
     my $string_temp = $string;
     my @oids = ();
     my $done = 1;
+    my $noinf = 0;
 
     # Find any IP addresses and remove from $string_temp
+    
+    $noinf = 0;
     while ($done)
     {
       if ($string_temp =~ /(?<!\.)(\d+\.\d+\.\d+\.\d+)(?!\.)/ ) { $found = 1; }
@@ -2962,37 +2965,60 @@ sub translate_value_oids_sub
 
       if ($found)
       {
-	print "ip:$&\n";
+	#print "ip:$&\n";
 	$string_temp =~ s/(?<!\.)$1(?!\.)//g;	# Remove IP from string_temp
       }
       else
       {
 	$done = 0;
       }
+      $noinf++;
+      if ($noinf >= 100) # Safe guard to make sure regex pattern search / replace doesn't cause an
+                         # infinit loop in the while.  Shouldn't, but just in case..
+      {
+	$done = 0;
+        if ($DEBUGGING >= 2)
+        {
+          print "  Possible infinit loop (1) in translate_value_oids_sub averted.\n";
+        }
+      }
     }
 
     # Find all the OIDs and put them in a @oids array, and remove from $string_temp
     $done = 1;
     my $oid_found = 0;
+    $noinf = 0;
     while ($done)
     {   
-      if ($string_temp =~ /(?<!\.|\d)(\.\d+)+(?!\.)/) {	$found = 1; }
+      if ($string_temp =~ /(?<!\d)(\.\d+)+/) {	$found = 1; }  # don't match n.n.n but do match .n.n.n
       else { $found = 0; }
 
       if ($found)
       {
 	my $oid = $&;
 	push (@oids, $oid);
-	print "oid:$oid\n";
-	$string_temp =~ s/(?<!\.|\d)$oid(?!\.)//g;	# Remove OID from string_temp
+	#print "oid:$oid\n";
+	#print "\$string_temp before: $string_temp\n";
+	$string_temp =~ s/(?<!\d)$oid(?!\.\d)//g;	# Remove OID from string_temp
+	#print "\$string_temp after : $string_temp\n";
 	$oid_found = 1;
       }
       else
       {
 	$done = 0;
       }
+      $noinf++;
+      if ($noinf >= 100) # Safe guard to make sure regex pattern search / replace doesn't cause an
+                         # infinit loop in the while.  Shouldn't, but just in case..
+      {
+	$done = 0;
+        if ($DEBUGGING >= 2)
+        {
+          print "  Possible infinit loop (2) in translate_value_oids_sub averted.\n";
+        }
+      }
     }
-    #die();
+
     if ($oid_found == 1 && $DEBUGGING >= 2)
     {
       print "  Value contains an OID.\n";
@@ -3002,7 +3028,7 @@ sub translate_value_oids_sub
     # converted OIDs.  Probably not needed due to look ahead and behind expression below
     @oids = reverse sort(@oids);
  
-    print "oids: @oids\n";
+    #print "oids: @oids\n";
      
     # Replace all OIDs in $string with textual names if possible
     foreach my $oid (@oids)
@@ -3010,7 +3036,7 @@ sub translate_value_oids_sub
       my $temp = my_translateObj($oid,$translate_value_oids);
       if (defined ($temp))
       {
-	$string =~ s/(?<!\.|\d)$oid(?!\.)/$temp/g;
+	$string =~ s/(?<!\.|\d)$oid(?!\.\d)/$temp/g;
 	if ($oid_found == 1 && $DEBUGGING >= 2)
 	{
 	  print "    OID: $oid=$temp\n";
