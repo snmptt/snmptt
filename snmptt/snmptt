@@ -695,6 +695,7 @@ sub processtrap
 			}
 
 			$trap_successfully_logged = 0;
+			$trap_attempted_to_log = 1;
 			if ($log_enable == 1)
 			{
 				if (open LOGFILE, ">>$log_file")
@@ -1533,6 +1534,7 @@ sub searchfortrap
 	
 	$processed = 0;
 	$receivedtrap = @var[3];
+	$trap_attempted_to_log = 0;
 	
 	# Check for exact match
 	if (exists $event{"$receivedtrap"})
@@ -1615,6 +1617,13 @@ sub searchfortrap
 			}
 		}
 	}
+	
+	if ($trap_attempted_to_log == 0)
+	{
+	  $trap_successfully_logged = 1;	# If we didn't even try to log, set it as a successful
+	  					# log so the trap file gets deleted from the spool dir
+	}
+
 }
 
 sub findsnmpttini
