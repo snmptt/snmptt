@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; September 3rd, 2003
+This file was last updated on:&nbsp; September 4th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -213,9 +213,12 @@ enterprise variables</li>
   <li><span style="font-weight: bold;">REGEX </span>now supports
 substitution with captures and the modifiers <span
  style="font-weight: bold;">i</span>, <span style="font-weight: bold;">g</span>
-and <span style="font-weight: bold;">e</span><br>
+and <span style="font-weight: bold;">e</span>.&nbsp; The <span
+ style="font-weight: bold;">e</span> modifier allows for complex REGEX
+expressions.<br>
   </li>
-  <li>Added support for remote MySQL and PostgreSQL databases</li>
+  <li>Added support for <span style="font-weight: bold;">remote</span>
+MySQL and PostgreSQL databases</li>
   <li>Added PostgreSQL support for <a
  href="http://search.cpan.org/search?dist=DBD-Pg">DBD:Pg</a></li>
   <li>An EVENT can now contain mulitple EXEC lines</li>
@@ -223,6 +226,9 @@ and <span style="font-weight: bold;">e</span><br>
   <li>Added the option <span style="font-weight: bold;">dynamic_nodes</span>
 to allow NODES files to be either loaded at startup or loaded each time
 an EVENT is processed<br>
+  </li>
+  <li>Added the option <span style="font-weight: bold;">resolve_value_ip_addresses</span>
+to resolve ip addresses contained inside enterprise variable values<br>
   </li>
   <li>Added <span style="font-weight: bold;">trapoid </span>column
 for database logging to contain the actual trap received.&nbsp; The <span
@@ -232,6 +238,9 @@ actual matched entry from the .conf file (which could be a wildcard OID)<br>
   <li>Fixed bug that prevented some variables from displaying the
 correct values because the received trap OID was replaced with the
 actual EVENT entry<br>
+  </li>
+  <li>Fixed bug that caused OIDs not to be translated correctly with
+transl<br>
   </li>
   <li>Agent IP address is now used instead of 'host' IP address for
 NODES matches, the 'hostname' column in database logs and the $A
@@ -255,6 +264,8 @@ to enable DNS lookups on host and agent IP addresses</li>
 the IP address is used to perform the match.&nbsp; This will allow for
 aliases to be used.<br>
   </li>
+  <li>Added the option <span style="font-weight: bold;">resolve_value_ip_addresses</span>
+to resolve ip addresses contained inside enterprise variable values</li>
   <li>Changed snmptt.ini setting <span style="font-weight: bold;">translate_trap_oid</span>
 to <span style="font-weight: bold;">translate_log_trap_oid</span></li>
   <li>Changed snmptt.ini setting <span style="font-weight: bold;">translate_oids</span>
@@ -1653,14 +1664,34 @@ Failure Trap from IP address: 192.168.1.254</span><br>
 address: C0 A8 1 FE<br>
 </span></div>
 <br>
-<div style="margin-left: 40px;"> <span style="font-weight: bold;">REGEX
+<div style="margin-left: 40px;"><span style="font-weight: bold;">REGEX
 (Address:
 (\w+)\s+(\w+)\s+(\w+)\s+(\w+))("address:".sprintf("%03d.%03d.%03d.%03d",hex($1),hex($2),hex($3),hex($4)))ie</span><br
  style="font-weight: bold;">
+</div>
 <br>
-FORMAT line after:&nbsp; <span style="font-weight: bold;">Authentication
+<div style="margin-left: 40px;">FORMAT line after:&nbsp; <span
+ style="font-weight: bold;">Authentication
 Failure Trap from IP address: 192.168.001.254</span><br>
+</div>
 <br>
+<p>Example 3<br>
+</p>
+<div style="margin-left: 40px;"> FORMAT line before:&nbsp;<span
+ style="font-weight: bold;"> Extremely severe error has occured<br>
+</span></div>
+<br>
+<div style="margin-left: 40px;"> <span style="font-weight: bold;">REGEX
+(</span><span style="font-weight: bold;">Extremely severe error has
+occured</span><span style="font-weight: bold;">)(("Better get a lotto
+ticket!!&nbsp; Here is a lotto number to try:".sprintf ("%s",
+lottonumber());sub lottonumber { for(my $i=0;$i&lt;6;$i++) { $temp =
+$temp . " " . (int(rand 49) +1); } return $temp; } )ie</span><br
+ style="font-weight: bold;">
+<br>
+FORMAT line after:&nbsp; <span style="font-weight: bold;">Better get a
+lotto ticket!!&nbsp; Here is a lotto number to try: 36 27 38 32 29 6<br>
+</span><br>
 </div>
 </div>
 <blockquote><a name="SNMPTT.CONF-SDESC"></a><b>SDESC</b>

@@ -5,6 +5,7 @@ September 4rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - When using e modifier with REGEX, force a new package to prevent
   user from accessing internal snmptt variables, and prevent access
   to the main:: package variables.
+- Added resolve_value_ip_addresses option, updated .ini files
 
 September 3rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added support for i, g and e modifiers for REGEX

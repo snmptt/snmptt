@@ -1364,6 +1364,11 @@ sub substitute
       $val = &translate_value_oids_sub($val);
     }
 
+    if ($dns_enable == 1 && $resolve_value_ip_addresses == 1 && $net_snmp_perl_enable == 1)
+    {
+      $val = &resolve_value_ip_addresses_sub($val);
+    }
+    
     if ($translate_integers == 1 && $net_snmp_perl_enable == 1)
     {
       if (! ($entvar[$i-1] =~ /\D+/))				# Check to see if value is numerical
@@ -2625,6 +2630,7 @@ sub loadsnmpttini {
 	$net_snmp_perl_best_guess = $cfg->val('General', 'net_snmp_perl_best_guess');
 	$translate_log_trap_oid = $cfg->val('General', 'translate_log_trap_oid');
 	$translate_value_oids = $cfg->val('General', 'translate_value_oids');
+	$resolve_value_ip_addresses = $cfg->val('General', 'resolve_value_ip_addresses');
 	$translate_enterprise_oid_format = $cfg->val('General', 'translate_enterprise_oid_format');
 	$translate_trap_oid_format = $cfg->val('General', 'translate_trap_oid_format');
 	$translate_varname_oid_format = $cfg->val('General', 'translate_varname_oid_format');
@@ -2726,6 +2732,7 @@ sub loadsnmpttini {
 	if (! defined ($net_snmp_perl_best_guess)) { $net_snmp_perl_best_guess = 0} ;
 	if (! defined ($translate_log_trap_oid)) { $translate_log_trap_oid = 0} ;
 	if (! defined ($translate_value_oids)) { $translate_value_oids = 0} ;
+	if (! defined ($resolve_value_ip_addresses)) { $resolve_value_ip_addresses = 0} ;
 	if (! defined ($translate_enterprise_oid_format)) { $translate_enterprise_oid_format = 1} ;
 	if (! defined ($translate_trap_oid_format)) { $translate_trap_oid_format = 1} ;
 	if (! defined ($translate_varname_oid_format)) { $translate_varname_oid_format = 1} ;
@@ -3059,6 +3066,99 @@ sub translate_value_oids_sub
   # Return the new string
   return $string;    
 }
+
+sub resolve_value_ip_addresses_sub
+{
+  my $string = $_[0];
+
+  if ($string =~ /(?<!\.)(\d+\.\d+\.\d+\.\d+)(?!\.)/)	# If it appears to contain an IP address
+  {
+    if ($DEBUGGING >= 2)
+    {
+      print "  Value appears to contain an IP address.\n";
+    }
+    my $string_temp = $string;
+    my @hostnames = ();
+    my $done = 1;
+    my $noinf = 0;
+
+    # Find any IP addresses and put them in a @oids array, and remove from $string_temp
+    
+    $done = 1;
+    my $hostname_found = 0;
+    $noinf = 0;
+    while ($done)
+    {
+      if ($string_temp =~ /(?<!\.)(\d+\.\d+\.\d+\.\d+)(?!\.)/ ) { $found = 1; }
+      else { $found = 0; }
+
+      if ($found)
+      {
+	my $hostname = $&;
+	push (@hostnames, $hostname);
+	#print "ip:$&\n";
+	$string_temp =~ s/(?<!\.)$1(?!\.)//g;	# Remove IP from string_temp
+	$hostname_found = 1;
+      }
+      else
+      {
+	$done = 0;
+      }
+      $noinf++;
+      if ($noinf >= 100) # Safe guard to make sure regex pattern search / replace doesn't cause an
+                         # infinit loop in the while.  Shouldn't, but just in case..
+      {
+	$done = 0;
+        if ($DEBUGGING >= 2)
+        {
+          print "  Possible infinit loop (1) in resolve_value_ip_addresses_sub averted.\n";
+        }
+      }
+    }
+
+    if ($hostname_found == 1 && $DEBUGGING >= 2)
+    {
+      print "  Value contains an IP address.\n";
+    }
+    
+    #print "hostnames: @hostnames\n";
+     
+    # Replace all ip addresses in $string with textual names if possible
+    foreach my $hostname (@hostnames)
+    {
+      my $temp = gethostbyaddr(Socket::inet_aton($hostname),Socket::AF_INET());
+      if (defined ($temp))
+      {
+	if ($DEBUGGING => 2)
+	{
+	  print "    IP address ($hostname) resolved to: $temp\n";
+	}
+	if ($strip_domain)
+	{
+	  $temp = strip_domain_name($temp, $strip_domain);
+	}
+	$string =~ s/(?<!\.|\d)$hostname(?!\.\d)/$temp/g;
+      }
+      else
+      {
+	if ($DEBUGGING => 2)
+	{
+	  print "    IP address ($hostname) could not be resolved by DNS.\n";
+	}
+      }
+    }
+  }
+  else
+  {
+    if ($DEBUGGING >= 2)
+    {
+      print "  Value does not appear to contain an IP address\n";
+    }
+  }
+  # Return the new string
+  return $string;    
+}
+
 
 sub match(match)
 {
