@@ -445,6 +445,8 @@ sub processtrap
 		# $event is the hash of events defined in the config file
 		# $event2 is a copy of the matching event
 	
+		# Flush out @event2
+		@event2 = ();
 	
 		#	$event2[0]=$event{"$receivedtrap"}[0];	# 0: name of trap	
 		#	$event2[1]=$event{"$receivedtrap"}[1];	# 1: category
@@ -901,8 +903,10 @@ sub loadsnmpttconf
 
 sub readtrap
 {
-	# Flush out @tempvar
+	# Flush out @tempvar, @var and @entvar
 	@tempvar = ();
+	@var = ();
+	@entvar = ();
 
 	chomp($tempvar[0]=<$input>);	#hostname
 	chomp($tempvar[1]=<$input>);	#ip address
