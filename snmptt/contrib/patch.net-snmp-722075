@@ -1,0 +1,782 @@
+--- perl/SNMP/SNMP-5.0.8.xs	2002-12-19 17:51:30.000000000 -0500
++++ perl/SNMP/SNMP.xs	2003-04-14 20:15:44.000000000 -0400
+@@ -228,7 +228,8 @@
+     
+         netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_BREAKDOWN_OIDS, 1);
+         netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_SUFFIX_ONLY, 1);
+-
++	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT,
++                                              NETSNMP_OID_OUTPUT_FULL);
+         SOCK_STARTUP;
+     
+     }
+@@ -809,6 +810,8 @@
+    return MAX_BAD;
+ }
+ 
++/* Convert a tag (string) to an OID array              */
++/* Tag can be either a symbolic name, or an OID string */
+ static struct tree *
+ __tag2oid(tag, iid, oid_arr, oid_arr_len, type, best_guess)
+ char * tag;
+@@ -823,38 +826,80 @@
+    DLL_IMPORT extern struct tree *tree_head;
+    oid newname[MAX_OID_LEN], *op;
+    int newname_len = 0;
++   const char *cp = NULL;
++   char ch;
++   char *module = NULL;
++
++   char str_buf[STR_BUF_SIZE];
++   str_buf[0] = '\0';
+ 
+    if (type) *type = TYPE_UNKNOWN;
+    if (oid_arr_len) *oid_arr_len = 0;
+    if (!tag) goto done;
+ 
+-   if (best_guess) {
+-      tp = rtp = find_best_tree_node(tag, tree_head, NULL);
+-      if (tp) {
+-	 if (type) *type = tp->type;
+-	 if ((oid_arr == NULL) || (oid_arr_len == NULL)) return rtp;
+-	 for (op = newname + MAX_OID_LEN - 1; op >= newname; op--) {
+-            *op = tp->subid;
+-	    tp = tp->parent;
+-	    if (tp == NULL)
+-	       break;
+-	 }
+-	 *oid_arr_len = newname + MAX_OID_LEN - op;
+-	 memcpy(oid_arr, op, *oid_arr_len * sizeof(oid));
+-      }
+-      return(rtp);
++   /*********************************************************/
++   /* best_guess = 0 - same as no switches (read_objid)     */
++   /*                  if multiple parts, or uses find_node */
++   /*                  if a single leaf                     */
++   /* best_guess = 1 - same as -Ib (get_wild_node)          */
++   /* best_guess = 2 - same as -IR (get_node)               */
++   /*********************************************************/
++
++   /* numeric scalar                (1,2) */
++   /* single symbolic               (1,2) */
++   /* single regex                  (1)   */
++   /* partial full symbolic         (2)   */
++   /* full symbolic                 (2)   */
++   /* module::single symbolic       (2)   */
++   /* module::partial full symbolic (2)   */
++   if (best_guess == 1 || best_guess == 2) { 
++     if (!__scan_num_objid(tag, newname, &newname_len)) { /* make sure it's not a numeric tag */
++       newname_len = MAX_OID_LEN;
++       if (best_guess == 2) {		/* Random search -IR */
++         if (get_node(tag, newname, &newname_len)) {
++	   rtp = tp = get_tree(newname, newname_len, get_tree_head());
++         }
++       }
++       else if (best_guess == 1) {	/* Regex search -Ib */
++	 clear_tree_flags(get_tree_head()); 
++         if (get_wild_node(tag, newname, &newname_len)) {
++	   rtp = tp = get_tree(newname, newname_len, get_tree_head());
++         }
++       }
++     }
++     else {
++       rtp = tp = get_tree(newname, newname_len, get_tree_head());
++     }
++     if (type) *type = (tp ? tp->type : TYPE_UNKNOWN);
++     if ((oid_arr == NULL) || (oid_arr_len == NULL)) return rtp;
++     memcpy(oid_arr,(char*)newname,newname_len*sizeof(oid));
++     *oid_arr_len = newname_len;
+    }
+-
+-   if (strchr(tag,'.')) { /* if multi part tag  */
+-      if (!__scan_num_objid(tag, newname, &newname_len)) { /* numeric tag */
+-         newname_len = MAX_OID_LEN;
+-         read_objid(tag, newname, &newname_len); /* long name */
++   
++   /* if best_guess is off and multi part tag or module::tag */
++   /* numeric scalar                                         */
++   /* module::single symbolic                                */
++   /* module::partial full symbolic                          */
++   /* FULL symbolic OID                                      */
++   else if (strchr(tag,'.') || strchr(tag,':')) { 
++     if (!__scan_num_objid(tag, newname, &newname_len)) { /* make sure it's not a numeric tag */
++	newname_len = MAX_OID_LEN;
++	if (read_objid(tag, newname, &newname_len)) {	/* long name */
++	  rtp = tp = get_tree(newname, newname_len, get_tree_head());
++	}
++      }
++      else {
++	rtp = tp = get_tree(newname, newname_len, get_tree_head());
+       }
+       if (type) *type = (tp ? tp->type : TYPE_UNKNOWN);
+       if ((oid_arr == NULL) || (oid_arr_len == NULL)) return rtp;
+       memcpy(oid_arr,(char*)newname,newname_len*sizeof(oid));
+       *oid_arr_len = newname_len;
+-   } else { /* else it is a leaf */
++   }
++   
++   /* else best_guess is off and it is a single leaf */
++   /* single symbolic                                */
++   else { 
+       rtp = tp = find_node(tag, Mib);
+       if (tp) {
+          if (type) *type = tp->type;
+@@ -2849,6 +2894,7 @@
+            int verbose = SvIV(perl_get_sv("SNMP::verbose", 0x01 | 0x04));
+            int use_enums;
+            struct enum_list *ep;
++           int best_guess;	   
+ 
+            New (0, oid_arr, MAX_OID_LEN, oid);
+ 
+@@ -2863,6 +2909,7 @@
+               sv_setpv(*err_str_svp, "");
+               sv_setiv(*err_num_svp, 0);
+               sv_setiv(*err_ind_svp, 0);
++              best_guess = SvIV(*hv_fetch((HV*)SvRV(sess_ref),"BestGuess",9,1));
+ 
+               pdu = snmp_pdu_create(SNMP_MSG_SET);
+ 
+@@ -2875,7 +2922,7 @@
+                     tag_pv = __av_elem_pv(varbind, VARBIND_TAG_F,NULL);
+                     tp=__tag2oid(tag_pv,
+                                  __av_elem_pv(varbind, VARBIND_IID_F,NULL),
+-                                 oid_arr, &oid_arr_len, &type,0);
++                                 oid_arr, &oid_arr_len, &type, best_guess);
+ 
+                     if (oid_arr_len==0) {
+                        if (verbose)
+@@ -3046,6 +3093,7 @@
+            int sprintval_flag = USE_BASIC;
+            int verbose = SvIV(perl_get_sv("SNMP::verbose", 0x01 | 0x04));
+ 	   SV *sv_timestamp = NULL;
++           int best_guess;
+ 
+            New (0, oid_arr, MAX_OID_LEN, oid);
+ 
+@@ -3063,8 +3111,9 @@
+                  sprintval_flag = USE_ENUMS;
+               if (SvIV(*hv_fetch((HV*)SvRV(sess_ref),"UseSprintValue", 14, 1)))
+                  sprintval_flag = USE_SPRINT_VALUE;
++              best_guess = SvIV(*hv_fetch((HV*)SvRV(sess_ref),"BestGuess",9,1));
+ 
+-              pdu = snmp_pdu_create(SNMP_MSG_GET);
++	      pdu = snmp_pdu_create(SNMP_MSG_GET);
+ 
+               varlist = (AV*) SvRV(varlist_ref);
+               varlist_len = av_len(varlist);
+@@ -3075,7 +3124,7 @@
+                     tag_pv = __av_elem_pv(varbind, VARBIND_TAG_F,NULL);
+                     tp = __tag2oid(tag_pv,
+                                    __av_elem_pv(varbind, VARBIND_IID_F,NULL),
+-                                   oid_arr, &oid_arr_len, NULL,0);
++                                   oid_arr, &oid_arr_len, NULL, best_guess);
+ 
+                     if (oid_arr_len) {
+                        snmp_add_null_var(pdu, oid_arr, oid_arr_len);
+@@ -3129,7 +3178,7 @@
+ 
+                     tp=__tag2oid(__av_elem_pv(varbind, VARBIND_TAG_F,NULL),
+                                  __av_elem_pv(varbind, VARBIND_IID_F,NULL),
+-                                 oid_arr, &oid_arr_len, &type,0);
++                                 oid_arr, &oid_arr_len, &type, best_guess);
+ 
+                     for (vars = last_vars; vars; vars=vars->next_variable) {
+ 	            if (__oid_cmp(oid_arr, oid_arr_len, vars->name,
+@@ -3205,7 +3254,8 @@
+            int verbose = SvIV(perl_get_sv("SNMP::verbose", 0x01 | 0x04));
+ 	   int old_numeric, old_printfull;	/* Old values of globals */
+ 	   SV *sv_timestamp = NULL;
+-
++           int best_guess;
++	   
+            New (0, oid_arr, MAX_OID_LEN, oid);
+ 
+            if (oid_arr && SvROK(sess_ref) && SvROK(varlist_ref)) {
+@@ -3224,7 +3274,8 @@
+                  sprintval_flag = USE_ENUMS;
+ 	      if (SvIV(*hv_fetch((HV*)SvRV(sess_ref),"UseSprintValue", 14, 1)))
+                  sprintval_flag = USE_SPRINT_VALUE;
+-
++              best_guess = SvIV(*hv_fetch((HV*)SvRV(sess_ref),"BestGuess",9,1));
++	      
+               pdu = snmp_pdu_create(SNMP_MSG_GETNEXT);
+ 
+               varlist = (AV*) SvRV(varlist_ref);
+@@ -3236,7 +3287,7 @@
+ 
+                     tp = __tag2oid(__av_elem_pv(varbind, VARBIND_TAG_F, ".0"),
+                               __av_elem_pv(varbind, VARBIND_IID_F, NULL),
+-                              oid_arr, &oid_arr_len, NULL,0);
++                              oid_arr, &oid_arr_len, NULL, best_guess);
+ 
+       		    if (oid_arr_len) {
+   		       snmp_add_null_var(pdu, oid_arr, oid_arr_len);
+@@ -3412,8 +3463,9 @@
+ 	   int old_numeric, old_printfull;	/* Old values of globals */
+ 	   SV *rv;
+ 	   SV *sv_timestamp = NULL;
++           int best_guess;
+ 
+-           New (0, oid_arr, MAX_OID_LEN, oid);
++	   New (0, oid_arr, MAX_OID_LEN, oid);
+ 
+            if (oid_arr && SvROK(sess_ref) && SvROK(varlist_ref)) {
+ 
+@@ -3433,7 +3485,8 @@
+                  sprintval_flag = USE_ENUMS;
+ 	      if (SvIV(*hv_fetch((HV*)SvRV(sess_ref),"UseSprintValue", 14, 1)))
+                  sprintval_flag = USE_SPRINT_VALUE;
+-
++              best_guess = SvIV(*hv_fetch((HV*)SvRV(sess_ref),"BestGuess",9,1));
++	      
+               pdu = snmp_pdu_create(SNMP_MSG_GETBULK);
+ 
+ 	      pdu->errstat = nonrepeaters;
+@@ -3447,7 +3500,7 @@
+                     varbind = (AV*) SvRV(*varbind_ref);
+                     __tag2oid(__av_elem_pv(varbind, VARBIND_TAG_F, "0"),
+                               __av_elem_pv(varbind, VARBIND_IID_F, NULL),
+-                              oid_arr, &oid_arr_len, NULL,0);
++                              oid_arr, &oid_arr_len, NULL, best_guess);
+ 
+ 
+                     if (oid_arr_len) {
+@@ -3607,8 +3660,9 @@
+ 	   int i;				/* General purpose iterator  */
+ 	   int npushed;				/* Number of return arrays   */
+ 	   int okay;				/* Did bulkwalk complete okay */
++           int best_guess;
+ 
+-           if (!SvROK(sess_ref) || !SvROK(varlist_ref)) {
++	   if (!SvROK(sess_ref) || !SvROK(varlist_ref)) {
+ 	      if (verbose)
+ 		 warn("Bad session or varlist reference!\n");
+ 
+@@ -3623,7 +3677,8 @@
+ 	   sv_setpv(*err_str_svp, "");
+ 	   sv_setiv(*err_num_svp, 0);
+ 	   sv_setiv(*err_ind_svp, 0);
+-
++           best_guess = SvIV(*hv_fetch((HV*)SvRV(sess_ref),"BestGuess",9,1));
++	   
+ 	   /* Create and initialize a new session context for this bulkwalk.
+ 	   ** This will be used to carry state between callbacks.
+ 	   */
+@@ -3711,7 +3766,7 @@
+ 	      varbind = (AV*) SvRV(*varbind_ref);
+ 	      __tag2oid(__av_elem_pv(varbind, VARBIND_TAG_F, "0"),
+ 			__av_elem_pv(varbind, VARBIND_IID_F, NULL),
+-			oid_arr, &oid_arr_len, NULL, 0);
++			oid_arr, &oid_arr_len, NULL, best_guess);
+ 
+ 	      if ((oid_arr_len == 0) || (oid_arr_len > MAX_OID_LEN)) {
+ 		 if (verbose)
+@@ -3914,7 +3969,8 @@
+            int verbose = SvIV(perl_get_sv("SNMP::verbose", 0x01 | 0x04));
+            int use_enums = SvIV(*hv_fetch((HV*)SvRV(sess_ref),"UseEnums",8,1));
+            struct enum_list *ep;
+-
++           int best_guess;
++	   
+            New (0, oid_arr, MAX_OID_LEN, oid);
+ 
+            if (oid_arr && SvROK(sess_ref)) {
+@@ -3927,7 +3983,8 @@
+               sv_setpv(*err_str_svp, "");
+               sv_setiv(*err_num_svp, 0);
+               sv_setiv(*err_ind_svp, 0);
+-
++              best_guess = SvIV(*hv_fetch((HV*)SvRV(sess_ref),"BestGuess",9,1));
++	      
+               pdu = snmp_pdu_create(SNMP_MSG_TRAP);
+ 
+               if (SvROK(varlist_ref)) {
+@@ -3940,7 +3997,7 @@
+ 
+                     tp=__tag2oid(__av_elem_pv(varbind, VARBIND_TAG_F, NULL),
+                                  __av_elem_pv(varbind, VARBIND_IID_F, NULL),
+-                                 oid_arr, &oid_arr_len, &type,0);
++                                 oid_arr, &oid_arr_len, &type, best_guess);
+ 
+                     if (oid_arr_len == 0) {
+                        if (verbose)
+@@ -3988,7 +4045,7 @@
+ 
+ 	      pdu->enterprise = (oid *)malloc( MAX_OID_LEN * sizeof(oid));
+               tp = __tag2oid(enterprise,NULL, pdu->enterprise,
+-                             &pdu->enterprise_length, NULL,0);
++                             &pdu->enterprise_length, NULL, best_guess);
+   	      if (pdu->enterprise_length == 0) {
+ 		  if (verbose) warn("error:trap:invalid enterprise id: %s", enterprise);
+                   goto err;
+@@ -4051,7 +4108,8 @@
+            int verbose = SvIV(perl_get_sv("SNMP::verbose", 0x01 | 0x04));
+            int use_enums = SvIV(*hv_fetch((HV*)SvRV(sess_ref),"UseEnums",8,1));
+            struct enum_list *ep;
+-
++           int best_guess;
++	   
+            New (0, oid_arr, MAX_OID_LEN, oid);
+ 
+            if (oid_arr && SvROK(sess_ref) && SvROK(varlist_ref)) {
+@@ -4064,7 +4122,8 @@
+               sv_setpv(*err_str_svp, "");
+               sv_setiv(*err_num_svp, 0);
+               sv_setiv(*err_ind_svp, 0);
+-
++              best_guess = SvIV(*hv_fetch((HV*)SvRV(sess_ref),"BestGuess",9,1));
++	      
+               pdu = snmp_pdu_create(SNMP_MSG_TRAP2);
+ 
+               varlist = (AV*) SvRV(varlist_ref);
+@@ -4096,7 +4155,7 @@
+ 
+                     tp=__tag2oid(__av_elem_pv(varbind, VARBIND_TAG_F,NULL),
+                                  __av_elem_pv(varbind, VARBIND_IID_F,NULL),
+-                                 oid_arr, &oid_arr_len, &type,0);
++                                 oid_arr, &oid_arr_len, &type, best_guess);
+ 
+                     if (oid_arr_len == 0) {
+                        if (verbose)
+@@ -4188,7 +4247,8 @@
+            int verbose = SvIV(perl_get_sv("SNMP::verbose", 0x01 | 0x04));
+            int use_enums = SvIV(*hv_fetch((HV*)SvRV(sess_ref),"UseEnums",8,1));
+            struct enum_list *ep;
+-
++           int best_guess;
++	   
+            New (0, oid_arr, MAX_OID_LEN, oid);
+ 
+            if (oid_arr && SvROK(sess_ref) && SvROK(varlist_ref)) {
+@@ -4201,7 +4261,8 @@
+               sv_setpv(*err_str_svp, "");
+               sv_setiv(*err_num_svp, 0);
+               sv_setiv(*err_ind_svp, 0);
+-
++              best_guess = SvIV(*hv_fetch((HV*)SvRV(sess_ref),"BestGuess",9,1));
++	      
+               pdu = snmp_pdu_create(SNMP_MSG_INFORM);
+ 
+               varlist = (AV*) SvRV(varlist_ref);
+@@ -4233,7 +4294,7 @@
+ 
+                     tp=__tag2oid(__av_elem_pv(varbind, VARBIND_TAG_F,NULL),
+                                  __av_elem_pv(varbind, VARBIND_IID_F,NULL),
+-                                 oid_arr, &oid_arr_len, &type,0);
++                                 oid_arr, &oid_arr_len, &type, best_guess);
+ 
+                     if (oid_arr_len == 0) {
+                        if (verbose)
+@@ -4323,15 +4384,17 @@
+ 
+ 
+ char *
+-snmp_get_type(tag)
++snmp_get_type(tag, best_guess)
+ 	char *		tag
++        int             best_guess
+ 	CODE:
+ 	{
+ 	   struct tree *tp  = NULL;
+ 	   static char type_str[MAX_TYPE_NAME_LEN];
+            char *ret = NULL;
++           int best_guess;
+ 
+-           if (tag && *tag) tp = __tag2oid(tag, NULL, NULL, NULL, NULL,0);
++           if (tag && *tag) tp = __tag2oid(tag, NULL, NULL, NULL, NULL, best_guess);
+            if (tp) __get_type_str(tp->type, ret = type_str);
+ 	   RETVAL = ret;
+ 	}
+@@ -4349,10 +4412,11 @@
+ 
+ 
+ char *
+-snmp_map_enum(tag, val, iflag)
++snmp_map_enum(tag, val, iflag, best_guess)
+ 	char *		tag
+ 	char *		val
+ 	int		iflag
++        int             best_guess
+ 	CODE:
+ 	{
+ 	   struct tree *tp  = NULL;
+@@ -4362,7 +4426,7 @@
+ 
+            RETVAL = NULL;
+ 
+-           if (tag && *tag) tp = __tag2oid(tag, NULL, NULL, NULL, NULL,0);
++           if (tag && *tag) tp = __tag2oid(tag, NULL, NULL, NULL, NULL, best_guess);
+ 
+            if (tp) {
+               if (iflag) {
+@@ -4391,23 +4455,29 @@
+ #define SNMP_XLATE_MODE_TAG2OID 0
+ 
+ char *
+-snmp_translate_obj(var,mode,use_long,auto_init,best_guess)
++snmp_translate_obj(var,mode,use_long,auto_init,best_guess,include_module_name)
+ 	char *		var
+ 	int		mode
+ 	int		use_long
+ 	int		auto_init
+ 	int             best_guess
++	int		include_module_name
+ 	CODE:
+ 	{
+-	   char str_buf[STR_BUF_SIZE];
+-	   oid oid_arr[MAX_OID_LEN];
++           char str_buf[STR_BUF_SIZE];
++           char str_buf_temp[STR_BUF_SIZE];
++           oid oid_arr[MAX_OID_LEN];
+            int oid_arr_len = MAX_OID_LEN;
+            char * label;
+            char * iid;
+            int status = FAILURE;
+            int verbose = SvIV(perl_get_sv("SNMP::verbose", 0x01 | 0x04));
++           struct tree *module_tree = NULL;
++           char modbuf[256];
+ 
+            str_buf[0] = '\0';
++           str_buf_temp[0] = '\0';
++
+   	   switch (mode) {
+               case SNMP_XLATE_MODE_TAG2OID:
+ 		if (!__tag2oid(var, NULL, oid_arr, &oid_arr_len, NULL, best_guess)) {
+@@ -4419,20 +4489,37 @@
+              case SNMP_XLATE_MODE_OID2TAG:
+ 		oid_arr_len = 0;
+ 		__concat_oid_str(oid_arr, &oid_arr_len, var);
+-		snprint_objid(str_buf, sizeof(str_buf), oid_arr, oid_arr_len);
++		snprint_objid(str_buf_temp, sizeof(str_buf_temp), oid_arr, oid_arr_len);
++
+ 		if (!use_long) {
+                   label = NULL; iid = NULL;
+-		  if (((status=__get_label_iid(str_buf,
++		  if (((status=__get_label_iid(str_buf_temp,
+ 		       &label, &iid, NO_FLAGS)) == SUCCESS)
+ 		      && label) {
+-		     strcpy(str_buf, label);
++		     strcpy(str_buf_temp, label);
+ 		     if (iid && *iid) {
+-		       strcat(str_buf, ".");
+-		       strcat(str_buf, iid);
++		       strcat(str_buf_temp, ".");
++		       strcat(str_buf_temp, iid);
+ 		     }
+  	          }
+ 	        }
+-                break;
++		
++		/* Prepend modulename:: if enabled */
++		if (include_module_name) {
++		  module_tree = get_tree (oid_arr, oid_arr_len, get_tree_head());
++		  if (module_tree) {
++		    if (strcmp(module_name(module_tree->modid, modbuf), "#-1") ) {
++		      strcat(str_buf, modbuf);
++		      strcat(str_buf, "::");
++		    }
++		    else {
++		      strcat(str_buf, "UNKNOWN::");
++		    }
++		  }
++		}
++		strcat(str_buf, str_buf_temp);
++
++		break;
+              default:
+ 	       if (verbose) warn("snmp_translate_obj:unknown translation mode: %s\n", mode);
+            }
+--- perl/SNMP/SNMP-5.0.8.pm	2003-03-17 17:20:26.000000000 -0500
++++ perl/SNMP/SNMP.pm	2003-04-14 20:17:34.000000000 -0400
+@@ -113,7 +113,8 @@
+ $save_descriptions = 0; #tied scalar to control saving descriptions during
+                # mib parsing - must be set prior to mib loading
+ $best_guess = 0;  # determine whether or not to enable best-guess regular
+-                  # expression object name translation
++                  # expression object name translation.  1 = Regex (-Ib),
++		  # 2 = random (-IR)
+ $replace_newer = 0; # determine whether or not to tell the parser to replace
+                     # older MIB modules with newer ones when loading MIBs.
+                     # WARNING: This can cause an incorrect hierarchy.
+@@ -183,24 +184,29 @@
+ }
+ 
+ sub translateObj {
+-# translate object identifier(tag or numeric) into alternate representation
++# Translate object identifier(tag or numeric) into alternate representation
+ # (i.e., sysDescr => '.1.3.6.1.2.1.1.1' and '.1.3.6.1.2.1.1.1' => sysDescr)
+ # when $SNMP::use_long_names or second arg is non-zero the translation will
+-# return longer textual identifiers (e.g., system.sysDescr)
+-# if Mib is not loaded and $SNMP::auto_init_mib is enabled Mib will be loaded
+-# returns 'undef' upon failure
++# return longer textual identifiers (e.g., system.sysDescr).  An optional 
++# third argument of non-zero will cause the module name to be prepended
++# to the text name (e.g. 'SNMPv2-MIB::sysDescr').  If no Mib is loaded 
++# when called and $SNMP::auto_init_mib is enabled then the Mib will be 
++# loaded. Will return 'undef' upon failure.
+    SNMP::init_snmp("perl");
+    my $obj = shift;
+-   my $long_names = shift || $SNMP::use_long_names;
++   my $temp = shift;
++   my $include_module_name = shift;
++   my $long_names = $temp || $SNMP::use_long_names;
++
+    return undef if not defined $obj;
+    my $res;
+    if ($obj =~ /^\.?(\d+\.)*\d+$/) {
+-      $res = SNMP::_translate_obj($obj,1,$long_names,$SNMP::auto_init_mib,0);
++      $res = SNMP::_translate_obj($obj,1,$long_names,$SNMP::auto_init_mib,0,$include_module_name);
+    } elsif ($obj =~ /(\.\d+)*$/ && $SNMP::best_guess == 0) {
+-      $res = SNMP::_translate_obj($`,0,$long_names,$SNMP::auto_init_mib,0);
++      $res = SNMP::_translate_obj($`,0,$long_names,$SNMP::auto_init_mib,0,$include_module_name);
+       $res .= $& if defined $res and defined $&;
+    } elsif ($SNMP::best_guess) {
+-      $res = SNMP::_translate_obj($obj,0,$long_names,$SNMP::auto_init_mib,$SNMP::best_guess);
++      $res = SNMP::_translate_obj($obj,0,$long_names,$SNMP::auto_init_mib,$SNMP::best_guess,$include_module_name);
+    }
+ 
+    return($res);
+@@ -211,7 +217,7 @@
+ # OBJECTID, OCTETSTR, INTEGER, NETADDR, IPADDR, COUNTER
+ # GAUGE, TIMETICKS, OPAQUE, or undef
+   my $tag = shift;
+-  SNMP::_get_type($tag);
++  SNMP::_get_type($tag, $SNMP::best_guess);
+ }
+ 
+ sub mapEnum {
+@@ -233,7 +239,7 @@
+       $val = shift;
+   }
+   my $iflag = $val =~ /^\d+$/;
+-  my $res = SNMP::_map_enum($tag, $val, $iflag);
++  my $res = SNMP::_map_enum($tag, $val, $iflag, $SNMP::best_guess);
+   if ($update and defined $res) { $var->[$SNMP::Varbind::val_f] = $res; }
+   return($res);
+ }
+@@ -487,6 +493,7 @@
+ 
+    $this->{UseLongNames} ||= $SNMP::use_long_names;
+    $this->{UseSprintValue} ||= $SNMP::use_sprint_value;
++   $this->{BestGuess} ||= $SNMP::best_guess;
+    $this->{UseEnums} ||= $SNMP::use_enums;
+    $this->{UseNumeric} ||= $SNMP::use_numeric;
+ 
+@@ -512,6 +519,7 @@
+ 
+    $this->{UseLongNames} ||= $SNMP::use_long_names;
+    $this->{UseSprintValue} ||= $SNMP::use_sprint_value;
++   $this->{BestGuess} ||= $SNMP::best_guess;
+    $this->{UseEnums} ||= $SNMP::use_enums;
+    $this->{UseNumeric} ||= $SNMP::use_numeric;
+ 
+@@ -544,7 +552,8 @@
+      $varbind_list_ref = [$vars];
+      $varbind_list_ref = $vars if ref($$vars[0]) =~ /ARRAY/;
+    } else {
+-     my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     # my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     my ($tag, $iid) = ($vars =~ /^(.*?)\.?(\d+)+$/);     
+      my $val = shift;
+      $varbind_list_ref = [[$tag, $iid, $val]];
+    }
+@@ -566,7 +575,8 @@
+      $varbind_list_ref = [$vars];
+      $varbind_list_ref = $vars if ref($$vars[0]) =~ /ARRAY/;
+    } else {
+-     my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     # my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     my ($tag, $iid) = ($vars =~ /^(.*?)\.?(\d+)+$/);
+      $varbind_list_ref = [[$tag, $iid]];
+    }
+ 
+@@ -590,7 +600,8 @@
+      $varbind_list_ref = [$vars];
+      $varbind_list_ref = $vars if ref($$vars[0]) =~ /ARRAY/;
+    } else {
+-     my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     # my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     my ($tag, $iid) = ($vars =~ /^(.*?)\.?(\d+)+$/);
+      $varbind_list_ref = [[$tag, $iid]];
+    }
+ 
+@@ -621,7 +632,8 @@
+      $varbind_list_ref = [$vars];
+      $varbind_list_ref = $vars if ref($$vars[0]) =~ /ARRAY/;
+    } else {
+-     my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     # my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     my ($tag, $iid) = ($vars =~ /^(.*?)\.?(\d+)+$/);
+      $varbind_list_ref = [[$tag, $iid]];
+    }
+ 
+@@ -645,7 +657,8 @@
+      $varbind_list_ref = [$vars];
+      $varbind_list_ref = $vars if ref($$vars[0]) =~ /ARRAY/;
+    } else {
+-     my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     # my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     my ($tag, $iid) = ($vars =~ /^(.*?)\.?(\d+)+$/);
+      $varbind_list_ref = [[$tag, $iid]];
+    }
+ 
+@@ -678,7 +691,8 @@
+      $varbind_list_ref = [$vars];
+      $varbind_list_ref = $vars if ref($$vars[0]) =~ /ARRAY/;
+    } else {
+-     my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     # my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|(?:\w+(?:\-*\w+)+))\.?(.*)$/);
++     my ($tag, $iid) = ($vars =~ /^(.*?)\.?(\d+)+$/);
+      $varbind_list_ref = [[$tag, $iid]];
+    }
+ 
+@@ -704,7 +718,8 @@
+       $varbind_list_ref = [$vars];
+       $varbind_list_ref = $vars if ref($$vars[0]) =~ /ARRAY/;
+    } else {
+-      my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|\w+)\.?(.*)$/);
++      # my ($tag, $iid) = ($vars =~ /^((?:\.\d+)+|\w+)\.?(.*)$/);
++      my ($tag, $iid) = ($vars =~ /^(.*?)\.?(\d+)+$/);
+       $varbind_list_ref = [[$tag, $iid]];
+    }
+ 
+@@ -1253,6 +1268,14 @@
+ as numeric OID's rather than descriptions.  UseLongNames will be
+ set so that the full OID is returned to the caller.
+ 
++=item BestGuess
++
++defaults to the value of SNMP::best_guess at time of session
++creation. this setting controls how <tags> are parsed.  setting to
++0 causes a regular lookup.  setting to 1 causes a regular expression 
++match (defined as -Ib in snmpcmd) and setting to 2 causes a random 
++access lookup (defined as -IR in snmpcmd).
++
+ =item ErrorStr
+ 
+ read-only, holds the error message assoc. w/ last request
+--- perl/SNMP/README-5.0.8	2002-06-23 18:03:13.000000000 -0400
++++ perl/SNMP/README	2003-04-14 20:22:34.000000000 -0400
+@@ -1,4 +1,4 @@
+-	      The Perl5 'SNMP' Extension Module v5.0
++	      nThe Perl5 'SNMP' Extension Module v5.0
+ 		      for the Net-SNMP Library
+ 
+ Contents:
+@@ -219,6 +219,11 @@
+                creation. set to non-zero to have <tags> returned by the 'get'
+                methods untranslated (i.e. dotted-decimal).  Setting the
+                UseLongNames value for the session is highly recommended.
++ BestGuess   - defaults to the value of SNMP::best_guess at time of session
++               creation. this setting controls how <tags> are parsed.  setting 
++               to 0 causes a regular lookup.  setting to 1 causes a regular 
++               expression match (defined as -Ib in snmpcmd) and setting to 2 
++               causes a random access lookup (defined as -IR in snmpcmd).
+  ErrorStr    - read-only, holds the error message assoc. w/ last request
+  ErrorNum    - read-only, holds the snmp_err or status of last request
+  ErrorInd    - read-only, holds the snmp_err_index when appropriate
+@@ -418,6 +423,13 @@
+                         OID's, instead of translating them.  Also setting
+                         $SNMP::use_long_names to non-zero is highly recommended.
+ 
++ $SNMP::best_guess    - default '0'.  this setting controls how <tags> are 
++                        parsed.  setting to 0 causes a regular lookup.  setting 
++                        to 1 causes a regular expression match (defined as -Ib 
++                        in snmpcmd) and setting to 2 causes a random access 
++                        lookup (defined as -IR in snmpcmd).  can also be set 
++                        on a per session basis (see BestGuess)
++
+  $SNMP::save_descriptions - default '0',set non-zero to have mib parser save
+                         attribute descriptions. must be set prior to mib
+                         initialization
+@@ -499,16 +511,20 @@
+ 
+  &SNMP::unloadModules(<mod>,...) - *Not Implemented*
+ 
+- &SNMP::translateObj(<var>[,arg]) - will convert a text obj tag to an OID and
+-                            vice-versa. any iid suffix is retained numerically.
+-                            default behaviour when converting a numeric OID
+-                            to text form is to return leaf identifier only
+-                            (e.g.,'sysDescr') but when $SNMP::use_long_names
+-                            is non-zero or a non-zero second arg is supplied
+-                            will return longer textual identifier. If no Mib
+-                            is loaded when called and $SNMP::auto_init_mib is
+-                            enabled then the Mib will be loaded. Will return
+-                            'undef' upon failure.
++ &SNMP::translateObj(<var>[,arg,[arg]]) - will convert a text obj tag to an 
++                       OID and vice-versa. Any iid suffix is retained 
++                       numerically.  Default behaviour when converting a 
++                       numeric OID to text form is to return leaf identifier 
++                       only (e.g.,'sysDescr') but when $SNMP::use_long_names 
++                       is non-zero or a non-zero second arg is supplied it 
++                       will return a longer textual identifier.  An optional 
++                       third argument of non-zero will cause the module name 
++                       to be prepended to the text name (e.g. 
++                       'SNMPv2-MIB::sysDescr').  When converting a text obj, 
++                       the $SNMP::best_guess option is used.  If no Mib is 
++                       loaded when called and $SNMP::auto_init_mib is enabled 
++                       then the Mib will be loaded. Will return 'undef' upon 
++                       failure.
+ 
+  &SNMP::getType(<var>) - return SNMP data type for given textual identifier
+                         OBJECTID, OCTETSTR, INTEGER, NETADDR, IPADDR, COUNTER
+--- include/net-snmp/library/parse-5.0.8.h	2002-11-09 09:54:20.000000000 -0500
++++ include/net-snmp/library/parse.h	2003-04-12 18:34:55.000000000 -0400
+@@ -227,6 +227,7 @@
+      * backwards compatability 
+      */
+     struct tree    *find_node(const char *, struct tree *);
++    struct tree    *find_node2(const char *, const char *); 
+     struct module  *find_module(int);
+     void            adopt_orphans(void);
+     char           *snmp_mib_toggle_options(char *options);
+--- snmplib/parse-5.0.8.c	2002-12-19 10:07:35.000000000 -0500
++++ snmplib/parse.c	2003-04-14 18:54:10.000000000 -0400
+@@ -1205,7 +1205,6 @@
+     int             rc;
+     regex_t         parsetree;
+     regmatch_t      pmatch;
+-
+     rc = regcomp(&parsetree, key, REG_ICASE | REG_EXTENDED);
+     if (rc == 0)
+         rc = regexec(&parsetree, search_base, 1, &pmatch, 0);
+@@ -1299,7 +1298,6 @@
+                 break;          /* this is the best result we can get */
+         }
+     }
+-
+     if (match)
+         *match = old_match;
+     return (best_so_far);
+@@ -4943,12 +4941,30 @@
+         return 0;
+ }
+ 
++/* Find node in any MIB module
++   Used by Perl modules		*/
+ struct tree    *
+ find_node(const char *name, struct tree *subtree)
+ {                               /* Unused */
+     return (find_tree_node(name, -1));
+ }
+ 
++/* Find node in specific MIB module
++   Used by Perl modules		*/
++struct tree    *
++find_node2(const char *name, const char *module)
++{                               
++  int modid = -1;
++  if (module) {
++    modid = which_module(module);
++  }
++  if (modid == -1)
++  {
++    return (NULL);
++  }
++  return (find_tree_node(name, modid));
++}
++
+ struct module  *
+ find_module(int mid)
+ {

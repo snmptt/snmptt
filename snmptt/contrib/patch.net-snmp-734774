@@ -1,0 +1,23 @@
+*** perl/SNMP/t/startagent-5.0.8.pl	2002-05-07 14:15:32.000000000 -0400
+--- perl/SNMP/t/startagent.pl	2003-05-08 10:40:34.000000000 -0400
+***************
+*** 70,77 ****
+  if ($^O !~ /win32/i) {
+    if ($snmpd_cmd) {
+      if (-r $snmpd_cmd and -x $snmpd_cmd) {
+! #      print STDERR "running: $snmpd_cmd -r -l t/snmptest.log -C -c t/snmptest.conf -P t/snmpd.pid $agent_port > /dev/null 2>&1\n";
+!       system "$snmpd_cmd -r -l t/snmptest.log -C -c t/snmptest.conf -P t/snmpd.pid $agent_port > /dev/null 2>&1";
+      } else {
+        warn("Couldn't run snmpd\n");
+      }
+--- 70,79 ----
+  if ($^O !~ /win32/i) {
+    if ($snmpd_cmd) {
+      if (-r $snmpd_cmd and -x $snmpd_cmd) {
+!       $basedir = `pwd`;
+!       chomp $basedir;
+!       #print STDERR "running: $snmpd_cmd -r -l t/snmptest.log -C -c $basedir/t/snmptest.conf -P $basedir/t/snmpd.pid/t/snmpd.pid $agent_port > /dev/null 2>&1\n";
+!       system "$snmpd_cmd -r -l t/snmptest.log -C -c $basedir/t/snmptest.conf -P $basedir/t/snmpd.pid $agent_port > /dev/null 2>&1";
+      } else {
+        warn("Couldn't run snmpd\n");
+      }
