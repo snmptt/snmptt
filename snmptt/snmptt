@@ -824,13 +824,30 @@ sub processtrap
 		  if ($DEBUGGING >= 2)
 		  {
 		    print "  MATCH statements found\n";
-		    print "    MATCH type: " . uc($match_type) . "\n";
+		    print "    MATCH mode: " . uc($match_type) . "\n";
 		  }
 		  
 		  for (my $i=0; defined($event2[7][$i]); $i++)
 		  {
 		    my $match_temp = $event2[7][$i];
-		    $match_temp =~ s/\s//g;	# Remove any white space from $match
+
+                    # If it's a regex (has ()) then remove white space before and after ()s.  
+		    # Otherwise, remove all white space
+		    #print "!$match_temp!\n";
+		    if ($match_temp =~ /\(|\)/)
+		    {
+			$match_temp =~ s/\s*(\(.*\))\s*/$1/g;	# Remove any white space from before and after ()'s
+
+			$match_temp =~ s/\)\s*(\i)\s*/\)$1/g;	# Remove any white space from before and after i modifier
+			                                        # if there is one
+			
+			$match_temp =~ s/\s*(\!.*)/$1/g;	# Remvoe any white space in front of the ! if there is one
+		    }
+		    else
+		    {
+		      $match_temp =~ s/\s//g;	# Remove any white space from $match
+		    }
+		    #print "!$match_temp!\n";
 		    
 		    # DEFAULT= line
 		    if ($match_temp =~ /^mode=(.*)/i)
@@ -3212,11 +3229,13 @@ sub match
   if ($match =~ /\(.*\)/)
   {
     #print "Regex detected\n";
+      
     $result = match_regex($value, $match);
     $result = match_result($result, $not);
     if ($DEBUGGING >= 1)
     {
-      print "    REGEX: value=$value, match=$match.  Result=" . ($result == 1 ? "true" : "false") . "\n";
+      print "    REGEX: value=$value, match=" . ($not == 1 ? "!$match" : "$match") . " Result=" . 
+             ($result == 1 ? "true" : "false") . "\n";
     }
   }
   # Match is an IP address
@@ -3227,7 +3246,8 @@ sub match
     $result = match_result($result, $not);
     if ($DEBUGGING >= 1)
     {
-      print "    IP ADDRESS: value=$value, match=$match.  Result=" . ($result == 1 ? "true" : "false") . "\n";
+      print "    IP ADDRESS: value=$value, match=" . ($not == 1 ? "!$match" : "$match") . " Result=" . 
+             ($result == 1 ? "true" : "false") . "\n";
     }
   }
   # Match is a number
@@ -3238,7 +3258,8 @@ sub match
     $result = match_result($result, $not);
     if ($DEBUGGING >= 1)
     {
-      print "    NUMBER: value=$value, match=$match.  Result=" . ($result == 1 ? "true" : "false") . "\n";
+      print "    NUMBER: value=$value, match=" . ($not == 1 ? "!$match" : "$match") . " Result=" . 
+             ($result == 1 ? "true" : "false") . "\n";
     }
   }
   # Unknown entry - ignore it
@@ -3246,7 +3267,7 @@ sub match
   {
     if ($DEBUGGING >= 1)
     {
-      print "  IGNORED: value=$value, match=$match\n";
+      print "    IGNORED: value=$value, match=" . ($not == 1 ? "!$match" : "$match") . "\n";
       $result = 0;
     }
   }
@@ -3274,7 +3295,14 @@ sub match_result
   }
   else
   {
-    return !$result;
+    if ($result >= 1)
+    {
+      return 0;
+    }
+    else
+    {
+      return 1;
+    }
   }
   return 0;
 }
@@ -3331,9 +3359,16 @@ sub match_regex
   my $regex_temp = shift;
 
   my $result;
+  my $modifier_i = 0;
 
   #print "value: $value\n";
   #print "regex: $regex_temp\n";
+
+  if ($regex_temp =~ /i$/)
+  {
+    #print "! i modifier\n";
+    $modifier_i = 1;
+  }
   
   $regex_temp =~ /\((.*)\)/;
   $regex_temp = $1;
@@ -3346,10 +3381,21 @@ sub match_regex
     {
       print "  Doing REGEX MATCH: ($regex_temp)\n";
     }
-    if ($value =~ /$regex_temp/i)
+    if ($modifier_i == 1)
     {
-      #print "Match!\n";
-      return 1;
+      if ($value =~ /$regex_temp/i)
+      {
+	#print "Match!\n";
+	return 1;
+      }
+    }
+    else
+    {
+      if ($value =~ /$regex_temp/)
+      {
+	#print "Match!\n";
+	return 1;
+      }
     }
   }
   return 0;

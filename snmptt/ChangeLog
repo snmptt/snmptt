@@ -1,3 +1,8 @@
+September 12th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Fix MATCH.  sub match_result was not returning a 0 (didn't really
+  matter).  If a match regex contained a space, it was removed...  Fixed
+- Add i modifier support for MATCH
+
 September 8th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added snmptt.pid support
 

@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; September 11th, 2003
+This file was last updated on:&nbsp; September 12th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -1658,14 +1658,21 @@ for important DNS information.</p>
   <div style="margin-left: 40px;"><br>
   <span style="font-weight: bold;">[MATCH [MODE=[or | and]] | [</span><span
  style="font-weight: bold;">$n:</span><span style="font-weight: bold;">[!][(&nbsp;&nbsp;&nbsp;
-) | n | n-n | &gt; n | &lt; n | x.x.x.x | x.x.x.x-x.x.x.x | x.x.x.x/x]]</span></div>
+)[i] | n | n-n | &gt; n | &lt; n | x.x.x.x | x.x.x.x-x.x.x.x |
+x.x.x.x/x]]</span></div>
   <p style="margin-left: 40px;">Optional match expression that must be
 evaluated to true for the trap to be considered a match to this EVENT
 definition.<br>
   </p>
   <p style="margin-left: 40px;">If a MATCH statement exists, and no
 matches evaluate to true, then the default will be to NOT match this
-EVENT definition.</p>
+EVENT definition.<br>
+  </p>
+  <p style="margin-left: 40px;">The following Perl regular expression
+modifiers are supported:<br>
+  </p>
+  <div style="margin-left: 80px;"><span style="font-weight: bold;">i</span>
+- ignore case when trying to match </div>
   <p style="margin-left: 40px;">The following command formats are
 available:<br>
   </p>
@@ -1675,7 +1682,7 @@ MODE=[or | and]</span><br style="font-weight: bold;">
  style="font-style: italic; font-weight: bold;">n</span><span
  style="font-weight: bold;">: [!] (</span><span
  style="font-style: italic; font-weight: bold;">reg</span><span
- style="font-weight: bold;">)</span><br style="font-weight: bold;">
+ style="font-weight: bold;">) [i]</span><br style="font-weight: bold;">
   <span style="font-weight: bold;">MATCH $</span><span
  style="font-style: italic; font-weight: bold;">n</span><span
  style="font-weight: bold;">: [!] </span><span
@@ -1719,7 +1726,8 @@ MODE=[or | and]</span><br style="font-weight: bold;">
   <br>
 where:<br>
   <div style="margin-left: 40px;"><span style="font-weight: bold;">or </span>or<span
- style="font-weight: bold;">and </span>set the default evaluation mode
+ style="font-weight: bold;"> and </span>set the default evaluation
+mode
 for ALL matches<br>
   <span style="font-weight: bold;">$<span style="font-style: italic;">n</span>
   </span>is
@@ -1770,8 +1778,6 @@ There can be only one match <span style="font-weight: bold;">mode </span>per
 EVENT.&nbsp; If multiple MATCH MODE= lines exists, the last one in the
 list is used.<br>
 <br>
-Regular expression searches are not case sensitive<br>
-<br>
 </div>
 </div>
 </div>
@@ -1797,14 +1803,16 @@ $3: 52</span><br style="font-weight: bold;">
 <div style="margin-left: 80px;">
 <div style="margin-left: 40px;"><br>
 All must match (and): $3 must be greater than 20, and $5 must not
-contain the words alarm and critical, and $6 must contain the string
-'(1) remaining':<br>
+contain the words alarm or critical, $6 must contain the string
+'(1) remaining' and $7 must contain the string 'power' which is not
+case sensitive:<br>
 <br style="font-weight: bold;">
 <div style="margin-left: 40px;"><span style="font-weight: bold;">MATCH
 $3: &gt;20</span><br style="font-weight: bold;">
 <span style="font-weight: bold;">MATCH $5: !(alarm|critical)</span><br
  style="font-weight: bold;">
-<span style="font-weight: bold;">MATCH $6: (\(1\) remaining)</span><br
+<span style="font-weight: bold;">MATCH $6: (\(1\) remaining)<br>
+</span><span style="font-weight: bold;">MATCH $7: (power)i</span><br
  style="font-weight: bold;">
 <span style="font-weight: bold;">MATCH MODE=and</span><br>
 </div>
