@@ -1,3 +1,8 @@
+July 7th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Allow multiple EXEC lines in config
+- Added dynamic_nodes config option
+- Allow multiple NODES lines in config
+
 July 2nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added remote database support (host & port) for MySQL
 

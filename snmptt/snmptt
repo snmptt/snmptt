@@ -695,45 +695,9 @@ sub processtrap
 			{
 			  print "  Nodes defined for this entry...\n";
 			}	
+
+			@nodes2 = &process_nodes($event2[5]);
 			
-			# Put all the NODES entries into @nodes, and then go through them all and put
-			# them into @nodes2.  This is done so files that are in the NODES list can be
-			# read in and merged into @nodes2 to allow a NODES line to contain both host
-			# names / ip addresses AND filenames.
-			@nodes = split /\s/, $event2[5];
-			foreach my $a (@nodes)
-			{
-			  # Contain a \ or /?  Must be a filename and not an IP address / network number
-			  if ( ($a =~ /\\|\//) && !($a =~ /\d+\.\d+\.\d+\.\d+/))
-			  {
-			    if (open NODESFILE, $a)
-			    {
-			      while (defined($line = <NODESFILE>))
-			      {
-				chomp($line);
-				
-				# Allow comment lines starting with a #
-				if (!($line =~ /((^#)|(\s+#)).*/))
-				{
-				  my @temp2 = split /\s/, $line;
-				  foreach my $b (@temp2)
-				  {
-				    push (@nodes2, $b);
-				  }
-				}
-			      }
-			      close LOGFILE;
-			    }
-			    else
-			    {
-			      warn "Can not open NODES file: $event2[5] $!";
-			    }
-			  }
-			  else 	# Must be a single node
-			  {
-			    push (@nodes2, $a);
-			  }
-			}
 			if ($DEBUGGING >= 1)
 			{
 			  print "  NODES entries: @nodes2\n";
@@ -1264,27 +1228,29 @@ sub processtrap
 
 			if ($DEBUGGING >= 1)
 			{
-				print "\n\nEXEC line:\n";
+				print "\n\nEXEC line(s):\n";
 			}
 			
 			if ($event2[4] ne '' && $event2[1] ne "LOGONLY")
 			{
-				
-				$_ = $event2[4];	# EXEC string
-			
-				&substitute;
-		
-				$page = $_;
-			
-				if ($exec_enable == 1)
-				{
-					if ($DEBUGGING >= 1)
-					{	
-						print "EXEC command:$page\n";
-					}
-					# Send page
-					system $page;
-				}
+			  for (my $i=0; defined($event2[4][$i]); $i++)
+			  {
+			    $_ = $event2[4][$i];
+			    
+			    &substitute;
+			    
+			    my $command = $_;
+			    
+			    if ($exec_enable == 1)
+			    {
+			      if ($DEBUGGING >= 1)
+			      {	
+				print "EXEC command:$command\n";
+			      }
+			      # Execute command
+			      system $command;
+			    }
+			  }
 			}
 			elsif ($DEBUGGING >= 1)
 			{
@@ -1773,6 +1739,7 @@ sub loadsnmpttconf
 			$lineexec = '';
 			$linenodes = '';
 			$lineregex = '';
+			@exec = ();
 			@regex = ();
 			@match = ();
 	
@@ -1796,12 +1763,15 @@ sub loadsnmpttconf
 					# It's an EXEC line
 					
 					$lineexec = substr($line2,5);
+
+					push (@exec,$lineexec);
 				}
 				elsif ($line2 =~ /^NODES/)
 				{
 					# It's a NODES line
-					
-					$linenodes = substr($line2,6);
+					# Allow for multiple NODES lines - concatenate them
+
+					$linenodes = $linenodes . substr($line2,6) . " ";
 				}
 				elsif ($line2 =~ /^REGEX/)
 				{
@@ -1849,8 +1819,21 @@ sub loadsnmpttconf
 				@{ $event{$temp[2]} }[2+$countx]= $temp[3];
 				@{ $event{$temp[2]} }[3+$countx]= $temp[4];
 				@{ $event{$temp[2]} }[4+$countx]= $lineformat;
-				@{ $event{$temp[2]} }[5+$countx]= $lineexec;
-				@{ $event{$temp[2]} }[6+$countx]= $linenodes;
+				#@{ $event{$temp[2]} }[5+$countx]= $lineexec;
+				@{ $event{$temp[2]} }[5+$countx]= [@exec];
+				
+				# If dynamic_nodes is disabled, process the nodes list to load any nodes
+				# files first so they are not loaded each time a trap is processed
+				if ($dynamic_nodes == 0)
+				{
+				  my @nodes2 = &process_nodes($linenodes);
+				  @{ $event{$temp[2]} }[6+$countx]= "@nodes2";
+				}
+				else
+				{
+				  @{ $event{$temp[2]} }[6+$countx]= $linenodes;
+				}
+
 				@{ $event{$temp[2]} }[7+$countx]= [@regex];
 				@{ $event{$temp[2]} }[8+$countx]= [@match];
 				@{ $event{$temp[2]} }[0]= 9+ @{ $event{$temp[2]} }[0];
@@ -2510,6 +2493,7 @@ sub loadsnmpttini {
 	$mibs_environment = $cfg->val('General', 'mibs_environment');
 	$allow_unsafe_regex = $cfg->val('General', 'allow_unsafe_regex');
 	$remove_backslash_from_quotes = $cfg->val('General', 'remove_backslash_from_quotes');
+	$dynamic_nodes = $cfg->val('General', 'dynamic_nodes');
 	
 	# DaemonMode
 	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -2607,10 +2591,13 @@ sub loadsnmpttini {
 	if (! defined ($wildcard_expansion_separator)) { $wildcard_expansion_separator = " "} ;
 	if (! defined ($allow_unsafe_regex)) { $allow_unsafe_regex = 0} ;
 	if (! defined ($remove_backslash_from_quotes)) { $remove_backslash_from_quotes = 0} ;
+	if (! defined ($dynamic_nodes)) { $dynamic_nodes = 0} ;
+	
 	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($spool_directory)) { $spool_directory = ''} ;
 	if (! defined ($sleep)) { $sleep = 5} ;
 	if (! defined ($use_trap_time)) { $use_trap_time = 1} ;
+
 	if (! defined ($keep_unlogged_traps)) { $keep_unlogged_traps = 1} ;
 	if (! defined ($stdout_enable)) { $stdout_enable = 0} ;
 	if (! defined ($log_enable)) { $log_enable = 1} ;
@@ -3216,4 +3203,50 @@ sub my_mapEnum(oid, value)
   }
 }
  
+sub process_nodes(nodes_list)
+{
+  my $nodes_list = shift;
+  my @nodes = ();
+  my @nodes2 = ();
 
+  # print "Processing NODES\n";
+  
+  # Put all the NODES entries into @nodes, and then go through them all and put
+  # them into @nodes2.  This is done so files that are in the NODES list can be
+  # read in and merged into @nodes2 to allow a NODES line to contain both host
+  # names / ip addresses AND the entries from nodes files.
+  @nodes = split /\s/, $nodes_list;
+  foreach my $a (@nodes)
+  {
+    # Contain a \ or /?  Must be a filename and not an IP address / network number
+    if ( ($a =~ /\\|\//) && !($a =~ /\d+\.\d+\.\d+\.\d+/))
+    {
+      if (open NODESFILE, $a)
+      {
+	while (defined($line = <NODESFILE>))
+	{
+	  chomp($line);
+	  # Allow comment lines starting with a #
+	  if (!($line =~ /((^#)|(\s+#)).*/))
+	  {
+	    my @temp2 = split /\s/, $line;
+	    foreach my $b (@temp2)
+	    {
+	      push (@nodes2, $b);
+	    }
+	  }
+	}
+	close LOGFILE;
+      }
+      else
+      {
+	warn "Can not open NODES file: $event2[5] $!";
+      }
+    }
+    else 	# Must be a single node
+    {
+      push (@nodes2, $a);
+    }
+  }
+  return @nodes2;
+}

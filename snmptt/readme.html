@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; July 4th, 2003
+This file was last updated on:&nbsp; July 7th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -211,7 +211,12 @@ trap
 enterprise variables</li>
   <li><span style="font-weight: bold;">REGEX </span>now supports
 substitution with captures</li>
-  <li>Added support for remote MySQL and PostgreSQL databases<br>
+  <li>Added support for remote MySQL and PostgreSQL databases</li>
+  <li>An EVENT can now contain mulitple EXEC lines</li>
+  <li>An EVENT can now contain mulitple NODES lines</li>
+  <li>Added the option <span style="font-weight: bold;">dynamic_nodes</span>
+to allow NODES files to be either loaded at startup or loaded each time
+an EVENT is processed<br>
   </li>
   <li>Added <span style="font-weight: bold;">trapoid </span>column
 for database logging to contain the actual trap received.&nbsp; The <span
@@ -1104,6 +1109,8 @@ the syslog level or NT Event Log type to the severity level.</blockquote>
   </blockquote>
   <a name="SNMPTT.CONF-FORMAT"></a><b>FORMAT:</b>
   <blockquote><b>FORMAT</b> format_string
+    <p>There can be only one FORMAT line per EVENT.<br>
+    </p>
     <p>The format string is used to generate the text that will be
 logged to any of the supported logging methods. </p>
     <p><a name="Variable-substitutions"></a>Variable substitution is
@@ -1247,8 +1254,11 @@ patch page</a>.</blockquote>
   </blockquote>
   <a name="SNMPTT.CONF-EXEC"></a><b>EXEC:</b>
   <blockquote>[<b>EXEC</b> command_string]
+    <p>There can be multiple EXEC lines per EVENT.<br>
+    </p>
     <p>Optional string containing command to execute when trap is
-received and arguments to pass to the program. </p>
+received and arguments to pass to the program.&nbsp; The EXEC lines are
+executed in the order that they appear. </p>
     <p>EXEC uses the same variable substitution as the FORMAT line. </p>
     <p>Example: </p>
     <blockquote>EXEC /usr/bin/qpage -f TRAP alex "$r: $x $X - NIC
@@ -1262,6 +1272,7 @@ the
 page above, you must use the variables such as $r, $x and $X.</blockquote>
   <a name="SNMPTT.CONF-NODES"></a><b>NODES:</b>
   <blockquote>[<b>NODES</b> sources_list]
+    <p>There can be multiple NODES lines per EVENT.</p>
     <p>Used to limit which devices can be mapped to this EVENT
 definition.<br>
     </p>
@@ -1305,7 +1316,14 @@ Using 172.16/24 will NOT work.<br>
 Do not use any spaces between network ranges as they will be
 interpreted as two different values.&nbsp; For example,
 192.168.1.1&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp; 192.168.1.20 will not
-work.&nbsp; Use 192.168.1.1-192.168.1.20 instead.
+work.&nbsp; Use 192.168.1.1-192.168.1.20 instead.<br>
+      <br>
+By default, NODES files are loaded when the <span
+ style="font-weight: bold;">snmptt.conf</span> files are loaded (during
+startup of SNMPTT).&nbsp; The <span style="font-weight: bold;">snmptt.ini
+      </span>option <span style="font-weight: bold;">dynamic_nodes</span>
+can be set to <span style="font-weight: bold;">1</span> to have the
+nodes files loaded each time an EVENT is processed.<br>
       <p>See the section '<a
  href="file:///I:/cvs/snmptt/readme.html#DNS">Name Resolution / DNS</a>'
 for important DNS information.</p>

@@ -142,6 +142,15 @@ allow_unsafe_regex = 0
 # Set to 0 to disable
 remove_backslash_from_quotes = 0
 
+# Set to 1 to have NODES files loaded each time a trap is processed
+# Set to 0 to have all NODES files loaded when the snmptt.conf files are loaded
+# If NODES files are used (files that contain lists of NODES), then setting to 1
+# will cause the list to be loaded each time an EVENT is processed that uses
+# NODES files.  This will allow the NODES file to be modified while SNMPTT is 
+# running but can result in many file reads depending on the number of traps
+# received.  Defaults to 0
+dynamic_nodes = 0
+
 [DaemonMode]
 # Set to 1 to have snmptt fork to the background when run in daemon mode
 # Ignored by Windows.  See documentation
