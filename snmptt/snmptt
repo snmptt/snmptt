@@ -593,7 +593,7 @@ sub processtrap
 			if ($DEBUGGING >= 1)
 			{
 			  print "  No nodes defined for this entry so all nodes will match\n";
-			}
+			}z
 		}
 		else
 		{
@@ -694,15 +694,15 @@ sub processtrap
 				print "$message";
 			}
 
-			$trap_successfully_logged = 0;
-			$trap_attempted_to_log = 1;
 			if ($log_enable == 1)
 			{
+				$trap_attempted_to_log++;	
+				
 				if (open LOGFILE, ">>$log_file")
 				{
 					print LOGFILE $trap_date_time." $message";
 					close LOGFILE;
-					$trap_successfully_logged = 1;
+					$trap_successfully_logged++;
 				}
 				else
 				{
@@ -722,11 +722,13 @@ sub processtrap
 	
 			if ($syslog_enable == 1)
 			{
+				$trap_attempted_to_log++;
+				
 				if (Sys::Syslog::openlog('TRAPD', '',$syslog_facility) )
 				{
 					Sys::Syslog::syslog ($syslog_level, $message,1);
 					Sys::Syslog::closelog();
-					$trap_successfully_logged = 1;
+					$trap_successfully_logged++;
 				}
 				else
 				{
@@ -736,31 +738,35 @@ sub processtrap
 			
 			if ($eventlog_enable == 1)
 			{
+			  $trap_attempted_to_log++;
+			  
 			  if ($eventlog_type =~ /INFORMATION/s)
 			  {
 			    if (eventlog_system($message,2,$eventlog_information) == 0)
 			    {
-			      $trap_successfully_logged = 1;
+			      $trap_successfully_logged++;
 			    }
 			  }
 			  elsif ($eventlog_type =~ /ERROR/s)
 			  {
 			    if (eventlog_system($message,2,$eventlog_error) == 0)
 			    {
-			      $trap_successfully_logged = 1;
+			      $trap_successfully_logged++;
 			    }
 			  }
 			  else
 			  {
 			    if (eventlog_system($message,2,$eventlog_warning) == 0)
 			    {
-			      $trap_successfully_logged = 1;
+			      $trap_successfully_logged++;
 			    }
 			  }
 			}
 
 			if ($mysql_dbi_enable == 1 && defined ($dbh_mysql))
 			{
+				$trap_attempted_to_log++;	
+				
 				$message = $_;
 
 				unless (defined ($dbh_mysql->do(
@@ -785,12 +791,14 @@ sub processtrap
 				 }
 				 else
 				 {
-				   $trap_successfully_logged = 1;
+				   $trap_successfully_logged++;
 				 }
 			}
 			
 			if ($dbd_odbc_enable == 1 && defined ($dbh_odbc))
 			{
+				$trap_attempted_to_log++;	
+				
 				$message = $_;
 				
 				unless (defined ($dbh_odbc->do(
@@ -816,12 +824,14 @@ sub processtrap
 					}
 					else
 					{
-					  $trap_successfully_logged = 1;
+					  $trap_successfully_logged++;
 					}
 			}				 
 			
 			if ($sql_win32_odbc_enable == 1 && defined ($dbh_win32_odbc) )
 			{
+				$trap_attempted_to_log++;	
+				
 				$message = $_;
 				
 				# if defined, there's an error
@@ -842,7 +852,7 @@ sub processtrap
 				}
 				else
 				{
-				  $trap_successfully_logged = 1;
+				  $trap_successfully_logged++;
 				}
 			}				 
 
@@ -1534,8 +1544,10 @@ sub searchfortrap
 	
 	$processed = 0;
 	$receivedtrap = @var[3];
+
 	$trap_attempted_to_log = 0;
-	
+	$trap_successfully_logged = 0;
+
 	# Check for exact match
 	if (exists $event{"$receivedtrap"})
 	{
@@ -1618,12 +1630,35 @@ sub searchfortrap
 		}
 	}
 	
-	if ($trap_attempted_to_log == 0)
-	{
-	  $trap_successfully_logged = 1;	# If we didn't even try to log, set it as a successful
-	  					# log so the trap file gets deleted from the spool dir
-	}
 
+	# If keep_unlogged_traps is set to 0, or if we didn't even try to log, set it as a successful log 
+	# so the trap file gets deleted from the spool dir (the trap wasn't found, or a node didn't match)
+	if ($trap_attempted_to_log == 0 || $keep_unlogged_traps == 0)	
+	{					
+	  $trap_successfully_logged = 1;	
+	}
+	elsif ($keep_unlogged_traps == 1)	# Delete spool if ONE successfully logged
+	{
+	  if ($trap_successfully_logged >= 1)
+	  {
+	    $trap_successfully_logged = 1;
+	  }
+	  else
+	  {
+	    $trap_successfully_logged = 0;
+	  }
+	}
+	elsif ($keep_unlogged_traps == 2)	# Delete spool if ALL successfully logged
+	{
+	  if ($trap_successfully_logged == $trap_attempted_to_log)
+	  {
+	    $trap_successfully_logged = 1;
+	  }
+	  else
+	  {
+	    $trap_successfully_logged = 0;
+	  }
+	}
 }
 
 sub findsnmpttini

@@ -1,3 +1,8 @@
+February 25th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Updated keep_unlogged_traps option to have SNMPTT erase the spooled trap
+  file only after it successfully logs to at least one or all log systems. 
+  This will help prevent traps from being lost due to logging problems.
+
 February 24th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added keep_unlogged_traps variable to prevent SNMPTT from deleting the
   spooled trap file if NONE of defined logging systems successfully logged 
