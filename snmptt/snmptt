@@ -4572,7 +4572,7 @@ sub postgresql_ping {
   if ($postgresql_dbi_enable == 1) {
     if (defined ($dbh_postgresql)) {
       my $rc = $dbh_postgresql->ping;
-      if ($dbh_postgresql->{'errno'} != 0) {
+      if (!$rc) { 
         &dbh_postgresql_connect();
       }
     }
@@ -4593,7 +4593,7 @@ sub dbd_odbc_ping {
   if ($dbd_odbc_enable == 1) {
     if (defined ($dbh_odbc)) {
       my $rc = $dbh_odbc->ping;
-      if ($dbh_odbc->{'errno'} != 0) {
+      if (!$rc) { 
         &dbd_odbc_connect();
       }
     }
