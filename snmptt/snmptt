@@ -146,7 +146,16 @@ if ($debugfile ne '')
 	$debugfilecmdline = 1;
 }
 
+##############################################################################
+#
+# Load config file 
+#
+
+&findsnmpttini;
+&loadsnmpttini
 		
+##############################################################################
+
 use Text::ParseWords;
 
 if ($syslog_enable == 1)
@@ -185,10 +194,6 @@ if ($DEBUGGING >= 1)
 }		
 
 ##############################################################################
-
-&findsnmpttini;
-&loadsnmpttini;
-
 ####  MAIN SECTION START
 
 # Pull in passed SNMP info from snmptrapd via STDIN and place in the array @tempvar
@@ -528,7 +533,6 @@ sub processtrap
 		
 			if ($log_enable == 1)
 			{
-				print "aa\n";
 				if (open LOGFILE, ">>$log_file")
 				{
 					print LOGFILE scalar(localtime)." $message";
