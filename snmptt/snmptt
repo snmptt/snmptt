@@ -48,6 +48,9 @@
 # Set to 0 to run standalone (snmptt called from snmptrapd.conf)
 $daemonmode = 0;
 
+# Set to 1 to have the snmptt fork to the background if supported
+$daemonfork=1;
+
 # Set to 1 to enable messages to be sent to standard output, or 0 to disable.
 # Would normally be left off unless you are piping this program to another
 $enablestdout = 1;
@@ -259,7 +262,7 @@ if ($daemon == 1)
 	&loadsnmpttconf;	# Load SNMPTT.CONF file
 
 	# Only fork to the background if not Win32
-	if ($^O ne "MSWin32")
+	if (($^O ne "MSWin32") && ($daemonfork==1))
 	{
 		use POSIX qw(setsid);
 	
@@ -283,7 +286,7 @@ if ($daemon == 1)
 	{
 	
 		
-		unless (chdir($spooldirectory))
+		if (! (chdir($spooldirectory)))
 		{
 			if ($DEBUGGING >= 1)
 			{
@@ -291,8 +294,7 @@ if ($daemon == 1)
 			}
 			warn "Unable to enter dir $spooldirectory:$!\n";
 		}
-
-		unless (opendir(DIR, "."))
+		elsif (! (opendir(DIR, ".")))
 		{
 			if ($DEBUGGING >= 1)
 			{
@@ -300,8 +302,7 @@ if ($daemon == 1)
 			}
 			warn "Unable to open $spooldirectory:$!\n";
 		}
-	
-		unless (@filenames = readdir(DIR))
+		elsif (! (@filenames = readdir(DIR)))
 		{
 		
 			if ($DEBUGGING >= 1)
@@ -310,52 +311,51 @@ if ($daemon == 1)
 			}
 			warn "Unable to read $spooldirectory:$!\n";
 		}
-
-		closedir(DIR);
-		
-		foreach my $file (@filenames)
+		else
 		{
-			next if ($file eq ".");
-			next if ($file eq "..");
-		
-			if ($DEBUGGING >= 1)
+			closedir(DIR);
+			
+			foreach my $file (@filenames)
 			{
-				print "Processing file: $file\n";
-			}
-		
-			$filesuccess = 1;
-			unless (open FILE, $spooldirectory.$file)
-			{
+				next if ($file eq ".");
+				next if ($file eq "..");
+			
 				if ($DEBUGGING >= 1)
 				{
-					print "Could not open trap file $spooldirectory$file: ($!)\n";
+					print "Processing file: $file\n";
 				}
-				warn "Could not open trap file $spooldirectory$file: ($!)\n";
-				$filesuccess = 0;
-			}
-		
-		
-			$input = 'FILE';
-	
-			&readtrap;		# Read trap from STDIN or file
-	
-			&searchfortrap;		# Search for trap snmptt.conf (array)
-
-			close FILE;
-
-			if ($filesuccess == 1)
-			{
-				unless (unlink($file))
+			
+				$filesuccess = 1;
+				unless (open FILE, $spooldirectory.$file)
 				{
 					if ($DEBUGGING >= 1)
 					{
-						print "Unable to delete $file:$!\n";
+						print "Could not open trap file $spooldirectory$file: ($!)\n";
 					}
-					warn "Unable to delete $file:$!\n";
+					warn "Could not open trap file $spooldirectory$file: ($!)\n";
+					$filesuccess = 0;
+				}
+						
+				$input = 'FILE';
+		
+				&readtrap;		# Read trap from STDIN or file
+		
+				&searchfortrap;		# Search for trap snmptt.conf (array)
+	
+				close FILE;
+	
+				if ($filesuccess == 1)
+				{
+					unless (unlink($file))
+					{
+						if ($DEBUGGING >= 1)
+						{
+							print "Unable to delete $file:$!\n";
+						}
+						warn "Unable to delete $file:$!\n";
+					}
 				}
 			}
-				
-			#exit();
 		}
 		if ($DEBUGGING >= 1)
 		{
@@ -489,7 +489,7 @@ sub processtrap
 				}
 				else
 				{
-				warn "Cannot open NODES file: $!";
+				warn "Cannot open NODES file: $event2[5] $!";
 				}
 				
 				#load file
@@ -687,7 +687,7 @@ sub loadsnmpttconf
 	
 	#Load entire snmptt.conf file into array @snmpttconf
 	open SNMPTTCONF, $snmpttconffile
-		or die "Could not open snmptt.conf file ($!)";
+		or die "Could not open snmptt.conf file: $snmpttconffile ($!)";
 
 	if ($snmpttconfiletype == 0)	# config file contains traps
 	{
@@ -727,7 +727,7 @@ sub loadsnmpttconf
 		foreach $snmpttconffile (@snmpttconffiles)
 		{
 			open SNMPTTCONF, $snmpttconffile
-				or warn "Could not open snmptt.conf file ($!)";
+				or die "Could not open snmptt.conf file: $snmpttconffile ($!)";
 
 			if ($DEBUGGING >= 1)
 			{

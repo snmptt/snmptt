@@ -1,3 +1,9 @@
+September 4th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Added variable to allow user to disable forking for daemon mode.
+- Cleaned up file / directory error handling for daemon mode
+- Tested snmptt in deamon mode and snmptthandler on both Linux
+  and Windows NT
+
 September 3rd, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Added fork for daemon mode for non Win32 systems
 - Fixed minor Win32 file problems and tested deamon mode under 
