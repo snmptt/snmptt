@@ -1,5 +1,5 @@
 #
-# SNMPTT 0.7 Configuration File
+# SNMPTT 0.8 Configuration File
 #
 # Windows NT
 #
@@ -18,6 +18,17 @@ mode = standalone
 #	the NODES list prevents it from being considered a match, the wildcard entry will
 #	only be used if there are no other exact matches.
 multiple_event = 1
+
+# SNMPTRAPD passes the IP address of device sending the trap, and the IP address of the
+# actual SNMP agent.  These address could differ if the trap was sent on behalf of another
+# device (relay, proxy etc).
+# If DNS is enabled, the agent IP address is converted to a host name using a DNS lookup
+# (which includes the local hosts file, depending on how the OS is configured).  This name
+# will be used for: NODES entry matches, hostname field in logged traps (file / database), 
+# the $A variable, 
+# Set to 0 to disable DNS resolution
+# Set to 1 to enable DNS resolution
+dns_enable = 0
 
 # Set to 0 to enable the use of FQDN (Fully Qualified Domain Names).  If a host name is
 # passed to SNMPTT that contains a domain name, it will not be altered in any way by

@@ -1,3 +1,7 @@
+April 20th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added dns_enable option and changed (nearly) all $var[0] 
+  to $agent_dns_name
+
 April 19th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added additional translation options
 
