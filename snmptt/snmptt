@@ -386,7 +386,7 @@ sub processtrap
 		if ($event{"@var[3]"}[4] ne '' && $event{@var[3]}[1] ne "LOGONLY")
 		{
 			
-			$_ = $event{"@var[3]"}[4];	# FORMAT string
+			$_ = $event{"@var[3]"}[4];	# EXEC string
 		
 			&substitute;
 	
