@@ -2344,7 +2344,7 @@ sub searchfortrap
 				#print out all enterprise specific variables
 				for ($i=0;$i <= $#entvar;$i++)
 				{
-					print LOGFILE "Value $i: $entvarname[$i]=$entvar[$i]\n";
+					print LOGFILE "Ent Value $i: $entvarname[$i]=$entvar[$i]\n";
 				}
 				print LOGFILE "\n\n";
 				close LOGFILE;

@@ -1,3 +1,7 @@
+April 29th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Enterprise variables in snmpttunknown.log now start with Ent Value: instead
+  of just Value:
+
 April 25th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Snmpttconvertmib:  Now prints the variables contained in each
   trap unless --no_variables is set.  When using --net_snmp_perl
