@@ -125,6 +125,18 @@ translate_integers = 1
 # more characters
 wildcard_expansion_separator = " "
 
+# Set to 1 to allow unsafe REGEX code to be executed.
+# Set to 0 to prevent unsafe REGEX code to be executed (default).
+# Enabling unsafe REGEX code will allow substitution with captures such
+# as:
+# (one (two) three)(five $1 six)
+# which results in the output of: five two six
+# This is considered unsafe because the contents of the regular expression
+# (left)(and right) is executed by Perl which *could contain unsafe code*.
+# If this option is enabled, BE SURE THAT THE SNMPTT CONFIGURATION FILES ARE 
+# SECURE!
+allow_unsafe_regex = 0
+
 [DaemonMode]
 # Set to 1 to have snmptt fork to the background when run in daemon mode
 # Ignored by Windows.  See documentation

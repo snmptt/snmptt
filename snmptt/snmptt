@@ -1591,7 +1591,15 @@ sub substitute
       {
 	print "  Doing REGEX: s($regex_temp2[0])($regex_temp2[1])g\n";
       }
-      s($regex_temp2[0])($regex_temp2[1])g;
+      if ($allow_unsafe_regex == 1)
+      {
+	$regex_temp2[1] = "\"$regex_temp2[1]\"";
+	s($regex_temp2[0])($regex_temp2[1])eeg;
+      }
+      else
+      {
+	s($regex_temp2[0])($regex_temp2[1])g;
+      }
     }
   }
 }
@@ -2491,6 +2499,7 @@ sub loadsnmpttini {
 	$translate_integers = $cfg->val('General', 'translate_integers');
 	$wildcard_expansion_separator = $cfg->val('General', 'wildcard_expansion_separator');
 	$mibs_environment = $cfg->val('General', 'mibs_environment');
+	$allow_unsafe_regex = $cfg->val('General', 'allow_unsafe_regex');
 	
 	# DaemonMode
 	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -2582,6 +2591,7 @@ sub loadsnmpttini {
 	if (! defined ($translate_varname_oid_format)) { $translate_varname_oid_format = 1} ;
 	if (! defined ($translate_integers)) { $translate_integers = 0} ;
 	if (! defined ($wildcard_expansion_separator)) { $wildcard_expansion_separator = " "} ;
+	if (! defined ($allow_unsafe_regex)) { $allow_unsafe_regex = 0} ;
 	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($spool_directory)) { $spool_directory = ''} ;
 	if (! defined ($sleep)) { $sleep = 5} ;

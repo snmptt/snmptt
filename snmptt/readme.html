@@ -187,6 +187,8 @@ traps using symbolic form, or you enable the options <span
   <li>Added <span style="font-weight: bold;">MATCH </span>keyword
 support to allow trap matching based on values contained inside the trap
 enterprise variables</li>
+  <li><span style="font-weight: bold;">REGEX </span>now supports
+substitution with captures</li>
   <li>Added <span style="font-weight: bold;">trapoid </span>column
 for database logging to contain the actual trap received.&nbsp; The <span
  style="font-weight: bold;">eventid</span> column will contain the
@@ -1449,8 +1451,36 @@ FORMAT line after:&nbsp; <span style="font-weight: bold;">Alarm One
 and (Two) has been triggered</span><br>
   </div>
 </blockquote>
-<div style="margin-left: 80px;">Note:&nbsp; Memory parentheses are
-currently not supported and searches are not case sensitive.<br>
+<div style="margin-left: 80px;"><br>
+To use substitution with captures (memory parenthesis), you must first
+enable support in the snmptt.ini file by setting <span
+ style="font-weight: bold;">allow_unsafe_regex </span>to <span
+ style="font-weight: bold;">1</span>.&nbsp; Note:&nbsp; <span
+ style="font-weight: bold;">This is considered unsafe because the
+contents of the regular expression (left)(and right) is executed by
+Perl which could contain unsafe code</span>.&nbsp; If this option is
+enabled, <span style="font-weight: bold;">BE SURE THAT THE SNMPTT
+CONFIGURATION FILES ARE SECURE!&nbsp; </span><br>
+<p>Example:<br>
+</p>
+<div style="margin-left: 40px;"> FORMAT line before:&nbsp;<span
+ style="font-weight: bold;"> The system has logged exception error 55
+for the service testservice<br>
+</span></div>
+<span style="font-weight: bold;"></span><br>
+<div style="margin-left: 40px;"> <span style="font-weight: bold;">REGEX
+(</span><span style="font-weight: bold;">The system has logged
+exception error (\d+) for the service (\w+</span><span
+ style="font-weight: bold;">))(Service $2 generated error $1)</span><br
+ style="font-weight: bold;">
+<span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><br>
+FORMAT line after:&nbsp; <span style="font-weight: bold;"></span><span
+ style="font-weight: bold;">Service testservice generated error 55</span><span
+ style="font-weight: bold;"></span><br>
+</div>
+<br>
+Note:&nbsp; Searches are <span style="font-weight: bold;">not </span>case
+sensitive.<br>
 </div>
 <blockquote><b>SDESC</b>
   <blockquote>[<b>SDESC</b>]
