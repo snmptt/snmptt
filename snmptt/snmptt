@@ -2217,8 +2217,8 @@ sub readtrap
 
 	  ($temp1, $temp2) = split (/ /, $line, 2);
   
-	  chomp ($temp1);
-	  chomp ($temp2);
+	  chomp ($temp1);       # Variable NAME
+	  chomp ($temp2);       # Variable VALUE
 	  chomp ($line);
 	
 	  if ($linenum == 1)
@@ -2235,7 +2235,10 @@ sub readtrap
 
 	  if ($variable_fix == 0 )
 	  {
-	    # If line begins with a double quote (") but does not END in a double quote then we need to merge
+            # Make sure variable names are numerical
+            $temp1 = translate_symbolic_to_oid($temp1);
+
+            # If line begins with a double quote (") but does not END in a double quote then we need to merge
 	    # the following lines together into one until we find the closing double quote.
 	    # Net-SNMP sometimes divides long lines into multiple lines..
 	    if ( ($temp2 =~ /^\"/) && ( ! ($temp2 =~ /\"$/)) )
@@ -2359,7 +2362,7 @@ sub readtrap
 	$var[5] = "";	# Clear trap community string
 	$var[6] = "";	# Clear enterprise
 
-        # Check to see if OID passed from snmptrapd is fully numeric.  If not, try to translate
+        # Make sure trap OID is numerical as event lookups are done using numerical OIDs only
         $var[3] = translate_symbolic_to_oid($var[3]);
         
 	# Cycle through remaining variables searching for for agent IP (.1.3.6.1.6.3.18.1.3.0),
@@ -2368,7 +2371,6 @@ sub readtrap
 	$j=0;
 	for ($i=6;$i <= $#tempvar; $i+=2)
         {
-          $tempvar[$i] = translate_symbolic_to_oid($tempvar[$i]);	
           if ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.3.0$/)		# ip address from trap agent
           {
             $var[4] = $tempvar[$i+1];
@@ -2379,7 +2381,9 @@ sub readtrap
           }
           elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.1.1.4.3.0$/)	# enterprise
           {
-            $var[6] = $tempvar[$i+1];
+            # $var[6] = $tempvar[$i+1];
+            # Make sure enterprise value is numerical
+            $var[6] = translate_symbolic_to_oid($tempvar[$i+1]);
           }
           else	# application specific variables
           {
@@ -3738,9 +3742,8 @@ sub process_nodes
   return @nodes2;
 }
 
-# Used when reading received traps to convert the trap symbolic to numeric.
-# Also used to convert the variable 'names' for community, agent_address and
-# enterprise so they can be extracted by searching for the numerical OID
+# Used when reading received traps to symbolic names in variable names and
+# values to numerical
 sub translate_symbolic_to_oid
 {
   my $temp = shift;
@@ -3751,7 +3754,7 @@ sub translate_symbolic_to_oid
     # Not numeric
     # Try to convert to numerical
     if ($DEBUGGING >= 2) {
-      print "\nSymbolic trap variable name detected ($temp).  Will attempt to translate to a numerical OID\n";
+      print "Symbolic trap variable name detected ($temp).  Will attempt to translate to a numerical OID\n";
     }
     if ($net_snmp_perl_enable == 1)
     {

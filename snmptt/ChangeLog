@@ -1,3 +1,8 @@
+January 25th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Clean up yesterday's symbolic fix.  It now translates all
+  variable NAMES (if needed), the trap OID and the enterprise
+  VALUE.
+
 January 24th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Traps received using symbolic format (snmptrapd without -On) 
   were not being handled correctly.  Code in readtrap was looking
