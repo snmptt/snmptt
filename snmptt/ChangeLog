@@ -1,3 +1,13 @@
+June 24th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Snmpttconvertmib: Took out most of the net_snmp_perl code
+  and moved only the variables code into the main 
+  snmptranslate code as that's really the only difference,
+  and snmptranslate now works fast as the exact MIB name
+  is used on the command line.  Perl module only used to 
+  convert variable syntax, desc and enums.
+- Improved formatting of variables output
+- Allow comments on VARIABLES lines in MIB files
+
 June 21th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Snmpttconvertmib: Changed --net_snmp_perl method to use
   the moduleID from the hash of OIDs instead of trying to 
