@@ -1,3 +1,9 @@
+May  9th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed bug when using wildcards.  The received trap was reset to the 
+  matching EVENT entry which contained the .*.  This caused things like
+  $S not to work.  Changed so that actual received trap is not overwritten
+  with what it matched to in the EVENT table.
+
 May  7th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - SNMPTT will strip DOS carriage return from snmptt.conf files if detected.
 

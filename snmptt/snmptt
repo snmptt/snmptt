@@ -615,7 +615,7 @@ sub processtrap
 	#
 	#		or
 	# 		
-	# 		$event{"$receivedtrap"}[3]	
+	# 		$event{"$receivedtrap_entry"}[3]	
 	###############################################################################
 	# if no nodes list, then $hostmatch = 1 so trap is logged etc, otherwise it is not
 
@@ -627,7 +627,7 @@ sub processtrap
 					# different machines to have different actions based on 
 					# the node name.
 	
-	while (defined($event{$receivedtrap}[$l+1]))
+	while (defined($event{$receivedtrap_entry}[$l+1]))
 	{
 	  if (($multiple_event == 0) && ($multiple_event_passes > 0))
 	  {
@@ -640,7 +640,7 @@ sub processtrap
 	  }
 	  if ($DEBUGGING >= 1)
 		{
-			print  "Working with EVENT entry: $receivedtrap => $event{$receivedtrap}[0+$l],$event{$receivedtrap}[1+$l],$event{$receivedtrap}[2+$l],$event{$receivedtrap}[5+$l]\n";
+			print  "Working with EVENT entry: $receivedtrap_entry => $event{$receivedtrap_entry}[0+$l],$event{$receivedtrap_entry}[1+$l],$event{$receivedtrap_entry}[2+$l],$event{$receivedtrap_entry}[5+$l]\n";
 		}
 		
 		$hostmatch = 0;
@@ -657,21 +657,21 @@ sub processtrap
 		@nodes = ();
 		@nodes2 = ();
 	
-		#	$event2[0]=$event{"$receivedtrap"}[0];	# 0: name of trap	
-		#	$event2[1]=$event{"$receivedtrap"}[1];	# 1: category
-		#	$event2[2]=$event{"$receivedtrap"}[2];	# 2: severity
-		#	$event2[3]=$event{"$receivedtrap"}[3];	# 3: FORMAT string
-		#	$event2[4]=$event{"$receivedtrap"}[4];	# 4: EXEC string
-		#	$event2[5]=$event{"$receivedtrap"}[5];	# 5: NODES string
+		#	$event2[0]=$event{"$receivedtrap_entry"}[0];	# 0: name of trap	
+		#	$event2[1]=$event{"$receivedtrap_entry"}[1];	# 1: category
+		#	$event2[2]=$event{"$receivedtrap_entry"}[2];	# 2: severity
+		#	$event2[3]=$event{"$receivedtrap_entry"}[3];	# 3: FORMAT string
+		#	$event2[4]=$event{"$receivedtrap_entry"}[4];	# 4: EXEC string
+		#	$event2[5]=$event{"$receivedtrap_entry"}[5];	# 5: NODES string
 		
-		$event2[0]=$event{"$receivedtrap"}[0+$l];	# 0: name of trap	
-		$event2[1]=$event{"$receivedtrap"}[1+$l];	# 1: category
-		$event2[2]=$event{"$receivedtrap"}[2+$l];	# 2: severity
-		$event2[3]=$event{"$receivedtrap"}[3+$l];	# 3: FORMAT string
-		$event2[4]=$event{"$receivedtrap"}[4+$l];	# 4: EXEC string
-		$event2[5]=$event{"$receivedtrap"}[5+$l];	# 5: NODES string
-		$event2[6]=$event{"$receivedtrap"}[6+$l];	# 6: REGEX string		
-		$event2[7]=$event{"$receivedtrap"}[7+$l];	# 7: MATCH string		
+		$event2[0]=$event{"$receivedtrap_entry"}[0+$l];	# 0: name of trap	
+		$event2[1]=$event{"$receivedtrap_entry"}[1+$l];	# 1: category
+		$event2[2]=$event{"$receivedtrap_entry"}[2+$l];	# 2: severity
+		$event2[3]=$event{"$receivedtrap_entry"}[3+$l];	# 3: FORMAT string
+		$event2[4]=$event{"$receivedtrap_entry"}[4+$l];	# 4: EXEC string
+		$event2[5]=$event{"$receivedtrap_entry"}[5+$l];	# 5: NODES string
+		$event2[6]=$event{"$receivedtrap_entry"}[6+$l];	# 6: REGEX string		
+		$event2[7]=$event{"$receivedtrap_entry"}[7+$l];	# 7: MATCH string		
 		
 		$l+=9;
 			
@@ -2267,6 +2267,8 @@ sub searchfortrap
 	
 	$processed = 0;
 	$receivedtrap = $var[3];
+	$receivedtrap_entry = $receivedtrap; 	# Will be used to processtrap to lookup EVENT info
+						# Changed to actual EVENT entry if using a wildcard 
 
 	$trap_attempted_to_log = 0;
 	$trap_successfully_logged = 0;
@@ -2316,7 +2318,7 @@ sub searchfortrap
 			
 			if (exists $event{$receivedtraptemp.'.*'})
 			{
-				$receivedtrap = $receivedtraptemp.'.*';	# Set $receivedtrap to matching trap with wildcard
+				$receivedtrap_entry = $receivedtraptemp.'.*';	# Set $receivedtrap to matching trap with wildcard
 				&processtrap;
 				last;	# found, so stop this while loop
 			}
