@@ -967,43 +967,72 @@ sub readtrap
 	
 	#Process varbinds
 	#Separate everything out, keeping both the variable name and the value
+	$linenum = 1;
 	while (defined($line = <$input>))
 	{
-		# use shellwords to divide the two space separated values
-		# without messing up quoted text and re-join using :: as the
-		# delimiter (Add a space to the end otherwise we loose lines 
-		# that contain just a 0)
+	  my $temp1;
+	  my $temp2;
+
+	  ($temp1, $temp2) = split (/ /, $line, 2);
+  
+	  chomp ($temp1);
+	  chomp ($temp2);
+	  chomp ($line);
 	
-		$temp = join "::", shellwords($line)," ";                
+	  if ($linenum == 1)
+	  {
+	    if (defined($temp2) )	# Check if line 1 contains 'variable value' or just 'value'  
+	    {
+	      $variable_fix = 0;
+	    }
+	    else
+	    {
+	      $variable_fix = 1;
+	    }
+	  }
 	
-		# Chop off last two
-		chop ($temp);
-		chop ($temp);
-		chop ($temp); # Cut off that extra space from above
+	  if ($variable_fix == 0 )
+	  {
+	    if ($temp2 =~ /^\"/ && $temp2 =~ /$\"/)			# Have quotes around it?
+	    {
+	      $temp2 = substr($temp2,1,(length($temp2)-2));		# Remove quotes
+	      push(@tempvar, $temp1);
+	      push(@tempvar, $temp2);
+	    }
+	    else
+	    {
+	      push(@tempvar, $temp1);
+	      push(@tempvar, $temp2);
+	    }
+	  }
+	  else			# Should have been variable value, but only value found.  Workaround
+	  			#
+				# Normally it is expected that a line contains a variable name
+				# followed by a space followed by the value (except for the 
+				# first line which is the hostname and the second which is the
+				# IP address).  If there is no variable name on the line (only
+				# one string), then add a variable string called 'variable' so 
+				# it is handled correctly in the next section.
+				# This happens with ucd-snmp v4.2.3 but not v4.2.1 or v4.2.5.
+				# This appears to be a bug in ucd-snmp v4.2.3.  This works around
+				# the problem by using 'variable' for the variable name, although 
+				# v4.2.3 should NOT be used with SNMPTT as it prevents SNMP V2 traps 
+				# from being handled correctly.
+	  {
+	    if ($temp2 =~ /^\"/ && $temp2 =~ /$\"/)			# Have quotes around it?
+	    {
+	      $line = substr($line,1,(length($line)-2));		# Remove quotes
+	      push(@tempvar, "variable");
+	      push(@tempvar, $line);
+	    }
+	    else
+	    {
+	      push(@tempvar, "variable");
+	      push(@tempvar, $line);
+	    }
+	  }
 	
-		# Split using the new delimiter
-		@temp = split ("::",$temp);
-	
-		# Normally it is expected that a line contains a variable name
-		# followed by a space followed by the value (except for the 
-		# first line which is the hostname and the second which is the
-		# IP address).  If there is no variable name on the line (only
-		# one string), then add a variable string called 'variable' so 
-		# it is handled correctly in the next section.
-		# This happens with ucd-snmp v4.2.3 but not v4.2.1 or v4.2.5.
-		# This appears to be a bug in ucd-snmp v4.2.3.  This works around
-		# the problem although v4.2.3 should NOT be used with SNMPTT as 
-		# it prevents SNMP V2 traps from being handled correctly.
-	        if (@temp[1] eq "")
-	        {
-	                print "Data passed from snmptrapd is incorrect.  UCD-SNMP 
-				v4.2.3 is known to cause this\n";
-	                @temp[1] = @temp[0];
-	                @temp[0] = "variable";
-	        }
-	
-		# Add two strings to @tempvar
-		push(@tempvar, @temp);
+	  $linenum++;
 	}
 	
 	if ($DEBUGGING >= 2)

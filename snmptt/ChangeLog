@@ -1,3 +1,8 @@
+February 18th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Values passed to snmptt that contained spaces but were not 
+  inside of quotes were being treated as multiple variables / 
+  values.  Replaced main readtrap code to fix this.
+
 February 15th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_0.5.1
 
