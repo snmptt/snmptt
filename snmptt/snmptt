@@ -1599,7 +1599,7 @@ sub substitute
 	}
       }
 
-      print "modifiers2 = $modifiers2\n";
+      #print "modifiers2 = $modifiers2\n";
       
       # 0	none
       # 1	i
