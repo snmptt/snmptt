@@ -1,3 +1,8 @@
+October 22th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed bug with issuing a RELOAD (-HUP) when using a configuration
+  file that contains a list of other configuration files.  
+  Variable was not being cleared.
+
 October 18th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Minor bug fix for MySQL / ODBC support - eventid wrong, use
   INSERT INTO instead of just INSERT for ODBC to allow it to

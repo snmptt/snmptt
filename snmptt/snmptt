@@ -777,6 +777,7 @@ sub loadsnmpttconf
 
 	# Flush variables in case this is a re-load during run
 	@snmpttconf = ();
+	@snmpttconffiles = ();
 	undef %event;
 	
 	#Load entire snmptt.conf file into array @snmpttconf
