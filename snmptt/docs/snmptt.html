@@ -16,7 +16,7 @@
 <body>
 <h1>SNMP Trap Translator v0.9.3</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on:&nbsp; June 23rd, 2004
+This file was last updated on:&nbsp; June 25th, 2004
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -265,27 +265,21 @@ module is recommended.<br /></span></blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
 <h3><b>0.9.2</b> <b>- ??, 2004</b></h3>
 <ul>
-  <li>Added <b>mysql_ping_insert</b> option to 'ping' the database before doing an INSERT and <b>mysql_ping_interval</b> option to periodically ping the database.  These two options will help ensure the connection to the database remains available.  If an error is returned, it will attempt to reconnect to the database.  This should prevent SNMPTT from having to be restarted if the SQL server is not available due to an outage or a connection timeout due to no activity.</li>
+  <li>Added <b>mysql_ping_on_insert</b> option to 'ping' the database before doing an INSERT and <b>mysql_ping_interval</b> option to periodically ping the database.  These two options will help ensure the connection to the database remains available.  If an error is returned, it will attempt to reconnect to the database.  This should prevent SNMPTT from having to be restarted if the SQL server is not available due to an outage or a connection timeout due to no activity.</li>
+  <li>Added variable substitution <b>$Fz</b> which when used on an EXEC line will dump the translated FORMAT line.  This will allow for simplified EXEC lines when they are the same as the FORMAT line (minus the command to execute of course).</li>
   <li>Added variable substitutions <b>$Fa</b>, <b>$Ff</b>, <b>$Fn</b>, <b>$Fr</b>, <b>$Ft</b>, for alarm (bell), form feed (FF), newline (LF, NL), return (CR) and tab (HT, TAB)</li>
-  <li>Added variable substitution <b>$D</b> to dump the description text from the MIB file for FORMAT and EXEC lines.  Can be enabled or disabled using the <b>mib_descriptions_enable</b> <b>snmptt.ini</b> option.</li>
-  <li>Fixed bug with MySQL 'gone away' errors when running SNMPTT as non-root due to connection being terminated when 
-  the uid changed</li>
-  <li>Added the error number reported by MySQL to MySQL errors (system syslog, eventlog etc)</li>
-  <li>Added some friendly error messages when required Perl modules are not available</li>
-  <li>Added <b>/usr/local/etc/snmp</b> and <b>/usr/local/etc</b> paths to the list of default directories searched for <b>snmptt.ini</b> under Unix</li>
+  <li>Added variable substitution <b>$D</b> to dump the description text for FORMAT and EXEC lines.  The descriptions can be pulled from either the SNMPTT.CONF or MIB files.  This is controlled by the <b>description_mode</b> and <b>description_clean</b> <b>snmptt.ini</b> options.</li>
+  <li>SQL database connections are now opened after changing users when running SNMPTT as a non-root user.  This should prevent 'gone away' errors with MySQL.</li>
   <li>Added support for logging unknown traps to a SQL table</li>
-<li>Added logging of statistical information for <span style=
-"font-weight: bold;">total traps received</span>, <span style=
-"font-weight: bold;">total traps translated</span>, <span style=
-"font-weight: bold;">total traps ignored</span> and <span style=
-"font-weight: bold;">total unknown traps</span>.&nbsp; Statistics
-logged at shut down, and optionally at a defined interval defined
-by new <span style="font-weight: bold;">snmptt.ini</span> variable
-<span style="font-weight: bold;">statistics_interval</span>.&nbsp;
-Logging can also be forced by sending the SIGUSR1 signal, or
-creating a file called !statistics in the spool folder.<br /></li>
-<li>Fixed bug with with handling traps in symbolic format
-(snmptrapd without -On)</li>
+  <li>Added logging of statistical information for <b>total traps received</b>, <b>total traps translated</b>, <b>total traps ignored</b> and <b>total unknown traps</b>. Statistics logged at shut down, and optionally at a defined interval defined
+  by the new <b>snmptt.ini</b> variable <b>statistics_interval</b>.  Logging can also be forced by sending the SIGUSR1 
+  signal, or creating a file called !statistics in the spool folder.<br /></li>
+  <li>Added the error number reported by MySQL to MySQL errors (system syslog, eventlog etc)</li>
+  <li>Added <b>/usr/local/etc/snmp</b> and <b>/usr/local/etc</b> paths to the list of default directories searched for <b>snmptt.ini</b> under Unix</li>
+  <li>Added some friendly error messages when required Perl modules are not available</li>
+  <li>Fixed bug with with handling traps in symbolic format
+  (snmptrapd without -On)</li>
+  <li>SNMPTTConvertMIB:  Fixed bug that caused the variable list (OBJECTS) of V2 MIB files from being converted
 </ul>
 <h3><b>0.9</b><b>- November 3rd, 2003</b></h3>
 <ul>
@@ -645,6 +639,7 @@ is executable (<span style="font-weight: bold;">chmod +x
 <span style="font-style: italic;">filename</span></span>)</li>
 <li>Backup your <b>snmptt.ini</b> file, replace it with the new
 version, and make any necessary configuration changes to it</li>
+<li>If you are using a MySQL and do not want the database to be pinged before each INSERT, set <b>mysql_ping_on_insert</b> to 0 in <b>snmptt.ini</b>.  If you do not want the database to be pinged periodically, set set <b>mysql_ping_interval</b> to 0 in <b>snmptt.ini</b>.</li>
 <li>Enable any new features in <span style=
 "font-weight: bold;">snmptt.ini</span> as required</li>
 <li>Test and report any issues to alex_b@users.sourceforge.net, or
@@ -1766,7 +1761,7 @@ this string using the following variables:</p>
 $aA - Trap agent IP address<br />
 $c - Category<br />
 $C - Trap community string<br />
-$D - Description text from MIB file <b>(see Note 6)</b><br />
+$D - Description text from SNMPTT.CONF or MIB file <b>(see Note 6)</b><br />
 $E - Enterprise trap OID in symbolic format<br />
 $e&nbsp; - Enterprise trap OID in number format<br />
 $Fa&nbsp; - alarm (bell) (BEL)<br />
@@ -1774,6 +1769,7 @@ $Ff&nbsp; - form feed (FF)<br />
 $Fn&nbsp; - newline (LF, NL)<br />
 $Fr&nbsp; - return (CR)<br />
 $Ft&nbsp; - tab (HT, TAB)<br />
+$Fz&nbsp; - Translated FORMAT line (EXEC only)<br />
 $G&nbsp; - Generic trap number (0 if enterprise trap)<br />
 $S&nbsp; - Specific trap number (0 if generic trap)<br />
 $N&nbsp; - Event name defined in .conf file of matched entry<br />
@@ -1911,11 +1907,12 @@ it can be downloaded from the <a href=
 "http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
 Net-SNMP patch page</a>.</blockquote>
 <p>Note (6):</p>
-<blockquote>You must have the UCD-SNMP / Net-SNMP Perl module
-installed for this to work and you must enable support for it by
-enabling <b>mib_descriptions_enable</b> in the <b>snmptt.ini</b> file.&nbsp;
-The description is pulled from the MIB file, <b>not</b> from the 
-<b>snmptt.conf</b> file.</blockquote>
+<blockquote>
+  The <b>snmptt.ini</b> <b>description_mode</b> option must be set to either
+  1 or 2.  If set to 1, the description is pulled from the SNMPTT.CONF files.  
+  If set to 2, the description is pulled from the MIB file.  If using the MIB
+  file, you must have the UCD-SNMP / Net-SNMP Perl module installed and enabled.
+</blockquote>
 </blockquote>
 <h3><a id="SNMPTT.CONF-EXEC" name=
 "SNMPTT.CONF-EXEC"></a><b>EXEC:</b></h3>

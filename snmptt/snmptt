@@ -251,7 +251,7 @@ if ($net_snmp_perl_enable == 1)
     $ENV{'MIBS'} = $mibs_environment;
   }
   my $noperlwarning;
-  if ($mib_descriptions_enable >= 1) {
+  if ($description_mode == 2) {
     $SNMP::save_descriptions = 1;
   }
   &SNMP::initMib();
@@ -841,6 +841,7 @@ sub processtrap
 	# 5: NODES string
 	# 6: REGEX array
 	# 7: MATCH array
+	# 8: DESC array
 	#
 	# Example: 	To access FORMAT string for received trap:
 	# 		$event{"$var[3]"}[3]
@@ -902,10 +903,11 @@ sub processtrap
 		$event2[3]=$event{"$receivedtrap_entry"}[3+$l];	# 3: FORMAT string
 		$event2[4]=$event{"$receivedtrap_entry"}[4+$l];	# 4: EXEC string
 		$event2[5]=$event{"$receivedtrap_entry"}[5+$l];	# 5: NODES string
-		$event2[6]=$event{"$receivedtrap_entry"}[6+$l];	# 6: REGEX string		
-		$event2[7]=$event{"$receivedtrap_entry"}[7+$l];	# 7: MATCH string		
+		$event2[6]=$event{"$receivedtrap_entry"}[6+$l];	# 6: REGEX array
+		$event2[7]=$event{"$receivedtrap_entry"}[7+$l];	# 7: MATCH array
+		$event2[8]=$event{"$receivedtrap_entry"}[8+$l];	# 7: DESC array
 		
-		$l+=9;
+		$l+=10;
 			
 		if ($event2[5] eq '')
 		{
@@ -1086,6 +1088,7 @@ sub processtrap
 		
 		if ($hostmatch == 1 && $event2[1] ne "IGNORE")
 		{
+                  $message_short = "";
 
 			# Trap received exists in our list of trap definitions
 			
@@ -1292,7 +1295,7 @@ sub processtrap
                             $community =~ s(\")(\\\")g;   #"				
 
                             # Make sure the connect is up
-                            if ($mysql_ping_insert == 1) {
+                            if ($mysql_ping_on_insert == 1) {
                               &mysql_ping();
                             }
                               
@@ -1468,8 +1471,8 @@ sub processtrap
                             for (my $i=0; defined($event2[4][$i]); $i++)
                             {
                               $_ = $event2[4][$i];
-                              
-                              &substitute;
+                                                           
+                              &substitute($message_short);
                               
                               my $command = $_;
                               
@@ -1527,6 +1530,8 @@ sub processtrap
 
 sub substitute
 {
+  my $format_line = shift;      # Used for $Fz variable substitution for EXEC line.
+  
   # Perform substitution on $_ variable
 
   # Wildcards - $*, $+*, $-*
@@ -1827,12 +1832,22 @@ sub substitute
   }	
 
   # $D - Description from MIB file (NOT from snmptt.conf)
-  if ($net_snmp_perl_enable == 1 && $mib_descriptions_enable >= 1) {
+  if ($net_snmp_perl_enable == 1 && $description_mode == 2) {
     my $description_temp = $SNMP::MIB{$event2[0]}->{description};
-    if ($mib_descriptions_enable >= 2) {
+    if ($description_clean == 1) {
       $description_temp =~ s/\n\s+/\n/g;
     }
-    #s(\$D)($description_temp)g;
+    s(\$D)($description_temp)g;
+    &substitute2 ("\$D", $description_temp);
+  }
+  elsif ($description_mode == 1) {
+    for (my $i=0; defined($event2[8][$i]); $i++)
+    {
+      $description_temp = $description_temp . $event2[8][$i] . "\n";
+    }
+    if ($description_clean == 1) {
+      $description_temp =~ s/\n\s+/\n/g;
+    }
     &substitute2 ("\$D", $description_temp);
   }
   else {
@@ -1855,6 +1870,9 @@ sub substitute
 
   # tab                   (HT, TAB)
   &substitute2 ("\$Ft", "\t");
+
+  # FORMAT line (only possible when doing EXEC line)
+  &substitute2 ("\$Fz", "$format_line");
 
   # $$ - Print a $
   s(\$\$)(\$)g;
@@ -2166,6 +2184,9 @@ sub loadsnmpttconf
 			# 3: FORMAT string
 			# 4: EXEC string
 			# 5: NODES string
+                	# 6: REGEX array
+                	# 7: MATCH array
+                	# 8: DESC array
 			
 			$tempcount++;		# Temporary counter of the number of EVENTS found
 			
@@ -2228,6 +2249,7 @@ sub loadsnmpttconf
 			@exec = ();
 			@regex = ();
 			@match = ();
+                        @desc = ();
 	
 			$currentline++; # Increment to the next line which should be a FORMAT, EXEC or NODES
 			$line2 = $snmpttconf[$currentline];
@@ -2283,7 +2305,23 @@ sub loadsnmpttconf
 
 					push (@match,$linematch);
 				}
-				$currentline++; # Increment to the next line
+				elsif ( ($line2 =~ /^SDESC/) && ($description_mode == 1) ) {
+				{
+					# It's a DESC line
+                                        
+                                        $currentline++; # Increment to the next line
+                                        $line2 = $snmpttconf[$currentline]; # Get next line
+
+                                        while ( ($currentline <= $#snmpttconf) && !($line2 =~ /^EVENT/) && 
+                                          !($line2 =~ /^EDESC/)) {
+                                          print "DESC line: $line2\n";
+                                          push (@desc,$line2);
+                                          $currentline++; # Increment to the next line
+                                          $line2 = $snmpttconf[$currentline]; # Get next line
+                                        }
+				}
+
+                                $currentline++; # Increment to the next line
 				$line2 = $snmpttconf[$currentline]; # Get next line
 			}
 			if ($lineformat ne '' || $exec[0] ne '')
@@ -2322,7 +2360,8 @@ sub loadsnmpttconf
 
 				@{ $event{$temp[2]} }[7+$countx]= [@regex];
 				@{ $event{$temp[2]} }[8+$countx]= [@match];
-				@{ $event{$temp[2]} }[0]= 9+ @{ $event{$temp[2]} }[0];
+				@{ $event{$temp[2]} }[9+$countx]= [@desc];
+				@{ $event{$temp[2]} }[0]= 10+ @{ $event{$temp[2]} }[0];
 				
 				$tempcount2++;		# Temporary counter of the number of EVENTS found with at
 							# least a FORMAT line specified
@@ -2765,6 +2804,8 @@ sub searchfortrap
 	# 4: EXEC string
 	# 5: NODES string
 	# 6: REGEX array
+	# 7: MATCH array
+	# 9: DESC array
 	#
 	# Example: 	To access FORMAT string for received trap:
 	# 		$event{"$var[3]"}[3]
@@ -3189,7 +3230,8 @@ sub loadsnmpttini {
 	$allow_unsafe_regex = $cfg->val('General', 'allow_unsafe_regex');
 	$remove_backslash_from_quotes = $cfg->val('General', 'remove_backslash_from_quotes');
 	$dynamic_nodes = $cfg->val('General', 'dynamic_nodes');
-	$mib_descriptions_enable = $cfg->val('General', 'mib_descriptions_enable');
+	$description_mode = $cfg->val('General', 'description_mode');
+	$description_clean = $cfg->val('General', 'description_clean');
         
 	# DaemonMode
 	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -3240,7 +3282,7 @@ sub loadsnmpttini {
 	$mysql_dbi_table_unknown = $cfg->val('SQL', 'mysql_dbi_table_unknown');
 	$mysql_dbi_username = $cfg->val('SQL', 'mysql_dbi_username');
 	$mysql_dbi_password = $cfg->val('SQL', 'mysql_dbi_password');
-	$mysql_ping_insert = $cfg->val('SQL', 'mysql_ping_insert');
+	$mysql_ping_on_insert = $cfg->val('SQL', 'mysql_ping_on_insert');
         $mysql_ping_interval = $cfg->val('SQL', 'mysql_ping_interval');
 
 	$postgresql_dbi_enable = $cfg->val('SQL', 'postgresql_dbi_enable');
@@ -3300,7 +3342,8 @@ sub loadsnmpttini {
 	if (! defined ($allow_unsafe_regex)) { $allow_unsafe_regex = 0} ;
 	if (! defined ($remove_backslash_from_quotes)) { $remove_backslash_from_quotes = 0} ;
 	if (! defined ($dynamic_nodes)) { $dynamic_nodes = 0} ;
-	if (! defined ($mib_descriptions_enable)) { $mib_descriptions_enable = 0} ;
+	if (! defined ($description_mode)) { $description_mode = 0} ;
+	if (! defined ($description_clean)) { $description_clean = 1} ;
 
         if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($daemon_uid)) { $daemon_uid = ''} ;
@@ -3335,7 +3378,7 @@ sub loadsnmpttini {
 	if (! defined ($mysql_dbi_table_unknown)) { $mysql_dbi_table_unknown = ''} ;
 	if (! defined ($mysql_dbi_username)) { $mysql_dbi_username = ''} ;
 	if (! defined ($mysql_dbi_password)) { $mysql_dbi_password = ''} ;
-	if (! defined ($mysql_ping_insert)) { $mysql_ping_insert = 1} ;
+	if (! defined ($mysql_ping_on_insert)) { $mysql_ping_on_insert = 1} ;
 	if (! defined ($mysql_ping_interval)) { $mysql_ping_interval = 500} ;
 	if (! defined ($postgresql_dbi_enable)) { $postgresql_dbi_enable = 0} ;
 	if (! defined ($postgresql_dbi_module)) { $postgresql_dbi_module = 0} ;

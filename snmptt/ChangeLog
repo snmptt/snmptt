@@ -1,3 +1,12 @@
+June 25th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Changed mysql_ping_insert to mysql_ping_on_insert.
+- Added $Fz variable which outputs the processed FORMAT line for use in 
+  EXEC lines so if the FORMAT and EXEC lines contain the same thing (minus
+  the program to execute of course) the EXEC line can be simplified.
+- Removed mib_descriptions_enable and replaced with description_mode and
+  description_clean.  Can now use the description from either the 
+  SNMPTT.CONF or the MIB files.
+
 June 24th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Removed references from sub substitute2.
 

@@ -165,18 +165,23 @@ remove_backslash_from_quotes = 0
 # received.  Defaults to 0
 dynamic_nodes = 0
 
-# This enables the UCD-SNMP / NET-SNMP Perl module save_descriptions variable 
-# used for retaining the description text inside of MIB files.  It also
-# determines how the $D variable substitution will be handled.  Setting to 0
-# will disable save_descriptions and cause $D to output nothing.
-# Set to 0 to disable $D.
-# Set to 1 to enable $D.
-# Set to 2 to enable $D and to remove any white space at the start of each line
-# of the description.
-# Note:  Enabling this option can greatly increase the amount of memory used by
-#        SNMPTT.  Only enable it if you need to use the $D variable.
-# Note:  net_snmp_perl_enable *must* be enabled
-mib_descriptions_enable = 0
+# This option allows you to use the $D substitution variable to include the
+# description text from the SNMPTT.CONF or MIB files.
+# Set to 0 to disable the $D substitution variable.  If $D is used, nothing
+#  will be outputted.
+# Set to 1 to enable the $D substitution variable and have it use the
+#  descriptions stored in the SNMPTT .conf files.  Enabling this option can
+#  greatly increase the amount of memory used by SNMPTT.
+# Set to 2 to enable the $D substitution variable and have it use the
+#  description from the MIB files.  This enables the UCD-SNMP / NET-SNMP Perl 
+#  module save_descriptions variable.  Enabling this option can greatly 
+#  increase the amount of memory used by the Net-SNMP SNMP Perl module, which 
+#  will result in an increase of memory usage by SNMPTT.
+description_mode = 0
+
+# Set to 1 to remove any white space at the start of each line from the MIB
+# or SNMPTT.CONF description when description_mode is set to 1 or 2.
+description_clean = 1
 
 [DaemonMode]
 # Set to 1 to have snmptt fork to the background when run in daemon mode
@@ -312,12 +317,13 @@ mysql_dbi_password = password
 # Set to 0 to disable
 # Set to 1 to enable
 # Note:  This has no effect on mysql_ping_interval.
-mysql_ping_insert = 1
+mysql_ping_on_insert = 1
 
 # MySQL: How often in seconds the database should be 'pinged' to ensure the
 # connection is still valid.  If *any* error is generate by the ping such as 
 # 'Unable to connect to database', it will attempt to re-create the database
 # connection.  Set to 0 to disable pinging.
+# Note:  This has no effect on mysql_ping_on_insert.
 # disabled = 0
 # 5 minutes = 300
 # 15 minutes = 900
