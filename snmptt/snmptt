@@ -331,7 +331,14 @@ sub processtrap
 
 		foreach $a (@nodes)
 		{	
-			if (lc $a eq lc @var[0])	# lowercase compare	
+			if ($a =~ /(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IP address
+			{
+				if ( $a eq @var[1])     # compare against ip
+				{
+					$hostmatch = 1;
+				}
+			}
+                        elsif (lc $a eq lc @var[0])	# NODES entry is a host name.  Do lowercase compare	
 			{
 				$hostmatch = 1;
 			}

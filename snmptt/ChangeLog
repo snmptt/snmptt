@@ -1,4 +1,6 @@
 August 29th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- NODES file / list now accepts both IP addresses and host 
+  names.  Thanks to Ingo Flaschberger.
 - Lines starting with # in NODES file treated as comment.
   Thanks to Ingo Flaschberger.
 - Changed @var[3] references to $receivedtrap
