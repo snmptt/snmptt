@@ -128,15 +128,17 @@ translate_integers = 1
 wildcard_expansion_separator = " "
 
 # Set to 1 to allow unsafe REGEX code to be executed.
-# Set to 0 to prevent unsafe REGEX code to be executed (default).
-# Enabling unsafe REGEX code will allow substitution with captures such
-# as:
-# (one (two) three)(five $1 six)
-# which results in the output of: five two six
-# This is considered unsafe because the contents of the regular expression
-# (left)(and right) is executed by Perl which *could contain unsafe code*.
-# If this option is enabled, BE SURE THAT THE SNMPTT CONFIGURATION FILES ARE 
-# SECURE!
+# Set to 0 to prevent unsafe REGEX code from being executed (default).
+# Enabling unsafe REGEX code will allow variable interopolation and the use of the e
+# modifier to allow statements such as substitution with captures such
+# as:            (one (two) three)(five $1 six)
+# which outputs: five two six
+# or:            (one (two) three)("five ".length($1)." six")e
+# which outputs: five 3 six
+#
+# This is considered unsafe because the contents of the regular expression 
+# (right) is executed (eval) by Perl which *could contain unsafe code*.
+# BE SURE THAT THE SNMPTT CONFIGURATION FILES ARE SECURE!
 allow_unsafe_regex = 0
 
 # Set to 1 to have the backslash (escape) removed from quotes passed from

@@ -1,3 +1,6 @@
+September 3rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added support for i, g and e modifiers for REGEX
+
 August 14th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added support for DBD:Pg for PostgreSQL
 - Added postgresql_dbi_module and postgresql_dbi_hostport_enable 

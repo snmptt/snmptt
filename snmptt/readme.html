@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; August 14th, 2003
+This file was last updated on:&nbsp; September 3rd, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -211,7 +211,10 @@ support to allow trap matching based on values contained inside the
 trap
 enterprise variables</li>
   <li><span style="font-weight: bold;">REGEX </span>now supports
-substitution with captures</li>
+substitution with captures and the modifiers <span
+ style="font-weight: bold;">i</span>, <span style="font-weight: bold;">g</span>
+and <span style="font-weight: bold;">e</span><br>
+  </li>
   <li>Added support for remote MySQL and PostgreSQL databases</li>
   <li>Added PostgreSQL support for <a
  href="http://search.cpan.org/search?dist=DBD-Pg">DBD:Pg</a></li>
@@ -533,6 +536,10 @@ want agent host names to be used instead of IP addresses</li>
 want Enterprise trap OID in symbolic format</li>
   <li>In your snmptt.conf files, replace any $O with $o unless you
 want Trap OID in symbolic format</li>
+  <li>In your snmptt.conf files, append a <span
+ style="font-weight: bold;">g</span> to the end of all REGEX lines to
+enable global search and replace<br>
+  </li>
   <li>Review other translate settings in <span
  style="font-weight: bold;">snmptt.ini</span><br>
   </li>
@@ -1047,7 +1054,8 @@ The syntax of the snmptt.conf file&nbsp; is:
  style="font-weight: bold;">$n:</span><span style="font-weight: bold;">[!][(&nbsp;&nbsp;&nbsp;
 ) | n | n-n | &gt; n | &lt; n | x.x.x.x | x.x.x.x-x.x.x.x | x.x.x.x/x]</span>]</p>
   <p>[<b style="font-weight: bold;">REGEX</b><span
- style="font-weight: bold;"> (&nbsp;&nbsp;&nbsp; )(&nbsp; &nbsp; )</span>]</p>
+ style="font-weight: bold;"> (&nbsp;&nbsp;&nbsp; )(&nbsp; &nbsp; )</span><span
+ style="font-weight: bold;">[i][g][e]</span>]</p>
   <p>[<b>SDESC</b>] <br>
 [<b>EDESC</b>] </p>
   <p>Note: Lines starting with a # will be ignored. </p>
@@ -1518,15 +1526,41 @@ $3: &gt;20</span><br style="font-weight: bold;">
 <blockquote><a name="SNMPTT.CONF-REGEX"></a><b>REGEX:</b> <br>
   <div style="margin-left: 40px;"><br>
 [<b style="font-weight: bold;">REGEX</b><span style="font-weight: bold;">
-(&nbsp;&nbsp;&nbsp; )(&nbsp;&nbsp;&nbsp; )</span>] </div>
+(&nbsp;&nbsp;&nbsp; )(&nbsp;&nbsp;&nbsp; )[i][g][e]</span>] </div>
   <p style="margin-left: 40px;">Optional regular expression to perform
-a global search and replace on the translated FORMAT / EXEC line.&nbsp;
+a search and replace on the translated FORMAT / EXEC line.&nbsp;
 Multiple REGEX (&nbsp;&nbsp;&nbsp; )(&nbsp;&nbsp;&nbsp; ) lines are
 permitted.<br>
   </p>
   <p style="margin-left: 40px;">First (&nbsp;&nbsp;&nbsp; ) contains
 the search expression.<br>
 Second (&nbsp;&nbsp;&nbsp; ) contains the replacement text<br>
+  </p>
+  <p style="margin-left: 40px;">The following Perl regular expression
+modifiers are supported:<br>
+  </p>
+  <div style="margin-left: 80px;"><span style="font-weight: bold;">i</span>
+- ignore case when trying to match left side<br>
+  <span style="font-weight: bold;">g</span> - replace all occurances
+instead of only the first<br>
+  <span style="font-weight: bold;">e</span> - execute the right side
+(eval) as code</div>
+  <p style="margin-left: 40px;">To use substitution with captures
+(memory parenthesis) or the <span style="font-weight: bold;">e</span>
+modifier, you must first
+enable support in the snmptt.ini file by setting <span
+ style="font-weight: bold;">allow_unsafe_regex </span>to <span
+ style="font-weight: bold;">1</span>.&nbsp; Note:&nbsp; <span
+ style="font-weight: bold;">This is considered unsafe because the
+contents of the right expression is executed (eval) by
+Perl
+which could contain unsafe code</span>.&nbsp; If this option is
+enabled, <span style="font-weight: bold;">BE SURE THAT THE SNMPTT
+CONFIGURATION FILES
+ARE SECURE!&nbsp; </span></p>
+  <p style="margin-left: 40px;">Each REGEX line is processed in order
+from top to bottom and are accumulative.&nbsp; The second REGEX
+operates on the results of the first REGEX etc.<br>
   </p>
   <p style="margin-left: 40px;">Example:<br>
   </p>
@@ -1540,21 +1574,19 @@ Building alarm 3.</span><br>
 room high temperature)<br>
   </span><span style="font-weight: bold;">REGEX (Building alarm
 4)(Moisture detection alarm)</span><br style="font-weight: bold;">
-  <span style="font-weight: bold;">REGEX (room)(ROOM)</span><br
+  <span style="font-weight: bold;">REGEX (roOm)(ROOM)ig</span><br
  style="font-weight: bold;">
   <span style="font-weight: bold;">REGEX (UPS)(The big UPS)<br>
-REGEX (\s+)( )<br>
+REGEX (\s+)( )g<br>
   </span><br>
 FORMAT line after:&nbsp; <span style="font-weight: bold;">The big UPS
 has detected a building alarm. Cause: UPS1 Alarm #14: Computer ROOM
 high
 temperature</span><br>
   </div>
-  <p style="margin-left: 40px;">Each REGEX line is processed in order
-from top to bottom.<br>
-  </p>
   <p style="margin-left: 40px;">To use parentheses ( or ) in the search
-expression, they must be backslashed (\).&nbsp; The replacement text
+expression, they must be backslashed (\) otherwise it is interpreted as
+a capture (see below).&nbsp; The replacement text
 does not need to be backslashed.<br>
   </p>
   <p style="margin-left: 40px;">Example:<br>
@@ -1571,18 +1603,8 @@ FORMAT line after:&nbsp; <span style="font-weight: bold;">Alarm One
 and (Two) has been triggered</span><br>
   </div>
 </blockquote>
-<div style="margin-left: 80px;"><br>
-To use substitution with captures (memory parenthesis), you must first
-enable support in the snmptt.ini file by setting <span
- style="font-weight: bold;">allow_unsafe_regex </span>to <span
- style="font-weight: bold;">1</span>.&nbsp; Note:&nbsp; <span
- style="font-weight: bold;">This is considered unsafe because the
-contents of the regular expression (left)(and right) is executed by
-Perl
-which could contain unsafe code</span>.&nbsp; If this option is
-enabled, <span style="font-weight: bold;">BE SURE THAT THE SNMPTT
-CONFIGURATION FILES
-ARE SECURE!&nbsp; </span><br>
+<div style="margin-left: 80px;">If <span style="font-weight: bold;">allow_unsafe_regex</span>
+is enabled, then captures can be used in the replacement text.<br>
 <p>Example:<br>
 </p>
 <div style="margin-left: 40px;"> FORMAT line before:&nbsp;<span
@@ -1601,8 +1623,45 @@ FORMAT line after:&nbsp; <span style="font-weight: bold;"></span><span
  style="font-weight: bold;"></span><br>
 </div>
 <br>
-Note:&nbsp; Searches are <span style="font-weight: bold;">not </span>case
-sensitive.<br>
+If <span style="font-weight: bold;">allow_unsafe_regex</span> is
+enabled and an <span style="font-weight: bold;">e</span> modifier is
+specified, then the right side is executed (evaluated).&nbsp; This
+allows you to use Perl functions to perform various tasks such as
+convert from hex to decimal, format text using sprintf etc.&nbsp; All
+text must be inside of quotes, and statements can be concatenated
+together using the dot (.).<br>
+<p>Example 1:<br>
+</p>
+<div style="margin-left: 40px;"> FORMAT line before:&nbsp;<span
+ style="font-weight: bold;"> Authentication Failure Trap from IP
+address: C0 A8 1 FE<br>
+</span></div>
+<br>
+<div style="margin-left: 40px;"> <span style="font-weight: bold;">REGEX
+(Address: (\w+)\s+(\w+)\s+(\w+)\s+(\w+))("address:
+".hex($1).".".hex($2).".".hex($3).".".hex($4))ei</span><br
+ style="font-weight: bold;">
+<br>
+FORMAT line after:&nbsp; <span style="font-weight: bold;">Authentication
+Failure Trap from IP address: 192.168.1.254</span><br>
+</div>
+<br>
+<p>Example 2:<br>
+</p>
+<div style="margin-left: 40px;"> FORMAT line before:&nbsp;<span
+ style="font-weight: bold;"> Authentication Failure Trap from IP
+address: C0 A8 1 FE<br>
+</span></div>
+<br>
+<div style="margin-left: 40px;"> <span style="font-weight: bold;">REGEX
+(Address:
+(\w+)\s+(\w+)\s+(\w+)\s+(\w+))("address:".sprintf("%03d.%03d.%03d.%03d",hex($1),hex($2),hex($3),hex($4)))ie</span><br
+ style="font-weight: bold;">
+<br>
+FORMAT line after:&nbsp; <span style="font-weight: bold;">Authentication
+Failure Trap from IP address: 192.168.001.254</span><br>
+<br>
+</div>
 </div>
 <blockquote><a name="SNMPTT.CONF-SDESC"></a><b>SDESC</b>
   <blockquote>[<b>SDESC</b>]

@@ -1567,28 +1567,141 @@ sub substitute
     
     #print "!!!!!!$regex_temp\n";
     # Remove starting and ending ()
-    $regex_temp =~ /^\((.*)\)$/;
+    #$regex_temp =~ /^\((.*)\)$/;
+    $regex_temp =~ /^\((.*)\)(.*)$/;
     $regex_temp = $1;
+    my $modifiers = $2;
     
     # Split using )(
     my @regex_temp2 = split(/\)\(/,$regex_temp,2);
     #print "0:$regex_temp2[0]\n";
     #print "1:$regex_temp2[1]\n";
-    			  
+    #print "Modifiers: $modifiers\n";
+
     if ($regex_temp2[0] ne '')
     {
+      # allowed modifiers: any combination of: i, g, e, ee+ not permitted
+      my $modifiers2 = 0;
+      if ($modifiers =~ /i/) { $modifiers2 = $modifiers2 | 1; }
+      if ($modifiers =~ /g/) { $modifiers2 = $modifiers2 | 2; }
+      if ($modifiers =~ /e/) 
+      { 
+	if ($allow_unsafe_regex == 1)
+	{
+	  $modifiers2 = $modifiers2 | 4; 
+	}
+	else
+	{
+	  if ($DEBUGGING >= 2)
+          {
+	    print "  REGEX detected with e modifier, but allow_unsafe_regex is disabled.  Removing e modifier\n";
+          }
+	}
+      }
+
+      print "modifiers2 = $modifiers2\n";
+      
+      # 0	none
+      # 1	i
+      # 2	g
+      # 3	ig
+      # 4	e
+      # 5	ie
+      # 6	ge
+      # 7	ige
+
       if ($DEBUGGING >= 2)
       {
-	print "  Doing REGEX: s($regex_temp2[0])($regex_temp2[1])g\n";
+	print "  Doing REGEX: s($regex_temp2[0])($regex_temp2[1])$modifiers\n";
       }
-      if ($allow_unsafe_regex == 1)
+
+      # If unsafe is off, then don't use the e modifier.  This means that variable interopolation
+      # will not work on the right side.  If the user puts a $1 on the right, it will print out $1.
+      # 
+      # If unsafe is on, then we use the /ee modifier.
+      # 
+      # With a normal regular expression in a program, the e modifier is not requried for variable 
+      # interopolation to work.  If you want to have code executed, then you need at least one e
+      # modifier in a regular program.
+      # 
+      # Because we are passing the right side to a perl program instead of hard-coding the right side
+      # *inside* of the program, we need to handle it differently.  These are the rules:
+      # 
+      # -for interopolation and / or code execution to work, we need to use the /ee modifier inside the 
+      #  program (snmptt)
+      # -if we only want interop and no code execution (same behaviour as a program with no e modifier),
+      #  then we:
+      #   -escape all backslashes
+      #   -escape all double quotes
+      #   -escape all single quotes
+      #   -put quotes around the whole thing
+      # - One would assume that if we didn't put quotes around everything, and used one /e instead of two, then
+      #   it would work, but it does not..
+      #   
+      # -if we want both interop and code to execute (same behaviour as a program with one e modifier), 
+      #  then we:
+      #   -do nothing extra (no escaping or putting quotes around it)
+      # 
+      # With unsafe off, or unsafe no with NO e modifier, whatever the user puts in the right side of the 
+      # REGEX will display exactly, with the only exception of the $n variable interop working with unsafe on.
+      #
+      # With unsafe on and one e modifier, the right side is evaluated so any text needs to be in quotes, and
+      # printable quotes need to be escaped etc just like a normal program.  
+      #
+      # Example1:
+      # 
+      # "5 + 5 is ".(5+5)."and \"this is quoted\""
+      # will output:
+      # 5+5 is 10 and "this is quoted"
+      #
+      # If unsafe was off, it would output:
+      #
+      # "5 + 5 is ".(5+5)."and \"this is quoted\""
+      #
+      # Example2:
+      # 
+      # "5 + 5 is ".sprintf("%d",(5+5))."and \"this is quoted\""
+      # will output:
+      # 5+5 is 10 and "this is quoted"
+      #
+      # If unsafe was off, it would output:
+      #
+      # "5 + 5 is ".sprintf("%d",(5+5))."and \"this is quoted\""
+
+      if ($allow_unsafe_regex == 0)
       {
-	$regex_temp2[1] = "\"$regex_temp2[1]\"";
-	s($regex_temp2[0])($regex_temp2[1])eeg;
+	# unsafe_regex is OFF
+	if    ($modifiers2 == 0 ) { s($regex_temp2[0])($regex_temp2[1]); }
+        elsif ($modifiers2 == 1)  { s($regex_temp2[0])($regex_temp2[1])i; }
+        elsif ($modifiers2 == 2)  { s($regex_temp2[0])($regex_temp2[1])g; }
+        elsif ($modifiers2 == 3)  { s($regex_temp2[0])($regex_temp2[1])ig; }
       }
       else
       {
-	s($regex_temp2[0])($regex_temp2[1])g;
+	# unsafe_regex is ON
+	
+	# If unsafe is on, use two e's.  If user does not specify an e, 
+	# escape back slashes and quotes, and put quotes around the whole string
+	# to prevent functions from being executed
+	if (! ($modifiers =~ /e/))
+	{
+	  # If it contains a \, then escape it
+	  $regex_temp2[1] =~ s/\\/\\\\/g;
+	  # Escape each quote
+	  $regex_temp2[1] =~ s/\"/\\\"/g;	# double quotes
+	  $regex_temp2[1] =~ s/\'/\\\'/g;	# single quotes
+	  # put quotes around the whole thing
+	  $regex_temp2[1] = "\"$regex_temp2[1]\"";
+	}      
+	#print "1:$regex_temp2[1]\n";
+	if    ($modifiers2 == 0 ) { s($regex_temp2[0])($regex_temp2[1])ee; }
+        elsif ($modifiers2 == 1)  { s($regex_temp2[0])($regex_temp2[1])eei; }
+        elsif ($modifiers2 == 2)  { s($regex_temp2[0])($regex_temp2[1])eeg; }
+        elsif ($modifiers2 == 3)  { s($regex_temp2[0])($regex_temp2[1])eeig; }
+        elsif ($modifiers2 == 4)  { s($regex_temp2[0])($regex_temp2[1])ee; }
+        elsif ($modifiers2 == 5)  { s($regex_temp2[0])($regex_temp2[1])eei; }
+        elsif ($modifiers2 == 6)  { s($regex_temp2[0])($regex_temp2[1])eeg; }
+        elsif ($modifiers2 == 7)  { s($regex_temp2[0])($regex_temp2[1])eeig; }
       }
     }
   }
