@@ -863,8 +863,7 @@ Options:
   --debug=n              Set debug level (1 or 2)
   --help                 Display this message
   --version              Display author and version information
-  --net_snmp_perl        Use NET-SNMP Perl integration instead of
-			 NET-SNMP snmptranslate utility
+  --net_snmp_perl        Enable NET-SNMP Perl integration (see below)
   --in=filename          Input file
   --out=filename         Output file
   --nodes=name or file   If specified, will insert a NODES line after FORMAT or 

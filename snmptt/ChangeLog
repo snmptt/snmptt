@@ -1,5 +1,6 @@
 July 5th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Add SEC documentation
+- Update help for snmpttconvertmib
 
 June 25th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Changed mysql_ping_insert to mysql_ping_on_insert.
