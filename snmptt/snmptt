@@ -60,13 +60,13 @@ sub showversion
 
 use Getopt::Long;
 
-$version = '';
-$daemon = '';
-$debug = '';
+$version = 0;
+$daemon = 0;
+$debug = 0;
 $debugfile = '';
-$dump = '';
-$help = '';
-$time = '';
+$dump = 0;
+$help = 0;
+$time = 0;
 $ini = '';
 
 GetOptions 	('version' => \$version, 
@@ -1712,7 +1712,7 @@ sub searchfortrap
 		while ($counter <= 40 && $receivedtraptemp ne '')
 		{
 			# Remove last digit of recevied trap, add a * and look for match
-			$receivedtraptemp =~ s/(.*)\.\d+$/\1/;
+			$receivedtraptemp =~ s/(.*)\.\d+$/$1/;
 	
 			if ($DEBUGGING >= 2)
 			{

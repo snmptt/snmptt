@@ -1,6 +1,6 @@
 March 21th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Removed unused emerg ini setting, init $debugcmdline and 
-  $debugfilecmdline, remove unused $vartype variable.
+  $debugfilecmdline, remove unused $vartype variable, change a \1 to $1
 
 March 18th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with MySQL database not closing correctly at shutdown due to 
