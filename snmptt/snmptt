@@ -2305,7 +2305,7 @@ sub loadsnmpttconf
 
 					push (@match,$linematch);
 				}
-				elsif ( ($line2 =~ /^SDESC/) && ($description_mode == 1) ) {
+				elsif ( ($line2 =~ /^SDESC/) && ($description_mode == 1) )
 				{
 					# It's a DESC line
                                         
