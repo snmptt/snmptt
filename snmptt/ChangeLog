@@ -1,3 +1,6 @@
+September 16th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_0.8
+
 September 15th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Bug fix - sometimes Net-SNMP would pass a quoted line on multiple
   lines.  They are now combined into one in snmptt.  Thanks to

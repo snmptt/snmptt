@@ -10,9 +10,9 @@
 </head>
 <body>
 <br>
-<b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
+<b><font size="+3">SNMP Trap Translator v0.8</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; September 15th, 2003
+This file was last updated on:&nbsp; September 16th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -210,8 +210,8 @@ traps using symbolic form, or you enable the options <span
   </span></blockquote>
 <p><br>
 <a name="Whats-New"></a><b><font size="+2">What's New</font></b> </p>
-<p><b><font size="+1">0.8</font></b><b><font size="+1"> - ???</font></b><b><font
- size="+1">, 2003</font></b></p>
+<p><b><font size="+1">0.8</font></b><b><font size="+1"> - </font></b><b><font
+ size="+1">September 16th</font></b><b><font size="+1">, 2003</font></b></p>
 <ul>
   <li>Added <span style="font-weight: bold;">MATCH </span>keyword
 support to allow trap matching based on values contained inside the
@@ -296,12 +296,12 @@ should have been)</li>
   <li>Fixed bug with handling traps that contain quoted values that
 span multiple lines<br>
   </li>
-  <li>Added <a href="http://www.nagios.org">Nagios</a> / <a
- href="http:/www.netsaint.org">Netsaint</a> integration documentation</li>
   <li>PID file now created (/var/run/snmptt.pid or ./snmptt.pid) when
 running in daemon
 mode on Linux / Unix.&nbsp; snmptt-init.d script updated to remove the
 pid file when shutting down snmptt.</li>
+  <li>Added <a href="http://www.nagios.org">Nagios</a> / <a
+ href="http:/www.netsaint.org">Netsaint</a> integration documentation</li>
   <li>Added contrib folder<br>
   </li>
   <li>Snmpttconvertmib</li>
@@ -540,7 +540,7 @@ files to load</li>
   <li> Replace <span style="font-weight: bold;">snmptt</span> and <span
  style="font-weight: bold;">snmpttconvertmib </span>with the new
 versions contained in
-the v0.8 package.&nbsp; Make sure the files areexecutable (<span
+the v0.8 package.&nbsp; Make sure the files are executable (<span
  style="font-weight: bold;">chmod +x <span style="font-style: italic;">filename</span></span>)</li>
   <li>Replace your <span style="font-weight: bold;">/etc/rc.d/init.d/snmptt</span>
 file (<span style="font-weight: bold;">cp snmptt-init.d
@@ -2564,7 +2564,7 @@ Note:&nbsp; The #EXEC line is added by default.&nbsp; This can be
 changed by editing the SNMPTTCONVERT script. <br>
 &nbsp; </p>
 <p><a name="SNMP-Trap-Translator-Convert-MIB"></a><b><font size="+3">SNMP
-Trap Translator Convert MIB v0.3</font></b><br>
+Trap Translator Convert MIB v0.4</font></b><br>
 <b><font size="+1">(SNMPTTCONVERTMIB)</font></b> </p>
 <p><b>SNMPTTCONVERTMIB</b> is a Perl script which will read a MIB file
 and convert the <b>TRAP-TYPE</b> (v1) or <b>NOTIFICATION-TYPE</b>
