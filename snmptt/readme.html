@@ -10,14 +10,14 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.5</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; February 12th, 2003
+<br>This file was last updated on:&nbsp; February 13th, 2003
 <p>&nbsp;<a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote>&nbsp;<a href="#What is it">What is it?</a>
 <br>&nbsp;<a href="#Downloading">Downloading</a>
 <br>&nbsp;<a href="#Features">Features</a>
 <br>&nbsp;<a href="#Requirements">Requirements</a>
-<br>&nbsp;<a href="#Whats New">Whats New</a>
+<br>&nbsp;<a href="#Whats New">What's New</a>
 <br>&nbsp;<a href="#Upgrading">Upgrading</a>
 <br>&nbsp;<a href="#Configuration Options">Configuration Options - snmptt.ini</a>
 <br>&nbsp;<a href="#Logging - Standard">Logging - Standard</a>
@@ -65,13 +65,13 @@ for use with the NET-SNMP / UCD-SNMP snmptrapd program (<a href="http://www.net-
 <p>The NET-SNMP package has the ability to log SNMP traps to syslog.&nbsp;
 The format of the log is basically variable = value, variable = value,
 variable = value etc.&nbsp; A more descriptive / friendly trap message
-can be created using SNMPTT's variable subtitution.
+can be created using SNMPTT's variable substitution.
 <p>For example, receiving the trap .1.3.6.1.4.1.232.0.3017 from a Compaq
 server running the Compaq Insight Agents could result in the following
 message from SNMPTT:
 <p>"Compaq Drive Array Spare Drive on controller 3, bus 0, bay 3 status
 is Failed."
-<p>Variable substition works by defining a string such as:
+<p>Variable substation works by defining a string such as:
 <p>"Compaq Drive Array Spare Drive on controller $4, bus $5, bay $6 status
 is $3."
 <p>Each $<i>number</i> is replaced with the corresponding enterprise variable
@@ -148,7 +148,7 @@ you are using the Compaq supplied UCD-SNMP package) then you should at
 the very least use the <b>snmptrapd</b> program from v4.2.5.
 <p>Note:&nbsp;&nbsp; This script does NOT require the NET-SNMP Perl module
 included in the NET-SNMP package.
-<p><a NAME="Whats New"></a><b><font size=+2>Whats New</font></b>
+<p><a NAME="Whats New"></a><b><font size=+2>What's New</font></b>
 <p><b><font size=+1>0.5 - February 12th, 2003</font></b>
 <ul>
 <li>
@@ -184,7 +184,7 @@ to the --#SUMMARY line to provide a more descriptive FORMAT / EXEC line</li>
 <b><font size=+1>0.4 - November 18th, 2002</font></b>
 <ul>
 <li>
-Variable substituion changes:</li>
+Variable substitution changes:</li>
 
 <ul>
 <li>
@@ -270,17 +270,21 @@ v0.4, or leave as 1 (recommended default) and test</li>
 
 <li>
 Replace <b><u>both</u></b> <b>SNMPTTHANDLER</b> and <b>SNMPTT</b> with
-the new versions contained in the v0.5 package.</li>
+the new versions contained in the v0.5 package</li>
+
+<li>
+Backup your snmptt.ini file, replace it with the new version, and make
+any necessary configuration changes to it</li>
 </ol>
 <b><font size=+1>v0.1, v0.2 or v0.3 to v0.4</font></b>
 <p>To upgrade from v0.1, v0.2 to v0.3 to v0.4, you should:
 <ol>
 <li>
 In your snmptt.conf file, replace all <b>$x</b> with <b>$x $X</b> (see
-Whats New section)</li>
+What's New section)</li>
 
 <li>
-In your snmptt.conf file, replace all <b>$S</b> with <b>$N (</b>see Whats
+In your snmptt.conf file, replace all <b>$S</b> with <b>$N (</b>see What's
 New section)</li>
 
 <li>
@@ -402,7 +406,7 @@ the following command line could be used:
 Spare Drive on controller $4, bus $5, bay $6 status is $3."</b></blockquote>
 $r is translated to the hostname, and $x is the current date, and $X is
 the current time (described in detail below)
-<p>To enable or diable the execution of EXEC definitions, edit the snmptt.ini
+<p>To enable or disable the execution of EXEC definitions, edit the snmptt.ini
 file and modify the following variable:
 <blockquote><b>exec_enable</b></blockquote>
 
@@ -685,7 +689,7 @@ file, the following rules apply:
 The received trap OID matches a defined OID in the configuration file</li>
 
 <li>
-<b>AND</b> <b>( </b>the hostname matches a defined hostname int the NODES
+<b>AND</b> <b>( </b>the hostname matches a defined hostname in the NODES
 entry <b>OR</b> the NODES entry is blank<b>)</b></li>
 </ul>
 <b>If multiple_event is set to 1 in snmptt.ini:</b>
@@ -960,17 +964,23 @@ to the end of the <b>snmptt.conf</b> file (specified on the command line):
 <br>#
 <br>EVENT cpqHo2NicSwitchoverOccurred2 .1.3.6.1.4.1.232.0.11010 "Status
 Events" Normal
-<br>FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6.
-<br>#EXEC qpage -f TRAP notifygroup1 "NIC switchover to slot $3, port $4
-from slot $5, port $6."
+<br>FORMAT Status Trap: NIC switchover to slot $3, port $4 from slot $5,
+port $6.
+<br>#EXEC qpage -f TRAP notifygroup1 "Status Trap: NIC switchover to slot
+$3, port $4 from slot $5, port $6."
 <br>SDESC
 <br>This trap will be sent any time the configured redundant NIC
 <br>becomes the active NIC.
 <br>EDESC</blockquote>
 
-<p><br>Note:&nbsp; The #EXEC line is added by default.&nbsp; This can be
-changed by editing the <b>SNMPTTCONVERTMIB</b> script.
-<p><b><font size=+2>Requirements</font></b>
+<p><br>Notes:
+<blockquote>The #EXEC line is added by default.&nbsp; This can be changed
+by editing the <b>SNMPTTCONVERTMIB</b> script.
+<p>To prevent the --#TYPE text from being prepended to the --#SUMMARY line,
+change <b>$prepend_type</b> to <b>0</b> in the <b>SNMPTTCONVERTMIB</b>
+script.</blockquote>
+
+<p><br><b><font size=+2>Requirements</font></b>
 <ul>
 <li>
 UCD-SNMP / NET-SNMP <b>snmptranslate</b> utility</li>
@@ -1028,7 +1038,7 @@ is used with the following syntax to find the <b>OID</b> of the trap:
 statements etc.&nbsp; This is why snmptranslate is used.
 <p>If <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> are found, the <b>%<i>letter</i></b>
 variables are replaced with <b>$<i>number</i></b> variables based on the
-values lists in the <b>--#ARGUMENTS</b> section incrememented by 1 (ARGUMENTS
+values lists in the <b>--#ARGUMENTS</b> section incremented by 1 (ARGUMENTS
 starts with 0, SNMPTT starts with 1).&nbsp; This will be used to define
 the <b>FORMAT</b> and <b>EXEC</b> lines.
 <p>If there is no <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, but
