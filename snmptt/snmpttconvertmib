@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v0.2.3
+# SNMPTTCONVERTMIB v0.2.4
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -80,7 +80,10 @@ $no_format_desc = 0;
 $format = 0;
 $format_desc = 0;
 $no_desc_wildcard = 0;
+$no_severity = 0;
+$severity = 'Normal';
 $exec = '';
+
 
 GetOptions 	('version' => \$version,
 		'debug:i' => \$debug,
@@ -93,6 +96,8 @@ GetOptions 	('version' => \$version,
 		'no_description' => \$no_description,
 		'no_format_summary' => \$no_format_summary,
 		'no_format_desc' => \$no_format_desc,
+		'no_severity' => \$no_severity,
+		'severity=s' => \$severity,
 		'format=n' => \$format,
 		'format_desc=n' => \$format_desc,
 		'no_desc_wildcard' => \$no_desc_wildcard,
@@ -123,7 +128,15 @@ Options:
 			 entries.  See NODES section in readme.html for examples
   --no_description	 Do not save the description
   --no_format_summary	 Do not use the --#SUMMARY lines for FORMAT \/ EXEC
-  --no_format_desc	 Do not use the description line for FORMAT \/ EXEC.
+  --no_format_desc	 Do not use the description line for FORMAT \/ EXEC
+  --no_severity 	 Do not use the --#SEVERITY line for EVENT line.  Default
+                         severity of "Normal" will be used, unless --severity= is 
+			 set
+  --severity=s  	 Severity level for EVENT line.  Only used if there is no
+                         --#SEVERITY line, or --no_severity is set.  Must NOT 
+			 contain any spaces.
+			 Example: 
+			   Critical
   --format=n		 FORMAT \/ EXEC order preference
 			   0 = --#SUMMARY or description
 			   1 = description or --#SUMMARY
@@ -192,7 +205,7 @@ else
   check_snmptranslate_version();
 }
 
-
+print "severity: $severity\n";
 print "\nFile to load is:	$input\n";
 print "File to APPEND TO:	$output\n";
 
@@ -307,7 +320,7 @@ if ($net_snmp_perl == 0)
 	$traptype = "";
 	$trapsummary = "";
 	@description = ();
-	$severity = "Normal";
+	$trap_severity = $severity;
 	
         if ($line3 =~ /ENTERPRISE\s+(.*)/)
         {
@@ -405,7 +418,7 @@ if ($net_snmp_perl == 0)
               $line4 = $mibfile[$currentline];
               next;
             }
-	    # If next line is a --#SEVERITY, pull out the information and place in $severity
+	    # If next line is a --#SEVERITY, pull out the information and place in $trap_severity
             if ($line4 =~ /--#SEVERITY(.*)/)
             {
               # Pull out text and remove beginning and trailing white space and quotes
@@ -417,8 +430,11 @@ if ($net_snmp_perl == 0)
                 # "
                 
                 #print ("2\n");
-                $severity = $_;
-                #print "Severity: $severity \n";
+                if ($no_severity == 0)
+		{
+		  $trap_severity = $_;
+		}
+                #print "Severity: $trap_severity \n";
               }
               # Increment to next line and continue with the loop
               $currentline++; # Increment to the next line
@@ -515,7 +531,7 @@ if ($net_snmp_perl == 0)
       if ($trapoid ne "")
       {
         print OUTPUTFILE "#\n#\n#\n";
-        print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" $severity\n";
+        print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" $trap_severity\n";
         
         # Loop through trapsummary and replace the %s and %d etc with %1 to %n
         
@@ -770,7 +786,7 @@ else
             $traptype = "";
 	    $trapsummary = "";
 	    @description = ();
-	    $severity = "Normal";
+	    $trap_severity = $severity;
 	    
             if ($line3 =~ /DESCRIPTION(.*)/s)
             {
@@ -866,7 +882,7 @@ else
                   $line4 = $mibfile[$currentline];
                   next;
                 }
-		# If next line is a --#SEVERITY, pull out the information and place in $severity
+		# If next line is a --#SEVERITY, pull out the information and place in $trap_severity
                 if ($line4 =~ /--#SEVERITY(.*)/)
                 {
                   # Pull out text and remove beginning and trailing white space and quotes
@@ -878,9 +894,12 @@ else
                     # "
                     
                     #print ("2\n");
-                    $severity = $_;
-                    #print "Severity: $severity \n";
-                  }
+                    if ($no_severity == 0)
+		    {
+		      $trap_severity = $_;
+		    }
+		    #print "Severity: $trap_severity \n";
+		  }
                   # Increment to next line and continue with the loop
                   $currentline++; # Increment to the next line
                   $line4 = $mibfile[$currentline];
@@ -953,7 +972,7 @@ else
           if ($trapoid ne "")
           {
             print OUTPUTFILE "#\n#\n#\n";
-            print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" $severity\n";
+            print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" $trap_severity\n";
             
             # Loop through trapsummary and replace the %s and %d etc with %1 to %n
             
