@@ -72,7 +72,6 @@ $help = 0;
 $net_snmp_perl = 0;
 $in = '';
 $out = '';
-$mibdir = '/usr/share/snmp/mibs/';
 $nodes = '';
 $no_description = 0;
 $no_variables = 0;
@@ -92,7 +91,6 @@ GetOptions 	('version' => \$version,
 		'in=s' => \$in,
 		'out=s' => \$out,
 		'net_snmp_perl' => \$net_snmp_perl,
-		'mibdir=s' => \$mibdir,
 		'nodes=s' => \$nodes,
 		'no_description' => \$no_description,
 		'no_variables' => \$no_variables,
@@ -123,7 +121,6 @@ Options:
 			 NET-SNMP snmptranslate utility
   --in=filename          Input file
   --out=filename         Output file
-  --mibdir=dir           Directory for mib files when net_snmp_perl is enabled*
   --nodes=name or file   If specified, will insert a NODES line after FORMAT or 
   			 EXEC.  The host name(s) separated by spaces, or the 
 			 name of the nodes file.  Use quotes for multiple
@@ -155,9 +152,20 @@ Options:
   --exec=command         Command line to use for EXEC line.  Use SINGLE quotes
                          with Unix.  Example:
     			   'qpage -f TRAP notifygroup1'
-					 
-* Note:  If net_snmp_perl is enabled, then the directory path for the MIB file directory is
-required.  Not specifying a --mibdir will use the default of \/usr\/share\/snmp\/mibs\/.
+
+  Note:  The only benefit in using the --net_snmp_perl switch (which requires the
+         Net-SNMP Perl module to be installed) is that the Variables: description section 
+         will include:
+           -variable syntax
+           -variable description
+           -variable enums
+
+	   For example:
+           2: globalStatus
+              Syntax="INTEGER"
+                2: ok
+                4: failure
+              Descr="Current status of the entire library system"
 /;
   
   &showversion;
@@ -201,8 +209,7 @@ if ($net_snmp_perl == 1)
   $SNMP::save_descriptions = 1;	# Need them only for looking up variable descriptions. 
                                 # Do TRAP definition by hand to be able to pull out 
 				# the SUMMARY lines
-  &SNMP::addMibDirs($mibdir);
-  &SNMP::setMib($input);
+  &SNMP::initMib();
   
   print "\n\n*****  Using UCD-SNMP / NET-SNMP Perl module *****\n\n";
 }
@@ -215,11 +222,6 @@ else
 print "severity: $severity\n";
 print "\nFile to load is:	$input\n";
 print "File to APPEND TO:	$output\n";
-
-if ($net_snmp_perl == 1)
-{
-  print "MIB directory:    	$mibdir\n";
-}
 
 if ($DEBUGGING >= 1)
 {
@@ -253,30 +255,45 @@ unless (open OUTPUTFILE, ">>$output")
 print OUTPUTFILE "#\n#\n#\n#\n";
 print OUTPUTFILE "MIB: $input converted on " . scalar(localtime) . " using snmpttconvertmib $snmpttconvertmib_version\n";
 
+# Determine name of MIB file
+$mib_name = '';
+while ($currentline <= $#mibfile)
+{
+  $line = $mibfile[$currentline];
+  if ($line =~ /(.*)DEFINITIONS ::= BEGIN/)
+  {
+    $mib_name = $1;
+    $mib_name =~ s/\s+//g;
+    print "Name of MIB:            $mib_name\n";
+    last;
+  }
+  $currentline++;
+}
+
+if ($mib_name eq '')
+{
+  print "\n\nAborting!!!\n";
+  print "Could not find DEFINITIONS ::= BEGIN statement in MIB file!\n\n";
+  exit (1);
+}
+
+# Set MIBS environment to only point to the selected MIB.  Speeds things up!
+$ENV{'MIBS'} = $mib_name;
+
+$currentline=0;
 if ($net_snmp_perl == 0)
 {
   # Process the trap files by hand
-  
-  $mib_name = '';
-  
+   
   while ($currentline <= $#mibfile)
   {
     $line = $mibfile[$currentline];
-
-    if ($line =~ /(.*)DEFINITIONS ::= BEGIN/)
-    {
-      #$enterprise = $1;
-      #$enterprisefound =1;
-      $mib_name = $1;
-      $mib_name =~ s/\s+//g;
-      print "Name of MIB:            $mib_name\n";
-    }
 
     # TRAP-TYPE (V1) / NOTIFICATION-TYPE (V2)
     #
     # eg: 'mngmtAgentTrap-23003 TRAP-TYPE';
     # eg: 'ciscoSystemClockChanged NOTIFICATION-TYPE';
-    elsif ( $line =~ /(.*)\s+TRAP-TYPE.*/ || $line =~ /(.*)\s+NOTIFICATION-TYPE.*/ )
+    if ( $line =~ /(.*)\s+TRAP-TYPE.*/ || $line =~ /(.*)\s+NOTIFICATION-TYPE.*/ )
     {
       if ( $line =~ /(.*)\s+TRAP-TYPE.*/ )
       {
@@ -825,7 +842,7 @@ else
   
   foreach $key (sort keys %SNMP::MIB)
   {
-    if ($SNMP::MIB{$key}{type} eq 'TRAP' || $SNMP::MIB{$key}{type} eq 'NOTIF')
+    if (($SNMP::MIB{$key}{type} eq 'TRAP' || $SNMP::MIB{$key}{type} eq 'NOTIF') && $SNMP::MIB{$key}{moduleID} eq $mib_name )
     {
       #print "#\n#\n#\n";
       
