@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.6.1</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; March 27th, 2003
+This file was last updated on:&nbsp; March 28th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -509,9 +509,11 @@ in the snmptt.ini file. </p>
 Note:&nbsp; Sample values are defined in the default ini file.
 <p>The following PostgreSQL script can create the database and table
 (not tested!).&nbsp; Permissions etc should also be defined. </p>
-<blockquote><b><tt>CREATE DATABASE snmptt;</tt></b> <br>
-  <b><tt>USE snmptt;</tt></b>
-  <p><b><tt>DROP TABLE snmptt;;</tt></b> <br>
+<blockquote><b><tt>su - postgres<br>
+createdb snmptt<br>
+psql snmptt<br>
+  </tt></b> <b><tt></tt></b>
+  <p><b><tt>DROP TABLE snmptt;</tt></b><br>
   <b><tt>CREATE TABLE snmptt (</tt></b> <br>
   <b><tt>eventname VARCHAR(50),</tt></b> <br>
   <b><tt>eventid VARCHAR(50),</tt></b> <br>
@@ -523,7 +525,9 @@ Note:&nbsp; Sample values are defined in the default ini file.
   <b><tt>severity VARCHAR(20),</tt></b> <br>
   <b><tt>uptime&nbsp; VARCHAR(20),</tt></b> <br>
   <b><tt>traptime VARCHAR(30),</tt></b> <br>
-  <b><tt>formatline VARCHAR(255));</tt></b></p>
+  <b><tt>formatline VARCHAR(255));<br>
+\q<br>
+  </tt></b></p>
 </blockquote>
 All variables are INSERTted into the database as standard text
 including the date and time.&nbsp; The variable lengths I have chosen
