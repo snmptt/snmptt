@@ -615,8 +615,9 @@ sub processtrap
 		$event2[3]=$event{"$receivedtrap"}[3+$l];	# 3: FORMAT string
 		$event2[4]=$event{"$receivedtrap"}[4+$l];	# 4: EXEC string
 		$event2[5]=$event{"$receivedtrap"}[5+$l];	# 5: NODES string
+		$event2[6]=$event{"$receivedtrap"}[6+$l];	# 6: REGEX string		
 	
-		$l+=7;
+		$l+=8;
 			
 		if ($event2[5] eq '')
 		{
@@ -733,9 +734,28 @@ sub processtrap
 		
 			&substitute;
 		
-			$message = "$receivedtrap $event2[2] \"$event2[1]\" $var[0] - $_\n";
 			$message_short = $_;
-		
+
+			# Do user defined REGEX on $message
+			
+			for (my $i=0; defined($event2[6][$i]); $i++)
+			{
+			  my $regex_temp = $event2[6][$i];
+
+			  #print "!!!!!!$regex_temp\n";
+			  # Remove starting and ending ()
+			  $regex_temp =~ /^\((.*)\)$/;
+			  $regex_temp = $1;
+			  
+			  my @regex_temp2 = split(/\)\(/,$regex_temp,2);
+			  #print "0:$regex_temp2[0]\n";
+			  #print "1:$regex_temp2[1]\n";
+
+			  $message_short =~ s($regex_temp2[0])($regex_temp2[1])g;
+			}
+
+			$message = "$receivedtrap $event2[2] \"$event2[1]\" $var[0] - $message_short\n";
+			
 			if ($stdout_enable == 1 || $DEBUGGING >= 1)
 			{
 				print "$message";
@@ -1442,6 +1462,8 @@ sub loadsnmpttconf
 			$lineformat = '';
 			$lineexec = '';
 			$linenodes = '';
+			$lineregex = '';
+			@regex = ();
 	
 			$currentline++; # Increment to the next line which should be a FORMAT, EXEC or NODES
 			$line2 = $snmpttconf[$currentline];
@@ -1470,6 +1492,18 @@ sub loadsnmpttconf
 					
 					$linenodes = substr($line2,6);
 				}
+				elsif ($line2 =~ /^REGEX/)
+				{
+					# It's a REGEX line
+					
+					$lineregex = substr($line2,6);
+					# Remove spaces before and after
+					
+					$lineregex =~ /^\s*(.*?)\s*$/;
+					$lineregex = $1;
+
+					push (@regex,$lineregex);
+				}
 				$currentline++; # Increment to the next line
 				$line2 = $snmpttconf[$currentline]; # Get next line
 			}
@@ -1484,6 +1518,8 @@ sub loadsnmpttconf
 					@{ $event{$temp[2]} }[0] = 0;
 				}
 
+				#@regex = qw/one two/;
+								
 				$countx = @{ $event{$temp[2]} }[0];
 				#print "countx $countx\n";
 				@{ $event{$temp[2]} }[1+$countx]= $temp[1];
@@ -1492,7 +1528,8 @@ sub loadsnmpttconf
 				@{ $event{$temp[2]} }[4+$countx]= $lineformat;
 				@{ $event{$temp[2]} }[5+$countx]= $lineexec;
 				@{ $event{$temp[2]} }[6+$countx]= $linenodes;
-				@{ $event{$temp[2]} }[0]= 7+ @{ $event{$temp[2]} }[0];
+				@{ $event{$temp[2]} }[7+$countx]= [@regex];
+				@{ $event{$temp[2]} }[0]= 8+ @{ $event{$temp[2]} }[0];
 				
 				$tempcount2++;		# Temporary counter of the number of EVENTS found with at
 							# least a FORMAT line specified
@@ -1524,8 +1561,8 @@ sub loadsnmpttconf
 			$l=0;
 			while (defined($event{$key}[$l+1]))
 			{	
-				print  "hash: $key => $event{$key}[1+$l],$event{$key}[2+$l],$event{$key}[3+$l],$event{$key}[4+$l]\n";
-			$l+=7;
+				print  "hash: $key => $event{$key}[1+$l],$event{$key}[2+$l],$event{$key}[3+$l],$event{$key}[4+$l],$event{$key}[7+$l][0]\n";
+			$l+=8;
 			}
 
 		}
