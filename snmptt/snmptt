@@ -150,12 +150,7 @@ Options:
     --time                               Use to see how long it takes to load and 
                                          process trap file (eg: time snmptt --time)
 /;
-
-if ($DEBUGGING >= 1)
-{
-	# Print out time
-	print "SNMPTT started: ",scalar(localtime),"\n\n"
-}		
+		
 	&showversion;
 	print $USAGE;
 
@@ -190,7 +185,6 @@ if ($debugfile ne '')
 {
 	$DEBUGGINGFILE = $debugfile;	# commandline overpowers snmptt script
 }
-	
 
 ##############################################################################
 		
