@@ -1,3 +1,8 @@
+June 20th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Snmpttconvertmib: Changed snmptranslate method to use
+  modulename::trapname instead of enterprise.trapname as some
+  MIB files were not converting.
+
 June 19th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed $# - was giving one less than the actual number of enterprise
   variables
