@@ -851,53 +851,46 @@ sub processtrap
 			$_ = $event2[3];	# FORMAT string
 		
 			$receivedtrap_trans = $receivedtrap;	# Default to numeric OID of received trap
-
-			# $translate_trap_oid = 1;
-			
-			if ($net_snmp_perl_enable == 1 && $translate_trap_oid != 0)
+	
+			if ($net_snmp_perl_enable == 1 && $translate_log_trap_oid)
 			{
-			  my $use_long = 0;
-			  my $include_module = 0;
-			  
-			  if ($translate_trap_oid == 1) 	# Short text
-			  {
-			    $use_long = 0;
-			    $include_module = 0;
+			  # Try to convert to text
+			  if ($DEBUGGING >= 2) {
+			    print "\nOID of trap: $receivedtrap.  Will attempt to translate to text\n";
 			  }
-			  elsif ($translate_trap_oid == 2)	# Short module::text
-			  {
-			    $use_long = 0;
-			    $include_module = 1;
-			  }
-			  elsif ($translate_trap_oid == 3)	# Long text
-			  {
-			    $use_long = 1;
-			    $include_module = 0;
-			  }
-			  elsif ($translate_trap_oid == 4)	# Long module::text
-			  {
-			    $use_long = 1;
-			    $include_module = 1;
-			  }
-
-			  if ($translate_trap_oid =>1 && $translate_trap_oid <=4)
-			  {
-			    # Try to convert to text
+			  my $temp2 = my_translateObj("$receivedtrap",$translate_log_trap_oid);
+			  if (defined ($temp2) ) {
 			    if ($DEBUGGING >= 2) {
-			      print "\nOID of trap: $receivedtrap.  Will attempt to translate to text\n";
+			      print "  Translated to $temp2\n";
 			    }
-			    my $temp2 = &SNMP::translateObj("$receivedtrap",$use_long,$include_module);
-			    if (defined ($temp2) ) {
-			      if ($DEBUGGING >= 2) {
-				print "  Translated to $temp2\n";
-			      }
-			      $receivedtrap_trans = $temp2;
+			    $receivedtrap_trans = $temp2;
+			  }
+			  else {
+			    # Could not translate default to numeric
+			    if ($DEBUGGING >= 2) {
+			      print "  Could not translate - defaulting to numeric\n";
 			    }
-			    else {
-			      # Could not translate default to numeric
-			      if ($DEBUGGING >= 2) {
-				print "  Could not translate - defaulting to numeric\n";
-			      }
+			  }
+			}
+			
+			$enterprise_trans = $var[6];	# Default to numeric enterprise
+			if ($net_snmp_perl_enable == 1 && $var[6] ne '')
+			{
+			  if ($DEBUGGING >= 2) {
+			    print "\nOID of enterprise: $var[6].  Will attempt to translate to text\n";
+			  }
+			  my $temp = my_translateObj("$var[6]",$translate_enterprise_oid_format);
+			  if (defined ($temp) ) {
+			    if ($DEBUGGING >= 2) {
+			      print "  Translated to $temp\n";
+			    }
+			    $enterprise_trans = $temp;
+			  }
+			  else 
+			  {
+			    # Could not translate default to numeric
+			    if ($DEBUGGING >= 2) {
+			      print "  Could not translate - defaulting to numeric\n";
 			    }
 			  }
 			}
@@ -1060,6 +1053,15 @@ sub processtrap
 			  }
 			}
 
+			if ($net_snmp_perl_enable == 1 && $db_translate_enterprise == 1)
+			{
+			  $db_enterprise = $enterprise_trans;
+			}
+			else
+			{
+			  $db_enterprise = $var[6];
+			}
+
 			if ($mysql_dbi_enable == 1 && defined ($dbh_mysql))
 			{
 				$trap_attempted_to_log++;	
@@ -1076,7 +1078,7 @@ sub processtrap
 				unless (defined ($dbh_mysql->do(
 					"INSERT INTO $mysql_dbi_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap_trans'\,\'$var[6]\',\'$community\',\'$var[0]\',\'$var[4]\',
+					\'$event2[0]\',\'$receivedtrap_trans'\,\'$db_enterprise\',\'$community\',\'$var[0]\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
 					\'$message_short2\')" ) ) )
 					{
@@ -1115,7 +1117,7 @@ sub processtrap
 				unless (defined ($dbh_postgresql->do(
 					"INSERT INTO $postgresql_dbi_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap_trans'\,\'$var[6]\',\'$community\',\'$var[0]\',\'$var[4]\',
+					\'$event2[0]\',\'$receivedtrap_trans'\,\'$db_enterprise\',\'$community\',\'$var[0]\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
 					\'$message_short2\')" ) ) )
 					{
@@ -1154,7 +1156,7 @@ sub processtrap
 				unless (defined ($dbh_odbc->do(
 					"INSERT INTO $dbd_odbc_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap_trans'\,\'$var[6]\',\'$community\',\'$var[0]\',\'$var[4]\',
+					\'$event2[0]\',\'$receivedtrap_trans'\,\'$db_enterprise\',\'$community\',\'$var[0]\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
 					\'$message_short2\')" ) ) )
 					{
@@ -1195,7 +1197,7 @@ sub processtrap
 				if (defined ($dbh_win32_odbc->Sql
 				        ("INSERT INTO $sql_win32_odbc_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap_trans'\,\'$var[6]\',\'$community\',\'$var[0]\',\'$var[4]\',
+					\'$event2[0]\',\'$receivedtrap_trans'\,\'$db_enterprise\',\'$community\',\'$var[0]\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
 					\'$message_short2\')" ) ) )
 				{					
@@ -1296,20 +1298,10 @@ sub substitute
   {
     if ($net_snmp_perl_enable == 1)
     {
-      my $temp = &SNMP::translateObj($entvarname[$i-1],0);
+      my $temp = my_translateObj($entvarname[$i-1],$translate_varname_oid_format);
       if (!defined ($temp) )
       {
 	$temp = $entvarname[$i-1];
-      }
-      else
-      {
-	# It's been translated to text..
-	# If the translated text name ends in a . without a number, chop off the .
-	# as it's ugly.
-	if ($temp =~ /\.$/)
-	{
-	  chop $temp;
-	}
       }
       s(\$v$i)($temp)g;
     }
@@ -1333,9 +1325,9 @@ sub substitute
     # This will translate (if enabled) any OIDs found in the VALUE (not the variable name) to the textual  
     # name if possible.  For example, if the value was 'A UPS Alarm (.1.3.6.1.4.1.534.1.7.12) has cleared.', 
     # it could be translated to: 'A UPS Alarm (xupsBuildingAlarm) has cleared.'
-    if ($translate_oids > 0 && $net_snmp_perl_enable == 1)
+    if ($translate_value_oids > 0 && $net_snmp_perl_enable == 1)
     {
-      $val = &translate_oids_sub($val);
+      $val = &translate_value_oids_sub($val);
     }
 
     if ($translate_integers == 1 && $net_snmp_perl_enable == 1)
@@ -1359,7 +1351,8 @@ sub substitute
 	# Solution:  For displaying the variable name, leave the .# on the end, but chop off
 	# the . if there is no number following it.  
 	# For any call to getType or mapEnum, use a copy of the text name without . or .#
-	my $temp_textOID = &SNMP::translateObj($entvarname[$i-1],0);
+	# (do we really need to remove the last .number of a text name??) 
+	my $temp_textOID = SNMP::translateObj($entvarname[$i-1],1);
 	
 	# Chop off .# or just .
 	if ($temp_textOID =~ /(.*)\.\d*$/)
@@ -1407,9 +1400,10 @@ sub substitute
     {
       s(\$$i)($val)g;			# $n	      
       
+      # Translate for $+n and $-n
       my $temp2 = '';
       my $temp3 = '';
-      my $temp = &SNMP::translateObj($entvarname[$i-1],0);
+      my $temp = my_translateObj($entvarname[$i-1],$translate_varname_oid_format);
       if (defined ($temp) )		
       {
 	# It's been translated to text..
@@ -1464,8 +1458,10 @@ sub substitute
   # $C - Trap community string
   s(\$C)($var[5])g;
   
-  # $E, $e - Enterprise trap as Object ID string of numbers
-  s(\$E)($var[6])g;
+  # $E - Enterprise trap (symbolic)
+  s(\$E)($enterprise_trans)g;
+  
+  # $e - Enterprise trap (numerical)
   s(\$e)($var[6])g;
   
   # $N - Event name
@@ -1477,9 +1473,35 @@ sub substitute
   # $$ - Print a $
   s(\$\$)(\$)g;
   
-  # $O, $o - Received trap
-  s(\$O)($receivedtrap_trans)g;
-  s(\$o)($receivedtrap_trans)g;	
+  # $O - Received trap (symbolic)
+  if ($net_snmp_perl_enable == 1)
+  {
+    if ($DEBUGGING >= 2) {
+      print "\nOID of received trap: $receivedtrap.  Will attempt to translate to text\n";
+    }
+    my $temp = my_translateObj("$receivedtrap",$translate_trap_oid_format);
+    if (defined ($temp) ) {
+      if ($DEBUGGING >= 2) {
+	print "  Translated to $temp\n";
+      }
+      s(\$O)($temp)g;
+    }
+    else 
+    {
+      # Could not translate default to numeric
+      if ($DEBUGGING >= 2) {
+	print "  Could not translate - defaulting to numeric\n";
+      }
+      s(\$O)($temp)g;
+    }
+  }
+  else
+  {
+    s(\$O)($receivedtrap)g;
+  }
+
+  # $o - Received trap (numerical)
+  s(\$o)($receivedtrap)g;	
   
   # $s - Severity
   s(\$s)($event2[2])g;
@@ -1700,7 +1722,7 @@ sub loadsnmpttconf
 			    {
 			      print "Non-numeric OID: $temp[2].  Will attempt to translate to numerical\n";
 			    }
-			    my $temp2 = &SNMP::translateObj("$temp[2]",1);
+			    my $temp2 = SNMP::translateObj("$temp[2]",0);
 			    if (defined ($temp2) )
 			    {
 			      if ($DEBUGGING >= 2)
@@ -1947,7 +1969,7 @@ sub readtrap
 	      }
 	      if ($net_snmp_perl_enable == 1)
 	      {
-		my $temp3 = &SNMP::translateObj("$temp1");
+		my $temp3 = SNMP::translateObj("$temp1",0);
 		if (defined ($temp3) ) {
 		  if ($DEBUGGING >= 2) {
 		    print "    Translated to $temp3\n";
@@ -2411,8 +2433,11 @@ sub loadsnmpttini {
 	@strip_domain_list = $cfg->val('General', 'strip_domain_list');
 	$net_snmp_perl_enable = $cfg->val('General', 'net_snmp_perl_enable');
 	$net_snmp_perl_best_guess = $cfg->val('General', 'net_snmp_perl_best_guess');
-	$translate_trap_oid = $cfg->val('General', 'translate_trap_oid');
-	$translate_oids = $cfg->val('General', 'translate_oids');
+	$translate_log_trap_oid = $cfg->val('General', 'translate_log_trap_oid');
+	$translate_value_oids = $cfg->val('General', 'translate_value_oids');
+	$translate_enterprise_oid_format = $cfg->val('General', 'translate_enterprise_oid_format');
+	$translate_trap_oid_format = $cfg->val('General', 'translate_trap_oid_format');
+	$translate_varname_oid_format = $cfg->val('General', 'translate_varname_oid_format');
 	$translate_integers = $cfg->val('General', 'translate_integers');
 	$wildcard_expansion_separator = $cfg->val('General', 'wildcard_expansion_separator');
 	$mibs_environment = $cfg->val('General', 'mibs_environment');
@@ -2454,6 +2479,7 @@ sub loadsnmpttini {
 	$exec_enable = $cfg->val('Exec', 'exec_enable');
 	
 	# SQL
+	$db_translate_enterprise = $cfg->val('SQL', 'db_translate_enterprise');
 	$mysql_dbi_enable = $cfg->val('SQL', 'mysql_dbi_enable');
 	$mysql_dbi_database = $cfg->val('SQL', 'mysql_dbi_database');
 	$mysql_dbi_table = $cfg->val('SQL', 'mysql_dbi_table');
@@ -2498,8 +2524,11 @@ sub loadsnmpttini {
 	if (! defined ($strip_domain)) { $strip_domain = 0} ;
 	if (! defined ($net_snmp_perl_enable)) { $net_snmp_perl_enable = 0} ;
 	if (! defined ($net_snmp_perl_best_guess)) { $net_snmp_perl_best_guess = 0} ;
-	if (! defined ($translate_trap_oid)) { $translate_trap_oid = 0} ;
-	if (! defined ($translate_oids)) { $translate_oids = 0} ;
+	if (! defined ($translate_log_trap_oid)) { $translate_log_trap_oid = 0} ;
+	if (! defined ($translate_value_oids)) { $translate_value_oids = 0} ;
+	if (! defined ($translate_enterprise_oid_format)) { $translate_enterprise_oid_format = 1} ;
+	if (! defined ($translate_trap_oid_format)) { $translate_trap_oid_format = 1} ;
+	if (! defined ($translate_varname_oid_format)) { $translate_varname_oid_format = 1} ;
 	if (! defined ($translate_integers)) { $translate_integers = 0} ;
 	if (! defined ($wildcard_expansion_separator)) { $wildcard_expansion_separator = " "} ;
 	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
@@ -2522,6 +2551,7 @@ sub loadsnmpttini {
 	if (! defined ($eventlog_enable)) { $eventlog_enable = 'WARNING'} ;
 	if (! defined ($eventlog_system_enable)) { $eventlog_system_enable = 0} ;	
 	if (! defined ($exec_enable)) { $exec_enable = 1} ;
+	if (! defined ($db_translate_enterprise)) { $db_translate_enterprise = 0} ;
 	if (! defined ($mysql_dbi_enable)) { $mysql_dbi_enable = 0} ;
 	if (! defined ($mysql_dbi_database)) { $mysql_dbi_database = ''} ;
 	if (! defined ($mysql_dbi_table)) { $mysql_dbi_table = ''} ;
@@ -2704,7 +2734,7 @@ sub bin2dec {
     return unpack("N", pack("B32", substr("0" x 32 . shift, -32)));
 }
 
-sub translate_oids_sub
+sub translate_value_oids_sub
 {
   my $string = $_[0];
 
@@ -2764,37 +2794,9 @@ sub translate_oids_sub
     # Replace all OIDs in $string with textual names if possible
     foreach my $oid (@oids)
     {
-      my $use_long = 0;
-      my $include_module = 0;
-      
-      if ($translate_oids == 1) 	# Short text
-      {
-	$use_long = 0;
-	$include_module = 0;
-      }
-      elsif ($translate_oids == 2)	# Short module::text
-      {
-	$use_long = 0;
-	$include_module = 1;
-      }
-      elsif ($translate_oids == 3)	# Long text
-      {
-	$use_long = 1;
-	$include_module = 0;
-      }
-      elsif ($translate_oids == 4)	# Long module::text
-      {
-	$use_long = 1;
-	$include_module = 1;
-      }
-      
-      my $temp = &SNMP::translateObj($oid,$use_long,$include_module);
+      my $temp = my_translateObj($oid,$translate_value_oids);
       if (defined ($temp))
       {
-	if ($temp =~ /\.$/)
-	{
-	  chop $temp;
-	}
 	$string =~ s/$oid/$temp/g;
 	if ($oid_found == 1 && $DEBUGGING >= 2)
 	{
@@ -2984,5 +2986,49 @@ sub match_regex
     }
   }
   return 0;
+}
+
+sub my_translateObj (oid, mode)
+{
+  my $oid = shift;
+  my $mode = shift;
+  
+  my $use_long = 0;
+  my $include_module = 0;
+  my $temp;
+  my $use_long = 0;
+  my $include_module = 0;
+    
+  if ($mode == 1) 	# Short text
+  {
+    $use_long = 0;
+    $include_module = 0;
+  }
+  elsif ($mode == 2)	# Short module::text
+  {
+    $use_long = 0;
+    $include_module = 1;
+  }
+  elsif ($mode == 3)	# Long text
+  {
+    $use_long = 1;
+    $include_module = 0;
+  }
+  elsif ($mode == 4)	# Long module::text
+  {
+    $use_long = 1;
+    $include_module = 1;
+  }
+  
+  $temp = &SNMP::translateObj($oid,$use_long,$include_module);
+  if (defined ($temp))
+  {
+    # If it ends in a single ., chop it off
+    if ($temp =~ /\.$/)
+    {
+      chop $temp;
+    }
+  }
+  return $temp;	# Will be either the translated trap, or undef if translateObj failed
 }
 
