@@ -227,6 +227,7 @@ if ($net_snmp_perl_enable == 1)
 if ($mysql_dbi_enable == 1)
 {
 	require DBI;
+	require DBD::mysql;
 	
 	unless ($dbh_mysql = DBI->connect("DBI:mysql:$mysql_dbi_database",$mysql_dbi_username,$mysql_dbi_password) )
 	{
@@ -241,6 +242,26 @@ if ($mysql_dbi_enable == 1)
 	  }
 	}
 }
+
+if ($postgres_dbi_enable == 1)
+{
+	require DBI;
+	require DBD::PgPP;
+	
+	unless ($dbh_postgres = DBI->connect("DBI:PgPP:$postgres_dbi_database",$postgres_dbi_username,$postgres_dbi_password) )
+	{
+	  warn "Postgres error: Unable to connect to database: $DBI::errstr\n";
+	  if ($syslog_system_enable == 1)
+	  {
+	    syslog_system("Postgres error: Unable to connect to database: $DBI::errstr");
+	  }
+	  if ($eventlog_system_enable == 1)
+	  {
+	    eventlog_system("Postgres error: Unable to connect to database: $DBI::errstr",18,$eventlog_error);
+	  }
+	}
+}
+
 
 if ($dbd_odbc_enable == 1)
 {
@@ -497,6 +518,11 @@ if (defined $dbh_mysql)
 {
 	$dbh_mysql->disconnect;
 }
+if (defined $dbh_postgres)
+{
+	$dbh_postgres->disconnect;
+}
+
 if (defined $dbh_odbc)
 {
 	$dbh_odbc->disconnect;
@@ -865,6 +891,37 @@ sub processtrap
 				   $trap_successfully_logged++;
 				 }
 			}
+
+			if ($postgres_dbi_enable == 1 && defined ($dbh_postgres))
+			{
+				$trap_attempted_to_log++;	
+
+				unless (defined ($dbh_postgres->do(
+					"INSERT INTO $postgres_dbi_table (eventname, eventid, enterprise, community, 
+					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
+					\'$event2[0]\',\'$receivedtrap'\,\'$var[6]\',\'$var[5]\',\'$var[0]\',\'$var[4]\',
+					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
+					\'$message_short\')" ) ) )
+					{
+					  warn "Postgres error: Unable to perform INSERT INTO: ".$dbh_postgres->errstr."\n";
+
+					  if ($syslog_system_enable == 1)
+					  {
+					    syslog_system("Postgres error: Unable to perform INSERT INTO: ".$dbh_postgres->errstr);
+					  }
+					  
+					  if ($eventlog_system_enable == 1)
+					  {
+					    eventlog_system("Postgres error: Unable to perform INSERT INTO: ".$dbh_postgres->errstr,
+					    		19,$eventlog_error);
+					  }
+				 }
+				 else
+				 {
+				   $trap_successfully_logged++;
+				 }
+			}
+
 			
 			if ($dbd_odbc_enable == 1 && defined ($dbh_odbc))
 			{
@@ -1936,6 +1993,12 @@ sub loadsnmpttini {
 	$mysql_dbi_username = $cfg->val('SQL', 'mysql_dbi_username');
 	$mysql_dbi_password = $cfg->val('SQL', 'mysql_dbi_password');
 
+	$postgres_dbi_enable = $cfg->val('SQL', 'postgres_dbi_enable');
+	$postgres_dbi_database = $cfg->val('SQL', 'postgres_dbi_database');
+	$postgres_dbi_table = $cfg->val('SQL', 'postgres_dbi_table');
+	$postgres_dbi_username = $cfg->val('SQL', 'postgres_dbi_username');
+	$postgres_dbi_password = $cfg->val('SQL', 'postgres_dbi_password');
+	
 	$dbd_odbc_enable = $cfg->val('SQL', 'dbd_odbc_enable');
 	$dbd_odbc_dsn = $cfg->val('SQL', 'dbd_odbc_dsn');
 	$dbd_odbc_table = $cfg->val('SQL', 'dbd_odbc_table');
@@ -1994,6 +2057,11 @@ sub loadsnmpttini {
 	if (! defined ($mysql_dbi_table)) { $mysql_dbi_table = ''} ;
 	if (! defined ($mysql_dbi_username)) { $mysql_dbi_username = ''} ;
 	if (! defined ($mysql_dbi_password)) { $mysql_dbi_password = ''} ;
+	if (! defined ($postgres_dbi_enable)) { $postgres_dbi_enable = 0} ;
+	if (! defined ($postgres_dbi_database)) { $postgres_dbi_database = ''} ;
+	if (! defined ($postgres_dbi_table)) { $postgres_dbi_table = ''} ;
+	if (! defined ($postgres_dbi_username)) { $postgres_dbi_username = ''} ;
+	if (! defined ($postgres_dbi_password)) { $postgres_dbi_password = ''} ;
 	if (! defined ($dbd_odbc_enable)) { $dbd_odbc_enable = 0} ;
 	if (! defined ($dbd_odbc_dsn)) { $dbd_odbc_dsn = ''} ;
 	if (! defined ($dbd_odbc_table)) { $dbd_odbc_table = ''} ;
