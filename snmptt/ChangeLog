@@ -1,4 +1,17 @@
 March 26th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Translation of integers not working under Net-SNMP 5.0.8 under
+  Cygwin.  Reasons:
+
+  Problem #1: UCD-SNMP 4.2.3 allows getType and mapEnum to be passed
+  a numerical OID.  Net-SNMP 5.0.8 does not (at least under Cygwin).
+  Because of this, we should make sure we use a textual OID instead when 
+  calling getType or mapEnum.  It's probably the correct way to do it anyways.	
+
+  Problem #2: UCD-SNMP 4.2.3 translateObject returns the textualOID followed
+  by .#, even if it is called with ,0 to use short names.  Net-SNMP 5.0.8
+  returns a short name some what correctly, but trails the textual name 
+  with a .
+
 - Postgres SQL support via DBD::PgPP
 - Changed version to snmptt_0.6.1
 

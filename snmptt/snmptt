@@ -1068,6 +1068,16 @@ sub substitute
       {
 	$temp = $entvarname[$i-1];
       }
+      else
+      {
+	# It's been translated to text..
+	# If the translated text name ends in a . without a number, chop off the .
+	# as it's ugly.
+	if ($temp =~ /\.$/)
+	{
+	  chop $temp;
+	}
+      }
       s(\$v$i)($temp)g;
     }
     else
@@ -1090,13 +1100,34 @@ sub substitute
 	{
 	  print "\nVariable $entvarname[$i-1] with value $entvar[$i-1] may be numerical\n";
 	}
-	if (&SNMP::getType($entvarname[$i-1]) eq "INTEGER") # Make sure it's a SNMP INTEGER type
+	
+	# Problem #1: UCD-SNMP 4.2.3 allows getType and mapEnum to be passed a numerical OID.  
+	# Net-SNMP 5.0.8 does not (at least under Cygwin).  Because of this, we should make sure 
+	# we use a textual OID instead when calling getType or mapEnum.  It's probably the correct
+	# way to do it anyways.
+	#
+	# Problem #2: UCD-SNMP 4.2.3 translateObject returns the textualOID followed
+	# by .#, even if it is called with ,0 to use short names.  Net-SNMP 5.0.8
+	# returns a short name some what correctly, but trails the textual name with a .
+	# 
+	# Solution:  For displaying the variable name, leave the .# on the end, but chop off
+	# the . if there is no number following it.  
+	# For any call to getType or mapEnum, use a copy of the text name without . or .#
+	my $temp_textOID = &SNMP::translateObj($entvarname[$i-1],0);
+	
+	# Chop off .# or just .
+	if ($temp_textOID =~ /(.*)\.\d*$/)
+	{
+	  $temp_textOID = $1;
+	}
+	
+	if (&SNMP::getType($temp_textOID) eq "INTEGER") # Make sure it's a SNMP INTEGER type
 	{
 	  if ($DEBUGGING >= 2)
 	  {
 	    print "Variable $entvarname[$i-1] is also defined as an INTEGER in the mib - will attempt to translate\n";
 	  }
-	  my $val2 = SNMP::mapEnum($entvarname[$i-1], $entvar[$i-1]);
+	  my $val2 = SNMP::mapEnum($temp_textOID, $entvar[$i-1]);
 	  if ($val2 ne '')					# Make sure we got something
 	  {
 	    $val = $val2;
@@ -1122,19 +1153,47 @@ sub substitute
     {
       s(\$$i)($val)g;			# $n	      
       
+      my $temp2 = '';
+      my $temp3 = '';
       my $temp = &SNMP::translateObj($entvarname[$i-1],0);
-      if (!defined ($temp) )
+      if (defined ($temp) )		
+      {
+	# It's been translated to text..
+	# If the translated text name ends in a . without a number, chop off the .
+	# as it's ugly.
+	if ($temp =~ /\.$/)
+	{
+	  chop $temp;
+	}
+
+	# If the translated text name ends in a .# chop off the .# and place in $temp2
+	# for later use by getType.  See problem #1 and #2 a couple screens up.
+	if ($temp =~ /(.*)\.\d*$/)
+	{
+	  $temp2 = $1;
+	}
+	else
+	{
+	  $temp2 = $temp;
+	}
+
+	$temp3 = &SNMP::getType($temp2);
+
+	if ($temp3 eq '')
+	{
+	  $temp3 = "unknown";
+	}
+
+      }
+      else
       {
 	$temp = $entvarname[$i-1];
+	$temp3 = "unknown";
       }
+            
       s(\$\+$i)($temp:$val)g;		# $+n
-      
-      my $temp2 = &SNMP::getType($entvarname[$i-1]);
-      if (!defined ($temp2) )
-      {
-	$temp2 = "unknown";
-      }
-      s(\$-$i)($temp ($temp2):$val)g;	# $-n
+
+      s(\$-$i)($temp ($temp3):$val)g;	# $-n
     }
     else
     {
