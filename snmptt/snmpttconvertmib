@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v0.1
+# SNMPTTCONVERTMIB v0.1.1
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -37,6 +37,11 @@ $defaultexec = '#EXEC qpage -f TRAP notifygroup1';
 #$defaultexecquote = '';		# no quotes
 #$defaultexecquote = "\'";		# single (') quotes
 $defaultexecquote = "\"";		# double (") quotes
+
+# Set this to 1 to have the --TYPE string prepended to the --SUMMARY string.
+# Set to 0 to disable
+$prepend_type = 1;
+
 #
 # OPTIONS END
 #
@@ -136,6 +141,7 @@ while ($currentline <= $#mibfile)
 			if ($line3 =~ /DESCRIPTION(.*)/s)
 			{
 				$temp1 = 0;
+				$traptype = "";
 				$trapsummary = "";
 				@description = ();
 				
@@ -169,6 +175,29 @@ while ($currentline <= $#mibfile)
 				# Assume the rest is the description up until a ::= or end of the file
 				while (! ($line4 =~ /::=/))
 				{
+					# If next line is a --#TYPE, pull out the information and place in $traptype
+					if ($line4 =~ /--#TYPE(.*)/)
+					{
+							
+						# Pull out text and remove beginning and trailing white space and quotes
+						if ($line4 =~ /\s*--#TYPE\s*(.*)\s*/)
+						{
+							# Remove any quotes
+							$_ = $1;
+							s(\")()g;
+							# "
+							
+							#print ("2\n");
+							$traptype = $_;
+							#print "Type: $traptype \n";
+						}
+						
+						# Increment to next line and continue with the loop
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}
+				  	
 					# If next line is a --#SUMMARY, pull out the information and place in $summary
 					if ($line4 =~ /--#SUMMARY(.*)/)
 					{
@@ -256,6 +285,12 @@ while ($currentline <= $#mibfile)
 			$line3 = @mibfile[$currentline];
 		}
 
+		# Combine Trap type and summary together to make new summary
+		if ($traptype ne "" && $prepend_type == 1)
+		{
+			$trapsummary = $traptype . ": " . $trapsummary;
+		}
+		
 		$trapoid = `snmptranslate -IR -Ts $enterprise#.$trapname`;
 		chomp $trapoid;
 		if ($trapoid ne "")
@@ -390,6 +425,7 @@ while ($currentline <= $#mibfile)
 			if ($line3 =~ /DESCRIPTION(.*)/s)
 			{
 				$temp1 = 0;
+				$notificationtype = "";
 				$notificationsummary = "";
 				@description = ();
 				
@@ -423,10 +459,34 @@ while ($currentline <= $#mibfile)
 				# Assume the rest is the description up until a ::= or end of the file
 				while (! ($line4 =~ /^\s+.*::=/))
 				{
-					# If next line is a --#SUMMARY, pull out the information and place in $summary
-					if ($line4 =~ /--#SUMMARY(.*)/)
+					# If next line is a --#TYPE, pull out the information and place in 
+					# $notificationtype
+					if ($line4 =~ /--#TYPE(.*)/)
 					{
 							
+						# Pull out text and remove beginning and trailing white space and quotes
+						if ($line4 =~ /\s*--#TYPE\s*(.*)\s*/)
+						{
+							# Remove any quotes
+							$_ = $1;
+							s(\")()g;
+							# "
+							
+							#print ("2\n");
+							$notificationtype = $_;
+							#print "Type: $notificationtype \n";
+						}
+						
+						# Increment to next line and continue with the loop
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}
+
+				  	# If next line is a --#SUMMARY, pull out the information and place in
+					# $notificationsummary
+					if ($line4 =~ /--#SUMMARY(.*)/)
+					{
 						# Pull out text and remove beginning and trailing white space and quotes
 						if ($line4 =~ /\s*--#SUMMARY\s*(.*)\s*/)
 						{
@@ -527,6 +587,12 @@ while ($currentline <= $#mibfile)
 			}
 			$currentline++; # Increment to the next line
 			$line3 = @mibfile[$currentline];
+		}
+
+		# Combine Notification type and summary together to make new summary
+		if ($notificationtype ne "" && $prepend_type == 1)
+		{
+			$notificationsummary = $notificationtype . ": " . $notificationsummary;
 		}
 		
 		$notificationoid = `snmptranslate -IR -Ts $enterprise.$notificationname`;
