@@ -1,5 +1,9 @@
 September 3rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added support for i, g and e modifiers for REGEX
+- Fix translate_value_oids_sub.  If string contained multiple OIDs,
+  they may not be converted correctly.  Example, if you had
+  .1.2.3.4 and .1.2.3.4.5 it would translate to whatever and
+  whatever.5.  Improved with lookaheads and lookbehinds
 
 August 14th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added support for DBD:Pg for PostgreSQL

@@ -2957,33 +2957,34 @@ sub translate_value_oids_sub
     # Find any IP addresses and remove from $string_temp
     while ($done)
     {
-      if ($string_temp =~ /(?<!\.|\d)(\d+\.\d+\.\d+\.\d+)(?!\.)/ ) { $found = 1; }
+      if ($string_temp =~ /(?<!\.)(\d+\.\d+\.\d+\.\d+)(?!\.)/ ) { $found = 1; }
       else { $found = 0; }
 
       if ($found)
       {
-	$string_temp =~ s/$1//g;	# Remove IP from string_temp
-	#print "ip:$temp\n";
+	print "ip:$&\n";
+	$string_temp =~ s/(?<!\.)$1(?!\.)//g;	# Remove IP from string_temp
       }
       else
       {
 	$done = 0;
       }
     }
-    
+
     # Find all the OIDs and put them in a @oids array, and remove from $string_temp
     $done = 1;
     my $oid_found = 0;
     while ($done)
     {   
-      if ($string_temp =~ /(\.\d+)+/) {	$found = 1; }
+      if ($string_temp =~ /(?<!\.|\d)(\.\d+)+(?!\.)/) {	$found = 1; }
       else { $found = 0; }
 
       if ($found)
       {
 	my $oid = $&;
 	push (@oids, $oid);
-	$string_temp =~ s/$oid//g;	# Remove OID from string_temp
+	print "oid:$oid\n";
+	$string_temp =~ s/(?<!\.|\d)$oid(?!\.)//g;	# Remove OID from string_temp
 	$oid_found = 1;
       }
       else
@@ -2991,19 +2992,25 @@ sub translate_value_oids_sub
 	$done = 0;
       }
     }
-
+    #die();
     if ($oid_found == 1 && $DEBUGGING >= 2)
     {
       print "  Value contains an OID.\n";
     }
     
+    # Reverse sort the list to make sure large OIDs are done first, so we don't get half
+    # converted OIDs.  Probably not needed due to look ahead and behind expression below
+    @oids = reverse sort(@oids);
+ 
+    print "oids: @oids\n";
+     
     # Replace all OIDs in $string with textual names if possible
     foreach my $oid (@oids)
     {
       my $temp = my_translateObj($oid,$translate_value_oids);
       if (defined ($temp))
       {
-	$string =~ s/$oid/$temp/g;
+	$string =~ s/(?<!\.|\d)$oid(?!\.)/$temp/g;
 	if ($oid_found == 1 && $DEBUGGING >= 2)
 	{
 	  print "    OID: $oid=$temp\n";
