@@ -16,40 +16,38 @@
 <b>(SNMPTT)</b> <br>
 This file was last updated on:&nbsp; March 24th, 2003
 <p><a href="#License">License</a> </p>
-<p><a href="#What%20is%20it">SNMPTT</a> </p>
-<blockquote><a href="#What%20is%20it">What is it?</a> <br>
+<p><a href="#What-is-it">SNMPTT</a> </p>
+<blockquote><a href="#What-is-it">What is it?</a> <br>
   <a href="#Downloading">Downloading</a> <br>
   <a href="#Features">Features</a> <br>
   <a href="#Requirements">Requirements</a> <br>
-  <a href="#Whats%20New">What's New</a> <br>
+  <a href="#Whats-New">What's New</a> <br>
   <a href="#Upgrading">Upgrading</a> <br>
-  <a href="#Configuration%20Options">Configuration Options - snmptt.ini</a> <br>
+  <a href="#Configuration-Options">Configuration Options - snmptt.ini</a> <br>
   <a href="#LoggingStandard">Logging</a> <br>
   <b>&nbsp;&nbsp; </b><a href="#LoggingStandard">Standard</a> <br>
   <b>&nbsp;&nbsp; </b><a href="#LoggingSyslog">Syslog</a> <br>
   <b>&nbsp;&nbsp; </b><a href="#LoggingEventLog">EventLog</a> <br>
   <b>&nbsp;&nbsp; </b><a href="#LoggingDatabase">Database</a> <br>
   <b>&nbsp;&nbsp; </b><a href="#LoggingUnknown">Unknown Traps</a> <br>
-  <a href="#Executing%20an%20external%20program">Executing an external
-program</a> <br>
-  <a href="#Modes%20of%20Operation">Modes of Operation</a> <br>
-  <a href="#Command%20line%20arguments">Command line arguments</a> <br>
-  <a href="#SNMPTT.CONF%20Configuration%20file%20format">SNMPTT.CONF
+  <a href="#Executing-an-external-program">Executing an external program</a> <br>
+  <a href="#Modes-of-Operation">Modes of Operation</a> <br>
+  <a href="#Command-line-arguments">Command line arguments</a> <br>
+  <a href="#SNMPTT.CONF-Configuration-file-format">SNMPTT.CONF
 Configuration file format</a> <br>
-  <a href="#SNMPTT.CONF%20Configuration%20file%20Notes">SNMPTT.CONF
+  <a href="#SNMPTT.CONF-Configuration-file-Notes">SNMPTT.CONF
 Configuration file Notes</a> <br>
-  <a href="#Sample1%20SNMPTT.CONF%20file">Sample1 SNMPTT.CONF file</a> <br>
-  <a href="#Sample2%20SNMPTT.CONF%20file">Sample2 SNMPTT.CONF file</a> <br>
+  <a href="#Sample1-SNMPTT.CONF-file">Sample1 SNMPTT.CONF file</a> <br>
+  <a href="#Sample2-SNMPTT.CONF-file">Sample2 SNMPTT.CONF file</a> <br>
   <a href="#Notes">Notes</a> <br>
-  <a href="#Installation%20-%20Unix">Installation</a> <br>
-  <b>&nbsp;&nbsp; </b><a href="#Installation%20-%20Unix">Unix</a> <br>
-  <b>&nbsp;&nbsp; </b><a href="#Installation%20-%20Windows">Windows</a> <br>
+  <a href="#Installation-Unix">Installation</a> <br>
+  <b>&nbsp;&nbsp; </b><a href="#Installation-Unix">Unix</a> <br>
+  <b>&nbsp;&nbsp; </b><a href="#Installation-Windows">Windows</a> <br>
   <a href="#Limitations">Limitations</a> <br>
   <a href="#Feedback">Feedback &amp; Bugs</a></blockquote>
-<a href="#SNMP%20Trap%20Translator%20Convert">SNMP Trap Translator
-Convert</a>
-<p><a href="#SNMP%20Trap%20Translator%20Convert%20MIB">SNMP Trap
-Translator Convert MIB</a> </p>
+<a href="#SNMP-Trap-Translator-Convert">SNMP Trap Translator Convert</a>
+<p><a href="#SNMP-Trap-Translator-Convert-MIB">SNMP Trap Translator
+Convert MIB</a> </p>
 <p><a href="#FAQ-Troubleshooting">FAQ / Troubleshooting</a> <br>
 &nbsp; <br>
 &nbsp; </p>
@@ -70,7 +68,7 @@ along with this program; if not, write to the Free Software <br>
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA&nbsp;
 02111-1307&nbsp; USA <br>
 &nbsp; </p>
-<p><a name="What is it"></a><b><font size="+2">What is it?</font></b> </p>
+<p><a name="What-is-it"></a><b><font size="+2">What is it?</font></b> </p>
 <p>SNMPTT (SNMP Trap Translator) is a SNMP trap handler written in Perl
 for use with the NET-SNMP / UCD-SNMP snmptrapd program (<a
  href="http://www.net-snmp.org">http://www.net-snmp.org)</a>. </p>
@@ -103,8 +101,8 @@ configuration file</li>
   <li> Translates received traps into a readable format by performing
 variable substitution</li>
   <li> Outputs translated traps to standard output, text log file,
-syslog, NT Event Log, MySQL, or any database support by the DBD::ODBC
-or Win32::ODBC modules</li>
+syslog, NT Event Log, MySQL, or any database support by the DBD::ODBC or
+Win32::ODBC modules</li>
   <li> Executes a user defined program when a trap is received</li>
 </ul>
 <p><br>
@@ -147,9 +145,9 @@ or if translation of integers is enabled</li>
 All development and testing was done on Mandrake Linux 8.1 using
 UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).&nbsp; I have
 also tested the program with Windows 2000 using a test file without
-actually using UCD-SNMP.&nbsp; <b>Windows users must disable the
-syslog feature as described below.</b>&nbsp; Both SNMP V1 and V2 traps
-have been tested.
+actually using UCD-SNMP.&nbsp; <b>Windows users must disable the syslog
+feature as described below.</b>&nbsp; Both SNMP V1 and V2 traps have
+been tested.
 <p>UCD-SNMP v4.2.3 appears to have a bug that prevents it from working
 correctly with SNMPTT.&nbsp; UCD-SNMP v4.2.1, v4.2.4 and v4.2.5 appear
 to work fine.&nbsp; If you need to use UCD-SNMP v4.2.3 (if for example
@@ -161,7 +159,7 @@ enable the translation of integer values (translate_integers = 1) to
 enumeration tags in MIB files or want to have variable names translated
 into text from the MIB files.</blockquote>
 <p><br>
-<a name="Whats New"></a><b><font size="+2">What's New</font></b> </p>
+<a name="Whats-New"></a><b><font size="+2">What's New</font></b> </p>
 <p><b><font size="+1">0.6 - ???, 2003</font></b> </p>
 <ul>
   <li>Snmpttconvertmib</li>
@@ -225,11 +223,11 @@ sample trap file<br>
 processed in the order they are received when in daemon mode</li>
   <li> Added <b>use_trap_time </b>variable to config file for daemon
 mode to have SNMPTT use either the time from the spool file, or the
-current time.&nbsp; Changed SNMPTTHANDLER to output the current date
-and time on the first line of the spool file</li>
+current time.&nbsp; Changed SNMPTTHANDLER to output the current date and
+time on the first line of the spool file</li>
   <li> Fixed bug with default variable settings being ignored.&nbsp;
-Defaults were not being set correctly if variable was not defined in
-the .ini file.</li>
+Defaults were not being set correctly if variable was not defined in the
+.ini file.</li>
   <li> Fixed bug with SNMPTT ignoring the daemon mode parameter in the
 .ini file</li>
   <li> Fixed bug with Nodes list not being flushed out for each
@@ -239,8 +237,8 @@ configuration options to enable / disable the removal of the domain name
 from the host name passed to SNMPTT.&nbsp; Defaults to disabled (do
 not&nbsp; strip domain name)</li>
   <li> SNMPTTCONVERTMIB now prepends the contents of the --#TYPE line
-(if present) to the --#SUMMARY line to provide a more descriptive
-FORMAT / EXEC line</li>
+(if present) to the --#SUMMARY line to provide a more descriptive FORMAT
+/ EXEC line</li>
 </ul>
 <b><font size="+1">0.4 - November 18th, 2002</font></b>
 <ul>
@@ -320,7 +318,7 @@ snmptthandler scripts</li>
 files instead of trap definitions, move that list to the snmptt.ini file</li>
 </ol>
 <p><br>
-<a name="Configuration Options"></a><b><font size="+2">Configuration
+<a name="Configuration-Options"></a><b><font size="+2">Configuration
 Options - snmptt.ini</font></b> </p>
 <p>As mentioned throughout this document, configuration options are set
 by editing the <b>snmptt.ini</b> file. </p>
@@ -520,7 +518,7 @@ modify the following variables: </p>
 <blockquote><b>enable_unknown_trap_log</b> <br>
   <b>unknown_trap_log_file</b></blockquote>
 <p><br>
-<a name="Executing an external program"></a><b><font size="+2">Executing
+<a name="Executing-an-external-program"></a><b><font size="+2">Executing
 an external program</font></b> </p>
 <p>An external program can be launched when a trap is received.&nbsp;
 The command line is defined in the configuration file.&nbsp; For
@@ -534,7 +532,7 @@ the current time (described in detail below)
 snmptt.ini file and modify the following variable: </p>
 <blockquote><b>exec_enable</b></blockquote>
 <p><br>
-<a name="Modes of Operation"></a><b><font size="+2">Modes of Operation</font></b> </p>
+<a name="Modes-of-Operation"></a><b><font size="+2">Modes of Operation</font></b> </p>
 <p>SNMPTT can be run in two modes:&nbsp; standalone mode and daemon
 mode. </p>
 <p><b><font size="+1">Standalone mode</font></b> </p>
@@ -555,8 +553,8 @@ traps (EVENTs), it takes under a second to process the trap including
 logging and executing the qpage program.&nbsp; The larger the
 snmptt.conf file is, the longer it will take to process.&nbsp; If there
 are a large number of traps being received, daemon mode should be
-used.&nbsp; If it takes 1 second to process one trap, then obviously
-you shouldn't try to process more than one trap per second.
+used.&nbsp; If it takes 1 second to process one trap, then obviously you
+shouldn't try to process more than one trap per second.
 <p>Running SNMPTT without the <b>--daemon</b> command line option will
 result standalone mode unless the <b>mode</b> variable in the <b>snmptt.ini</b>
 file is set to <b>daemon</b>.&nbsp; For standalone mode, the <b>mode</b>
@@ -590,15 +588,15 @@ variable in the <b>snmptt.ini</b> file is set to <b>daemon</b> will
 cause SNMPTT to run in daemon mode. </p>
 <p>By setting the .ini variable <b>use_trap_time</b> to <b>1</b>
 (default), the date and time used for logging etc will be the date and
-time passed inside the trap spool file.&nbsp; If <b>use_trap_time</b>
-is set to <b>0</b>, the date and time that the trap was <i>processed</i>
+time passed inside the trap spool file.&nbsp; If <b>use_trap_time</b> is
+set to <b>0</b>, the date and time that the trap was <i>processed</i>
 by SNMPTT is used.&nbsp; Setting <b>use_trap_time</b> to <b>0</b> can
 result in inaccurate time stamps on log files due to the length of time
 SNMPTT sleeps between spool file polling. </p>
 <p>Note:&nbsp; When running on a <b>non</b> Windows platform, SNMPTT
 will fork to the background if <b>daemon_fork</b> is set to 1. <br>
 &nbsp; </p>
-<p><a name="Command line arguments"></a><b><font size="+2">Command line
+<p><a name="Command-line-arguments"></a><b><font size="+2">Command line
 arguments</font></b> </p>
 <p>The following command line arguments are supported: </p>
 <p>Usage: <br>
@@ -630,7 +628,7 @@ Use to see how long it takes to load and <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 process trap file (eg: time snmptt --time) <br>
 &nbsp; </p>
-<p><a name="SNMPTT.CONF Configuration file format"></a><b><font
+<p><a name="SNMPTT.CONF-Configuration-file-format"></a><b><font
  size="+2">SNMPTT.CONF Configuration file format</font></b> </p>
 <p>The configuration file (usually /etc/snmp/snmptt.conf or
 d:\snmp\snmptt.conf) contains a list of all the defined traps. </p>
@@ -684,8 +682,8 @@ Wildcards can also be used.&nbsp; For example:
       <p><b>Note:</b> </p>
       <blockquote>Specific trap matches are performed before wildcards
 so if you have an entry for 1.3.6.1.4.1.232.1.2.5 AND
-1.3.6.1.4.1.232.1.2.*, it will process the .5 trap when received even
-if the wildcard is defined first.
+1.3.6.1.4.1.232.1.2.*, it will process the .5 trap when received even if
+the wildcard is defined first.
         <p>Wildcard matches are only matched if there are NO exact
 matches.&nbsp; This takes into consideration the NODES list.&nbsp;
 Therefore, if there is a matching trap, but the NODES list prevents it
@@ -708,8 +706,8 @@ submit a passive service check.</p>
     <b>severity:</b>
     <blockquote>Character string of the severity of the event.&nbsp;
 Used in the output when logging.&nbsp; Example: Minor, Major, Normal,
-Critical, Warning.&nbsp; The <b>snmptt.ini</b> contains options to
-match the syslog level or NT Event Log type to the severity level.</blockquote>
+Critical, Warning.&nbsp; The <b>snmptt.ini</b> contains options to match
+the syslog level or NT Event Log type to the severity level.</blockquote>
   </blockquote>
   <b>FORMAT:</b>
   <blockquote><b>FORMAT</b> format_string
@@ -749,7 +747,7 @@ Example:
     <p>FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6 </p>
     <p>Note: </p>
     <blockquote>For the text log file, the output will be formatted as:
-      <blockquote><b><i>date time trap-OID severity category hostname -
+ <blockquote><b><i>date time trap-OID severity category hostname -
 format</i></b></blockquote>
 For all other log files except MySQL, DBD::ODBC and Win32::ODBC, the
 output will be formatted as:
@@ -773,9 +771,9 @@ into text by performing a lookup in the MIB file.
       <p>For this feature to work, you must ensure UCD-SNMP / NET-SNMP
 is configured correctly with all the required MIBS.&nbsp; If the option
 is enabled, but the value can not be found, the integer value will be
-used.&nbsp; If the MIB files are present, but translations do not
-occur, ensure UCD-SNMP / NET-SNMP is correctly configured to process
-all the required mibs.&nbsp; This is configured in the <b>snmp.conf</b>
+used.&nbsp; If the MIB files are present, but translations do not occur,
+ensure UCD-SNMP / NET-SNMP is correctly configured to process all the
+required mibs.&nbsp; This is configured in the <b>snmp.conf</b>
 file.&nbsp; Alternatively, you can try setting the <b>mibs_enviroment</b>
 variable in <b>snmptt.ini</b> to <b>ALL</b> (no quotes) to force all
 MIBS to be initialized at SNMPTT startup. </p>
@@ -790,8 +788,8 @@ in the snmptt.ini file. <br>
 *** Note:
     <blockquote>$v<i>n</i>, $+<i>n</i> and $-<i>n</i> variable names and
 variable type are translated into the text name by performing a lookup
-in the MIB file.&nbsp; You must have the UCD-SNMP / NET-SNMP Perl
-module installed for this to work and you must enable support for it by
+in the MIB file.&nbsp; You must have the UCD-SNMP / NET-SNMP Perl module
+installed for this to work and you must enable support for it by
 enabling <b>net_snmp_perl_enable</b> in the snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b>
 is not enabled, the $v<i>n</i> variable will be replaced with the text
 'variable<i>n</i>' where <i>n</i> is the variable number (1+).
@@ -818,8 +816,8 @@ or
     <blockquote>EXEC c:\snmp\pager netops "$r: $x $X - NIC switchover
 to slot $3, port $4 from slot $5, port $6"</blockquote>
 Note: Unlike the FORMAT line, nothing is prepended to the
-message.&nbsp; If you would like to include the hostname and date in
-the page above, you must use the variables such as $r, $x and $X.</blockquote>
+message.&nbsp; If you would like to include the hostname and date in the
+page above, you must use the variables such as $r, $x and $X.</blockquote>
   <b>NODES:</b>
   <blockquote>[<b>NODES</b> sources_list]
     <p>Optional string containing a list of source (host) names
@@ -860,8 +858,8 @@ any FQDN host.&nbsp; See the .ini file for details.</p>
   <blockquote>[<b>SDESC</b>]
     <p>Optional start of a description.&nbsp; All text between this
 line and the line EDESC will be ignored by snmptt. This section can be
-used to enter comments about the trap for your own use.&nbsp; If you
-use a SDESC, you MUST follow with a EDESC.</p>
+used to enter comments about the trap for your own use.&nbsp; If you use
+a SDESC, you MUST follow with a EDESC.</p>
   </blockquote>
   <b>EDESC</b>
   <blockquote>[<b>EDESC</b>]
@@ -874,7 +872,7 @@ EDESC</blockquote>
   </blockquote>
 </blockquote>
 <p><br>
-<a name="SNMPTT.CONF Configuration file Notes"></a><b><font size="+2">SNMPTT.CONF
+<a name="SNMPTT.CONF-Configuration-file-Notes"></a><b><font size="+2">SNMPTT.CONF
 Configuration file Notes</font></b> </p>
 <p>When there are multiple definitions of the same trap in the
 configuration file, the following rules apply: </p>
@@ -900,7 +898,7 @@ file</li>
   <li> If an exact match exists, the wildcard match is NOT performed</li>
   <li> If an exact match does NOT exist, the wildcard match IS performed</li>
 </ul>
-<a name="Sample1 SNMPTT.CONF file"></a><b><font size="+2">Sample1
+<a name="Sample1-SNMPTT.CONF-file"></a><b><font size="+2">Sample1
 SNMPTT.CONF file</font></b>
 <p>Following is a sample of two defined traps in <b>snmptt.conf:</b> </p>
 <blockquote># <br>
@@ -920,7 +918,7 @@ EXEC qpage -f TRAP notifygroup1 "$s $r $x $X: Battery status is $3" <br>
 NODES ntserver1 ntserver2 ntserver3 <br>
 # <br>
 #</blockquote>
-<a name="Sample2 SNMPTT.CONF file"></a><b><font size="+2">Sample2
+<a name="Sample2-SNMPTT.CONF-file"></a><b><font size="+2">Sample2
 SNMPTT.CONF file</font></b>
 <p>Following is a sample of a list of files to load in <b>snmptt.ini:</b> </p>
 <blockquote>snmptt_conf_files = &lt;&lt;END <br>
@@ -962,7 +960,7 @@ Snmpttconvert can be used to convert the file to snmptt.conf format. </p>
 definitions.&nbsp; Snmpttconvertmib can be used to convert the file to
 snmptt.conf format. <br>
 &nbsp; </p>
-<p><a name="Installation - Unix"></a><b><font size="+2">Installation -
+<p><a name="Installation-Unix"></a><b><font size="+2">Installation -
 Unix</font></b> </p>
 <p>1.&nbsp; <b><u>Read this entire file to understand how snmptt works</u></b> </p>
 <p>2.&nbsp; Copy <b>snmptt</b> to /usr/sbin/ and ensure it is
@@ -1006,8 +1004,8 @@ script if you have one and change <br>
 <p>&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
 file to include the line: <b>printNumericOids 1.&nbsp; </b>This
 setting will take effect no matter what is used on the command line. </p>
-<p><a name="Installation - Windows"></a><b><font size="+2">Installation
-- Windows</font></b> </p>
+<p><a name="Installation-Windows"></a><b><font size="+2">Installation -
+Windows</font></b> </p>
 <p>1.&nbsp; <b><u>Read this entire file to understand how snmptt works</u></b> </p>
 <p>2.&nbsp; Create the directory c:\snmp and copy <b>snmptt</b> and <b>snmptthandler</b>
 to it </p>
@@ -1093,8 +1091,8 @@ c:\winnt\system32\srvany.exe</b> </p>
 create a Sting Value (REG_SZ) called <b>Application</b> with the value
 of: <b>c:\perl\bin\perl.exe</b> </p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Inside of Parameters,
-create a Sting Value (REG_SZ) called <b>AppParameters</b> with the
-value of: <b>c:\snmp\snmptt --daemon</b> </p>
+create a Sting Value (REG_SZ) called <b>AppParameters</b> with the value
+of: <b>c:\snmp\snmptt --daemon</b> </p>
 <p>5.&nbsp;&nbsp;&nbsp; Start the service from the control panel, or
 from a command prompt, type:&nbsp; <b>net start snmptt</b> </p>
 <p>To remove the service, type:&nbsp; <b>instsrv SNMPTT remove</b> <br>
@@ -1106,8 +1104,8 @@ unique traps (EVENTs), it takes under a second to process the trap
 including logging and executing the qpage program.&nbsp; The larger the
 snmptt.conf file is, the longer it will take to process.&nbsp; If there
 are a large number of traps being received, daemon mode should be
-used.&nbsp; If it takes 1 second to process one trap, then obviously
-you shouldn't try to process more than one trap per second. </p>
+used.&nbsp; If it takes 1 second to process one trap, then obviously you
+shouldn't try to process more than one trap per second. </p>
 <p><b><font size="+1">Standalone or daemon mode:</font></b> </p>
 <p>The SNMPTRAPD program blocks when executing traphandle
 commands.&nbsp; This means that if the program called never quits,
@@ -1126,8 +1124,8 @@ are trying to convert and I will try to take a look at it. </p>
 <p>Please also send any bug reports, patches or improvements so I can
 fix / add them and add it to the next release. <br>
 &nbsp; </p>
-<p><a name="SNMP Trap Translator Convert"></a><b><font size="+3">SNMP
-Trap Translator Convert v0.1</font></b> <br>
+<p><a name="SNMP-Trap-Translator-Convert"></a><b><font size="+3">SNMP
+Trap Translator Convert v0.2</font></b> <br>
 <b><font size="+1">(SNMPTTCONVERT)</font></b> </p>
 <p>Some vendors provide a file that can be imported into HP Openview
 using a HP Openview utiltity.&nbsp; SNMPTTCONVERT is a simple Perl
@@ -1158,8 +1156,8 @@ EDESC</blockquote>
 Note:&nbsp; The #EXEC line is added by default.&nbsp; This can be
 changed by editing the SNMPTTCONVERT script. <br>
 &nbsp; </p>
-<p><a name="SNMP Trap Translator Convert MIB"></a><b><font size="+3">SNMP
-Trap Translator Convert MIB v0.1</font></b> <br>
+<p><a name="SNMP-Trap-Translator-Convert-MIB"></a><b><font size="+3">SNMP
+Trap Translator Convert MIB v0.2</font></b><br>
 <b><font size="+1">(SNMPTTCONVERTMIB)</font></b> </p>
 <p><b>SNMPTTCONVERTMIB</b> is a Perl script which will read a MIB file
 and convert the <b>TRAP-TYPE</b> (v1) or <b>NOTIFICATION-TYPE</b> (v2)
@@ -1234,9 +1232,10 @@ utility</li>
 </ul>
 <div style="margin-left: 40px;">or</div>
 <ul>
-  <li> UCD-SNMP / NET-SNMP <a><b style="font-weight: bold;"><a
+  <li> UCD-SNMP / NET-SNMP <a><b style="font-weight: bold;"></b></a><b
+ style="font-weight: bold;"><a
  href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">Perl
-module</a></b></a> utility</li>
+module</a></b> utility</li>
 </ul>
 <p><br>
 <b><font size="+2">Converting a MIB file</font></b> </p>
@@ -1262,9 +1261,8 @@ command line switch to force it on when calling <b>snmptranslate</b>.</li>
   <li> Convert the mib file with: <b>snmpttconvertmib --in=<i>path-to-mib</i>
 --out=<i>output-file-name</i></b>.&nbsp; Note:&nbsp; the <b>output-file-name</b>
 is appended to, so remember to delete it first if needed.&nbsp; To use
-the Perl module instead of snmptranslate, use: <b>snmpttconvertmib
---in=<i>path-to-mib</i> --out=<i>output-file-name</i> --net_snmp_perl
---mibdir=</b><b><i>path-to-mib-directory</i></b></li>
+the Perl module instead of snmptranslate, use: <b>snmpttconvertmib --in=<i>path-to-mib</i>
+--out=<i>output-file-name</i> --net_snmp_perl --mibdir=</b><b><i>path-to-mib-directory</i></b></li>
 </ol>
 Example:
 <blockquote><b>snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib
@@ -1315,8 +1313,8 @@ statements etc.&nbsp; This is why snmptranslate is used. </p>
 <p>If <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> are found, the <b>%<i>letter</i></b>
 variables are replaced with <b>$<i>number</i></b> variables based on the
 values lists in the <b>--#ARGUMENTS</b> section incremented by 1
-(ARGUMENTS starts with 0, SNMPTT starts with 1).&nbsp; This will be
-used to define the <b>FORMAT</b> and <b>EXEC</b> lines. </p>
+(ARGUMENTS starts with 0, SNMPTT starts with 1).&nbsp; This will be used
+to define the <b>FORMAT</b> and <b>EXEC</b> lines. </p>
 <p>If there is no <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, but
 the first line of the <b>DESCRIPTION</b> contains <b>%<i>letter</i></b>
 variables, then that line will be used to define the <b>FORMAT</b> and <b>EXEC</b>
@@ -1370,8 +1368,8 @@ statements etc.&nbsp; This is why snmptranslate is used. </p>
 <p>If <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> are found, the <b>%<i>letter</i></b>
 variables are replaced with <b>$<i>number</i></b> variables based on the
 values lists in the <b>--#ARGUMENTS</b> section incrememented by 1
-(ARGUMENTS starts with 0, SNMPTT starts with 1).&nbsp; This will be
-used to define the <b>FORMAT</b> and <b>EXEC</b> lines. </p>
+(ARGUMENTS starts with 0, SNMPTT starts with 1).&nbsp; This will be used
+to define the <b>FORMAT</b> and <b>EXEC</b> lines. </p>
 <p>If there is no <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, but
 the first line of the <b>DESCRIPTION</b> contains <b>%<i>letter</i></b>
 variables, then that line will be used to define the <b>FORMAT</b> and <b>EXEC</b>
@@ -1423,15 +1421,15 @@ of <span style="font-weight: bold;">snmptt.ini</span>.</li>
   <li>Check the logs files etc for a sample linkDown trap<br>
   </li>
 </ol>
-<p><b>Q:&nbsp; SNMPTT is not working!&nbsp; How do I troubleshoot it?</b> </p>
+<p><b><br>
+Q:&nbsp; SNMPTT is not working!&nbsp; How do I troubleshoot it?</b> </p>
 <p>A:&nbsp; Start by enabling <span style="font-weight: bold;">enable_unknown_trap_log</span>in
 the <span style="font-weight: bold;">snmptt.ini</span> file.&nbsp; Look
 inside this file to see if the traps are being passed correctly to
-SNMPTT but not being handled correctly.&nbsp; Next, enable debug mode
-of 2 and specify a debug text file to log to in the snmptt.ini
-file.&nbsp; After a trap is received, take a look at the file to try to
-determine what is going wrong.&nbsp; Disable both logs when you are
-finished. <br>
+SNMPTT but not being handled correctly.&nbsp; Next, enable debug mode of
+2 and specify a debug text file to log to in the snmptt.ini file.&nbsp;
+After a trap is received, take a look at the file to try to determine
+what is going wrong.&nbsp; Disable both logs when you are finished. <br>
 </p>
 <p>To make troubleshooting a particular trap easier when working in
 daemon mode, try the following:</p>
@@ -1449,20 +1447,11 @@ that contains the date / time)</li>
   <li>Troubleshoot by using the log files etc<br>
   </li>
 </ol>
-<p><b>Q:&nbsp; When I try to convert a MIB, it will not convert
-properly.&nbsp; Why?</b> </p>
-<p>A:&nbsp; If you are using Unix and transferred the MIB file from
-Windows (or downloaded a ZIP file containing the MIB), you need to make
-sure it does not contain DOS carriage returns.&nbsp; Displaying the
-file with the <b>joe</b> text editor will show <b><u>M</u></b>'s at
-the end of each line.&nbsp; To strip them out and craete a new file,
-type: </p>
-<p><b>cat <i>mib-file</i> | tr -d '\015' &gt; <i>mib-file.new</i></b> <br>
-&nbsp; </p>
-<p><b>Q:&nbsp; I have configured SNMPTT correctly with a snmptt.ini
-file, snmptt.conf file(s) etc and it still does not process
-traps.&nbsp; Everything appears in the snmpttunknowntrap.log
-file.&nbsp; What did I do wrong?</b> </p>
+<p><b><br>
+Q:&nbsp; I have configured SNMPTT correctly with a snmptt.ini file,
+snmptt.conf file(s) etc and it still does not process traps.&nbsp;
+Everything appears in the snmpttunknowntrap.log file.&nbsp; What did I
+do wrong?</b> </p>
 <p>A:&nbsp; You probably didn't start snmptrapd correctly.&nbsp; Make
 sure it is started using: </p>
 <blockquote><b>snmptrapd -On</b></blockquote>
@@ -1471,6 +1460,16 @@ numeric OIDs and SNMPTT will not process them.
 <p>As an alternative, you can edit your <b>snmp.conf</b> file to
 include the line: <b>printNumericOids 1.&nbsp; </b>This setting will
 take effect no matter what is used on the command line. </p>
+<p><br>
+<b>Q:&nbsp; When I try to convert a MIB, it will not convert
+properly.&nbsp; Why?</b> </p>
+<p>A:&nbsp; If you are using Unix and transferred the MIB file from
+Windows (or downloaded a ZIP file containing the MIB), you need to make
+sure it does not contain DOS carriage returns.&nbsp; Displaying the file
+with the <b>joe</b> text editor will show <b><u>M</u></b>'s at the end
+of each line.&nbsp; To strip them out and craete a new file, type: </p>
+<p><b>cat <i>mib-file</i> | tr -d '\015' &gt; <i>mib-file.new</i></b> <br>
+&nbsp; </p>
 <p><b>Q:&nbsp; I have disabled syslog support in SNMPTT, but my syslog
 (or NT Event Log) is still filling up with trap messages.&nbsp; How do I
 disable them?</b> <br>
@@ -1504,9 +1503,10 @@ patch section</a>.&nbsp; This patch should be included in the 5.1 (not
 started using: </p>
 <blockquote><b>snmptrapd -On -t</b></blockquote>
 <p><br>
-<b>Q:&nbsp; I want to enable the Perl support for UCD-SNMP / NET-SNMP,
-but I installed UCD-SNMP / NET-SNMP using RPMs.&nbsp; What's the easiest
-way to install the module without recompiling everything?</b> </p>
+<b>Q:&nbsp; I want to enable the Perl support for UCD-SNMP / NET-SNMP
+under Linux, but I installed UCD-SNMP / NET-SNMP using RPMs.&nbsp;
+What's the easiest way to install the module without recompiling
+everything?</b> </p>
 <p>A:&nbsp; You should not have to re-compile the entire package.&nbsp;
 Try the following: </p>
 <ol>
@@ -1518,10 +1518,18 @@ be in /usr/src/RPM/SOURCES</li>
   <li> Go into the sub directory perl/SNMP</li>
   <li> Follow the instructions in the README file</li>
 </ol>
-<p><br>
-<b>Q:&nbsp; I have enable net_snmp_perl_enable but the variable names
-are not being translated into text using $v<i>n, $-n, $+n, $-* or $+*</i>.&nbsp;
-How do I troubleshoot it?</b> <br>
+<p><b><br>
+<span style="font-weight: bold;">Q:&nbsp; I want to enable the Perl
+support for UCD-SNMP / NET-SNMP under Windows</span></b><span
+ style="font-weight: bold;"> but I don't know how.&nbsp; Do you?</span><br>
+</p>
+<p>A:&nbsp; If I ever find someone who has managed to get it to compile
+under a newer Net-SNMP, I will add the steps in here.<br>
+<br>
+</p>
+<p> <b>Q:&nbsp; I have enable net_snmp_perl_enable but the variable
+names are not being translated into text using $v<i>n, $-n, $+n, $-* or
+$+*</i>.&nbsp; How do I troubleshoot it?</b> <br>
 <b>Q:&nbsp; I have enabled translate_integers but the integer values
 are not being translated into text.&nbsp;&nbsp; How do I troubleshoot it?</b> </p>
 <p>A:&nbsp; You must have the UCD-SNMP / NET-SNMP Perl module installed
@@ -1562,9 +1570,8 @@ numberical.&nbsp; Why?</b> </p>
 <p><br>
 A:&nbsp; By default, <b>snmpttconvertmib</b> uses the <b>snmptranslate</b>
 command to convert MIB files.&nbsp; With Net-SNMP v5.0.2 and newer,
-setting the <b>-On</b> switch on the <b>snmptranslate</b> command
-causes the output to be in numerical format, which is what is needed
-for <b>snmpttconvertmib</b>. </p>
+setting the <b>-On</b> switch on the <b>snmptranslate</b> command causes
+the output to be in numerical format, which is what is needed for <b>snmpttconvertmib</b>.</p>
 <p>With Net-SNMP v5.0.1 and all versions of UCD-SNMP, setting the -On
 switch will TOGGLE the setting of using numerical output.&nbsp; With
 Net-SNMP v5.0.2 and newer, setting the -On switch will FORCE the output
