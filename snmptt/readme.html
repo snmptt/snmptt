@@ -169,7 +169,7 @@ tags.</blockquote>
 <a name="Whats-New"></a><b><font size="+2">What's New</font></b> </p>
 <p><b><font size="+1">0.7 - ??</font></b><b><font size="+1">, 2003</font></b></p>
 <ul>
-  <li>Postgres SQL support via DBI / DBD::PgPP <br>
+  <li>PostgreSQL support via DBI / DBD::PgPP <br>
   </li>
 </ul>
 <p><br>
@@ -437,8 +437,8 @@ EventID 14: Can not open log file <i>logfile</i> <br>
 EventID 15: MySQL error: Unable to perform INSERT INTO <br>
 EventID 16: DBI DBD::ODBC error: Unable to perform INSERT INTO <br>
 EventID 17: Win32::ODBC error: Unable to perform INSERT INTO<br>
-EventID 18: Postgres error: Unable to connect to database <br>
-EventID 19: PostgresL error: Unable to perform INSERT INTO <br>
+EventID 18: PostgreSQL error: Unable to connect to database <br>
+EventID 19: PostgreSQL error: Unable to perform INSERT INTO <br>
   <p><b>* (daemon mode only)</b></p>
 </blockquote>
 Note:
@@ -481,18 +481,18 @@ including the date and time.&nbsp; The variable lengths I have chosen
 above should be sufficient, but they may need to be increased depending
 on your environment.<br>
 <br>
-<p><b><font size="+1">DBD::PgPP (Postgres)<br>
+<p><b><font size="+1">DBD::PgPP (PostgreSQL)<br>
 </font></b></p>
-<p>To configure SNMPTT for Postgres, modify the following variables in
-the snmptt.ini file. </p>
-<blockquote><b>postgres_dbi_enable</b> <br>
-  <b>postgres</b><b>_dbi_database</b> <br>
-  <b>postgres</b><b>_dbi_table</b> <br>
-  <b>postgres</b><b>_dbi_username</b> <br>
-  <b>postgres</b><b>_dbi_password</b></blockquote>
+<p>To configure SNMPTT for PostgreSQL, modify the following variables
+in the snmptt.ini file. </p>
+<blockquote><b>postgresql_dbi_enable</b> <br>
+  <b>postgres</b><b>ql_dbi_database</b> <br>
+  <b>postgres</b><b>ql_dbi_table</b> <br>
+  <b>postgres</b><b>ql_dbi_username</b> <br>
+  <b>postgres</b><b>ql_dbi_password</b></blockquote>
 Note:&nbsp; Sample values are defined in the default ini file.
-<p>The following Postgres script can create the database and table (not
-tested!).&nbsp; Permissions etc should also be defined. </p>
+<p>The following PostgreSQL script can create the database and table
+(not tested!).&nbsp; Permissions etc should also be defined. </p>
 <blockquote><b><tt>CREATE DATABASE snmptt;</tt></b> <br>
   <b><tt>USE snmptt;</tt></b>
   <p><b><tt>DROP TABLE snmptt;;</tt></b> <br>

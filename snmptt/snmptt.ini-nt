@@ -157,21 +157,21 @@ mysql_dbi_username = snmpttuser
 # MySQL: Password to use
 mysql_dbi_password = password
 
-# Postgres: Set to 1 to enable logging to a Postgres database via DBI (Linux / Windows)
+# PostgreSQL: Set to 1 to enable logging to a PostgreSQL database via DBI (Linux / Windows)
 # This requires DBI:: and DBD::PgPP
-postgres_dbi_enable = 0
+postgresql_dbi_enable = 0
 
-# Postgres: Database to use
-postgres_dbi_database = snmptt
+# PostgreSQL: Database to use
+postgresql_dbi_database = snmptt
 
-# Postgres: Table to use
-postgres_dbi_table = snmptt
+# PostgreSQL: Table to use
+postgresql_dbi_table = snmptt
 
-# Postgres: Username to use
-postgres_dbi_username = snmpttuser
+# PostgreSQL: Username to use
+postgresql_dbi_username = snmpttuser
 
-# Postgres: Password to use
-postgres_dbi_password = password
+# PostgreSQL: Password to use
+postgresql_dbi_password = password
 
 # ODBC: Set to 1 to enable logging to a database via ODBC using DBD::ODBC.  
 # This requires both DBI:: and DBD::ODBC
