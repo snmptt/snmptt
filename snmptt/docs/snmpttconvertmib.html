@@ -13,10 +13,9 @@
 </head>
 <body>
 <h1><b>SNMP Trap Translator Convert MIB v0.4</b></h1>
-<b>(</b><a href="http://www.snmptt.org"><b><font size=
-"+1">SNMPTTCONVERTMIB</font></b></a><b>)</b><br />
+<b>(</b><a href="http://www.snmptt.org"><b>SNMPTTCONVERTMIB</b></a><b>)</b><br />
 This file was last updated on:&nbsp; November 1st, 2003
-<h2><b><font size="+2">License</font></b></h2>
+<h2><b>License</b></h2>
 <p>Copyright 2002, 2003 Alex Burger<br />
 alex_b@users.sourceforge.net<br />
 4/3/2002</p>
@@ -126,7 +125,7 @@ such as:</p>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2: ok<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4: failure<br />
 &nbsp;&nbsp; Descr="Current status of the entire library system"</div>
-<p><b><font size="+2"><br /></font></b></p>
+<p><b><br /></b></p>
 <h3>Converting a MIB file</h3>
 <p>See the <span style="font-weight: bold;">snmpttconvertmib</span> help
 screen for all possible command line options (<span style=
@@ -196,7 +195,7 @@ at the top of the file and contain <span style=
 name will be used when looking up the TRAP / NOTIFICATION to ensure the
 correct MIB file is accessed.</p>
 <p>The mib file is also searched for lines containing <b>TRAP-TYPE</b>
-or<font size="+1">NOTIFICATION-TYPE</font>.&nbsp; If it finds one that appears
+or NOTIFICATION-TYPE.&nbsp; If it finds one that appears
 to be a valid trap definition, it reads in the following lines until a ::= is
 found while looking for the <b>DESCRIPTION</b> section.&nbsp; It then looks
 for the <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> line if enabled.</p>

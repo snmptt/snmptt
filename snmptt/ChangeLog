@@ -1,3 +1,7 @@
+November 3rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_0.9
+- snmptt-net-snmp-test now defaults to best_guess=2
+
 October 27th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Syslog messages now use snmptt[pid] instead of TRAPD (traps) and
   snmptt-sys[pid] instead of SNMPTT (system messages)
