@@ -1,4 +1,12 @@
 October 22th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed multiple_event bug - if it was disabled, would not process
+  traps
+- Now requires Config::IniFiles
+- Moved all config options to external ini file
+- Added -ini= command line parameter
+- Changed version to snmptt_0.3.3
+
+October 22th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with issuing a RELOAD (-HUP) when using a configuration
   file that contains a list of other configuration files.  
   Variable was not being cleared.
