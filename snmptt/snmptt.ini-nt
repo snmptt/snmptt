@@ -42,7 +42,7 @@ END
 # Set to 0 to disable the use of the Perl module from the UCD-SNMP / NET-SNMP package.
 # Note: Enabling this with stand-alone mode can cause SNMPTT to run very slowly due to
 #       the loading of the MIBS at startup.
-net_snmp_perl_enable = 0;
+net_snmp_perl_enable = 0
 
 # Set to 0 to disable converting INTEGER values to enumeration tags as defined in the 
 # MIB files
