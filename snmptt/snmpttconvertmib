@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v0.1.3
+# SNMPTTCONVERTMIB v0.2
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -47,29 +47,119 @@ $prepend_type = 1;
 #
 #############################################################################
 #
-# Debugging:  	0 = no output messages
-#		1 = output some basic messages
-#		2 = out all messages
-use constant DEBUGGING => 2;
 
-if ((@ARGV[0] eq "") || (@ARGV[1] eq ""))
+$snmpttconvertmib_version = "v0.2";
+
+sub showversion
+{
+	print "\nSNMPTTCONVERTMIB $snmpttconvertmib_version\n";
+	print "(c) 2002 Alex Burger\n";
+	print "http://snmptt.sourceforge.net\n\n";
+}
+
+##############################################################################
+# Process command line arguments
+
+$| = 1;
+
+use Getopt::Long;
+
+$DEBUGGING = 0;
+
+$version = 0;
+$debug = 0;
+$help = 0;
+$net_snmp_perl = 0;
+$in = '';
+$out = '';
+$mibdir = '/usr/share/snmp/mibs/';
+
+GetOptions 	('version' => \$version, 
+		'debug:i' => \$debug,
+		'help' => \$help,
+		'in=s' => \$in,  
+		'out=s' => \$out,
+		'net_snmp_perl' => \$net_snmp_perl,
+		'mibdir=s' => \$mibdir);
+
+if ($version == 1)
+{
+	&showversion;
+	exit(0);
+}
+
+if ($help == 1)
+{
+$USAGE = qq/Usage:
+    snmpttconvertmib [<options>] 
+Options:
+    --debug=n                            Set debug level (1 or 2)
+    --help                               Display this message
+    --version                            Display author and version information
+    --net_snmp_perl                      Use NET-SNMP Perl integration instead of
+                                         NET-SNMP snmptranslate utility
+    --in=filename                        Input file
+    --out=filename                       Output file
+    --mibdir=dir                         Directory for mib files when net_snmp_perl is enabled*
+
+* Note:  If net_snmp_perl is enabled, then the directory path for the MIB file directory is 
+         required.  Not specifying a --mibdir will use the default of \/usr\/share\/snmp\/mibs\/.
+
+/;
+		
+	&showversion;
+	print $USAGE;
+
+	exit(0);
+}
+
+if ($debug == 1)
+{
+	$DEBUGGING = 1;	
+}
+if ($debug == 2)
+{
+	$DEBUGGING = 2;	
+}
+
+$input = $in;
+$output = $out;
+
+if (($input eq "") || ($output eq ""))
 {
 	print "Missing arguments!\n\n";
 	print "Syntax is: snmpttconvertmib inputmibfile outputfile\n\n";
 	die;
 }
 
-check_snmptranslate_version();
-
-print "\nFile to load is:	@ARGV[0]\n";
-print "File to APPEND TO:	@ARGV[1]\n";
-
-$input = @ARGV[0];
-$output = @ARGV[1];
-
-if (DEBUGGING >= 1)
+if ($net_snmp_perl == 1)
 {
-	print "\nLoading @ARGV[0]\n";
+	require SNMP;
+	$SNMP::save_descriptions = 0;	# Don't need them - process by hand
+					# to be able to pull out the SUMMARY lines
+	&SNMP::addMibDirs($mibdir);
+	&SNMP::setMib($input);
+
+	print "\n\n*****  Using UCD-SNMP / NET-SNMP Perl module *****\n\n";
+}
+else
+{
+	print "\n\n*****  Processing MIB file WITHOUT using UCD-SNMP / NET-SNMP Perl module *****\n\n";
+	check_snmptranslate_version();
+}
+
+
+print "\nFile to load is:	$input\n";
+print "File to APPEND TO:	$output\n";
+
+if ($net_snmp_perl == 1)
+{
+	print "MIB directory:    	$mibdir\n";
+}
+
+if ($DEBUGGING >= 1)
+{
+	print "\nLoading$input\n";
 }
 
 unless (open INPUTFILE, "<$input")
@@ -83,9 +173,9 @@ while (<INPUTFILE>)
 	push(@mibfile, $_);		#add to each line to @trapconf array
 }
 
-if (DEBUGGING >= 1)
+if ($DEBUGGING >= 1)
 {
-	print "Finished loading @ARGV[0]\n\n";
+	print "Finished loading $input\n\n";
 }
 
 $currentline=0;
@@ -94,6 +184,12 @@ unless (open OUTPUTFILE, ">>$output")
 {
 	die "Cannot open output file: $!";
 }
+
+
+
+if ($net_snmp_perl == 0)
+{
+	# Process the trap files by hand
 
 while ($currentline <= $#mibfile)
 {
@@ -487,3 +583,300 @@ sub check_snmptranslate_version
   }
 }
 
+# End of process the trap files by hand
+}
+else
+{
+	#Process the trap files using NET-SNMP Perl
+
+foreach $key (sort keys %SNMP::MIB)
+{
+  if ($SNMP::MIB{$key}{type} eq 'TRAP' || $SNMP::MIB{$key}{type} eq 'NOTIF')
+  {
+    print "#\n#\n#\n";
+    print "EVENT $SNMP::MIB{$key}{label} $key \"Status Events\" Normal\n";
+
+    # Determine FORMAT line
+
+    $currentline=0;
+    while ($currentline <= $#mibfile)
+    {
+      $line = @mibfile[$currentline];
+      if ( $line =~ /$SNMP::MIB{$key}{label}\s+TRAP-TYPE.*/  || $line =~ /$SNMP::MIB{$key}{label}\s+NOTIFICATION-TYPE.*/)
+      {
+	$currentline++; # Increment to the next line
+	$line3 = @mibfile[$currentline];
+	
+	while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ || $line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) )
+		{
+			# Keep going through the file until the next TRAP-TYPE or the end of the mib file
+			# is reached
+				
+			# Look for DESCRIPTION and anything after (including newline with /s)
+			# and capture that anything in $1
+		
+			if ($line3 =~ /DESCRIPTION(.*)/s)
+			{
+				$temp1 = 0;
+				$traptype = "";
+				$trapsummary = "";
+				@description = ();
+				
+				# Start of DESCRIPTION
+				
+				#print "SDESC\n";
+				
+				# If there is more text after the word DESCRIPTION, assume it's the start of 
+				# the description.  If it is, pull it out and place in $descriptionline1.
+				if ($1 ne "")
+				{
+					# Pull out text and remove beginning and trailing white space
+					if ($1 =~ /\s*(.*)\s*/)
+					{
+						#print ("2\n");
+						# Remove any quotes
+						$_ = $1;
+						s(\")()g;
+						# "								
+						$descriptionline1 = $_;
+						$temp1 = 1;
+
+						push (@description, "$_\n");
+						#print "Line 1a: $_ \n";
+					}
+				}
+				
+				$currentline++; # Increment to the next line
+				$line4 = @mibfile[$currentline];
+	
+				# Assume the rest is the description up until a ::= or end of the file
+				while (! ($line4 =~ /::=/))
+				{
+					# If next line is a --#TYPE, pull out the information and place in $traptype
+					if ($line4 =~ /--#TYPE(.*)/)
+					{
+							
+						# Pull out text and remove beginning and trailing white space and quotes
+						if ($line4 =~ /\s*--#TYPE\s*(.*)\s*/)
+						{
+							# Remove any quotes
+							$_ = $1;
+							s(\")()g;
+							# "
+							
+							#print ("2\n");
+							$traptype = $_;
+							#print "Type: $traptype \n";
+						}
+						
+						# Increment to next line and continue with the loop
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}
+				  	
+					# If next line is a --#SUMMARY, pull out the information and place in $summary
+					if ($line4 =~ /--#SUMMARY(.*)/)
+					{
+							
+						# Pull out text and remove beginning and trailing white space and quotes
+						if ($line4 =~ /\s*--#SUMMARY\s*(.*)\s*/)
+						{
+							# Remove any quotes
+							$_ = $1;
+							s(\")()g;
+							# "
+							
+							#print ("2\n");
+							$trapsummary = $_;
+							#print "Summary: $trapsummary \n";
+						}
+						
+						# Increment to next line and continue with the loop
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}
+					# If next line is a --#ARGUMENTS, pull out the information and place in $arguments
+					if ($line4 =~ /--#ARGUMENTS {(.*)}/)
+					{
+						@arguments = split /,/, $1;
+						
+						for($i=0;$i <= $#arguments;$i++)
+						{
+							#print "argument $i: @arguments[$i]\n";
+						}
+											
+						# Increment to next line and continue with the loop
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}					
+					# If next line starts with a --#, ignore it and continue with the loop
+					# (we already got the SUMMARY line above)
+					if ($line4 =~ /--#/)
+					{
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}
+					# If we did not find text after the word DESCRIPTION, then the NEXT
+					# line must be the first line of description.  Pull that out and place
+					# in $descriptionline1.
+					if ($temp1 == 0)
+					{
+						# Remove beginning and trailing white space
+						$line4 =~ (/\s*(.*)\s*/);
+						# Remove any quotes
+						$_ = $1;
+						s(\")()g;
+						# "								
+						$descriptionline1 = $_;
+						
+						push (@description, "$_\n");
+						#print "Line 1b: $_ \n";
+						$temp1 = 1;
+					}
+					else
+					{
+						# Remove beginning and trailing white space
+						$line4 =~ (/\s*(.*)\s*/);
+						if ($1 ne "")
+						{
+							# Remove any quotes
+							$_ = $1;
+							s(\")()g;
+							# "
+														
+							push (@description, "$_\n");
+							#print "c:$_\n";
+						}
+					}
+
+					$currentline++; # Increment to the next line
+					$line4 = @mibfile[$currentline];
+				}
+				#print "EDESC\n";
+			}
+			$currentline++; # Increment to the next line
+			$line3 = @mibfile[$currentline];
+		}
+		
+		# Combine Trap type and summary together to make new summary
+		if ($traptype ne "" && $prepend_type == 1)
+		{
+			$trapsummary = $traptype . ": " . $trapsummary;
+		}
+		
+		$trapoid = $key;
+		$trapname = $SNMP::MIB{$key}{label};	 
+		chomp $trapoid;
+		if ($trapoid ne "")
+		{
+			print OUTPUTFILE "#\n#\n#\n";
+			print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" Normal\n";
+	
+			# Loop through trapsummary and replace the %s and %d etc with %1 to %n
+	
+			$j = $#arguments; # j is last element number
+			
+			#print "j is $j\n";
+			
+			# Change the %s or %d etc into $1 etc (starts at $1)
+			$_ = $trapsummary;
+			for ($j=0; $j<= $#arguments; $j++)
+			{
+				$variable = (@arguments[$j])+1;
+				s(%[a-zA-Z])(\$$variable);
+			}
+			
+			#print "new summary: $_\n";
+			
+			$trapsummary = $_;
+			
+			# Use trapsummary line
+			if ($trapsummary ne "")
+			{
+				print OUTPUTFILE "FORMAT $trapsummary\n";
+				if ($defaultexec ne '')
+				{
+					print OUTPUTFILE "$defaultexec $defaultexecquote$trapsummary$defaultexecquote\n"
+				}		
+			}
+			# If trapsummary blank, use descriptionline1 line
+			elsif ($descriptionline1 ne "")
+			{
+
+
+				if ($descriptionline1 =~ /%[a-zA-Z]/)
+				{
+					# Sometimes the variables are in the first line of the description
+					# Change the %s or %d etc into $1 etc (starts at $1)
+					# There is no list of variables, so just put them in order starting at 1 and
+					# going up to 20
+					$_ = $descriptionline1;
+					for ($j=1; $j<= 20; $j++)
+					{
+						s(%[a-zA-Z])(\$$j);
+					}
+					$descriptionline1 = $_;
+					$descriptionlinehadvariables = 1;
+
+					print OUTPUTFILE "FORMAT $descriptionline1\n";
+					if ($defaultexec ne '')
+					{
+						print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1$defaultexecquote\n"
+					}
+				}
+				else
+				{
+					print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
+					if ($defaultexec ne '')
+					{
+						print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1 \$*$defaultexecquote\n"
+					}
+				}
+			}
+			# If descriptionline1 is also blank, just use $*
+			else
+			{
+				print OUTPUTFILE "FORMAT \$*\n";
+				if ($defaultexec ne '')
+				{
+					print OUTPUTFILE "$defaultexec $defaultexecquote\$*$defaultexecquote\n"
+				}
+				#print OUTPUTFILE "EXEC \$*\n";
+			}
+	
+			print OUTPUTFILE "SDESC\n";
+			#print OUTPUTFILE "$descriptionline1\n";
+			for ($i=0; $i <= $#description; $i++)
+			{
+				print OUTPUTFILE "@description[$i]";
+			}
+			print OUTPUTFILE "EDESC\n";
+	
+			$currentline--;
+		}
+		
+		print "OID: $trapoid\n";
+		#print "\@description is ", $#description,"\n";
+		#print "going to next trap\n\n";
+	}
+
+		
+
+      
+      $currentline++;
+    } #end of while
+   
+  }
+}
+
+
+
+	#End of process the trap files using NET-SNMP Perl
+}
+
+
+	

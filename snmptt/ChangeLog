@@ -1,6 +1,11 @@
 March 22nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Cleanup snmpttconvertmib code - combine V1 and V2 trap conversion
-  into one.
+  into one section
+- snmpttconvertmib now uses GetOpt::Long for arguments, usings --in and
+  --out switches for in / out file, --version, --help, --debug.
+- Added support to snmpttconvertmib for the NET-SNMP Perl module.  Can
+  enable using --net_snmp_perl switch, or run as usual using snmptranslate.
+  Must also specify the mib file directory with --mibdir
 
 March 21th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Removed unused emerg ini setting, init $debugcmdline and 
