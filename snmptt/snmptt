@@ -874,7 +874,9 @@ sub processtrap
 			if ($DEBUGGING >= 1)
 			{
 				print "\nTrap defined, processing...\n\n";
+				print "\nFORMAT line...\n\n";
 			}
+			
 			# Variable substitution for FORMAT string
 			
 			$_ = $event2[3];	# FORMAT string
@@ -1248,7 +1250,12 @@ sub processtrap
 			#
 			# Variable substitution for EXEC string
 			#
-		
+
+			if ($DEBUGGING >= 1)
+			{
+				print "\nEXEC line...\n\n";
+			}
+			
 			if ($event2[4] ne '' && $event2[1] ne "LOGONLY")
 			{
 				
