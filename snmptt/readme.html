@@ -1480,7 +1480,7 @@ the NODES entry is blank</li>
 configured to resolve host names) and the IP address of the actual SNMP
 agent (agent).<br>
 <br>
-If the configuration setting <span style="font-weight: bold;">dns_enabled</span>
+If the configuration setting <span style="font-weight: bold;">dns_enable</span>
 is set to 0 (dns disabled), then the host name of the AGENT will not be
 available for the $A variable, NODES matches, and the hostname column in
 SQL databases.&nbsp; The only exception to this is if the (host) IP
@@ -1488,7 +1488,7 @@ address matches the (agent) IP address and snmptrapd is configured to
 resolve host names.&nbsp; In that case, the host name of the (host) will
 be used for the (agent) host name as they are obviously the same host.<br>
 <br>
-If the configuration setting <span style="font-weight: bold;">dns_enabled</span>
+If the configuration setting <span style="font-weight: bold;">dns_enable</span>
 is set to 1 (dns enabled), then the host name of both the host and the
 AGENT will be resolved via DNS.&nbsp; NODES entries will also be
 resolved to IP addresses before performing matches.<br>

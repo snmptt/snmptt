@@ -20,7 +20,7 @@ mode = standalone
 multiple_event = 1
 
 # SNMPTRAPD passes the IP address of device sending the trap, and the IP address of the
-# actual SNMP agent.  These address could differ if the trap was sent on behalf of another
+# actual SNMP agent.  These addresses could differ if the trap was sent on behalf of another
 # device (relay, proxy etc).
 # If DNS is enabled, the agent IP address is converted to a host name using a DNS lookup
 # (which includes the local hosts file, depending on how the OS is configured).  This name
