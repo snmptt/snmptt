@@ -135,7 +135,7 @@ print "nodes: $nodes\n";
 if (($input eq "") || ($output eq ""))
 {
 	print "Missing arguments!\n\n";
-	print "Syntax is: snmpttconvertmib -in=inputmibfile -out=outputfile\n\n";
+	print "Syntax is: snmpttconvertmib --in=inputmibfile --out=outputfile\n\n";
 	die;
 }
 
