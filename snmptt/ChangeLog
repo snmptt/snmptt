@@ -1,3 +1,6 @@
+June 24th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Removed references from sub substitute2.
+
 June 23th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Added config option mysql_ping_insert to enable / disable pinging the
   database before an INSERT.
