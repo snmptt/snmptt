@@ -1,4 +1,7 @@
 April 29th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Snmpttconvertmib:  Printing of INTEGER enums was wrong.  Fixed.
+
+April 29th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Enterprise variables in snmpttunknown.log now start with Ent Value: instead
   of just Value:
 

@@ -1250,10 +1250,17 @@ else
 		    my $b = $SNMP::MIB{$variables[$i]}{enums};
 		    my %hash = %$b;
 		    my $i = 1;
-		    foreach $c (keys %hash)
+		    
+		    # Create a new copy of the hash swapping the key and the value
+		    my %temphash = ();
+		    while ((my $key, my $value) = each %hash)
 		    {
-		      print OUTPUTFILE "       " . $i . ": $c\n";
-		      $i++;
+		      $temphash{$value} = $key;
+		    }
+		    # Print out the entries in the hash
+		    foreach $c (sort keys %temphash)
+		    {
+		      print OUTPUTFILE "       " . $c . ": $temphash{$c}\n";
 		    }
 		  }
 
