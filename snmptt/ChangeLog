@@ -1,3 +1,8 @@
+September 10th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Bug fix - some variables were not being cleared causing data 
+  from previous traps being merged with newer traps when using
+  daemon mode.
+
 September 4th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Added variable to allow user to disable forking for daemon mode.
 - Cleaned up file / directory error handling for daemon mode
