@@ -223,6 +223,8 @@ if ($net_snmp_perl_enable == 1)
 	  $ENV{'MIBS'} = $mibs_environment;
 	}
 	&SNMP::initMib();
+	$SNMP::best_guess = 1;
+	$SNMP::use_long_names = 0;
 }
 
 if ($mysql_dbi_enable == 1)
