@@ -1,4 +1,6 @@
 April 1st, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Snmpttconvertmib: Combines multiple --#SUMMARY lines into one
+- Snmpttconvertmib: Uses --#SEVERITY line
 - Checks for both INTEGER and Integer32 types when checking MIB entries
   in SNMPTT.  Improve debugging output for this section also.
 

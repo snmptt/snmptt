@@ -303,6 +303,12 @@ if ($net_snmp_perl == 0)
         # If line starts with ENTERPRISE, pull it out
         # Only applies to SNMPv1 TRAPs
         # (SNMPv2 NOTIFICATIONS have the enterprise in the ::= line)
+	
+	$traptype = "";
+	$trapsummary = "";
+	@description = ();
+	$severity = "Normal";
+	
         if ($line3 =~ /ENTERPRISE\s+(.*)/)
         {
           $enterprise = $1;
@@ -312,10 +318,7 @@ if ($net_snmp_perl == 0)
         if ($line3 =~ /DESCRIPTION(.*)/s)
         {
           $temp1 = 0;
-          $traptype = "";
-          $trapsummary = "";
-          @description = ();
-          
+         
           # Start of DESCRIPTION
           
           #print "SDESC\n";
@@ -378,7 +381,7 @@ if ($net_snmp_perl == 0)
                 # "
                 
                 #print ("2\n");
-                $trapsummary = $_;
+                $trapsummary .= $_;
                 #print "Summary: $trapsummary \n";
               }
               
@@ -397,6 +400,26 @@ if ($net_snmp_perl == 0)
                 #print "argument $i: $arguments[$i]\n";
               }
               
+              # Increment to next line and continue with the loop
+              $currentline++; # Increment to the next line
+              $line4 = $mibfile[$currentline];
+              next;
+            }
+	    # If next line is a --#SEVERITY, pull out the information and place in $severity
+            if ($line4 =~ /--#SEVERITY(.*)/)
+            {
+              # Pull out text and remove beginning and trailing white space and quotes
+              if ($line4 =~ /\s*--#SEVERITY\s*(.*)\s*/)
+              {
+                # Remove any quotes
+                $_ = $1;
+                s(\")()g;
+                # "
+                
+                #print ("2\n");
+                $severity = $_;
+                #print "Severity: $severity \n";
+              }
               # Increment to next line and continue with the loop
               $currentline++; # Increment to the next line
               $line4 = $mibfile[$currentline];
@@ -492,7 +515,7 @@ if ($net_snmp_perl == 0)
       if ($trapoid ne "")
       {
         print OUTPUTFILE "#\n#\n#\n";
-        print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" Normal\n";
+        print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" $severity\n";
         
         # Loop through trapsummary and replace the %s and %d etc with %1 to %n
         
@@ -744,12 +767,14 @@ else
             # Look for DESCRIPTION and anything after (including newline with /s)
             # and capture that anything in $1
             
+            $traptype = "";
+	    $trapsummary = "";
+	    @description = ();
+	    $severity = "Normal";
+	    
             if ($line3 =~ /DESCRIPTION(.*)/s)
             {
               $temp1 = 0;
-              $traptype = "";
-              $trapsummary = "";
-              @description = ();
               
               # Start of DESCRIPTION
               
@@ -817,7 +842,7 @@ else
                     # "
                     
                     #print ("2\n");
-                    $trapsummary = $_;
+                    $trapsummary .= $_;
                     #print "Summary: $trapsummary \n";
                   }
                   
@@ -836,6 +861,26 @@ else
                     #print "argument $i: $arguments[$i]\n";
                   }
                   
+                  # Increment to next line and continue with the loop
+                  $currentline++; # Increment to the next line
+                  $line4 = $mibfile[$currentline];
+                  next;
+                }
+		# If next line is a --#SEVERITY, pull out the information and place in $severity
+                if ($line4 =~ /--#SEVERITY(.*)/)
+                {
+                  # Pull out text and remove beginning and trailing white space and quotes
+                  if ($line4 =~ /\s*--#SEVERITY\s*(.*)\s*/)
+                  {
+                    # Remove any quotes
+                    $_ = $1;
+                    s(\")()g;
+                    # "
+                    
+                    #print ("2\n");
+                    $severity = $_;
+                    #print "Severity: $severity \n";
+                  }
                   # Increment to next line and continue with the loop
                   $currentline++; # Increment to the next line
                   $line4 = $mibfile[$currentline];
@@ -908,7 +953,7 @@ else
           if ($trapoid ne "")
           {
             print OUTPUTFILE "#\n#\n#\n";
-            print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" Normal\n";
+            print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" $severity\n";
             
             # Loop through trapsummary and replace the %s and %d etc with %1 to %n
             
