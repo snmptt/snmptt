@@ -1,3 +1,10 @@
+March 23rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Re-fixed bug in snmpttconvertmib that would cause the last trap
+  (notification) converted from a v2 MIB file to contain an
+  incorrect DESCRIPTION and possibly FORMAT line when the last
+  thing in the MIB file is not the last trap definition
+  (broken when merging code below)
+
 March 22nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Cleanup snmpttconvertmib code - combine V1 and V2 trap conversion
   into one section

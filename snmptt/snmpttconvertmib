@@ -128,7 +128,7 @@ $output = $out;
 if (($input eq "") || ($output eq ""))
 {
 	print "Missing arguments!\n\n";
-	print "Syntax is: snmpttconvertmib inputmibfile outputfile\n\n";
+	print "Syntax is: snmpttconvertmib -in=inputmibfile -out=outputfile\n\n";
 	die;
 }
 
@@ -242,8 +242,11 @@ while ($currentline <= $#mibfile)
 		
 		$currentline++; # Increment to the next line
 		$line3 = @mibfile[$currentline];
+
+		$end_of_definition = 0;
 		
-		while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ ) && !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) )
+		while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ ) 
+			&& !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) && ($end_of_definition == 0) )
 		{
 			# Keep going through the file until the next TRAP-TYPE / NOTIFICATION-TYPE or the end of the mib file
 			# is reached
