@@ -1833,14 +1833,14 @@ sub readtrap
 		else {
 		  # Could not translate default to numeric
 		  if ($DEBUGGING >= 2) {
-		    print "  Could not translate - will add to hash table anyways\n";
+		    print "  Could not translate - will leave as-is\n";
 		  }
 		}
 	      }
 	      else
 	      {
 		if ($DEBUGGING >= 2) {
-		  print "  Could not translate - Net-SNMP Perl module not enabled - will add to hash table anyways\n";
+		  print "  Could not translate - Net-SNMP Perl module not enabled - will leave as-is\n";
 		}
 	      }
 	    }
