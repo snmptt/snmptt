@@ -1282,6 +1282,11 @@ sub processtrap
 			{
                           $trap_attempted_to_log++;	
 
+                          # Make sure the connection is up
+                          if ($mysql_ping_on_insert == 1) {
+                            &mysql_ping();
+                          }
+
                           if (defined ($dbh_mysql)) {
                             # Backslash any quotes
                             my $message_short2 = $message_short;
@@ -1292,10 +1297,6 @@ sub processtrap
                             $community =~ s(\')(\\\')g;   #'
                             $community =~ s(\")(\\\")g;   #"				
 
-                            # Make sure the connection is up
-                            if ($mysql_ping_on_insert == 1) {
-                              &mysql_ping();
-                            }
                               
                             unless (defined ($dbh_mysql->do(
                                   "INSERT INTO $mysql_dbi_table (eventname, eventid, trapoid, enterprise, 
@@ -1334,7 +1335,12 @@ sub processtrap
 			if ($postgresql_dbi_enable == 1)
 			{
                           $trap_attempted_to_log++;	
-                          
+                         
+                          # Make sure the connection is up
+                          if ($postgresql_ping_on_insert == 1) {
+                            &postgresql_ping();
+                          }
+
                           if (defined ($dbh_postgresql)) {
                             # Backslash any quotes
                             my $message_short2 = $message_short;
@@ -1344,11 +1350,6 @@ sub processtrap
                             my $community = $var[5];
                             $community =~ s(\')(\\\')g;   #'
                             $community =~ s(\")(\\\")g;   #"
-
-                            # Make sure the connection is up
-                            if ($postgresql_ping_on_insert == 1) {
-                              &postgresql_ping();
-                            }
                               
                             unless (defined ($dbh_postgresql->do(
                                   "INSERT INTO $postgresql_dbi_table (eventname, eventid, trapoid, enterprise, 
@@ -1388,6 +1389,11 @@ sub processtrap
 			if ($dbd_odbc_enable == 1)                       
 			{
                           $trap_attempted_to_log++;
+
+                          # Make sure the connection is up
+                          if ($dbd_odbc_ping_on_insert == 1) {
+                            &dbd_odbc_ping();
+                          }
                           
                           if (defined ($dbh_odbc))
                           {

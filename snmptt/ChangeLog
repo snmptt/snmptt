@@ -1,3 +1,6 @@
+Aug 15th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Moved xx_ping_on_insert check before if (defined ($dbh..))
+
 Aug 10th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Added database ping support to PostgreSQL and DBD::ODBC.  Added debug
   logging improvements for database connect and INSERT sections.  Thanks
