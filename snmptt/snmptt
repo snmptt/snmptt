@@ -169,21 +169,6 @@ else
 use Text::ParseWords;
 use POSIX qw(strftime);
 
-if ($syslog_enable == 1 || $syslog_system_enable == 1)
-{
-	require Sys::Syslog;
-}
-
-if ($eventlog_system_enable == 1 || $eventlog_enable == 1)
-{
-	require Win32::EventLog;
-	
-	# Constants not available when using 'require' (!)
-	$eventlog_error = 1;		# EVENTLOG_ERROR_TYPE
-	$eventlog_warning = 2;		# EVENTLOG_WARNING_TYPE
-	$eventlog_information = 4;	# EVENTLOG_INFORMATION_TYPE
-}
-
 $debug_file_used = 0;
 
 my $g_start_time = time();
@@ -207,6 +192,38 @@ if ($DEBUGGING >= 1)
 	print "********** SNMPTT $snmptt_version started: ",scalar(localtime($g_start_time))," **********\n\n"
 }
 
+if ($syslog_enable == 1 || $syslog_system_enable == 1)
+{
+  eval 'require Sys::Syslog;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load Perl module Sys::Syslog!  If syslog_system_enable or\n";
+    print "syslog_enable is enabled then the Sys::Syslog module is required.  Please\n";
+    print "see snmptt.html for system requirements.\n\n";
+    die "died";
+  }
+  require Sys::Syslog;
+}
+
+if ($eventlog_system_enable == 1 || $eventlog_enable == 1)
+{
+  eval 'require Win32::EventLog;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load Perl module Win32::EventLog!  If eventlog_system_enable or\n";
+    print "eventlog_enable is enabled, then the Win32::EventLog module is required.  \n";
+    print "Please see snmptt.html for system requirements.\n\n";
+    die "died";
+  }
+  require Win32::EventLog;
+  
+  # Constants not available when using 'require' (!)
+  $eventlog_error = 1;		# EVENTLOG_ERROR_TYPE
+  $eventlog_warning = 2;		# EVENTLOG_WARNING_TYPE
+  $eventlog_information = 4;	# EVENTLOG_INFORMATION_TYPE
+}
+
+
 if ($syslog_system_enable == 1 && $daemon == 1)
 {
   syslog_system("SNMPTT $snmptt_version started");
@@ -219,32 +236,49 @@ if ($eventlog_system_enable == 1 && $daemon == 1)
 
 if ($net_snmp_perl_enable == 1)
 {
-	require SNMP;
-	if (defined ($mibs_environment))
-	{
-	  $ENV{'MIBS'} = $mibs_environment;
-	}
-	my $noperlwarning;
-	&SNMP::initMib();
-
-	$SNMP::best_guess = $net_snmp_perl_best_guess;
-	$noperlwarning = $SNMP::best_guess;  # Just to get rid of the Perl warning that var used only once
-
-	$SNMP::use_long_names = 0;	# Set to 0, otherwise getType may fail when using a long name on 4.2.x
-	$noperlwarning = $SNMP::use_long_names;  # Just to get rid of the Perl warning that var used only once
-
-	if ($DEBUGGING >= 1)
-	{
-	  print "********** Net-SNMP version $SNMP::VERSION Perl module enabled **********\n\n";
-	  if (defined ($mibs_environment))
-	  {
-	    print "********** MIBS: $mibs_environment **********\n\n";
-	  }
-	}
+  eval 'require SNMP;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load the Perl module SNMP!  If net_snmp_perl_enable is\n";
+    print "enabled then the SNMP module is required.  Please see snmptt.html\n";
+    print "for system requirements.  Note:  SNMPTT uses the Net-SNMP package's\n";
+    print "SNMP module, NOT the CPAN Net::SNMP module!\n\n";
+    die "died";
+  }
+  require SNMP;
+  if (defined ($mibs_environment))
+  {
+    $ENV{'MIBS'} = $mibs_environment;
+  }
+  my $noperlwarning;
+  &SNMP::initMib();
+  
+  $SNMP::best_guess = $net_snmp_perl_best_guess;
+  $noperlwarning = $SNMP::best_guess;  # Just to get rid of the Perl warning that var used only once
+  
+  $SNMP::use_long_names = 0;	# Set to 0, otherwise getType may fail when using a long name on 4.2.x
+  $noperlwarning = $SNMP::use_long_names;  # Just to get rid of the Perl warning that var used only once
+  
+  if ($DEBUGGING >= 1)
+  {
+    print "********** Net-SNMP version $SNMP::VERSION Perl module enabled **********\n\n";
+    if (defined ($mibs_environment))
+    {
+      print "********** MIBS: $mibs_environment **********\n\n";
+    }
+  }
 }
 
 if ($dns_enable == 1)
 {
+  eval 'require Socket;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load the Net-SNMP Perl module Socket!  If dns_enable\n";
+    print "is enabled then the Socket module is required.  Please see snmptt.html\n";
+    print "for system requirements.\n\n";
+    die "died";
+  }
   require Socket;
   if ($DEBUGGING >= 1)
   {
@@ -254,99 +288,167 @@ if ($dns_enable == 1)
 
 if ($mysql_dbi_enable == 1)
 {
-	require DBI;
-	require DBD::mysql;
+  eval 'require DBI;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load the Perl module DBI!  If mysql_dbi_enable\n";
+    print "is enabled then the DBI module is required.  Please see snmptt.html\n";
+    print "for system requirements.\n\n";
+    die "died";
+  }
+  require DBI;
+
+  eval 'require DBD::mysql;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load the Perl module DBD::mysql!  If mysql_dbi_enable\n";
+    print "is enabled then the DBD::mysql module is required.  Please see snmptt.html\n";
+    print "for system requirements.\n\n";
+    die "died";
+  }
+  require DBD::mysql;
 	
-	unless ($dbh_mysql = DBI->connect("DBI:mysql:database=$mysql_dbi_database;host=$mysql_dbi_host;
-                port=$mysql_dbi_port",$mysql_dbi_username,$mysql_dbi_password) )
-	{
-	  warn "MySQL error: Unable to connect to database: $DBI::errstr\n";
-	  if ($syslog_system_enable == 1)
-	  {
-	    syslog_system("MySQL error: Unable to connect to database: $DBI::errstr");
-	  }
-	  if ($eventlog_system_enable == 1)
-	  {
-	    eventlog_system("MySQL error: Unable to connect to database: $DBI::errstr",12,$eventlog_error);
-	  }
-	}
+  
+  unless ($dbh_mysql = DBI->connect("DBI:mysql:database=$mysql_dbi_database;host=$mysql_dbi_host;
+      port=$mysql_dbi_port",$mysql_dbi_username,$mysql_dbi_password) )
+  {
+    warn "MySQL error: Unable to connect to database: $DBI::errstr\n";
+    if ($syslog_system_enable == 1)
+    {
+      syslog_system("MySQL error: Unable to connect to database: $DBI::errstr");
+    }
+    if ($eventlog_system_enable == 1)
+    {
+      eventlog_system("MySQL error: Unable to connect to database: $DBI::errstr",12,$eventlog_error);
+    }
+  }
 }
 
 if ($postgresql_dbi_enable == 1)
 {
-	require DBI;
-	my $dbi_module;
-	my $connect_string;
-	
-	if ($postgresql_dbi_module == 0)
-	{
-	  require DBD::PgPP;
-	  $dbi_module = "PgPP";
-	}
-	else
-	{
-	  require DBD::Pg;
-	  $dbi_module = "Pg";
-	}
-
-	if ($postgresql_dbi_hostport_enable == 0)
-	{
-	  # No network support
-	  $connect_string = "DBI:$dbi_module:dbname=$postgresql_dbi_database;";
-	}
-	else
-	{
-	  # Network support - include host and port
-	  $connect_string = "DBI:$dbi_module:dbname=$postgresql_dbi_database;host=$postgresql_dbi_host;port=$postgresql_dbi_port";
-	}
-	
-	unless ($dbh_postgresql = DBI->connect($connect_string,$postgresql_dbi_username,$postgresql_dbi_password) )
-        {
-	  warn "Postgres error: Unable to connect to database: $DBI::errstr\n";
-	  if ($syslog_system_enable == 1)
-	  {
-	    syslog_system("Postgres error: Unable to connect to database: $DBI::errstr");
-  	  }
-	  if ($eventlog_system_enable == 1)
-	  {
-	    eventlog_system("Postgres error: Unable to connect to database: $DBI::errstr",18,$eventlog_error);
-	  }
- 	}
+  eval 'require DBI;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load the Perl module DBI!  If postgresql_dbi_enable\n";
+    print "is enabled then the DBI module is required.  Please see snmptt.html\n";
+    print "for system requirements.\n\n";
+    die "died";
+  }
+  require DBI;
+  
+  my $dbi_module;
+  my $connect_string;
+  
+  if ($postgresql_dbi_module == 0)
+  {
+    eval 'require DBD::PgPP;';
+    if ($@) {
+      warn $@;
+      print "\nCould not load the Perl module DBD::PgPP!  If postgresql_dbi_module\n";
+      print "is set to 0 then the DBD::PgPP module is required.  Please see snmptt.html\n";
+      print "for system requirements.\n\n";
+      die "died";
+    }
+    require DBD::PgPP;
+    $dbi_module = "PgPP";
+  }
+  else
+  {
+    eval 'require DBD::Pg;';
+    if ($@) {
+      warn $@;
+      print "\nCould not load the Perl module DBD::Pg!  If postgresql_dbi_module\n";
+      print "is set to 1 then the DBD::Pg module is required.  Please see snmptt.html\n";
+      print "for system requirements.\n\n";
+      die "died";
+    }
+    require DBD::Pg;
+    $dbi_module = "Pg";
+  }
+  
+  if ($postgresql_dbi_hostport_enable == 0)
+  {
+    # No network support
+    $connect_string = "DBI:$dbi_module:dbname=$postgresql_dbi_database;";
+  }
+  else
+  {
+    # Network support - include host and port
+    $connect_string = "DBI:$dbi_module:dbname=$postgresql_dbi_database;host=$postgresql_dbi_host;port=$postgresql_dbi_port";
+  }
+  
+  unless ($dbh_postgresql = DBI->connect($connect_string,$postgresql_dbi_username,$postgresql_dbi_password) )
+  {
+    warn "Postgres error: Unable to connect to database: $DBI::errstr\n";
+    if ($syslog_system_enable == 1)
+    {
+      syslog_system("Postgres error: Unable to connect to database: $DBI::errstr");
+    }
+    if ($eventlog_system_enable == 1)
+    {
+      eventlog_system("Postgres error: Unable to connect to database: $DBI::errstr",18,$eventlog_error);
+    }
+  }
 }
 
 
 if ($dbd_odbc_enable == 1)
 {
-	require DBI;
-	
-	unless ($dbh_odbc = DBI->connect("DBI:ODBC:$dbd_odbc_dsn",$dbd_odbc_username,$dbd_odbc_password) )
-	{
-	  warn "DBI DBD:ODBC error: Unable to connect to DSN: $DBI::errstr\n";
-	  if ($syslog_system_enable == 1)
-	  {
-	    syslog_system("DBI DBD:ODBC error: Unable to connect to DSN: $DBI::errstr");
-	  }
-	  if ($eventlog_system_enable == 1)
-	  {
-	    eventlog_system("DBI DBD:ODBC error: Unable to connect to DSN: $DBI::errstr",12,$eventlog_error);
-	  }
-	}
+  eval 'require DBI;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load the Perl module DBI!  If dbd_odbc_enable\n";
+    print "is enabled then the DBI module is required.  Please see snmptt.html\n";
+    print "for system requirements.\n\n";
+    die "died";
+  }
+  require DBI;
+
+  eval 'require DBD::ODBC;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load the Perl module DBD::ODBC!  If dbd_odbc_enable\n";
+    print "is enabled then the DBD::ODBC module is required.  Please see snmptt.html\n";
+    print "for system requirements.\n\n";
+    die "died";
+  }
+  require DBD::ODBC;
+  
+  unless ($dbh_odbc = DBI->connect("DBI:ODBC:$dbd_odbc_dsn",$dbd_odbc_username,$dbd_odbc_password) )
+  {
+    warn "DBI DBD:ODBC error: Unable to connect to DSN: $DBI::errstr\n";
+    if ($syslog_system_enable == 1)
+    {
+      syslog_system("DBI DBD:ODBC error: Unable to connect to DSN: $DBI::errstr");
+    }
+    if ($eventlog_system_enable == 1)
+    {
+      eventlog_system("DBI DBD:ODBC error: Unable to connect to DSN: $DBI::errstr",12,$eventlog_error);
+    }
+  }
 }
 
 if ($sql_win32_odbc_enable == 1)
 {
-	require Win32::ODBC;
-	unless ($dbh_win32_odbc = new Win32::ODBC("DSN=$sql_win32_odbc_dsn","UID=$sql_win32_odbc_username","PWD=$sql_win32_odbc_password") )
-	{
-	  warn "SQL error: Unable to connect to DSN $sql_win32_odbc_dsn:" . Win32::ODBC::Error() . "\n";
-
-	  if ($eventlog_system_enable == 1)
-	  {
-	    eventlog_system("SQL error: Unable to connect to DSN $sql_win32_odbc_dsn:" . Win32::ODBC::Error(),13,$eventlog_error);
-	  }
-	}
-
-
+  eval 'require Win32::ODBC;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load the Perl module Win32::ODBC!  If sql_win32_odbc_enable\n";
+    print "is enabled then the Win32::ODBC module is required.  Please see snmptt.html\n";
+    print "for system requirements.\n\n";
+    die "died";
+  }
+  require Win32::ODBC;
+  
+  unless ($dbh_win32_odbc = new Win32::ODBC("DSN=$sql_win32_odbc_dsn","UID=$sql_win32_odbc_username","PWD=$sql_win32_odbc_password") )
+  {
+    warn "SQL error: Unable to connect to DSN $sql_win32_odbc_dsn:" . Win32::ODBC::Error() . "\n";
+    
+    if ($eventlog_system_enable == 1)
+    {
+      eventlog_system("SQL error: Unable to connect to DSN $sql_win32_odbc_dsn:" . Win32::ODBC::Error(),13,$eventlog_error);
+    }
+  }
 }
 
 ##############################################################################

@@ -16,7 +16,7 @@
 <body>
 <h1>SNMP Trap Translator v0.9.1</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on:&nbsp; May 4th, 2004
+This file was last updated on:&nbsp; May 13th, 2004
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -107,12 +107,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA&nbsp;
 02111-1307&nbsp; USA<br />
 &nbsp;</p>
 <h2><a id="What-is-it" name="What-is-it"></a>What is it?</h2>
-SNMPTT (SNMP Trap Translator) is an SNMP trap handler written in
+<p>SNMPTT (SNMP Trap Translator) is an SNMP trap handler written in
 Perl for use with the Net-SNMP / UCD-SNMP <a href=
 "http://www.net-snmp.org/man/snmptrapd.html" target=
 "net-snmp">snmptrapd</a> program (<a href="http://www.net-snmp.org"
 target="net-snmp">www.net-snmp.org</a>). SNMPTT supports Linux,
-Unix and Windows.
+Unix and Windows.</p>
 <p>Many network devices including but not limited to network
 switches, routers, remote access servers, UPSs, printers and
 operating systems such as Unix and Windows NT have the ability to
@@ -168,7 +168,7 @@ controller 3, bus 0, bay 3 status is Failed."</p>
 <p>Snmptt can log to any of the following destinations: text log,
 syslog, NT Event log or a SQL database. External programs can also
 be run to pass the translated trap to an email client, paging
-software etc.</p>
+software, Nagios etc.</p>
 <p>In addition to variable substitution, SNMPTT allows complex
 configurations allowing:</p>
 <ul class="SectionBody">
@@ -198,8 +198,9 @@ module (included with most distributions including ActivePerl)</li>
 <li>Required: <a href=
 "http://search.cpan.org/search?module=Getopt::Long">Getopt::Long</a>
 module (included with most distributions including ActivePerl)</li>
-<li>Required: Posix module (included with most if not all
-distributions including ActivePerl)</li>
+<li>Required: <a href=
+"http://search.cpan.org/search?module=POSIX">Posix</a>
+module (included with most if not all distributions including ActivePerl)</li>
 <li>Required: <a href=
 "http://search.cpan.org/search?module=Config::IniFiles">Config::IniFiles</a>
 module</li>
@@ -208,18 +209,21 @@ module</li>
 module (only required when using SNMPTT in daemon mode - required
 by <b>snmptthandler</b>)</li>
 <li>Optional: <a href=
+"http://search.cpan.org/search?module=Socket">Socket</a>
+module (included with most if not all distributions including ActivePerl).  Required for DNS translations.</li>
+<li>Optional: <a href=
 "http://search.cpan.org/search?module=Sys::Syslog">Sys::Syslog</a>
-module (included with most Unix distributions)</li>
+module (included with most Unix distributions).  Required for Syslog support.</li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBI">DBI</a> module.&nbsp;
-Required for DBD::MySQL, DBD::PgPP and DBD::ODBC<br /></li>
+Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support.<br /></li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBD::mysql">DBD::mysql</a>
-module.&nbsp; Required for MySQL support<br /></li>
+module.&nbsp; Required for MySQL support.<br /></li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBD::PgPP">DBD::PgPP</a> or
 <a href="http://search.cpan.org/search?dist=DBD-Pg">DBD:Pg</a>
-module.&nbsp; Required for PostgreSQL support<br /></li>
+module.&nbsp; Required for PostgreSQL support.<br /></li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBD::ODBC">DBD::ODBC</a>
 module.&nbsp; Required for ODBC (SQL etc) access on Linux / Windows
@@ -238,13 +242,13 @@ patch 722075</a>, or Net-SNMP 5.1.1 recommended.&nbsp;&nbsp; This
 is NOT the same as the Net::SNMP module availabe from
 CPAN.<br /></li>
 </ul>
-All development and testing was done on Mandrake Linux 8.1 using
-UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm) and Net-SNMP
-5.0.8 on Mandrake 9 / Windows 2000 (both native and Cygwin).&nbsp;
-See the FAQ for information on compiling Net-SNMP with Perl
-support.<br />
-<br />
-Both SNMP V1 and V2 traps have been tested.
+<p>All development and testing was done with Linux, Windows 2000 and 
+various versions of Net-SNMP from UCD SNMP v4.2.1 to the current 
+Net-SNMP 5.1.x release.  The Windows version has been tested with 
+both native mode and under Cygwin.</p>
+<p>
+Both SNMP V1 and V2 traps have been tested.</p>
+<p>Net-SNMP 5.1.1 or higher is recommended.</p>
 <p>UCD-SNMP v4.2.3 appears to have a bug that prevents it from
 working correctly with SNMPTT.&nbsp; UCD-SNMP v4.2.1, v4.2.4 and
 v4.2.5 appear to work fine.&nbsp; If you need to use UCD-SNMP
@@ -254,11 +258,10 @@ program from v4.2.5.&nbsp; Net-SNMP does not have this problem.</p>
 <p>Note:</p>
 <blockquote>SNMPTT only requires the Net-SNMP Perl module if you
 want to have variable names translated into symbolic form, want to
-be able to have <span style="font-weight: bold;">snmptrapd</span>
-pass traps using symbolic form, or you enable the options
-<span style="font-weight: bold;">translate_integers,
-translate_trap_oid</span> or <span style=
-"font-weight: bold;">translate_oids.<br /></span></blockquote>
+be able to have <b>snmptrapd</b> pass traps using symbolic form, 
+or you enable the options <b>translate_integers</b>,
+<b>translate_trap_oid</b> or <b>translate_oids</b>.  Although not required, using the Perl 
+module is recommended.<br /></span></blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
 <h3><b>0.9.1</b> <b>- ??, 2004</b></h3>
 <ul>
@@ -775,19 +778,18 @@ file</li>
 The following outlines the general steps required to install and
 configure SNMPTT:<br />
 <br />
-<br />
 <ol>
 <li>Install Net-SNMP and SNMPTT as described below</li>
-<li>Create an snmptt.conf file <a href=
+<li>Create an <b>snmptt.conf</b> file <a href=
 "#SNMPTT.CONF-Configuration-file-format">by hand</a>, or using
 <a href=
 "#SNMP-Trap-Translator-Convert-MIB">snmpttconvertmib<br /></a></li>
 <li><a href="#Configuration-Options">Modify snmptt.ini</a> to
-include the snmptt.conf file and set any desired options</li>
+include the <b>snmptt.conf</b> file and set any desired options</li>
 <li><a href="#Installation-Unix">Start snmptt</a></li>
 <li>Configure your network devices to send traps to the Net-SNMP /
-snmptt machine</li>
-<li>Initiate a trap on your network device and check the snmptt log
+SNMPTT machine</li>
+<li>Initiate a trap on your network device and check the SNMPTT log
 files for the result</li>
 <li>Secure the SNMPTT installation<br /></li>
 </ol>
@@ -885,7 +887,7 @@ snmptrapd.conf file by adding the following line:
 <blockquote><b>traphandle default perl c:\snmp\snmptthandler</b>
 <p>Launch snmptt using:</p>
 <p><b>snmptt --daemon</b></p>
-</blockquote>
+</blockquot~e>
 5.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD
 -On. <b><br /></b><b><span style=
 "font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; Note:&nbsp; The -On
