@@ -109,7 +109,7 @@ while ($currentline <= $#mibfile)
 		$trapname = $1;
 
 		# Remove beginning and trailing white space
-		$trapname =~ (/\s*(.*)\s*/);
+		$trapname =~ /\s*([A-Za-z0-9_-]+)\s*/;
 		$trapname = $1;
 
 		
@@ -370,7 +370,7 @@ while ($currentline <= $#mibfile)
 		$notificationname = $1;
 
 		# Remove beginning and trailing white space
-		$notificationname =~ (/\s*(.*)\s*/);
+		$notificationname =~ /\s*([A-Za-z0-9_-]+)\s*/;
 		$notificationname = $1;
 			
 		print "#\n";
