@@ -1,0 +1,542 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Alex  Burger">
+   <meta name="GENERATOR" content="Mozilla/4.78 [en] (Windows NT 5.0; U) [Netscape]">
+   <title>SNMP Trap Translator</title>
+</head>
+<body>
+<a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge Logo" BORDER=0 height=62 width=210></a>
+<br><b><font size=+3>SNMP Trap Translator v0.2.1</font></b>
+<br><b>(SNMPTT)</b>
+<br>This file was last updated on:&nbsp; August 16th, 2002
+<p><b><font size=+2>License</font></b>
+<p>Copyright 2002 Alex Burger
+<br>alex_b@users.sourceforge.net
+<br>4/3/2002
+<p>This program is free software; you can redistribute it and/or modify
+<br>it under the terms of the GNU General Public License as published by
+<br>the Free Software Foundation; either version 2 of the License, or
+<br>(at your option) any later version.
+<p>This program is distributed in the hope that it will be useful,
+<br>but WITHOUT ANY WARRANTY; without even the implied warranty of
+<br>MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.&nbsp; See the
+<br>GNU General Public License for more details.
+<p>You should have received a copy of the GNU General Public License
+<br>along with this program; if not, write to the Free Software
+<br>Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA&nbsp; 02111-1307&nbsp;
+USA
+<br>&nbsp;
+<p><b><font size=+2>What is it?</font></b>
+<p>SNMPTT (SNMP Trap Translator) is a SNMP trap handler written in Perl
+for use with the NET-SNMP / UCD-SNMP snmptrapd program (<a href="http://www.net-snmp.org">http://www.net-snmp.org)</a>.
+<p>The NET-SNMP package has the ability to log SNMP traps to syslog.&nbsp;
+The format of the log is basically variable = value, variable = value,
+variable = value etc.&nbsp; A more descriptive / friendly trap message
+can be created using SNMPTT's variable subtitution.
+<p>For example, receiving the trap .1.3.6.1.4.1.232.0.3017 trap from a
+Compaq server running the Compaq Insight Agents could result in the following
+message from SNMPTT:
+<p>"Compaq Drive Array Spare Drive on controller 3, bus 0, bay 3 status
+is Failed."
+<p>Variable substition works by defining a string such as:
+<p>"Compaq Drive Array Spare Drive on controller $4, bus $5, bay $6 status
+is $3."
+<p>Each $number is replaced with the corresponding enterprise variable
+received in the trap and is defined for each trap in the configuration
+file.&nbsp; The order of the variables is defined in the MIB or TRAP file
+which can be obtained from the vendor.
+<br>&nbsp;
+<p><b><font size=+2>Downloading</font></b>
+<p>SNMPTT can be downloaded from <a href="http://www.sourceforge.net/projects/snmptt">http://www.sourceforge.net/projects/snmptt</a>
+<br>&nbsp;
+<p><b><font size=+2>Features</font></b>
+<ul>
+<li>
+Allows unique custom actions for each trap, defined in a text configuration
+file</li>
+
+<li>
+Translates received traps into a readable format by performing variable
+substitution</li>
+
+<li>
+Outputs translated traps to standard output, text log file and / or syslog</li>
+
+<li>
+Executes a user defined program when a trap is received</li>
+</ul>
+
+<p><br><b><font size=+2>Requirements</font></b>
+<p>-(Tested with) Perl 5.6.1
+<br>-NET-SNMP (formerly known as UCD-SNMP)
+<br>-Required: Text::ParseWords (included with most distributions including
+ActivePerl)
+<br>-Required: Getopt::Long (included with most distributions including
+ActivePerl)
+<br>-Optional: Sys::Syslog module
+<p>All development and testing was done on Mandrake Linux 8.1 using UCD-SNMP
+v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).&nbsp; I have also tested
+the program with Windows 2000 using a test file without actually using
+UCD-SNMP.&nbsp; <b>Windows users must disable the syslog feature as described
+below.</b>&nbsp; Both SNMP V1 and V2 traps have been tested.
+<p>UCD-SNMP v4.2.3 appears to have a bug that prevents it from working
+correctly with SNMPTT.&nbsp; UCD-SNMP v4.2.1, v4.2.4 and v4.2.5 appear
+to work fine.&nbsp; If you need to use UCD-SNMP v4.2.3 (if for example
+you are using the Compaq supplied UCD-SNMP package) then you should at
+the very least use the <b>snmptrapd</b> program from v4.2.5.
+<p>Note:&nbsp;&nbsp; This script does NOT require the NET-SNMP Perl module
+included in the NET-SNMP package.
+<br>&nbsp;
+<p><b><font size=+2>Logging</font></b>
+<p>Translated traps can be sent to a log file.&nbsp; The format of the
+log entry is:
+<p>date trap-oid severity category hostname translated-trap
+<p>Translated traps can also be sent to syslog.&nbsp; The format of the
+entries will be similar to above without the date (as syslogd logs the
+date):
+<p>trap-oid severity category hostname translated-trap
+<p>The syslog facility and level is configurable.
+<p>Logging of non recognized traps is also possible.&nbsp; This would be
+used mainly for troubleshooting purposes.
+<br>&nbsp;
+<p><b><font size=+2>Executing an external program</font></b>
+<p>An external program can also be launched when a trap is received.&nbsp;
+The command line is defined in the configuration file.&nbsp; For example,
+to send a page using QPAGE (<a href="http://www.qpage.org">http://www.qpage.org</a>),
+the following command line could be used:
+<p>qpage -f TRAP notifygroup1 "$r $x Compaq Drive Array Spare Drive on
+controller $4, bus $5, bay $6 status is $3."
+<p>$r is translated to the hostname, and $x is the current time (described
+in detail below)
+<br>&nbsp;
+<p><b><font size=+2>Configuration Options</font></b>
+<p>As mentioned in the INSTALLATION section below, configuration options
+are set by editing the options between OPTIONS START and OPTIONS END in
+snmptt.
+<br>&nbsp;
+<p><b><font size=+2>Command line arguments</font></b>
+<p>The following command line arguments are supported:
+<p>Usage:
+<br>&nbsp;&nbsp;&nbsp; snmptt [&lt;options>]
+<br>Options:
+<br>&nbsp;&nbsp;&nbsp; --debug=n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Set debug level (1 or 2)
+<br>&nbsp;&nbsp;&nbsp; --debugfile=filename&nbsp;&nbsp;&nbsp; Set debug
+output file
+<br>&nbsp;&nbsp;&nbsp; --dump&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Dump (display) defined traps
+<br>&nbsp;&nbsp;&nbsp; --help&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Display this message
+<br>&nbsp;&nbsp;&nbsp; --version&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Display author and version information
+<br>&nbsp;&nbsp;&nbsp; --time&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Use to see how long it takes to load and
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+process trap file (eg: time snmptt --time)
+<p><b><font size=+2>SNMPTT.CONF Configuration file format</font></b>
+<p>The configuration file (defaults to /etc/snmp/snmptt.conf) can contain
+<b>EITHER</b>
+a list of all the defined traps (default) <b>OR</b> a list of other files
+that contain a list of all the defined traps.
+<p>If your snmptt.conf file is getting rather large and you would like
+to divide it up into many smaller files, then do the following:
+<p>-change <b>$snmpttconfiletype = 0</b> in the snmptt script to <b>$snmpttconfiletype
+= 1</b>
+<br>-list the filenames to load with complete paths in the snmptt.conf
+file.&nbsp; For example:
+<blockquote>/etc/snmp/snmptt-compaq.conf
+<br>/etc/snmp/snmptt-cisco.conf
+<br>/etc/snmp/snmptt-hp.conf
+<br>/etc/snmp/snmptt-3com.conf</blockquote>
+The syntax of the snmptt.conf file (or other config files if <b>$snmpttconfiletype</b>
+is set to 1)&nbsp; is:
+<p>Note:&nbsp; The EVENT and FORMAT line are REQUIRED.&nbsp; Commands in
+[] are optional.&nbsp; Do NOT include the []s in the configuration file!
+<blockquote><b>EVENT</b> event_name event_OID "category" severity
+<p><b>FORMAT</b> format_string
+<p>[<b>EXEC</b> command_string]
+<p>[<b>NODES</b> sources_list]
+<p>[<b>SDESC</b>]
+<br>[<b>EDESC</b>]
+<p>Note: Lines starting with a # will be ignored.</blockquote>
+
+<blockquote><b>EVENT:</b>
+<blockquote>event_name: Unique text label (alias) <b><u>containing no spaces</u></b>
+<p>event_OID: Object identifier string in dotted format notation <b><u>containing
+no spaces</u></b> as received by snmptrapd.
+<p>For example, a Compaq (1.3.6.1.4.1.232) cpqHoGenericTrap trap (11001)
+would be written as:
+<p>1.3.6.1.4.1.232.0.11001.
+<p>Note: SNMP V1 traps are in the format of enterprise ID (1.3.6.1.4.1.232)
+followed by a 0, and then followed by the trap number
+<br>(11001).
+<p>Wildcards can also be used.&nbsp; For example:
+<p>1.3.6.1.4.1.232.1.2.*
+<p>Note: Specific trap matches are performed before wildcards so if you
+have an entry for 1.3.6.1.4.1.232.1.2.5 AND 1.3.6.1.4.1.232.1.2.*, it will
+process the .5 trap when received
+<p>category: Character string enclosed in double "s.&nbsp; Used when logging
+output (see above).
+<p>If the category is "IGNORE", no action will take place even if the snmptt.conf
+contains FORMAT and / or EXEC statements.
+<p>If the category is "LOGONLY", the trap will be logged as usual, but
+the EXEC statement will be ignored.
+<p>Note:&nbsp;&nbsp; If you plan on using an external program such as Netsaint
+for logging, paging etc, you probably do not want any traps defined with
+LOGONLY
+<p>severity: Character string of the severity of the event.&nbsp; Used
+in the output when logging.&nbsp; Example: Minor, Major, Normal, Critical,
+Warning
+<br>&nbsp;</blockquote>
+<b>FORMAT:</b>
+<blockquote>Format string to be used when logging to snmptt.log and/or
+syslog.
+<p>Variable substitution is performed on this string using the following
+variables:
+<blockquote>$C&nbsp; - Trap community string
+<br>$e&nbsp; - Trap OID in number format
+<br>$E&nbsp; - Trap OID in number format
+<br>$A&nbsp; - Trap agent IP address
+<br>$S# - Number of variable-bindings in the trap
+<br>$$&nbsp; - Print a $
+<br>$r&nbsp; - Hostname
+<br>$s&nbsp; - Severity
+<br>$S&nbsp; - Event name
+<br>$x&nbsp; - Current date &amp; time
+<br>$*&nbsp; - Expand all variable-bindings
+<br>$n&nbsp; - Expand variable-binding n (1-n)</blockquote>
+Example:
+<p>FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6
+<p>Note: The trap OID, severity, category and hostname will always be prepended
+to the FORMAT string in both the text log and syslog.&nbsp; The text log
+will also have the date prepended at the beginning.
+<br>&nbsp;</blockquote>
+<b>EXEC:</b>
+<blockquote>Optional string containing command to execute when trap is
+received and arguments to pass to the program.
+<p>EXEC uses same variable substitution as the FORMAT line.
+<p>Example:
+<p>EXEC /usr/bin/qpage -f TRAP alex "$r: $x - NIC switchover to slot $3,
+port $4 from slot $5, port $6"
+<p>or
+<p>EXEC c:\snmp\pager netops "$r: $x - NIC switchover to slot $3, port
+$4 from slot $5, port $6"
+<p>Note: Unlike the FORMAT line, nothing is prepended to the message.&nbsp;
+If you would like to include the hostname and date in the page above, you
+must use the variables such as $r and $x.
+<br>&nbsp;</blockquote>
+<b>NODES:</b>
+<blockquote>Optional string containing a list of source (host) names separated
+by spaces that must match for this trap handle definition to be used.&nbsp;
+If this keyword omitted then ALL sources will be accepted.
+<p>Optionally a file can be specified which will contain the list of sources.
+<p>This list must be specified with a full path
+<p>Examples:
+<blockquote>NODES fred barney betty wilma
+<br>NODES /etc/snmptt-nodes
+<br>&nbsp; or
+<br>NODES c:\snmp\snmptt-nodes</blockquote>
+where snmptt-nodes contains:
+<blockquote>fred
+<br>barney
+<br>betty
+<br>wilma</blockquote>
+Note:&nbsp;&nbsp; The names are NOT case sensitive.
+<p>Note:&nbsp;&nbsp; If you are using DNS, the names may resolve to the
+Fully Qualified Domain Name (FQDN) by snmptrapd.&nbsp; For example: barney.bedrock.com.
+<p>Adding an entry for the host in your /etc/hosts file or c:\%systemroot%\system32\drivers\etc\hosts
+should result in snmptrapd sending the short name instead (barney).
+<br>&nbsp;</blockquote>
+<b><font size=+2>SDESC</font></b>
+<blockquote>Optional start of a description.&nbsp; All text between this
+line and the line EDESC will be ignored by snmptt. This section can be
+used to enter comments about the trap for your own use.&nbsp; If you use
+a SDESC, you MUST follow with a EDESC.</blockquote>
+<b><font size=+2>EDESC</font></b>
+<blockquote>Used to end the description section.
+<p>Example:
+<blockquote>SDESC
+<br>Trap used when power supply fails in
+<br>a server.
+<br>EDESC</blockquote>
+</blockquote>
+</blockquote>
+<b><font size=+2>Sample1 SNMPTT.CONF file</font></b>
+<p>Following is a sample of two defined traps in <b>snmptt.conf:</b>
+<blockquote>#
+<br>EVENT COMPAQ_11003 .1.3.6.1.4.1.232.0.11003 "LOGONLY" Normal
+<br>FORMAT Compaq Generic Trap: $*
+<br>EXEC qpage -f TRAP notifygroup1 "Compaq Generic Trap: $*"
+<br>NODES /etc/snmp/cpqnodes
+<br>SDESC
+<br>Generic test trap
+<br>EDESC
+<br>#
+<br>#
+<br>EVENT cpqDa3AccelBatteryFailed .1.3.6.1.4.1.232.0.3014 "Error Events"
+Critical
+<br>FORMAT Battery status is $3.
+<br>EXEC qpage -f TRAP notifygroup1 "$s $r $x: Battery status is $3"
+<br>NODES ntserver1 ntserver2 ntserver3
+<br>#
+<br>#</blockquote>
+<b><font size=+2>Sample2 SNMPTT.CONF file</font></b>
+<p>Following is a sample of a list of files to load in <b>snmptt.conf:</b>
+<blockquote>/etc/snmp/snmp-compaq.conf
+<br>/etc/snmp/snmp-compaq-hsv.conf</blockquote>
+Following is a sample of one defined traps in <b>/etc/snmp/snmptt-compaq.conf:</b>
+<blockquote>#
+<br>EVENT COMPAQ_11003 .1.3.6.1.4.1.232.0.11003 "LOGONLY" Normal
+<br>FORMAT Compaq Generic Trap: $*
+<br>EXEC qpage -f TRAP notifygroup1 "Compaq Generic Trap: $*"
+<br>NODES /etc/snmp/cpqnodes
+<br>SDESC
+<br>Generic test trap
+<br>EDESC
+<br>#</blockquote>
+Following is a sample of one defined traps in <b>/etc/snmp/snmptt-compaq-hsv.conf:</b>
+<blockquote>#
+<br>EVENT mngmtAgentTrap-16025 .1.3.6.1.4.1.232.0.136016025 "Status Events"
+Normal
+<br>FORMAT Host $1 : SCellName-TimeDate $2 : EventCode $3 : Description
+$4
+<br>EXEC qpage -f TRAP notifygroup1 "Host $1 : SCellName-TimeDate $2 :
+EventCode $3 : Description $4"
+<br>SDESC
+<br>"Ema EMU Internal State Machine Error [status:10]"
+<br>EDESC
+<br>#</blockquote>
+
+<p><br><b><font size=+2>Notes</font></b>
+<p>An existing HP Openview trapd.conf can be used in most cases.&nbsp;
+The file must be a VERSION 3 file.
+<p>Some vendors (such as Compaq and Cisco ) provide a file that can be
+imported in to HP Openview using an HP Openview utility.&nbsp; Snmpttconvert
+can be used to convert the file to snmptt.conf format.
+<br>&nbsp;
+<p><b><font size=+2>Installation - Unix</font></b>
+<p>1.&nbsp; Read this entire file to understand how snmptt works
+<p>2.&nbsp; Copy snmptt to /sbin and ensure it is executable (chmod +x
+snmptt)
+<p>3.&nbsp; Edit the options between OPTIONS START and OPTIONS END in snmptt
+<p>4.&nbsp; Modify the NET-SNMP snmptrapd.conf file by adding the following
+line:
+<blockquote>traphandle default /sbin/snmptt</blockquote>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Note:&nbsp;&nbsp; It is possible to configure
+snmptrapd to execute snmptt based on the trap received, but using the default
+option is preferred
+<p>5.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD -On.
+<b>The
+-On is required otherwise snmptt will NOT recognize the traps.</b>
+<br>&nbsp;
+<p><b><font size=+2>Installation - Windows</font></b>
+<p>1.&nbsp; Read this entire file to understand how snmptt works
+<p>2.&nbsp; Create the directory c:\snmp and copy snmptt to it
+<p>3.&nbsp; Edit the options between OPTIONS START and OPTIONS END in snmptt
+<p>4.&nbsp; Modify the NET-SNMP snmptrapd.conf file by adding the following
+line:
+<blockquote>&nbsp;traphandle default perl c:\snmp\snmptt</blockquote>
+&nbsp;&nbsp;&nbsp;&nbsp; Note:&nbsp;&nbsp; It is possible to configure
+snmptrapd to execute snmptt based on the trap received, but using the default
+option is preferred
+<p>5.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD -On.
+<b>The
+-On is required otherwise snmptt will NOT recognize the traps.</b>
+<br>&nbsp;
+<p><b><font size=+2>Limitations</font></b>
+<p>The SNMPTRAPD program blocks when executing traphandle commands.&nbsp;
+This means that if the program called never quits, SNMPTRAPD will wait
+forever.&nbsp; If a trap is received while the traphandler is running,
+it is buffered and will be processed when the traphandler finishes.&nbsp;
+I do not know how large this buffer is.
+<p>With a 600 Mhz PIII and a 9000 line snmptt.conf containing 566 unique
+traps (EVENTs), it takes under a second to process the trap including logging
+and executing the qpage program in my examples.
+<p>A future improvement may be to separate the program into two separate
+programs. One that is called by the traphandler which receives the raw
+trap and saved somewhere, and the other running as a daemon which processes
+the received traps.&nbsp; This would prevent any issues with blocking in
+SNMPTRAPD.
+<p>The program called by SNMPTT (EXEC) also blocks the system.&nbsp; If
+you call a program that does not return, SNMPTT will be left waiting.&nbsp;
+This could probably be fixed also by using two separate programs.
+<br>&nbsp;
+<p><b><font size=+2>Feedback</font></b>
+<p>Please send me any comments - good or bad - to alex_b@users.sourceforge.net.&nbsp;
+If you have any problems including converting trap files, please send me
+an email and include the file you are trying to convert and I will try
+to take a look at it.
+<p>Please also send any patches or improvments so I can add them in to
+the CVS tree.
+<p>This is my first real Perl program, so it's probably not perfect.
+<br>&nbsp;
+<p><b><font size=+3>SNMP Trap Translator Convert v0.1</font></b>
+<br><b><font size=+1>(SNMPTTCONVERT)</font></b>
+<p>SNMPTTCONVERT is a simple Perl script which will read a file created
+for HP Openview which is provided by most vendors including Compaq and
+Cisco.&nbsp; The file can contain multiple traps.
+<p>For example, if the file ciscotrap.txt contained:
+<blockquote>rpsFailed {.1.3.6.1.4.1.437.1.1.3} 6 5 - "Status Events" 1
+<br>Trap received from enterprise $E with $# arguments: sysName=$1
+<br>SDESC
+<br>"A redundant power source is connected to the switch but a failure
+exists in
+<br>the power system."
+<br>EDESC</blockquote>
+Executing snmpttconvert ciscotrap.txt would output:
+<blockquote>#
+<br>#
+<br>#
+<br>EVENT rpsFailed .1.3.6.1.4.1.437.1.1.3.0.5 "Status Events" Normal
+<br>FORMAT Trap received from enterprise $E with $# arguments: sysName=$1
+<br>#EXEC qpage -f TRAP notifygroup1 "Trap received from enterprise $E
+with $# arguments: sysName=$1"
+<br>SDESC
+<br>"A redundant power source is connected to the switch but a failure
+exists in
+<br>the power system."
+<br>EDESC</blockquote>
+
+<p><br>Note:&nbsp; The #EXEC line is added by default.&nbsp; This can be
+changed by editing the SNMPTTCONVERT script.
+<br>&nbsp;
+<p><b><font size=+3>SNMP Trap Translator MIB Convert v0.1</font></b>
+<br><b><font size=+1>(SNMPTTCONVERTMIB)</font></b>
+<p><b>SNMPTTCONVERTMIB</b> is a Perl script which will read a MIB file
+and convert the <b>TRAP-TYPE</b> definitions into a configuration file
+readable by <b>SNMPTT</b>.
+<p>For example, if the file <b>CPQHOST.mib</b> contained:
+<blockquote>CPQHOST-MIB DEFINITIONS ::= BEGIN
+<p>&nbsp;&nbsp;&nbsp; IMPORTS
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enterprises&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+FROM RFC1155-SMI
+<br>.
+<br>.
+<br>. (lines removed)
+<br>.
+<br>.
+<br>&nbsp;&nbsp;&nbsp; cpqHo2NicSwitchoverOccurred2 TRAP-TYPE
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENTERPRISE compaq
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VARIABLES { sysName, cpqHoTrapFlags,
+cpqHoIfPhysMapSlot,
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+cpqHoIfPhysMapPort, cpqHoIfPhysMapSlot,
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+cpqHoIfPhysMapPort }
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DESCRIPTION
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"This trap will be sent any time the configured redundant NIC
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+becomes the active NIC."
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--#TYPE "Status Trap"
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--#SUMMARY "NIC switchover to slot %s, port %s from slot %s, port %s."
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--#ARGUMENTS {2, 3, 4, 5}
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--#SEVERITY MAJOR
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--#TIMEINDEX 99
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ::= 11010
+<br>&nbsp;</blockquote>
+Executing <b>snmpttconvertmib CPQHOST.mib snmptt.conf </b>would APPEND
+to the end of the <b>snmptt.conf</b> file:
+<blockquote>#
+<br>#
+<br>#
+<br>EVENT cpqHo2NicSwitchoverOccurred2 .1.3.6.1.4.1.232.0.11010 "Status
+Events" Normal
+<br>FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6.
+<br>#EXEC qpage -f TRAP notifygroup1 "NIC switchover to slot $3, port $4
+from slot $5, port $6."
+<br>SDESC
+<br>This trap will be sent any time the configured redundant NIC
+<br>becomes the active NIC.
+<br>EDESC</blockquote>
+
+<p><br>Note:&nbsp; The #EXEC line is added by default.&nbsp; This can be
+changed by editing the <b>SNMPTTCONVERTMIB</b> script.
+<p><b><font size=+2>Requirements</font></b>
+<ul>
+<li>
+UCD-SNMP / NET-SNMP <b>snmptranslate</b> utility</li>
+</ul>
+
+<p><br><b><font size=+2>Converting a MIB file</font></b>
+<p>Follow these steps to successfully convert a MIB file:
+<br>&nbsp;
+<ol>
+<li>
+Edit the options between OPTIONS START and OPTIONS END in snmpttconvertmib</li>
+
+<li>
+Copy the MIB file to UCD-SNMP / NET-SNMP mibs folder</li>
+
+<li>
+Type: <b>EXPORT MIBS=ALL</b> to ensure all the mibs will be read in by
+<b>snmptranslate</b></li>
+
+<li>
+Make sure the MIB file can be interpreted by <b>snmptranlate</b> correctly.&nbsp;
+Simply typing <b>snmptranslate</b> should tell you if it was able to read
+the mib file correctly.&nbsp; If it can't, an error will be produced at
+the top of the help screen.</li>
+
+<li>
+Convert the mib file with: <b>snmpttconvertmib <i>path-to-mib</i> <i>output-file-name</i></b>.&nbsp;
+Note:&nbsp; the <b>output-file-name</b> is appended to, so remember to
+delete it first if needed.</li>
+</ol>
+Example:
+<blockquote><b>snmpttconvertmib /usr/share/snmp/mibs/CPQHOST.mib /etc/snmp/snmptt-compaqhost.conf</b></blockquote>
+
+<p><br><b><font size=+2>How it works</font></b>
+<p>Some MIB files contain <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines
+which are used by Novell's Network Management system.&nbsp; These MIB files
+convert very well to <b>SNMPTT</b> as they contain detailed information
+that can be used on the <b>FORMAT</b> and <b>EXEC</b> lines.&nbsp; Compaq's
+MIBs usually have these lines.
+<p>Other MIBS contain only a <b>DESCRIPTION</b> section where the first
+line contains the <b>FORMAT</b> string.&nbsp; In some MIBS, this line also
+contains variables similar to the <b>--#SUMMARY</b> lines.
+<p>The mib file is searched for lines containing <b>TRAP-TYPE</b>.&nbsp;
+If it finds one that appears to be a valid trap definition, it reads in
+the following lines until a ::= is found looking for the <b>ENTERPRISE</b>
+and <b>DESCRIPTION</b> section.&nbsp; It then looks for the <b>--#SUMMARY</b>
+and <b>--#ARGUMENTS</b> line.
+<p>The value for the <b>ENTERPRISE</b> is used when looking up the <b>TRAP-TYPE</b>.&nbsp;
+<b>SNMPTRANSLATE</b> is used with the following syntax to find the <b>OID</b>
+of the trap:
+<p><b>snmptranslate -IR -Ts <i>enterprise</i>#.<i>trapname</i></b>
+<p>MIB files can become quite complex to read due to the use of IMPORT
+statements etc.&nbsp; This is why snmptranslate is used.
+<p>If <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> are found, the <b>%<i>letter</i></b>
+variables are replaced with <b>$<i>number</i></b> variables based on the
+values lists in the <b>--#ARGUMENTS</b> section incrememented by 1 (ARGUMENTS
+starts with 0, SNMPTT starts with 1).&nbsp; This will be used to define
+the <b>FORMAT</b> and <b>EXEC</b> lines.
+<p>If there is no <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, but
+the first line of the <b>DESCRIPTION</b> contains <b>%<i>letter</i></b>
+variables, then that line will be used to define the <b>FORMAT</b> and
+<b>EXEC</b> lines.&nbsp; The <b>%<i>letter</i></b> variables are replaced
+with <b>$<i>number</i></b> variables starting at 1 and going up.
+<p>If there is no <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, and
+the first line of the <b>DESCRIPTION</b> does not contain <b>%<i>letter</i></b>
+variables, then that line will be used to define the <b>FORMAT</b> and
+<b>EXEC</b> lines followed by a <b>$*</b> which will dump all received
+variables.
+<br>&nbsp;
+<p><b><font size=+2>Troubleshooting</font></b>
+<p>If you find that the MIB file is not converting properly, make sure
+it does not contain DOS carriage returns.&nbsp; Displaying the file with
+the joe editor will show <b><u>M</u></b>'s at the end of each line.&nbsp;
+To create a new file without them, type:
+<p><b>cat <i>mib-file</i> | tr -d '\015' > <i>mib-file.new</i></b>
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+</body>
+</html>

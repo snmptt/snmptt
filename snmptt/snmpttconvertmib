@@ -94,8 +94,7 @@ while ($currentline <= $#mibfile)
 	
 	# eg: 'mngmtAgentTrap-23003 TRAP-TYPE';
 	if ( $line =~ /(.*)\s+TRAP-TYPE.*/ )
-	{
-
+	{	
 		# If the TRAP-TYPE line starts with white space, it's probably a import line, so ignore
 		if ( $line =~ /^\s+TRAP-TYPE.*/ )
 		{
@@ -130,6 +129,12 @@ while ($currentline <= $#mibfile)
 				
 			# Look for DESCRIPTION and anything after (including newline with /s)
 			# and capture that anything in $1
+			if ($line3 =~ /ENTERPRISE\s+(.*)/)
+			{
+				print "Enterprise: $1\n";
+				$enterprise = $1;
+			}
+			
 			if ($line3 =~ /DESCRIPTION(.*)/s)
 			{
 				$temp1 = 0;
@@ -253,8 +258,7 @@ while ($currentline <= $#mibfile)
 			$line3 = @mibfile[$currentline];
 		}
 
-
-		$trapoid = `snmptranslate -IR -Ts $trapname`;
+		$trapoid = `snmptranslate -IR -Ts $enterprise#.$trapname`;
 		chomp $trapoid;
 		if ($trapoid ne "")
 		{
