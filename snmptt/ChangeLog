@@ -1,3 +1,6 @@
+July 15th, 202:  Alex Burger <alex_b@users.sourceforge.net> 
+- Changed version to snmptt_0.2 for release
+
 June 15th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Using UCD-SNMP v4.2.3, data passed from SNMPTRAPD was not
   being handled correctly.  Data being passed only contained
