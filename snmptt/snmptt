@@ -1817,12 +1817,12 @@ sub readtrap
 	    if (! ($temp1 =~ /^(\.\d+)+$/)) 
 	    {
 	      # Not numeric
+	      # Try to convert to numerical
+	      if ($DEBUGGING >= 2) {
+		print "\n  Symbolic trap variable name detected ($temp1).  Will attempt to translate to a numerical OID\n";
+	      }
 	      if ($net_snmp_perl_enable == 1)
 	      {
-		# Try to convert to numerical
-		if ($DEBUGGING >= 2) {
-		  print "\n  Symbolic trap variable name detected ($temp1).  Will attempt to translate to a numerical OID\n";
-		}
 		my $temp3 = &SNMP::translateObj("$temp1");
 		if (defined ($temp3) ) {
 		  if ($DEBUGGING >= 2) {
