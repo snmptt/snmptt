@@ -98,7 +98,7 @@ $sysloglevel = 'warning';
 
 # MySQL: Set to 1 to enable logging to a MySQL database via DBI.  
 # Windows users should disable this.
-$enablemysqldbi = 1;
+$enablemysqldbi = 0;
 
 # MySQL: Database to use
 $mysqldbidatabase = 'snmptt';
