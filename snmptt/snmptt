@@ -189,11 +189,6 @@ if ($eventlog_system_enable == 1 || $eventlog_enable == 1)
 	$eventlog_information = 4;	# EVENTLOG_INFORMATION_TYPE
 }
 
-if (dns_enable == 1)
-{
-  require Socket;
-}
-
 $debug_file_used = 0;
 if ($DEBUGGING >= 1)
 {
@@ -234,6 +229,15 @@ if ($net_snmp_perl_enable == 1)
 	{
 	  print "********** Net-SNMP version $SNMP::VERSION Perl module enabled **********\n\n";
 	}
+}
+
+if ($dns_enable == 1)
+{
+  require Socket;
+  if ($DEBUGGING >= 1)
+  {
+    print "********** DNS enabled **********\n\n";
+  }
 }
 
 if ($mysql_dbi_enable == 1)
