@@ -4,7 +4,7 @@
 # Date:           September 9th, 2003
 # Purpose:        This script is meant to integrate with snmptt as a method to
 #                 send emails via the EXEC statement for received traps
-# Usage:          sendpage priority contact@email subjectLine textArea
+# Usage:          sendemail.sh priority contact@email subjectLine textArea
 # Requirements:   sendmail
 # SNMPTT example: EXEC sendemail.sh high admin@company.com "SNMPTT Alert"
 #                  "FORMAT NIC switchover to slot $3 from slot $5" 
