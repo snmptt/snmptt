@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v0.2.2
+# SNMPTT v0.3
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -134,7 +134,7 @@ $DEBUGGINGFILE = '';				# STDOUT
 
 sub showversion
 {
-	print "\nSNMPTT v0.2.2\n";
+	print "\nSNMPTT v0.3\n";
 	print "(c) 2002 Alex Burger\n";
 	print "http://snmptt.sourceforge.net\n\n";
 }

@@ -50,7 +50,7 @@
 #
 
 # Directory to store received traps.  Ex: /var/spool/snmptt/
-# or 'c:\snmp\snmptt\spool\'
+# or 'c:\\snmp\\snmptt\\spool\\'
 # Don't forget the trailing slash!
 $spooldirectory = '/var/spool/snmptt/';
 #$spooldirectory = 'd:\\snmp\\snmpttspool\\';
