@@ -1,4 +1,9 @@
-October 22th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+November 11th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Updated snmptthandler to use .ini file 
+- Cleaned up variable names to be easier to read
+- Created snmptt.ini-nt file and tested under Windows NT
+
+November 10th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed multiple_event bug - if it was disabled, would not process
   traps
 - Now requires Config::IniFiles

@@ -41,6 +41,8 @@
 # VARBINDS: 	A  list  of  variable bindings that describe the trap and 
 # 		the variables enclosed  in  it.  
 #
+# See the SNMPTT documentation (readme.html) for more information.
+#
 ##############################################################################
 #
 sub showversion
@@ -137,24 +139,39 @@ if ($time ==1)
 
 if ($debugfile ne '') 
 {
-	$DEBUGGINGFILE = $debugfile;	# commandline overpowers snmptt script
+	$DEBUGGING_FILE = $debugfile;	# commandline overpowers snmptt script
 	$debugfilecmdline = 1;
 }
 
 ##############################################################################
 # Load config file start
-
+# 
+# For Linux / Unix, try /etc/snmp/snmptt.ini first, /etc/snmptt.ini second.
+#
+# For Windows, try %SystemRoot%\snmptt.ini only.
+# 
 if ($ini ne '')
 {
   $configfile = $ini;
 }
 else
 {	
- 	if ($^O ne "MSWin32") {
- 	  $configfile = '/etc/snmp/snmptt.ini'
+ 	if ($^O ne "MSWin32")
+	{
+	  $configfile = '/etc/snmp/snmptt.ini';
+	  if( open( CONFIG, '/etc/snmp/snmptt.ini' ) )
+	  {
+	    $configfile = '/etc/snmp/snmptt.ini';
+	    close CONFIG;
+	  }
+	  elsif ( open( CONFIG, '/etc/snmptt.ini' ) )
+	  {
+	    $configfile = '/etc/snmptt.ini';
+	    close CONFIG;
+	  }
 	}
 	else {
-	  $configfile = '%sysdir%\\snmptt.ini';
+	  $configfile = $ENV{'SystemRoot'}."\\snmptt.ini";
 	}
 }
 
@@ -164,32 +181,32 @@ else
 		
 use Text::ParseWords;
 
-if ($enablesyslog == 1)
+if ($syslog_enable == 1)
 {
 	require Sys::Syslog;
 }
 
-if ($enablemysqldbi == 1)
+if ($mysql_dbi_enable == 1)
 {
 	require DBI;
-	$dbhmysql = DBI->connect("DBI:mysql:$mysqldbidatabase",$mysqldbiusername,$mysqldbipassword);
+	$dbhmysql = DBI->connect("DBI:mysql:$mysql_dbi_database",$mysql_dbi_username,$mysql_dbi_password);
 	warn "Unable to connect: $DBI::errstr\n" unless (defined $dbhmysql);
 
 }
 
-if ($enablesqlodbc == 1)
+if ($sql_win32_odbc_enable == 1)
 {
 	require Win32::ODBC;
-	$dbhodbc = new Win32::ODBC("DSN=$sqlodbcdsn","UID=$sqlodbcusername","PWD=$sqlodbcpassword");
-	warn "Unable to connect to DSN $sqlodbcdsn:" . Win32::ODBC::Error() . "\n" unless (defined $dbhodbc);
+	$dbhodbc = new Win32::ODBC("DSN=$sql_win32_odbc_dsn","UID=$sql_win32_odbc_username","PWD=$sql_win32_odbc_password");
+	warn "Unable to connect to DSN $sql_win32_odbc_dsn:" . Win32::ODBC::Error() . "\n" unless (defined $dbhodbc);
 
 }
 
 if ($DEBUGGING >= 1)
 {
-	if ($DEBUGGINGFILE ne '') 
+	if ($DEBUGGING_FILE ne '') 
 	{
-	  	open DEBUGFILE, ">>$DEBUGGINGFILE"
+	  	open DEBUGFILE, ">>$DEBUGGING_FILE"
 			or warn "Could not open debug output file ($!)";
 	
 		select DEBUGFILE;	# Change default output to debug file
@@ -217,7 +234,7 @@ if ($daemon == 1)
 	&loadsnmpttconf;	# Load SNMPTT.CONF file
 
 	# Only fork to the background if not Win32
-	if (($^O ne "MSWin32") && ($daemonfork==1))
+	if (($^O ne "MSWin32") && ($daemon_fork==1))
 	{
 		use POSIX qw(setsid);
 	
@@ -241,30 +258,30 @@ if ($daemon == 1)
 	{
 	
 		
-		if (! (chdir($spooldirectory)))
+		if (! (chdir($spool_directory)))
 		{
 			if ($DEBUGGING >= 1)
 			{
-				print "Unable to enter dir $spooldirectory:$!\n";
+				print "Unable to enter dir $spool_directory:$!\n";
 			}
-			warn "Unable to enter dir $spooldirectory:$!\n";
+			warn "Unable to enter dir $spool_directory:$!\n";
 		}
 		elsif (! (opendir(DIR, ".")))
 		{
 			if ($DEBUGGING >= 1)
 			{
-				print "Unable to open $spooldirectory:$!\n";
+				print "Unable to open $spool_directory:$!\n";
 			}
-			warn "Unable to open $spooldirectory:$!\n";
+			warn "Unable to open $spool_directory:$!\n";
 		}
 		elsif (! (@filenames = readdir(DIR)))
 		{
 		
 			if ($DEBUGGING >= 1)
 			{
-				print "Unable to read $spooldirectory:$!\n";
+				print "Unable to read $spool_directory:$!\n";
 			}
-			warn "Unable to read $spooldirectory:$!\n";
+			warn "Unable to read $spool_directory:$!\n";
 		}
 		else
 		{
@@ -281,13 +298,13 @@ if ($daemon == 1)
 				}
 			
 				$filesuccess = 1;
-				unless (open FILE, $spooldirectory.$file)
+				unless (open FILE, $spool_directory.$file)
 				{
 					if ($DEBUGGING >= 1)
 					{
-						print "Could not open trap file $spooldirectory$file: ($!)\n";
+						print "Could not open trap file $spool_directory$file: ($!)\n";
 					}
-					warn "Could not open trap file $spooldirectory$file: ($!)\n";
+					warn "Could not open trap file $spool_directory$file: ($!)\n";
 					$filesuccess = 0;
 				}
 						
@@ -434,9 +451,18 @@ sub processtrap
 			$hostmatch = 1;		# No nodes defined, so default to all nodes
 			$multiple_event_passes++;
 			$processed = 1;
+			if ($DEBUGGING >= 1)
+			{
+			  print "  No nodes defined for this entry so all nodes will match\n";
+			}
 		}
 		else
 		{
+			if ($DEBUGGING >= 1)
+			{
+			  print "  Nodes defined for this entry...\n";
+			}	
+			
 			if ($event2[5] =~ /\\|\// )	# Contain a \ or /?  Must be a filename
 			{
 				if (open NODESFILE, $event2[5])
@@ -456,7 +482,7 @@ sub processtrap
 				}
 				else
 				{
-				warn "Cannot open NODES file: $event2[5] $!";
+					warn "Cannot open NODES file: $event2[5] $!";
 				}
 				
 				#load file
@@ -487,6 +513,11 @@ sub processtrap
 			if ($hostmatch == 1)
 			{
 			  $multiple_event_passes++;
+			  
+			  if ($DEBUGGING >= 1)
+ 			  {
+			  	print "  Node found in list\n";
+			  }
 			}
 		}
 	
@@ -496,11 +527,16 @@ sub processtrap
 			#print "multiple_event is $multiple_event\n";
 			if (($multiple_event == 0) && ($multiple_event_passes > 1))
 			{
+				if ($DEBUGGING >= 1)
+ 				{
+			  		print "  multiple_event = $multiple_event, multiple_event_passes = " .
+					"$multiple_event_passes so don't process any more entries\n";
+				}
 				last;	# Don't look any further - stop
 
 			}
-			
-			
+
+			print "  multiple_event = $multiple_event, multiple_event_passes = " . "$multiple_event_passes\n";			
 			# Trap received exists in our list of trap definitions
 			if ($DEBUGGING >= 1)
 			{
@@ -514,43 +550,44 @@ sub processtrap
 		
 			$message = "$receivedtrap $event2[2] \"$event2[1]\" @var[0] - $_\n";
 		
-			if ($enablestdout == 1)
+			if ($stdout_enable == 1 || $DEBUGGING >= 1)
 			{
 				print "$message";
 			}
 		
-			if ($enablelog == 1)
+			if ($log_enable == 1)
 			{
-				if (open LOGFILE, ">>$logfile")
+				print "aa\n";
+				if (open LOGFILE, ">>$log_file")
 				{
 					print LOGFILE scalar(localtime)." $message";
 					close LOGFILE;
 				}
 				else
 				{
-					warn "Cannot open logfile: $!";
+					warn "Cannot open log_file: $!";
 				}
 			}
 	
-			if ($enablesyslog == 1)
+			if ($syslog_enable == 1)
 			{
-				if (Sys::Syslog::openlog('TRAPD', '',$syslogfacility) )
+				if (Sys::Syslog::openlog('TRAPD', '',$syslog_facility) )
 				{
-					Sys::Syslog::syslog ($sysloglevel, $message,1);
+					Sys::Syslog::syslog ($syslog_level, $message,1);
 					Sys::Syslog::closelog();
 				}
 				else
 				{
-					warn "Cannot open logfile: $!";
+					warn "Cannot open log_file: $!";
 				}
 			}
 			
-			if ($enablemysqldbi == 1)
+			if ($mysql_dbi_enable == 1)
 			{
 				$message = $_;
 				
 				$sth = $dbhmysql->prepare(
-					"INSERT $mysqldbitable (eventname, eventid, enterprise, community, 
+					"INSERT $mysql_dbi_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES 
 					(?,?,?,?,?,?,?,?,?,?,?)") or
 				 warn "Unable to prepare our query: ".$dbh->errstr."\n";
@@ -564,12 +601,12 @@ sub processtrap
 				 }
 			}				 
 			
-			if ($enablesqlodbc == 1)
+			if ($sql_win32_odbc_enable == 1)
 			{
 				$message = $_;
 				
 				if (defined $dbhodbc->Sql
-				        ("INSERT INTO $sqlodbctable (eventname, eventid, enterprise, community, 
+				        ("INSERT INTO $sql_win32_odbc_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
 					\'$event2[0]\',\'$receivedtrap'\,\'@var[6]\',\'@var[5]\',\'@var[0]\',\'@var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'@var[2]\',\'".scalar(localtime)."\',
@@ -593,7 +630,7 @@ sub processtrap
 		
 				$page = $_;
 			
-				if ($enableexec == 1)
+				if ($exec_enable == 1)
 				{
 					if ($DEBUGGING >= 1)
 					{	
@@ -686,10 +723,10 @@ sub loadsnmpttconf
 
 	# Flush variables in case this is a re-load during run
 	@snmpttconf = ();
-	# @snmpttconffiles = ();
+	# @snmptt_conf_files = ();
 	undef %event;
 	
-	foreach $snmpttconffile (@snmpttconffiles)
+	foreach $snmpttconffile (@snmptt_conf_files)
 	{
 		open SNMPTTCONF, $snmpttconffile
 			or die "Could not open snmptt.conf file: $snmpttconffile ($!)";
@@ -1110,9 +1147,9 @@ sub searchfortrap
 			print "\n\nTrap not defined.  Nothing to do...\n\n";
 		}
 		
-		if ($enableunknowntraplog == 1)
+		if ($unknown_trap_log_enable == 1)
 		{
-			if (open LOGFILE, ">>$unknowntraplogfile")
+			if (open LOGFILE, ">>$unknown_trap_log_file")
 			{	
 				print LOGFILE scalar(localtime),": Unknown trap (@var[3]) received from @var[0] at: \n";
 				#print out all standard variables
@@ -1130,7 +1167,7 @@ sub searchfortrap
 			}
 			else
 			{
-				warn "Cannot open logfile: $!";
+				warn "Cannot open log_file: $!";
 			}
 		}
 	}
@@ -1172,92 +1209,92 @@ sub loadsnmpttini {
 	# Defaults Start
 	# 
         $daemonmode = 0;
-	$daemonfork = 1;
-	$spooldirectory = '';
-	$sleep = 5;
-	$enablestdout = 0;
-	$enablelog = 1;
-	$logfile = '';
-	$enableunknowntraplog = 0;
-	$unknowntraplogfile = '';
-	$enablesyslog = 0;
-	$syslogfacility = 'local0';
-	$sysloglevel = 'warning';
-	$enableexec = 1;
 	$multiple_event = 0;
-	$enablemysqldbi = 0;
-	$mysqldbidatabase = '';
-	$mysqldbitable = '';
-	$mysqldbiusername = '';
-	$mysqldbipassword = '';
-	$enablesqlodbc = 0;
-	$sqlodbcdsn = '';
-	$sqlodbctable = '';
-	$sqlodbcusername = '';
-	$sqlodbcpassword = '';
+	$daemon_fork = 1;
+	$spool_directory = '';
+	$sleep = 5;
+	$stdout_enable = 0;
+	$log_enable = 1;
+	$log_file = '';
+	$unknown_trap_log_enable = 0;
+	$unknown_trap_log_file = '';
+	$syslog_enable = 0;
+	$syslog_facility = 'local0';
+	$syslog_level = 'warning';
+	$exec_enable = 1;
+	$mysql_dbi_enable = 0;
+	$mysql_dbi_database = '';
+	$mysql_dbi_table = '';
+	$mysql_dbi_username = '';
+	$mysql_dbi_password = '';
+	$sql_win32_odbc_enable = 0;
+	$sql_win32_odbc_dsn = '';
+	$sql_win32_odbc_table = '';
+	$sql_win32_odbc_username = '';
+	$sql_win32_odbc_password = '';
 	if ($debugcmdline == 0) {
 	  $DEBUGGING = 0
 	}
 	if ($debugfilecmdline == 0) {
-	  $DEBUGGINGFILE = ''
+	  $DEBUGGING_FILE = ''
 	}
-	@snmpttconffiles = '';
+	@snmptt_conf_files = '';
 	#
 	# Defaults End
 	# 
 	
 	# General
-	if ($cfg->val('Mode', 'mode') eq "standalone") {
+	if ($cfg->val('General', 'mode') eq "standalone") {
 	  $daemonmode = 0;
 	}
 	else {
 	  $daemonmode = 1;
 	}
+	$multiple_event = $cfg->val('General', 'multiple_event');
 	
 	# DaemonMode
 	if ($daemoncmdline == 0) {
-	  $daemonfork = $cfg->val('DaemonMode', 'daemonfork');
+	  $daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
 	}
-	$spooldirectory = $cfg->val('DaemonMode', 'spooldirectory');
+	$spool_directory = $cfg->val('DaemonMode', 'spool_directory');
 	$sleep = $cfg->val('DaemonMode', 'sleep');
 	
 	# Logging
-	$enablestdout = $cfg->val('Logging', 'enablestdout');
-	$enablelog = $cfg->val('Logging', 'enablelog');
-	$logfile = $cfg->val('Logging', 'logfile');
-	$enableunknowntraplog = $cfg->val('Logging', 'enableunknowntraplog');
-	$unknowntraplogfile = $cfg->val('Logging', 'unknowntraplogfile');
-	$enablesyslog = $cfg->val('Logging', 'enablesyslog');
-	$syslogfacility = $cfg->val('Logging', 'syslogfacility');
-	$sysloglevel = $cfg->val('Logging', 'sysloglevel');
+	$stdout_enable = $cfg->val('Logging', 'stdout_enable');
+	$log_enable = $cfg->val('Logging', 'log_enable');
+	$log_file = $cfg->val('Logging', 'log_file');
+	$unknown_trap_log_enable = $cfg->val('Logging', 'unknown_trap_log_enable');
+	$unknown_trap_log_file = $cfg->val('Logging', 'unknown_trap_log_file');
+	$syslog_enable = $cfg->val('Logging', 'syslog_enable');
+	$syslog_facility = $cfg->val('Logging', 'syslog_facility');
+	$syslog_level = $cfg->val('Logging', 'syslog_level');
 	
 	# Exec
-	$enableexec = $cfg->val('Exec', 'enableexec');
-	$multiple_event = $cfg->val('Exec', 'multiple_event');
+	$exec_enable = $cfg->val('Exec', 'exec_enable');
 	
 	# SQL
-	$enablemysqldbi = $cfg->val('SQL', 'enablemysqldbi');
-	$mysqldbidatabase = $cfg->val('SQL', 'mysqldbidatabase');
-	$mysqldbitable = $cfg->val('SQL', 'mysqldbitable');
-	$mysqldbiusername = $cfg->val('SQL', 'mysqldbiusername');
-	$mysqldbipassword = $cfg->val('SQL', 'mysqldbipassword');
+	$mysql_dbi_enable = $cfg->val('SQL', 'mysql_dbi_enable');
+	$mysql_dbi_database = $cfg->val('SQL', 'mysql_dbi_database');
+	$mysql_dbi_table = $cfg->val('SQL', 'mysql_dbi_table');
+	$mysql_dbi_username = $cfg->val('SQL', 'mysql_dbi_username');
+	$mysql_dbi_password = $cfg->val('SQL', 'mysql_dbi_password');
 	
-	$enablesqlodbc = $cfg->val('SQL', 'enablesqlodbc');
-	$sqlodbcdsn = $cfg->val('SQL', 'sqlodbcdsn');
-	$sqlodbctable = $cfg->val('SQL', 'sqlodbctable');
-	$sqlodbcusername = $cfg->val('SQL', 'sqlodbcusername');
-	$sqlodbcpassword = $cfg->val('SQL', 'sqlodbcpassword');
+	$sql_win32_odbc_enable = $cfg->val('SQL', 'sql_win32_odbc_enable');
+	$sql_win32_odbc_dsn = $cfg->val('SQL', 'sql_win32_odbc_dsn');
+	$sql_win32_odbc_table = $cfg->val('SQL', 'sql_win32_odbc_table');
+	$sql_win32_odbc_username = $cfg->val('SQL', 'sql_win32_odbc_username');
+	$sql_win32_odbc_password = $cfg->val('SQL', 'sql_win32_odbc_password');
 	
 	# Debugging
 	if ($debugcmdline == 0) {
 	  $DEBUGGING = $cfg->val('Debugging', 'DEBUGGING');
 	}
 	if ($debugfilecmdline == 0) {
-	  $DEBUGGINGFILE = $cfg->val('Debugging', 'DEBUGGINGFILE');
+	  $DEBUGGING_FILE = $cfg->val('Debugging', 'DEBUGGING_FILE');
 	}
 	
 	# TrapFiles
-	@snmpttconffiles = $cfg->val('TrapFiles', 'snmpttconffiles');
+	@snmptt_conf_files = $cfg->val('TrapFiles', 'snmptt_conf_files');
 	
 	$cfg->Delete;
 	

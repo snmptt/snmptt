@@ -7,11 +7,10 @@
    <title>SNMP Trap Translator</title>
 </head>
 <body>
-&nbsp;
-<a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=YOUR_GROUP_ID_GOES_HERE&amp;type=5" width="210" height="62" border="0" alt="SourceForge.net Logo"></a>
-<br><b><font size=+3>SNMP Trap Translator v0.3.1</font></b>
+<a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
+<br><b><font size=+3>SNMP Trap Translator v0.3.3</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; September 18th, 2002
+<br>This file was last updated on:&nbsp; November 11th, 2002
 <p>&nbsp;<a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote>&nbsp;<a href="#What is it">What is it?</a>
@@ -19,11 +18,11 @@
 <br>&nbsp;<a href="#Features">Features</a>
 <br>&nbsp;<a href="#Requirements">Requirements</a>
 <br>&nbsp;<a href="#Whats New">Whats New</a>
+<br>&nbsp;<a href="#Configuration Options">Configuration Options</a>
 <br>&nbsp;<a href="#Logging - Standard">Logging - Standard</a>
 <br>&nbsp;<a href="#Logging - Database">Logging - Database</a>
 <br>&nbsp;<a href="#Executing an external program">Executing an external
 program</a>
-<br>&nbsp;<a href="#Configuration Options">Configuration Options</a>
 <br>&nbsp;<a href="#Modes of Operation">Modes of Operation</a>
 <br>&nbsp;<a href="#Command line arguments">Command line arguments</a>
 <br>&nbsp;<a href="#SNMPTT.CONF Configuration file format">SNMPTT.CONF
@@ -93,7 +92,8 @@ Translates received traps into a readable format by performing variable
 substitution</li>
 
 <li>
-Outputs translated traps to standard output, text log file and / or syslog</li>
+Outputs translated traps to standard output, text log file, a SQL database
+and / or syslog</li>
 
 <li>
 Executes a user defined program when a trap is received</li>
@@ -143,6 +143,9 @@ included in the NET-SNMP package.
 <p><a NAME="Whats New"></a><b><font size=+2>Whats New</font></b>
 <p><b><font size=+1>0.4 - ??, 2002</font></b>
 <ul>
+<li>
+Configuration moved to a .ini file</li>
+
 <li>
 MySQL support via DBI under Linux</li>
 
@@ -199,45 +202,62 @@ SNMP V2 trap bug fix</li>
 UCD-SNMP v4.2.3 problem workaround</li>
 </ul>
 <b><font size=+1>0.1 - April 18th, 2002</font></b>
-<br>-Initial release
-<br>&nbsp;
+<ul>
+<li>
+Initial release</li>
+</ul>
+<a NAME="Configuration Options"></a><b><font size=+2>Configuration Options</font></b>
+<p>As mentioned throughout this document, configuration options are set
+by editing the <b>snmptt.ini</b> file.
+<p>For Linux / Unix, the <b>snmptt.ini</b> file should be located in either
+<b>/etc/snmp/</b>
+or <b>/etc/</b>.&nbsp; SNMPTT will search for the the file in both directories
+in that order.
+<p>For Windows, the file should be in <b>%SystemRoot%\</b>.&nbsp; For example,
+<b>c:\winnt</b>.
+<p>The location of the ini file can be set on the command line using the
+<b>-ini=</b>
+parameter.&nbsp; See <a href="#Command line arguments">Command Line Arguments</a>.
+<p>A sample <b>snmptt.ini</b> is provided in this package.&nbsp; For Windows
+NT, be sure to copy the <b>snmptt.ini-nt</b> file to <b>%SystemRoot%\snmptt.ini</b>.
 <br>&nbsp;
 <p><a NAME="Logging - Standard"></a><b><font size=+2>Logging - Standard</font></b>
 <p>Translated traps can be sent to standard output and to a log file.&nbsp;
 The output format is:
 <blockquote><b>date trap-oid severity category hostname translated-trap</b></blockquote>
-To configure standard output or regular logging, edit the snmptt script
+To configure standard output or regular logging, edit the snmptt.ini file
 and modify the following variables:
-<blockquote><b>$enablestdout</b>
-<br><b>$enablelog</b>
-<br><b>$logfile</b></blockquote>
+<blockquote><b>enable_stdout</b>
+<br><b>enable_log</b>
+<br><b>log_file</b></blockquote>
 Translated traps can also be sent to syslog.&nbsp; The format of the entries
 will be similar to above without the date (as syslogd logs the date):
 <blockquote><b>trap-oid severity category hostname translated-trap</b></blockquote>
-To configure syslog, edit the snmptt script and modify the following variables:
-<blockquote><b>$enablesyslog</b>
-<br><b>$syslogfacility</b>
-<br><b>$sysloglevel</b></blockquote>
-Note:&nbsp; Users that do not support SYSLOG (such as Windows NT) must
-disable syslog by setting $enablesyslog=0 as described in the snmptt script.
+To configure syslog, edit the snmptt ini file and modify the following
+variables:
+<blockquote><b>syslog_enable</b>
+<br><b>syslog_facility</b>
+<br><b>syslog_level</b></blockquote>
+Note:&nbsp; Systems that do not support SYSLOG (such as Windows NT) must
+disable syslog by setting <b>syslog_enable=0</b>..
 <p>Logging of non recognized traps is also possible.&nbsp; This would be
 used mainly for troubleshooting purposes.
-<p>To configure unknown trap logging, edit the snmptt script and modify
+<p>To configure unknown trap logging, edit the snmptt.ini file and modify
 the following variables:
-<blockquote><b>$enableunknowntraplog</b>
-<br><b>$unknowntraplogfile</b></blockquote>
+<blockquote><b>enable_unknown_trap_log</b>
+<br><b>unknown_trap_log_file</b></blockquote>
 <a NAME="Logging - Database"></a><b><font size=+2>Logging - Database</font></b>
 <p>Translated traps can also be sent to a database.&nbsp; MySQL (tested
 under Linux) and ODBC (testing under Windows NT) can be used.
 <p><b><font size=+1>MySQL</font></b>
 <p>To configure SNMPTT for MySQL, modify the following variables in the
-snmptt script.
-<blockquote><b>$enablemysqldbi</b>
-<br><b>$mysqldbidatabase</b>
-<br><b>$mysqldbitable</b>
-<br><b>$mysqldbiusername</b>
-<br><b>$mysqldbipassword</b></blockquote>
-Note:&nbsp; Sample values are defined in the default script
+snmptt.ini file.
+<blockquote><b>mysql_dbi_enable</b>
+<br><b>mysql_dbi_database</b>
+<br><b>mysql_dbi_table</b>
+<br><b>mysql_dbi_username</b>
+<br><b>mysql_dbi_password</b></blockquote>
+Note:&nbsp; Sample values are defined in the default ini file.
 <p>The following MySQL script can create the database and table.&nbsp;
 Permissions etc should also be defined.
 <blockquote><b><tt>CREATE DATABASE snmptt;</tt></b>
@@ -261,12 +281,12 @@ be sufficient, but they may need to be increased depending on your environment.
 <p><b><font size=+1>ODBC</font></b>
 <p>To configure SNMPTT for MS SQL via ODBC on Windows, modify the following
 variables in the snmptt script.
-<blockquote><b>$enablesqlodbc = 1;</b>
-<br><b>$sqlodbcdsn = 'snmptt';</b>
-<br><b>$sqlodbctable = 'snmptt';</b>
-<br><b>$sqlodbcusername = 'snmptt';</b>
-<br><b>$sqlodbcpassword = 'password';</b></blockquote>
-Note:&nbsp; Sample values are defined in the default script
+<blockquote><b>sql_win32_odbc_enable = 1;</b>
+<br><b>sql_win32_odbc_dsn = 'snmptt';</b>
+<br><b>sql_win32_odbc_table = 'snmptt';</b>
+<br><b>sql_win32_odbc_username = 'snmptt';</b>
+<br><b>sql_win32_odbc_password = 'password';</b></blockquote>
+Note:&nbsp; Sample values are defined in the default ini file.
 <p>The following MS SQL Server script can create the table inside an existing
 database.&nbsp; Permissions etc should also be defined.
 <blockquote><b><tt>CREATE TABLE snmptt (</tt></b>
@@ -295,23 +315,17 @@ the following command line could be used:
 Drive on controller $4, bus $5, bay $6 status is $3."</b></blockquote>
 $r is translated to the hostname, and $x is the current time (described
 in detail below)
-<p>To enable or diable the execution of EXEC definitions, edit the snmptt
-script and modify the following variable:
-<blockquote><b>$enableexec</b></blockquote>
+<p>To enable or diable the execution of EXEC definitions, edit the snmptt.ini
+file and modify the following variable:
+<blockquote><b>exec_enable</b></blockquote>
 
-<p><br><a NAME="Configuration Options"></a><b><font size=+2>Configuration
-Options</font></b>
-<p>As mentioned throughout this document, configuration options are set
-by editing the options between OPTIONS START and OPTIONS END in the snmptt
-script.
-<br>&nbsp;
-<p><a NAME="Modes of Operation"></a><b><font size=+2>Modes of Operation</font></b>
+<p><br><a NAME="Modes of Operation"></a><b><font size=+2>Modes of Operation</font></b>
 <p>SNMPTT can be run in two modes:&nbsp; standalone mode and daemon mode.
 <p><b><font size=+1>Standalone mode</font></b>
 <p>To use SNMPTT in standalone mode, the snmptrapd.conf file would contain
 a traphandle statement such as:
 <blockquote><b>traphandle default /usr/sbin/snmptt</b></blockquote>
-When a trap is received by SNMPTRAPD, the trap is passed to the /usr/sbin/snmptt
+When a trap is received by SNMPTRAPD, the trap is passed to the <b>/usr/sbin/snmptt</b>
 script.&nbsp; SNMPTT performs the following tasks:
 <ul>
 <li>
@@ -336,10 +350,10 @@ is, the longer it will take to process.&nbsp; If there are a large number
 of traps being received, daemon mode should be used.&nbsp; If it takes
 1 second to process one trap, then obviously you shouldn't try to process
 more than one trap per second.
-<p>Running SNMPTT without the --daemon command line option will result
-standalone mode unless the <b>$daemon</b> variable in SNMPTT is set to
-1.&nbsp; For standalone mode, he <b>$daemon</b> variable in SNMPTT should
-be set 0.
+<p>Running SNMPTT without the <b>--daemon</b> command line option will
+result standalone mode unless the <b>mode</b> variable in the <b>snmptt.ini</b>
+file is set to <b>daemon</b>.&nbsp; For standalone mode, the <b>mode</b>
+variable in the <b>snmptt.ini</b> file should be set <b>standalone</b>.
 <p><b><font size=+1>Daemon mode</font></b>
 <p>To use SNMPTT in daemon mode, SNMPTT would be run in daemon mode and
 the snmptrapd.conf file would contain a traphandle statement such as:
@@ -379,10 +393,11 @@ loops back up to 'reads traps passed from spool directory'</li>
 Using SNMPTTHANDLER and SNMPTT in daemon mode, a large number of traps
 per minute should be handled easily.
 <p>Running SNMPTT with the --daemon command line option or setting the
-<b>$daemon</b>
-variable in SNMPTT is set to 1 will cause SNMPTT to run in daemon mode.
+<b>mode</b>
+variable in the <b>snmptt.ini</b> file is set to <b>daemon</b> will cause
+SNMPTT to run in daemon mode.
 <p>Note:&nbsp; When running on a <b>non</b> Windows platform, SNMPTT will
-fork to the background unless <b>$daemonfork</b> is set to 0.
+fork to the background if <b>daemon_fork</b> is set to 1.
 <br>&nbsp;
 <p><a NAME="Command line arguments"></a><b><font size=+2>Command line arguments</font></b>
 <p>The following command line arguments are supported:
@@ -399,6 +414,8 @@ output file
 Dump (display) defined traps
 <br>&nbsp;&nbsp;&nbsp; --help&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Display this message
+<br>&nbsp;&nbsp;&nbsp; --ini=filename&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Specify path to snmptt.ini file
 <br>&nbsp;&nbsp;&nbsp; --version&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Display author and version information
 <br>&nbsp;&nbsp;&nbsp; --time&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -408,22 +425,21 @@ process trap file (eg: time snmptt --time)
 <br>&nbsp;
 <p><a NAME="SNMPTT.CONF Configuration file format"></a><b><font size=+2>SNMPTT.CONF
 Configuration file format</font></b>
-<p>The configuration file (defaults to /etc/snmp/snmptt.conf) can contain
-<b>EITHER</b>
-a list of all the defined traps (default) <b>OR</b> a list of other files
-that contain a list of all the defined traps.
+<p>The configuration file (usually /etc/snmp/snmptt.conf or d:\snmp\snmptt.conf)
+contains a list of all the defined traps.
 <p>If your snmptt.conf file is getting rather large and you would like
 to divide it up into many smaller files, then do the following:
-<p>-change <b>$snmpttconfiletype = 0</b> in the snmptt script to <b>$snmpttconfiletype
-= 1</b>
-<br>-list the filenames to load with complete paths in the snmptt.conf
-file.&nbsp; For example:
-<blockquote>/etc/snmp/snmptt-compaq.conf
+<p>-create additional snmptt.conf files
+<br>-add the file names to the <b>snmptt_conf_files</b> section in the
+snmptt.ini file.
+<p>For example:
+<blockquote>snmptt_conf_files = &lt;&lt;END
+<br>/etc/snmp/snmptt-compaq.conf
 <br>/etc/snmp/snmptt-cisco.conf
 <br>/etc/snmp/snmptt-hp.conf
-<br>/etc/snmp/snmptt-3com.conf</blockquote>
-The syntax of the snmptt.conf file (or other config files if <b>$snmpttconfiletype</b>
-is set to 1)&nbsp; is:
+<br>/etc/snmp/snmptt-3com.conf
+<br>END</blockquote>
+The syntax of the snmptt.conf file&nbsp; is:
 <blockquote><b>EVENT</b> event_name event_OID "category" severity
 <p><b>FORMAT</b> format_string
 <p>[<b>EXEC</b> command_string]
@@ -559,7 +575,7 @@ The received trap OID matches a defined OID in the configuration file</li>
 <b>AND</b> <b>( </b>the hostname matches a defined hostname int the NODES
 entry <b>OR</b> the NODES entry is blank<b>)</b></li>
 </ul>
-<b>If $multiple_event is set to 1 in snmptt:</b>
+<b>If multiple_event is set to 1 in snmptt.ini:</b>
 <ul>
 <li>
 A trap is handled as many times as it matches in the configuration file</li>
@@ -570,7 +586,7 @@ If any number of exact matches exist, the wildcard match is NOT performed</li>
 <li>
 If an exact match does NOT exist, the wildcard match IS performed</li>
 </ul>
-<b>If $multiple_event is set to 0 in snmptt:</b>
+<b>If multiple_event is set to 0 in snmptt.ini:</b>
 <ul>
 <li>
 A trap is handled once using the first match in the configuration file</li>
@@ -603,9 +619,11 @@ Critical
 <br>#</blockquote>
 <a NAME="Sample2 SNMPTT.CONF file"></a><b><font size=+2>Sample2 SNMPTT.CONF
 file</font></b>
-<p>Following is a sample of a list of files to load in <b>snmptt.conf:</b>
-<blockquote>/etc/snmp/snmp-compaq.conf
-<br>/etc/snmp/snmp-compaq-hsv.conf</blockquote>
+<p>Following is a sample of a list of files to load in <b>snmptt.ini:</b>
+<blockquote>snmptt_conf_files = &lt;&lt;END
+<br>/etc/snmp/snmp-compaq.conf
+<br>/etc/snmp/snmp-compaq-hsv.conf
+<br>END</blockquote>
 Following is a sample of one defined traps in <b>/etc/snmp/snmptt-compaq.conf:</b>
 <blockquote>#
 <br>EVENT COMPAQ_11003 .1.3.6.1.4.1.232.0.11003 "LOGONLY" Normal
@@ -640,12 +658,12 @@ Snmpttconvertmib can be used to convert the file to snmptt.conf format.
 <br>&nbsp;
 <p><a NAME="Installation - Unix"></a><b><font size=+2>Installation - Unix</font></b>
 <p>1.&nbsp; <b><u>Read this entire file to understand how snmptt works</u></b>
-<p>2.&nbsp; Copy <b>snmptt</b> to /usr/sbin and ensure it is executable
+<p>2.&nbsp; Copy <b>snmptt</b> to /usr/sbin/ and ensure it is executable
 (<b>chmod +x snmptt</b>)
-<p>3.&nbsp; Copy <b>snmptthandler</b> to /usr/sbin and ensure it is executable
+<p>3.&nbsp; Copy <b>snmptthandler</b> to /usr/sbin/ and ensure it is executable
 (<b>chmod +x snmptthandler</b>)
-<p>4.&nbsp; Edit the options between OPTIONS START and OPTIONS END in snmptt
-and snmptthandler (when using daemon mode only)
+<p>4.&nbsp; Copy <b>snmptt.ini</b> to <b>/etc/snmp/ </b>and edit the options
+inside the file.
 <p>5a.&nbsp;&nbsp; For <b>standlone mode:&nbsp; </b>Modify the NET-SNMP
 snmptrapd.conf file by adding the following line:
 <blockquote><b>traphandle default /usr/sbin/snmptt</b>
@@ -681,7 +699,8 @@ Windows</font></b>
 <p>1.&nbsp; <b><u>Read this entire file to understand how snmptt works</u></b>
 <p>2.&nbsp; Create the directory c:\snmp and copy <b>snmptt</b> and <b>snmptthandler</b>
 to it
-<p>3.&nbsp; Edit the options between OPTIONS START and OPTIONS END in snmptt
+<p>3.&nbsp; Copy <b>snmptt.ini-nt</b> to <b>%SystemRoot%\snmptt.ini</b>
+(c:\winnt\snmptt.ini)<b> </b>and edit the options inside the file.
 <p>4a.&nbsp;&nbsp; For <b>standlone mode:&nbsp; </b>Modify the NET-SNMP
 snmptrapd.conf file by adding the following line:
 <blockquote><b>traphandle default perl c:\snmp\snmptt</b></blockquote>
