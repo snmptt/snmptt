@@ -382,18 +382,21 @@ if ($daemon == 1)
 		defined(my $pid = fork)
 		   or die "Can't fork: $!";
 
-		if ( ! (open(PID, ">/var/run/snmptt.pid") ))
-		{
-		  open(PID, ">$working_dir/snmptt.pid");
+		if ($pid)
+		{		  
+	 	  if ( ! (open(PID, ">/var/run/snmptt.pid") ))
+  		  {
+  		    open(PID, ">$working_dir/snmptt.pid");
+  		  }
+		  
+		  if (defined (PID))
+  		  {
+  		    print(PID "$pid\n");
+  		    close(PID);
+  		  }
+		  exit;
 		}
 
-		if (defined (PID) && $pid != 0)
-		{
-		  print(PID "$pid\n");
-		  close(PID);
-		}
-
-		exit if $pid;
 		POSIX:setsid
 		   or die "Can't start a new session: $!";
 		umask 0;
