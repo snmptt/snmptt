@@ -1,0 +1,621 @@
+#!/usr/bin/perl
+#
+# SNMPTT v0.1
+#
+# Copyright 2002 Alex Burger
+# alex_b@users.sourceforge.net
+# 4/11/2002
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+##############################################################################
+#
+# http://www.sourceforge.net/projects/snmptt
+#
+# This script is a snmp trap handler for use with the NET-SNMP / UCD-SNMP 
+# snmptrapd program.
+#
+# The script is called by defining a 'traphandle' in snmptrapd.conf.  
+# For example:
+#
+# traphandle default /sbin/snmptrapexex
+# 
+# SNMPTRAPD feeds details about the trap to the launched program's standard
+# input in the following format (see snmptrapd.conf man page for a complete
+# descriptipon)
+#
+# HOSTNAME: 	The name of the host in question  that  sent the  trap
+# IPADDRESS: 	The IP address of the  host  that  sent  the trap
+# VARBINDS: 	A  list  of  variable bindings that describe the trap and 
+# 		the variables enclosed  in  it.  These
+##############################################################################
+#
+# OPTIONS START
+#
+# Set to 1 to enable messages to be sent to standard output, or 0 to disable.
+# Would normally be left off unless you are piping this program to another
+$enablestdout = 1;
+
+# Set to 1 to enable text logging.  Make sure you specify a logfile location
+$enablelog = 1;
+
+# Log file location.  The COMPLETE path and filename.  Ex: '/var/log/snmptt.log'
+# or 'c:\snmp\snmptt.log'
+$logfile = '/var/log/snmptt.log';
+#$logfile = 'd:\snmp\snmptt.log';
+
+# Set to 1 to enable logging of unknown traps.  This should normally be left off
+# as the file could grow large quickly.  Used primarily for troubleshooting.  If
+# you have defined a trap in snmptt.conf, but it is not executing, enable this to
+# see if it is being considered an unknown trap due to an incorrect entry or 
+# simpply missing from the snmptt.conf file
+$enableunknowntraplog = 0;
+
+# Log file location.  The COMPLETE path and filename.  Ex: '/var/log/snmpttunknown.log'
+# or 'c:\snmp\snmpttunknown.log'
+$unknowntraplogfile = '/var/log/snmpttunknown.log';
+#$unknowntraplogfile = 'd:\snmp\snmpttunknown.log';
+
+# Set to 1 to enable logging to syslog.  If you do not have the Sys::Syslog module
+# then disable this.  Windows users should disable this.
+$enablesyslog = 1;
+
+# Syslog facility to use.  For example: 'local0'
+$syslogfacility = 'local0';
+
+# Syslog level to use.  For example: 'warning'
+$sysloglevel = 'warning';
+
+# Set to 1 to allow EXEC statements to execute.  Should normally be left on unless you
+# want to temporarily disable all EXEC commands
+$enableexec = 1;
+
+# Location of the snmptt.conf (this is NOT the snmptrapd.conf file).  The COMPLETE path 
+# and filename.  Ex: '/etc/snmp/snmptt.conf'
+$snmpttconffile = '/etc/snmp/snmptt.conf';
+#$snmpttconffile = 'd:\snmp\snmptt.conf';
+
+#OPTIONS END
+#
+##############################################################################
+
+#Debugging:  	0 = no output messages
+#		1 = output some basic messages
+#		2 = out all messages
+use constant DEBUGGING => 0;
+
+use Text::ParseWords;
+
+if ($enablesyslog == 1)
+{
+	require Sys::Syslog;
+}
+
+##############################################################################
+# Pull in passed SNMP info from snmptrapd via STDIN and place in the array @tempvar
+
+chomp($tempvar[0]=<>);	#hostname
+chomp($tempvar[1]=<>);	#ip address
+
+#Process varbinds
+#Separate everything out, keeping both the variable name and the value
+while (defined($line = <>))
+{
+	# use shellwords to divide the two space separated values
+	# without messing up quoted text and re-join using :: as the
+	# delimiter (Add a space to the end otherwise we loose lines 
+	# that contain just a 0)
+	$temp = join "::", shellwords($line)," ";                
+
+	# Chop off last two
+	chop ($temp);
+	chop ($temp);
+	chop ($temp); # Cut off that extra space from above
+
+	# Split using the new delimiter
+	@temp = split ("::",$temp);
+
+	# Add two strings to @tempvar
+	push(@tempvar, @temp);
+}
+
+if (DEBUGGING >= 2)
+{
+	# Print out all items passed from snmptrapd
+	for ($i=0;$i <= $#tempvar;$i++)
+	{
+		print "value $i: @tempvar[$i]\n\n";
+	}
+}
+
+# Copy what I need to new variables to make it easier to manipulate later
+
+# Standard variables
+@var[0] = @tempvar[0];		# hostname
+@var[1] = @tempvar[1];		# ip address
+@var[2] = @tempvar[3];		# uptime
+@var[3] = @tempvar[5];		# trapname / OID
+
+# Enterprise variables passed (remainder minus last three)
+$j=0;
+for ($i=7;$i <= $#tempvar-6;$i+=2)
+{
+	@entvar[$j] = @tempvar[$i];
+	$j++;
+}
+
+# Remaining standard variables
+# Note:  It is assumed that the last three var binds will be the ip address,
+# trap community string and enterprise.  The C source shows this is true for
+# SNMP v1 traps (which get converted to SNMP v2 traps), so I am currently 
+# assuming that REAL SNMP v2 traps also have this format
+
+@var[4] = @tempvar[$#tempvar-4];	# ip address from trap agent
+@var[5] = @tempvar[$#tempvar-2];	# trap community string
+@var[6] = @tempvar[$#tempvar];		# enterprise
+
+if (DEBUGGING >= 1)
+{
+	print "Trap received from @tempvar[0]: @tempvar[5]\n";
+}
+
+if (DEBUGGING >= 2)
+{
+	#print out all standard variables
+	for ($i=0;$i <= $#var;$i++)
+	{
+		print "Value $i: @var[$i]\n\n";
+	}
+	#print out all enterprise specific variables
+	for ($i=0;$i <= $#entvar;$i++)
+	{
+		print "Value $i: @entvar[$i]\n\n";
+	}
+}
+	
+# Variables of trap received by SNMPTRAPD:
+# 
+# @var[0]		hostname
+# @var[1] 		ip address
+# @var[2] 		uptime
+# @var[3] 		trapname / OID
+# @var[4] 		ip address from trap agent
+# @var[5] 		trap community string
+# @var[6] 		enterprise
+#
+# @entvar[0]		passed variable 1
+# @entvar[0]		passed variable 2
+# .
+# .
+# etc..
+#
+##############################################################################
+#
+# snmptt.conf loader.
+# This section loads the snmptt.conf which defines the traps and text strings
+# that will be used for variable substitution
+
+#Load entire snmptt.conf file into array @snmpttconf
+open SNMPTTCONF, $snmpttconffile
+	or die "Could not open snmptt.conf file ($!)";
+
+if (DEBUGGING >= 1)
+{
+	print "\nLoading @ARGV\n";
+}
+
+while (<SNMPTTCONF>)
+{
+	chomp;				#remove <cr> at end of line	
+	push(@snmpttconf, $_);		#add to each line to @trapconf array
+}
+
+if (DEBUGGING >= 1)
+{
+	print "Finished loading\n\n";
+}
+
+# Process each line of snmptt.conf loaded into @snmpttconf array.
+# Add each EVENT to %event hash
+
+if (DEBUGGING >= 1)
+{
+	print "\nProcessing file\n";
+}
+
+$currentline=0;
+
+while ($currentline <= $#snmpttconf)
+{
+	$line = @snmpttconf[$currentline];
+
+	if ($line =~ /^EVENT/)
+	{
+		#EVENT name .x.x.x.x "category" severity  (note: .x.x. is FULL OID!)
+		#0      1       2        3         4
+		
+		# use shellwords to divide the two space separated values
+		# without messing up quoted text and re-join using :: as the
+		# delimiter
+		#
+		# hash elements:
+		# 0: name of trap
+		# 1: category
+		# 2: severity
+		# 3: FORMAT string
+		# 4: EXEC string
+		# 5: NODES string
+		
+		# Divide up line taking into consideration strings in quotes
+		$temp = join "::", shellwords($line);                
+
+		#print "line is: $temp\n";
+
+		# Split line up into multiple elements of an array using the new delimiter
+		@temp = split ("::",$temp);
+				
+		# Clear out the FORMAT, EXEC and NODES lines in case they are not found.  Don't want old
+		# data in them..
+		$lineformat = '';
+		$lineexec = '';
+		$linenodes = '';
+
+		$currentline++; # Increment to the next line which should be a FORMAT, EXEC or NODES
+		$line2 = @snmpttconf[$currentline];
+		
+		while ( ($currentline <= $#snmpttconf) && !($line2 =~ /^EVENT/) )
+		{
+			# Keep going through the file until the next EVENT or the end of snmptt.conf
+			# is reached
+		
+			# Check to see if next line is a FORMAT line (it should be!)
+			if ($line2 =~ /^FORMAT/)
+			{
+				# It's a FORMAT line
+				
+				$lineformat = substr($line2,7);
+			}
+			elsif ($line2 =~ /^EXEC/)
+			{
+				# It's an EXEC line
+				
+				$lineexec = substr($line2,5);
+			}
+			elsif ($line2 =~ /^NODES/)
+			{
+				# It's a NODES line
+				
+				$linenodes = substr($line2,6);
+			}
+			$currentline++; # Increment to the next line
+			$line2 = @snmpttconf[$currentline]; # Get next line
+		}
+		if ($lineformat ne '')
+		{			
+			# At least the mandatory FORMAT line was defined, so we'll keep it
+			# Stuff all elements into a one hash
+			$event{@temp[2]} = [@temp[1],@temp[3],@temp[4],$lineformat,$lineexec,$linenodes];		
+		}
+
+		# Change currentline back so the next increment will re-evalutate the last line which
+		# would have been an EVENT (to get out of the WHILE loop above), or the end of the file
+		$currentline--;
+	}
+	$currentline++;		# Increment current line for next loop through snmpttconf array	
+}
+if (DEBUGGING >= 1)
+{
+	print "Finished processing file\n";
+}
+
+if (DEBUGGING >= 2)
+{
+	# Print out all the hashed events
+	foreach $key (sort keys %event)
+	{
+		print "hash: $key => $event{$key}[0],$event{$key}[1],$event{$key}[2],$event{$key}[3]\n";
+		#			
+	}
+}
+
+# Variables of trap received by SNMPTRAPD:
+# 
+# @var[0]		hostname
+# @var[1] 		ip address
+# @var[2] 		uptime
+# @var[3] 		trapname / OID
+# @var[4] 		ip address from trap agent
+# @var[5] 		trap community string
+# @var[6] 		enterprise
+#
+# @entvar[0]		passed variable 1
+# @entvar[0]		passed variable 2
+# .
+# .
+# etc..
+# 
+# $event hash for each trapped defined in snmptt.conf with following values:
+# 
+# 0: name of trap
+# 1: category
+# 2: severity
+# 3: FORMAT string
+# 4: EXEC string
+# 5: NODES string
+#
+# Example: 	To access FORMAT string for received trap:
+# 		$event{"@var[3]"}[3]
+
+###############################################################################
+# Check to see if received trap is defined in the snmptt.conf, and perform variable
+# substitution, logging etc if found
+
+# Look for matching OID
+
+$processed = 0;
+
+# Check for exact match
+if (exists $event{"@var[3]"})
+{
+	&processtrap;
+	$processed = 1;
+}
+
+# Check for wildcard match if not already processed
+if ($processed == 0)
+{
+	$receivedtrap = @var[3];
+	
+	$counter = 0;	# Drill down only 40 times.  Should never need this, but
+			# it's here to prevent an infinite loop in this while statement
+			# just in case
+	while ($counter <= 40 && $receivedtrap ne '')
+	{
+		# Remove last digit of recevied trap, add a * and look for match
+		$receivedtrap =~ s/(.*)\.\d+$/\1/;
+
+		if (DEBUGGING >= 2)
+		{
+			print "Drilling down looking for this wildcards in the snmptt.conf\n";
+			print $receivedtrap.".\*\n\n";
+		}
+		
+		if (exists $event{$receivedtrap.'.*'})
+		{
+			@var[3] = $receivedtrap.'.*';	# Set @var[3] to matching trap with wildcard
+			&processtrap;
+			$processed = 1;
+			last;	# found, so stop this while loop
+		}
+		$counter++;
+	}
+}
+
+# Log to unknowntraplog etc if no match was found
+if ($processed == 0)
+{
+	if (DEBUGGING >= 1)
+	{
+		print "\n\nTrap not defined.  Nothing to do...\n\n";
+	}
+	
+	if ($enableunknowntraplog == 1)
+	{
+		if (open LOGFILE, ">>$unknowntraplogfile")
+		{	
+			print LOGFILE scalar(localtime),": Unknown trap (@var[3]) received from @var[0] at: \n";
+			#print out all standard variables
+			for ($i=0;$i <= $#var;$i++)
+			{
+				print 	LOGFILE "Value $i: @var[$i]\n";
+			}
+			#print out all enterprise specific variables
+			for ($i=0;$i <= $#entvar;$i++)
+			{
+				print LOGFILE "Value $i: @entvar[$i]\n";
+			}
+			print LOGFILE "\n\n";
+			close LOGFILE;
+		}
+		else
+		{
+			warn "Cannot open logfile: $!";
+		}
+	}
+}
+
+sub processtrap
+{
+	# if no nodes list, then $hostmatch = 1 so trap is logged etc, otherwise it is not
+	$hostmatch = 0;
+	if ($event{"@var[3]"}[5] eq '')
+	{
+		$hostmatch = 1;		# No nodes defined, so default to all nodes
+	}
+	else
+	{
+		if ($event{"@var[3]"}[5] =~ /\\|\// )	# Contain a \ or /?  Must be a filename
+		{
+			if (open NODESFILE, $event{@var[3]}[5])
+			{
+				while (defined($line = <NODESFILE>))
+				{
+					chomp($line);
+					$line = $line;
+					push (@nodes, $line);
+				}
+				close LOGFILE;
+			}
+			else
+			{
+			warn "Cannot open NODES file: $!";
+			}
+			
+			#load file
+			#
+			#
+		}
+		else 	# Must be a list of nodes
+		{
+			@nodes = split /\s/, $event{"@var[3]"}[5];
+		}
+
+		foreach $a (@nodes)
+		{	
+			if (lc $a eq lc @var[0])	# lowercase compare	
+			{
+				$hostmatch = 1;
+			}
+		}
+	}
+
+	if ($hostmatch == 1 && $event{@var[3]}[1] ne "IGNORE")
+	{
+	
+		# Trap received exists in our list of trap definitions
+		if (DEBUGGING >= 1)
+		{
+			print "\n\nTrap defined, processing...\n\n";
+		}
+		# Variable substitution for FORMAT string
+		
+		$_ = $event{"@var[3]"}[3];	# FORMAT string
+	
+		&substitute;
+	
+		$message = "@var[3] $event{@var[3]}[2] \"$event{@var[3]}[1]\" @var[0] - $_\n";
+	
+		if ($enablestdout == 1)
+		{
+			print "$message";
+		}
+	
+		if ($enablelog == 1)
+		{
+			if (open LOGFILE, ">>$logfile")
+			{
+				print LOGFILE scalar(localtime)." $message";
+				close LOGFILE;
+			}
+			else
+			{
+				warn "Cannot open logfile: $!";
+			}
+		}
+
+		if ($enablesyslog == 1)
+		{
+			if (Sys::Syslog::openlog('TRAPD', '',$syslogfacility) )
+			{
+				Sys::Syslog::syslog ($sysloglevel, $message,1);
+				Sys::Syslog::closelog();
+			}
+			else
+			{
+				warn "Cannot open logfile: $!";
+			}
+		}
+		
+		#
+		# Variable substitution for EXEC string
+		#
+	
+		if ($event{"@var[3]"}[4] ne '' && $event{@var[3]}[1] ne "LOGONLY")
+		{
+			
+			$_ = $event{"@var[3]"}[4];	# FORMAT string
+		
+			&substitute;
+	
+			$page = $_;
+		
+			if ($enableexec == 1)
+			{
+				if (DEBUGGING >= 1)
+				{	
+					print "EXEC command:$page\n";
+				}
+				# Send page
+				system $page;
+			}
+		}
+		elsif (DEBUGGING >= 1)
+		{
+			if ($event{@var[3]}[1] eq "LOGONLY")
+			{
+				print "\n\nTrap set to LOGONLY...\n\n";
+			}
+		}
+	}
+	else
+	{
+		if (DEBUGGING >= 1)
+		{
+			if ($event{@var[3]}[1] eq "IGNORE")
+			{
+				print "\n\nTrap set to IGNORE...\n\n";
+			}
+			else
+			{
+				print "\n\nTrap defined, but host @var[0] does not match...\n\n";
+			}
+		}
+	}
+}
+
+sub substitute
+{
+	# Perform substitution on $_ variable
+
+	# $n - Variable-bindings
+	for($i=0;$i <= $#entvar+1; $i++)
+	{
+		s(\$$i)($entvar[$i-1])g;
+	}
+	
+	# $C - Trap community string
+	s(\$C)(@var[5])g;
+	
+	# $e - Trap as Object ID string of numbers
+	s(\$e)(@var[6])g;
+
+	# $E - Trap as Object ID string of numbers
+	s(\$E)(@var[6])g;
+	
+	# $A - Trap agent IP address
+	s(\$A)(@var[4])g;
+
+	# $S - Event name
+	s(\$S)($event{"@var[3]"}[0])g;
+	
+	# $# - Number of variable-bindings in the trap
+	s(\$#)($#entvar)g;
+
+	# $$ - Print a $
+	s(\$\$)(\$)g;
+
+	# $s - Severity
+	s(\$s)(@temp[4])g;
+
+	# $r - Hostname
+	s(\$r)(@var[0])g;
+	
+	# $x - Current time
+	$now = scalar(localtime);
+	s(\$r)($now)g;
+	
+	# $* - Expand all variable-bindings
+	s(\$\*)(@entvar)g;
+}

@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+#
+# SNMPTTCONVERT v0.1
+#
+# Copyright 2002 Alex Burger
+# alex_b@users.sourceforge.net
+# 
+# 4/11/2002
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+##############################################################################
+#
+# http://www.sourceforge.net/projects/snmptt
+#
+# Debugging:  	0 = no output messages
+#		1 = output some basic messages
+#		2 = out all messages
+use constant DEBUGGING => 0;
+
+# Set this to '' to have no default EXEC line added, or modify as needed.
+#$defaultexec = '';
+$defaultexec = '#EXEC qpage -f TRAP notifygroup1 "';
+
+if (DEBUGGING >= 1)
+{
+	print "\nLoading @ARGV\n";
+}
+
+while (<>)
+{
+	chomp;				#remove <cr> at end of line	
+	push(@trapdconf, $_);		#add to each line to @trapconf array
+}
+
+if (DEBUGGING >= 1)
+{
+	print "Finished loading\n\n";
+}
+
+$currentline=0;
+
+while ($currentline <= $#trapdconf)
+{
+	$line = @trapdconf[$currentline];
+	
+	# $_ = 'COMPAQ_11001 {.1.3.6.1.4.1.232} 6 11001 A "LOGONLY" 1';
+
+	if ( $line =~ /(\w+)\s+\{(.*)\}\s+(\d+)\s+(\d+)\s+([CAMcam-])\s+(".+").*/ )
+	{
+		if ($3 == 6)
+		{
+			$temp = "EVENT $1 $2.0.$4 $6 Normal";
+		}
+		else
+		{
+			$temp = "EVENT $1 $2.$4 $6 Normal";  # Not sure if this is correct
+		}
+		
+		print "#\n#\n#\n";
+		print "$temp\n";
+		
+		$currentline++; # Increment to the next line
+		$line3 = @trapdconf[$currentline];
+		# FORMAT line		
+		print "FORMAT $line3\n";
+		
+		if ($defaultexec ne '')
+		{
+			print $defaultexec.$line3,"\"\n";
+		}
+
+		$currentline++; # Increment to the next line
+		$line3 = @trapdconf[$currentline];
+		
+		while ( ($currentline <= $#trapdconf) && 
+			!($line3 =~ /(\w+)\s+\{(.*)\}\s+(\d+)\s+(\d+)\s+([CAMcam])\s+(".+").*/ ) )
+		{
+			# Keep going through the file until the next EVENT or the end of trapd.conf
+			# is reached
+		
+			# Check to see if next line is a FORMAT line (it should be!)
+			if ($line3 =~ /^SDESC/)
+			{
+				# It's a SDESC line
+				
+				print "SDESC\n";
+				
+				$currentline++; # Increment to the next line
+				$line4 = @trapdconf[$currentline];
+	
+				while (! ($line4 =~ /^EDESC/) )
+				{
+					print $line4,"\n";
+
+					$currentline++; # Increment to the next line
+					$line4 = @trapdconf[$currentline];
+				}
+				print "EDESC\n";
+			}
+			$currentline++; # Increment to the next line
+			$line3 = @trapdconf[$currentline];
+		}
+		$currentline--;
+	}
+	$currentline++; # Increment to the next line
+	$line2 = @trapdconf[$currentline]; # Get next line
+}	
