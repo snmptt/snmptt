@@ -1584,6 +1584,7 @@ sub loadsnmpttconf
 	@snmpttconf = ();
 	# @snmptt_conf_files = ();
 	undef %event;
+	undef %nodes_file_hash;		# NODES entries from NODES files
 	
 	foreach $snmpttconffile (@snmptt_conf_files)
 	{
@@ -3221,26 +3222,65 @@ sub process_nodes(nodes_list)
     # Contain a \ or /?  Must be a filename and not an IP address / network number
     if ( ($a =~ /\\|\//) && !($a =~ /\d+\.\d+\.\d+\.\d+/))
     {
-      if (open NODESFILE, $a)
-      {
-	while (defined($line = <NODESFILE>))
+      if ($dynamic_nodes == 1)		# Dynamic enabled, always load the file
+      {	
+	#print "!Dynamic enabled\n";
+	if (open NODESFILE, $a)
 	{
-	  chomp($line);
-	  # Allow comment lines starting with a #
-	  if (!($line =~ /((^#)|(\s+#)).*/))
+	  while (defined($line = <NODESFILE>))
 	  {
-	    my @temp2 = split /\s/, $line;
-	    foreach my $b (@temp2)
+	    chomp($line);
+	    # Allow comment lines starting with a #
+	    if (!($line =~ /((^#)|(\s+#)).*/))
 	    {
-	      push (@nodes2, $b);
+	      my @temp2 = split /\s/, $line;
+	      foreach my $b (@temp2)
+	      {
+		push (@nodes2, $b);
+	      }
 	    }
 	  }
+	  close LOGFILE;
 	}
-	close LOGFILE;
+	else
+	{
+	  warn "Can not open NODES file: $event2[5] $!";
+	}
       }
-      else
+      else				# Not dynamic, so check nodes_file_hash first before loading
       {
-	warn "Can not open NODES file: $event2[5] $!";
+	#print "!Dynamic NOT enabled\n";
+	if ($nodes_file_hash{$a})
+	{
+	  push(@nodes2, $nodes_file_hash{$a});
+	  #print " !Found in hash\n";
+	}
+	else
+	{
+	  #print " !Not found in hash\n";
+	  if (open NODESFILE, $a)
+	  {
+	    while (defined($line = <NODESFILE>))
+	    {
+	      chomp($line);
+	      # Allow comment lines starting with a #
+	      if (!($line =~ /((^#)|(\s+#)).*/))
+	      {
+		my @temp2 = split /\s/, $line;
+		foreach my $b (@temp2)
+		{
+		  push (@nodes2, $b);
+		}
+	      }
+	    }
+	    close LOGFILE;
+	    $nodes_file_hash{$a} = "@nodes2";
+	  }
+	  else
+	  {
+	    warn "Can not open NODES file: $event2[5] $!";
+	  }
+	}
       }
     }
     else 	# Must be a single node
