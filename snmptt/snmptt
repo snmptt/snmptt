@@ -565,6 +565,7 @@ sub processtrap
 	# 3: FORMAT string
 	# 4: EXEC string
 	# 5: NODES string
+	# 6: REGEX array
 	#
 	# Example: 	To access FORMAT string for received trap:
 	# 		$event{"$var[3]"}[3]
@@ -736,29 +737,12 @@ sub processtrap
 		
 			$message_short = $_;
 
-			# Do user defined REGEX on $message
-			
-			for (my $i=0; defined($event2[6][$i]); $i++)
-			{
-			  my $regex_temp = $event2[6][$i];
-
-			  #print "!!!!!!$regex_temp\n";
-			  # Remove starting and ending ()
-			  $regex_temp =~ /^\((.*)\)$/;
-			  $regex_temp = $1;
-			  
-			  my @regex_temp2 = split(/\)\(/,$regex_temp,2);
-			  #print "0:$regex_temp2[0]\n";
-			  #print "1:$regex_temp2[1]\n";
-
-			  $message_short =~ s($regex_temp2[0])($regex_temp2[1])g;
-			}
-
 			$message = "$receivedtrap $event2[2] \"$event2[1]\" $var[0] - $message_short\n";
 			
 			if ($stdout_enable == 1 || $DEBUGGING >= 1)
 			{
-				print "$message";
+				print "$message_short\n";
+				print "\n$message";
 			}
 
 			if ($log_enable == 1)
@@ -899,13 +883,22 @@ sub processtrap
 			if ($mysql_dbi_enable == 1 && defined ($dbh_mysql))
 			{
 				$trap_attempted_to_log++;	
+				
+				# Escape any quotes
+				my $message_short2 = $message_short;
+				$message_short2 =~ s(\')(\\\')g;   #'
+				$message_short2 =~ s(\")(\\\")g;   #"
 
+				my $community = $var[5];
+				$community =~ s(\')(\\\')g;   #'
+				$community =~ s(\")(\\\")g;   #"				
+				
 				unless (defined ($dbh_mysql->do(
 					"INSERT INTO $mysql_dbi_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap'\,\'$var[6]\',\'$var[5]\',\'$var[0]\',\'$var[4]\',
+					\'$event2[0]\',\'$receivedtrap'\,\'$var[6]\',\'$community\',\'$var[0]\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
-					\'$message_short\')" ) ) )
+					\'$message_short2\')" ) ) )
 					{
 					  warn "MySQL error: Unable to perform INSERT INTO: ".$dbh_mysql->errstr."\n";
 
@@ -930,12 +923,21 @@ sub processtrap
 			{
 				$trap_attempted_to_log++;	
 
+				# Escape any quotes
+				my $message_short2 = $message_short;
+				$message_short2 =~ s(\')(\\\')g;   #'
+				$message_short2 =~ s(\")(\\\")g;   #"
+
+				my $community = $var[5];
+				$community =~ s(\')(\\\')g;   #'
+				$community =~ s(\")(\\\")g;   #"
+				
 				unless (defined ($dbh_postgresql->do(
 					"INSERT INTO $postgresql_dbi_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap'\,\'$var[6]\',\'$var[5]\',\'$var[0]\',\'$var[4]\',
+					\'$event2[0]\',\'$receivedtrap'\,\'$var[6]\',\'$community\',\'$var[0]\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
-					\'$message_short\')" ) ) )
+					\'$message_short2\')" ) ) )
 					{
 					  warn "Postgres error: Unable to perform INSERT INTO: ".$dbh_postgresql->errstr."\n";
 
@@ -955,18 +957,26 @@ sub processtrap
 				   $trap_successfully_logged++;
 				 }
 			}
-
 			
 			if ($dbd_odbc_enable == 1 && defined ($dbh_odbc))
 			{
-				$trap_attempted_to_log++;	
+				$trap_attempted_to_log++;
+
+				# Escape any quotes
+				my $message_short2 = $message_short;
+				$message_short2 =~ s(\')(\\\')g;   #'
+				$message_short2 =~ s(\")(\\\")g;   #"
+
+				my $community = $var[5];
+				$community =~ s(\')(\\\')g;   #'
+				$community =~ s(\")(\\\")g;   #"
 				
 				unless (defined ($dbh_odbc->do(
 					"INSERT INTO $dbd_odbc_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap'\,\'$var[6]\',\'$var[5]\',\'$var[0]\',\'$var[4]\',
+					\'$event2[0]\',\'$receivedtrap'\,\'$var[6]\',\'$community\',\'$var[0]\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
-					\'$message_short\')" ) ) )
+					\'$message_short2\')" ) ) )
 					{
 					  warn "DBI DBD::ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr."\n";
 
@@ -991,14 +1001,23 @@ sub processtrap
 			if ($sql_win32_odbc_enable == 1 && defined ($dbh_win32_odbc) )
 			{
 				$trap_attempted_to_log++;	
+
+				# Escape any quotes
+				my $message_short2 = $message_short;
+				$message_short2 =~ s(\')(\\\')g;   #'
+				$message_short2 =~ s(\")(\\\")g;   #"
+
+				my $community = $var[5];
+				$community =~ s(\')(\\\')g;   #'
+				$community =~ s(\")(\\\")g;   #"
 				
 				# if defined, there's an error
 				if (defined ($dbh_win32_odbc->Sql
 				        ("INSERT INTO $sql_win32_odbc_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap'\,\'$var[6]\',\'$var[5]\',\'$var[0]\',\'$var[4]\',
+					\'$event2[0]\',\'$receivedtrap'\,\'$var[6]\',\'$community\',\'$var[0]\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
-					\'$message_short\')" ) ) )
+					\'$message_short2\')" ) ) )
 				{					
 				  warn "Unable to perform INSERT INTO: ".Win32::ODBC::Error()."\n";
 				  
@@ -1338,6 +1357,37 @@ sub substitute
     # $G - Generic trap number - 0
     s(\$G)(0)g;	  
   }	
+  
+  # Do user defined REGEX on $message
+  
+  if ($DEBUGGING >= 2 && defined($event2[6][0]))
+  {
+    print "\n$_\n";
+  }
+  
+  for (my $i=0; defined($event2[6][$i]); $i++)
+  {
+    my $regex_temp = $event2[6][$i];
+    
+    #print "!!!!!!$regex_temp\n";
+    # Remove starting and ending ()
+    $regex_temp =~ /^\((.*)\)$/;
+    $regex_temp = $1;
+    
+    # Split using )(
+    my @regex_temp2 = split(/\)\(/,$regex_temp,2);
+    #print "0:$regex_temp2[0]\n";
+    #print "1:$regex_temp2[1]\n";
+    			  
+    if ($regex_temp2[0] ne '')
+    {
+      if ($DEBUGGING >= 2)
+      {
+	print "  Doing REGEX: s($regex_temp2[0])($regex_temp2[1])g\n";
+      }
+      s($regex_temp2[0])($regex_temp2[1])g;
+    }
+  }
 }
 
 sub loadsnmpttconf
@@ -1497,12 +1547,16 @@ sub loadsnmpttconf
 					# It's a REGEX line
 					
 					$lineregex = substr($line2,6);
+
 					# Remove spaces before and after
-					
 					$lineregex =~ /^\s*(.*?)\s*$/;
 					$lineregex = $1;
 
-					push (@regex,$lineregex);
+					# Make sure it looks like ()() before accepting
+					if ($lineregex =~ /\(.*?\)\(.*?\)/ )
+					{
+					  push (@regex,$lineregex);
+					}
 				}
 				$currentline++; # Increment to the next line
 				$line2 = $snmpttconf[$currentline]; # Get next line
@@ -1583,6 +1637,7 @@ sub readtrap
 	if ( $daemon == 1)
 	{
 	  chomp($trap_date_time_epoch = (<$input>));	# Pull time trap was spooled
+	  $trap_date_time_epoch =~ s(`)(')g;	#` Replace any back quotes with regular quotes
 	}
 	else
 	{
@@ -1603,7 +1658,10 @@ sub readtrap
 	}
 	
 	chomp($tempvar[0]=<$input>);	# hostname
+	$tempvar[0] =~ s(`)(')g;	#` Replace any back quotes with regular quotes
+	
 	chomp($tempvar[1]=<$input>);	# ip address
+	$tempvar[1] =~ s(`)(')g;	#` Replace any back quotes with regular quotes
 	
 	# Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
 	# out just the IP address
@@ -1615,6 +1673,7 @@ sub readtrap
 	$linenum = 1;
 	while (defined($line = <$input>))
 	{
+	  $line =~ s(`)(')g;	#` Replace any back quotes with regular quotes
 	  my $temp1;
 	  my $temp2;
 
@@ -1861,6 +1920,7 @@ sub searchfortrap
 	# 3: FORMAT string
 	# 4: EXEC string
 	# 5: NODES string
+	# 6: REGEX array
 	#
 	# Example: 	To access FORMAT string for received trap:
 	# 		$event{"$var[3]"}[3]

@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.6.1</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; April 1st, 2003
+This file was last updated on:&nbsp; April 3rd, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -174,6 +174,14 @@ translation of integer values (<span style="font-weight: bold;">translate_intege
 <a name="Whats-New"></a><b><font size="+2">What's New</font></b> </p>
 <p><b><font size="+1">0.7 - ??</font></b><b><font size="+1">, 2003</font></b></p>
 <ul>
+  <li>Added REGEX keyword support to allow user definable search and
+replace on FORMAT / EXEC lines<br>
+  </li>
+  <li>Fixed bug that prevented quoted text from being logged correctly
+to SQL databases</li>
+  <li>Back ticks (`) in recived trap is now replaced with forward ticks
+(')<br>
+  </li>
   <li> Added ability to translate OID values to text as defined in the
 MIB files.&nbsp; This feature requires the UCD-SNMP / NET-SNMP Perl
 module</li>
@@ -785,7 +793,10 @@ The syntax of the snmptt.conf file&nbsp; is:
 <blockquote><b>EVENT</b> event_name event_OID "category" severity
   <p><b>FORMAT</b> format_string </p>
   <p>[<b>EXEC</b> command_string] </p>
-  <p>[<b>NODES</b> sources_list] </p>
+  <p>[<b>NODES</b> sources_list]<br>
+  </p>
+  <p>[<b style="font-weight: bold;">REGEX</b><span
+ style="font-weight: bold;"> (&nbsp;&nbsp;&nbsp; )(&nbsp; &nbsp; )</span>] </p>
   <p>[<b>SDESC</b>] <br>
 [<b>EDESC</b>] </p>
   <p>Note: Lines starting with a # will be ignored. </p>
@@ -968,7 +979,6 @@ accepted. </p>
 path.&nbsp; The file is loaded each time a trap is processed, so it can
 be modified without restarting SNMPTT.<br>
     </p>
-    <p></p>
 Examples:
     <blockquote>NODES fred barney betty wilma <br>
 &nbsp; or<br>
@@ -1025,7 +1035,64 @@ doing a DNS query of the host name.<br>
       </p>
     </blockquote>
   </blockquote>
-  <b>SDESC</b>
+  <b>REGEX:</b> <br>
+  <div style="margin-left: 40px;"><br>
+[<b style="font-weight: bold;">REGEX</b><span style="font-weight: bold;">
+(&nbsp;&nbsp;&nbsp; )(&nbsp;&nbsp;&nbsp; )</span>] </div>
+  <p style="margin-left: 40px;">Optional regular expression to perform
+a global search and replace on the translated FORMAT / EXEC line.&nbsp;
+Multiple REGEX (&nbsp;&nbsp;&nbsp; )(&nbsp;&nbsp;&nbsp; ) lines are
+permitted.<br>
+  </p>
+  <p style="margin-left: 40px;">First (&nbsp;&nbsp;&nbsp; ) contains
+the search expression.<br>
+Second (&nbsp;&nbsp;&nbsp; ) contains the replacement text<br>
+  </p>
+  <p style="margin-left: 40px;">Example:<br>
+  </p>
+  <div style="margin-left: 80px;">FORMAT line before:&nbsp; <span
+ style="font-weight: bold;">UPS has&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+detected a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; building
+alarm.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cause: UPS1 Alarm #14:
+Building alarm 3.</span><br>
+  <br>
+  <span style="font-weight: bold;">REGEX (Building alarm 3)(Computer
+room high temperature)<br>
+  </span><span style="font-weight: bold;">REGEX (Building alarm
+4)(Moisture detection alarm)</span><br style="font-weight: bold;">
+  <span style="font-weight: bold;">REGEX (room)(ROOM)</span><br
+ style="font-weight: bold;">
+  <span style="font-weight: bold;">REGEX (UPS)(The big UPS)<br>
+REGEX (\s+)( )<br>
+  </span><br>
+FORMAT line after:&nbsp; <span style="font-weight: bold;">The big UPS
+has detected a building alarm. Cause: UPS1 Alarm #14: Computer ROOM
+high temperature</span><br>
+  </div>
+  <p style="margin-left: 40px;">Each REGEX line is processed in order
+from top to bottom.<br>
+  </p>
+  <p style="margin-left: 40px;">To use parentheses ( or ) in the search
+expression, they must be backslashed (\).&nbsp; The replacement text
+does not need to be backslashed.<br>
+  </p>
+  <p style="margin-left: 40px;">Example:<br>
+  </p>
+  <div style="margin-left: 80px;">FORMAT line before:&nbsp; <span
+ style="font-weight: bold;">Alarm (1) and (2) has been triggerd</span><br>
+  <br>
+  <span style="font-weight: bold;">REGEX (\(1\))(One)</span><br
+ style="font-weight: bold;">
+  <span style="font-weight: bold;">REGEX (\(2\))((Two))</span><br
+ style="font-weight: bold;">
+  <span style="font-weight: bold;"></span><br>
+FORMAT line after:&nbsp; <span style="font-weight: bold;">Alarm One
+and (Two) has been triggerd</span></div>
+</blockquote>
+<div style="margin-left: 80px;">Note:&nbsp; Memory parentheses are
+currently not supported and searches are case sensitive.<br>
+</div>
+<blockquote><b>SDESC</b>
   <blockquote>[<b>SDESC</b>]
     <p>Optional start of a description.&nbsp; All text between this
 line and the line EDESC will be ignored by snmptt. This section can be
