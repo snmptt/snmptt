@@ -1509,7 +1509,7 @@ sub substitute
   s(\$@)($trap_date_time_epoch)g;
   
   # iso(1) org(3) dod(6) internet(1) snmpV2(6) snmpModules(3) snmpMIB(1) snmpMIBObjects(1) 5
-  # SNMPv2 Generic?  1=coldStart....5=authenticationFailure, 6=enterprise?
+  # SNMPv2 Generic?  1=coldStart....5=authenticationFailure, 6=egpNeighborLoss so 0=enterprise?
   if ($receivedtrap =~ /^.1.3.6.1.6.3.1.1.5/)
   {
     # It's a generic trap
