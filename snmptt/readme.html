@@ -166,6 +166,12 @@ tags in MIB files.</blockquote>
 <p><b><font size=+1>0.6 - ???, 2003</font></b>
 <ul>
 <li>
+Added <b>keep_unlogged_traps</b> variable to prevent SNMPTT from deleting
+the spooled trap file if NONE of defined logging systems successfully logged
+the trap when in daemon mode.&nbsp; SNMPTT will continuously try to log
+the trap until it succeeds with at least one log file.</li>
+
+<li>
 Added support for logging of traps using DBD::ODBC</li>
 
 <li>
@@ -321,8 +327,8 @@ Replace <b>SNMPTTHANDLER, SNMPTT</b> and <b>SNMPTTCONVERTMIB</b> with the
 new versions contained in the v0.6 package</li>
 
 <li>
-Backup your snmptt.ini file, replace it with the new version, and make
-any necessary configuration changes to it</li>
+Backup your <b>snmptt.ini </b>file, replace it with the new version, and
+make any necessary configuration changes to it</li>
 </ol>
 <b><font size=+1>v0.4 to v0.5</font></b>
 <p>To upgrade from v0.1, v0.2 to v0.3 to v0.4, you should:
@@ -336,8 +342,8 @@ Replace <b><u>both</u></b> <b>SNMPTTHANDLER</b> and <b>SNMPTT</b> with
 the new versions contained in the v0.5 package</li>
 
 <li>
-Backup your snmptt.ini file, replace it with the new version, and make
-any necessary configuration changes to it</li>
+Backup your <b>snmptt.ini</b> file, replace it with the new version, and
+make any necessary configuration changes to it</li>
 </ol>
 <b><font size=+1>v0.1, v0.2 or v0.3 to v0.4</font></b>
 <p>To upgrade from v0.1, v0.2 to v0.3 to v0.4, you should:

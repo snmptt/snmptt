@@ -1,4 +1,7 @@
 February 24th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added keep_unlogged_traps variable to prevent SNMPTT from deleting the
+  spooled trap file if NONE of defined logging systems successfully logged 
+  the trap
 - Added support for logging of traps using DBD::ODBC
 - Cleaned up MySQL code
 - Fixed bug with Win32::ODBC connection not being closed on exit of 

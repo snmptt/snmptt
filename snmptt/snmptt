@@ -171,7 +171,7 @@ if ($syslog_enable == 1 || $syslog_system_enable == 1)
 	require Sys::Syslog;
 }
 
-if ($eventlog_system_enable == 1)
+if ($eventlog_system_enable == 1 || $eventlog_enable == 1)
 {
 	require Win32::EventLog;
 	
@@ -364,72 +364,76 @@ if ($daemon == 1)
 		}
 		else
 		{
-			closedir(DIR);
+		  closedir(DIR);
+		  
+		  @filenames = sort (@filenames);		# Sort list of filenames to ensure they
+		  						#are processed in the order they were
+		  						# received
+		  
+		  foreach my $file (@filenames)
+		  {
+		    next if ($file eq ".");
+		    next if ($file eq "..");
+		    
+		    if ($DEBUGGING >= 1)
+		    {
+		      print "Processing file: $file\n";
+		    }
+		    
+		    $filesuccess = 1;
+		    unless (open FILE, $spool_directory.$file)
+		    {
+		      if ($DEBUGGING >= 1)
+		      {
+			print "Could not open trap file $spool_directory$file: ($!)\n";
+		      }
+		      warn "Could not open trap file $spool_directory$file: ($!)\n";
+		      
+		      if ($syslog_system_enable == 1)
+		      {
+			syslog_system("Could not open trap file $spool_directory$file");
+		      }
+		      if ($eventlog_system_enable == 1)
+		      {
+			eventlog_system("Could not open trap file $spool_directory$file",6,$eventlog_error);
+		      }
+		      
+		      $filesuccess = 0;
+		    }
+		    
+		    $input = 'FILE';
+		    		
+		    &readtrap;			# Read trap from STDIN or file
+		    
+		    &searchfortrap;		# Search for trap snmptt.conf (array)
+		    
+		    close FILE;
+		    
+		    if ($filesuccess == 1)
+		    {
+		      if ($keep_unlogged_traps == 0 || $trap_successfully_logged == 1)
+		      {
+			unless (unlink($file))
 			
-			@filenames = sort (@filenames);		# Sort list of filenames to ensure they
-								# are processed in the order they were
-								# received
-			
-			foreach my $file (@filenames)
 			{
-				next if ($file eq ".");
-				next if ($file eq "..");
-			
-				if ($DEBUGGING >= 1)
-				{
-					print "Processing file: $file\n";
-				}
-			
-				$filesuccess = 1;
-				unless (open FILE, $spool_directory.$file)
-				{
-					if ($DEBUGGING >= 1)
-					{
-						print "Could not open trap file $spool_directory$file: ($!)\n";
-					}
-					warn "Could not open trap file $spool_directory$file: ($!)\n";
-
-					if ($syslog_system_enable == 1)
-					{
-					  syslog_system("Could not open trap file $spool_directory$file");
-					}
-					if ($eventlog_system_enable == 1)
-					{
-					  eventlog_system("Could not open trap file $spool_directory$file",6,$eventlog_error);
-					}
-
-					$filesuccess = 0;
-				}
-						
-				$input = 'FILE';
-		
-				&readtrap;		# Read trap from STDIN or file
-		
-				&searchfortrap;		# Search for trap snmptt.conf (array)
-	
-				close FILE;
-	
-				if ($filesuccess == 1)
-				{
-					unless (unlink($file))
-					{
-						if ($DEBUGGING >= 1)
-						{
-							print "Unable to delete trap file $file from spool dir:$!\n";
-						}
-						warn "Unable to delete trap file $file from spool dir:$!\n";
-						
-						if ($syslog_system_enable == 1)
-						{
-						  syslog_system("Unable to delete trap file $file from spool dir");
-						}
-						if ($eventlog_system_enable == 1)
-						{
-						  eventlog_system("Unable to delete trap file $file from spool dir",7,$eventlog_error);
-						}
-					}
-				}
+			  if ($DEBUGGING >= 1)
+			  {
+			    print "Unable to delete trap file $file from spool dir:$!\n";
+			  }
+			  warn "Unable to delete trap file $file from spool dir:$!\n";
+			  
+			  if ($syslog_system_enable == 1)
+			  {
+			    syslog_system("Unable to delete trap file $file from spool dir");
+			  }
+			  if ($eventlog_system_enable == 1)
+			  {
+			    eventlog_system("Unable to delete trap file $file from spool dir",7,$eventlog_error);
+			  }
 			}
+		      }
+		    }
+		  }
 		}
 		if ($DEBUGGING >= 1)
 		{
@@ -689,13 +693,15 @@ sub processtrap
 			{
 				print "$message";
 			}
-		
+
+			$trap_successfully_logged = 0;
 			if ($log_enable == 1)
 			{
 				if (open LOGFILE, ">>$log_file")
 				{
 					print LOGFILE $trap_date_time." $message";
 					close LOGFILE;
+					$trap_successfully_logged = 1;
 				}
 				else
 				{
@@ -719,6 +725,7 @@ sub processtrap
 				{
 					Sys::Syslog::syslog ($syslog_level, $message,1);
 					Sys::Syslog::closelog();
+					$trap_successfully_logged = 1;
 				}
 				else
 				{
@@ -730,15 +737,24 @@ sub processtrap
 			{
 			  if ($eventlog_type =~ /INFORMATION/s)
 			  {
-			    eventlog_system($message,2,$eventlog_information);
+			    if (eventlog_system($message,2,$eventlog_information) == 0)
+			    {
+			      $trap_successfully_logged = 1;
+			    }
 			  }
 			  elsif ($eventlog_type =~ /ERROR/s)
 			  {
-			    eventlog_system($message,2,$eventlog_error);
+			    if (eventlog_system($message,2,$eventlog_error) == 0)
+			    {
+			      $trap_successfully_logged = 1;
+			    }
 			  }
 			  else
 			  {
-			    eventlog_system($message,2,$eventlog_warning);
+			    if (eventlog_system($message,2,$eventlog_warning) == 0)
+			    {
+			      $trap_successfully_logged = 1;
+			    }
 			  }
 			}
 
@@ -765,6 +781,10 @@ sub processtrap
 					    eventlog_system("MySQL error: Unable to perform INSERT INTO: ".$dbh_mysql->errstr,
 					    		15,$eventlog_error);
 					  }
+				 }
+				 else
+				 {
+				   $trap_successfully_logged = 1;
 				 }
 			}
 			
@@ -793,6 +813,10 @@ sub processtrap
 					  }
 
 					}
+					else
+					{
+					  $trap_successfully_logged = 1;
+					}
 			}				 
 			
 			if ($sql_win32_odbc_enable == 1 && defined ($dbh_win32_odbc) )
@@ -814,6 +838,10 @@ sub processtrap
 				    eventlog_system("SQL error: Unable to perform INSERT INTO: ".Win32::ODBC::Error(),
 				    17,$eventlog_error);
 				  }
+				}
+				else
+				{
+				  $trap_successfully_logged = 1;
 				}
 			}				 
 
@@ -1679,6 +1707,7 @@ sub loadsnmpttini {
 	$spool_directory = $cfg->val('DaemonMode', 'spool_directory');
 	$sleep = $cfg->val('DaemonMode', 'sleep');
 	$use_trap_time = $cfg->val('DaemonMode', 'use_trap_time');
+	$keep_unlogged_traps = $cfg->val('DaemonMode', 'keep_unlogged_traps');	
 	
 	# Logging
 	$stdout_enable = $cfg->val('Logging', 'stdout_enable');
@@ -1737,10 +1766,11 @@ sub loadsnmpttini {
 	if (! defined ($multiple_event)) { $multiple_event = 0} ;
 	if (! defined ($strip_domain)) { $strip_domain = 0} ;
 	if (! defined ($translate_integers)) { $translate_integers = 0} ;
-	if (! defined ($use_trap_time)) { $use_trap_time = 1} ;
 	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($spool_directory)) { $spool_directory = ''} ;
 	if (! defined ($sleep)) { $sleep = 5} ;
+	if (! defined ($use_trap_time)) { $use_trap_time = 1} ;
+	if (! defined ($keep_unlogged_traps)) { $keep_unlogged_traps = 1} ;
 	if (! defined ($stdout_enable)) { $stdout_enable = 0} ;
 	if (! defined ($log_enable)) { $log_enable = 1} ;
 	if (! defined ($log_file)) { $log_file = ''} ;
@@ -1817,6 +1847,8 @@ sub eventlog_system {
   my $message = @_[0];
   my $eventid = @_[1];
   my $type = @_[2];
+  my $trap_log = @_[3];		# Should be 1 if this is a trap log.  Used
+  				# to set $trap_successfully_logged variable below.
 
   my %event_entry = ('Source' => "SNMPTT",
   		     'EventType' => $type,
@@ -1826,13 +1858,19 @@ sub eventlog_system {
   
   if (my $eventlog=Win32::EventLog->new('Application') )
   {
-    $eventlog->Report(\%event_entry)
-      or warn "Can not create event log entry: $!";
+    unless ($eventlog->Report(\%event_entry) )
+    {
+      warn "Can not create event log entry: $!";
+      $eventlog->Close();
+      return 1;
+    }
     $eventlog->Close();
+    return 0;
   }
   else
   {
     warn "Can not open log_file: $!";
+    return 1;
   }
 }  
   

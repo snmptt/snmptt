@@ -67,6 +67,11 @@ sleep = 5
 # result in the time being off by the number of seconds used for 'sleep'
 use_trap_time = 1
 
+# Set to 1 to prevent SNMPTT from deleting the spooled trap file if NONE of defined
+# logging systems successfully logged the trap.  SNMPTT will continuously try to log
+# the trap until it succeeds with at least one log file.
+keep_unlogged_traps = 1
+
 [Logging]
 # Set to 1 to enable messages to be sent to standard output, or 0 to disable.
 # Would normally be disabled unless you are piping this program to another
@@ -103,12 +108,6 @@ eventlog_type = 'WARNING'
 # All errors will be recorded to the Application log.  The event type used
 # will depend on the severity of the problem and is hard coded into SNMPTT.
 eventlog_system_enable = 0
-
-[Exec]
-
-# Set to 1 to allow EXEC statements to execute.  Should normally be left on unless you
-# want to temporarily disable all EXEC commands
-exec_enable = 1
 
 [SQL]
 # MySQL: Set to 1 to enable logging to a MySQL database via DBI (Linux / Windows)
@@ -158,6 +157,12 @@ sql_win32_odbc_username = snmptt
 
 # WinODBC:: Password to use
 sql_win32_odbc_password = password
+
+[Exec]
+
+# Set to 1 to allow EXEC statements to execute.  Should normally be left on unless you
+# want to temporarily disable all EXEC commands
+exec_enable = 1
 
 [Debugging]
 # 0 - do not output messages
