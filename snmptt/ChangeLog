@@ -1,4 +1,8 @@
 August 29th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- You can now have multiple definitions of the same trap.  Giving
+  each entry a different NODES list will allow you to define
+  actions for a particular trap based on the node.
+  Thanks to Ingo Flaschberger.
 - NODES file / list now accepts both IP addresses and host 
   names.  Thanks to Ingo Flaschberger.
 - Lines starting with # in NODES file treated as comment.

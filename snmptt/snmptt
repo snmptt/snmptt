@@ -93,6 +93,13 @@ $sysloglevel = 'warning';
 # want to temporarily disable all EXEC commands
 $enableexec = 1;
 
+# Set to 1 to allow multiple trap definitions to be executed for the same trap.
+# Set to 0 to have it stop after the first match.
+# Note: Wildcard matches are only matched if there are NO exact matches.  This includes
+# 	exact matches based on the NODES list (eg: Exact trap match, but NODE list used
+# 	and host does not match.  Wildcard entry could still match).
+$multiple_event = 1;
+
 # Location of the snmptt.conf (this is NOT the snmptrapd.conf file).  The COMPLETE path 
 # and filename.  Ex: '/etc/snmp/snmptt.conf'
 $snmpttconffile = '/etc/snmp/snmptt.conf';
@@ -290,153 +297,238 @@ exit();
 
 sub processtrap
 {
+	# Variables of trap received by SNMPTRAPD:
+	# 
+	# @var[0]		hostname
+	# @var[1] 		ip address
+	# @var[2] 		uptime
+	# @var[3] 		trapname / OID
+	# @var[4] 		ip address from trap agent
+	# @var[5] 		trap community string
+	# @var[6] 		enterprise
+	#
+	# @entvar[0]		passed variable 1
+	# @entvar[0]		passed variable 2
+	# .
+	# .
+	# etc..
+	# 
+	# $event hash for each trapped defined in snmptt.conf with following values:
+	# 
+	# 0: name of trap
+	# 1: category
+	# 2: severity
+	# 3: FORMAT string
+	# 4: EXEC string
+	# 5: NODES string
+	#
+	# Example: 	To access FORMAT string for received trap:
+	# 		$event{"@var[3]"}[3]
+	#
+	#		or
+	# 		
+	# 		$event{"$receivedtrap"}[3]	
+	###############################################################################
 	# if no nodes list, then $hostmatch = 1 so trap is logged etc, otherwise it is not
-	$hostmatch = 0;
-	if ($event{"$receivedtrap"}[5] eq '')
+
+	$l = 1;	# Start with first event entry
+
+	$multiple_event_passes = 0;	# Below, if =1, then abort because we already found a match for
+					# this trap.  This would only happen if you have a trap
+					# defined multiple times in the config file to allow 
+					# different machines to have different actions based on 
+					# the node name.
+	
+	while (defined($event{$receivedtrap}[$l+1]))
 	{
-		$hostmatch = 1;		# No nodes defined, so default to all nodes
-	}
-	else
-	{
-		if ($event{"$receivedtrap"}[5] =~ /\\|\// )	# Contain a \ or /?  Must be a filename
+		if ($DEBUGGING >= 1)
 		{
-			if (open NODESFILE, $event{$receivedtrap}[5])
+			print  "Working with event entry: $receivedtrap => $event{$receivedtrap}[0+$l],$event{$receivedtrap}[1+$l],$event{$receivedtrap}[2+$l],$event{$receivedtrap}[5+$l]\n";
+		}
+		
+		$hostmatch = 0;
+	
+		# $event is the hash of events defined in the config file
+		# $event2 is a copy of the matching event
+	
+	
+		#	$event2[0]=$event{"$receivedtrap"}[0];	# 0: name of trap	
+		#	$event2[1]=$event{"$receivedtrap"}[1];	# 1: category
+		#	$event2[2]=$event{"$receivedtrap"}[2];	# 2: severity
+		#	$event2[3]=$event{"$receivedtrap"}[3];	# 3: FORMAT string
+		#	$event2[4]=$event{"$receivedtrap"}[4];	# 4: EXEC string
+		#	$event2[5]=$event{"$receivedtrap"}[5];	# 5: NODES string
+		
+		$event2[0]=$event{"$receivedtrap"}[0+$l];	# 0: name of trap	
+		$event2[1]=$event{"$receivedtrap"}[1+$l];	# 1: category
+		$event2[2]=$event{"$receivedtrap"}[2+$l];	# 2: severity
+		$event2[3]=$event{"$receivedtrap"}[3+$l];	# 3: FORMAT string
+		$event2[4]=$event{"$receivedtrap"}[4+$l];	# 4: EXEC string
+		$event2[5]=$event{"$receivedtrap"}[5+$l];	# 5: NODES string
+	
+		$l+=7;
+			
+		if ($event2[5] eq '')
+		{
+			$hostmatch = 1;		# No nodes defined, so default to all nodes
+			$multiple_event_passes++;
+			$processed = 1;
+		}
+		else
+		{
+			if ($event2[5] =~ /\\|\// )	# Contain a \ or /?  Must be a filename
 			{
-				while (defined($line = <NODESFILE>))
+				if (open NODESFILE, $event2[5])
 				{
-					chomp($line);
-					$line = $line;
-					
-					# Allow comment lines starting with a #
-					if (!($temp =~ /((^#)|(\s+#)).*/))
+					while (defined($line = <NODESFILE>))
 					{
-						push (@nodes, $line);
+						chomp($line);
+						$line = $line;
+						
+						# Allow comment lines starting with a #
+						if (!($temp =~ /((^#)|(\s+#)).*/))
+						{
+							push (@nodes, $line);
+						}
+					}
+					close LOGFILE;
+				}
+				else
+				{
+				warn "Cannot open NODES file: $!";
+				}
+				
+				#load file
+				#
+				#
+			}
+			else 	# Must be a list of nodes
+			{
+				@nodes = split /\s/, $event2[5];
+			}
+	
+			foreach $a (@nodes)
+			{	
+				if ($a =~ /(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IP address
+				{
+					if ( $a eq @var[1])     # compare against ip
+					{
+						$hostmatch = 1;
+						$multiple_event_passes++;
+						$processed = 1;
 					}
 				}
-				close LOGFILE;
-			}
-			else
-			{
-			warn "Cannot open NODES file: $!";
-			}
-			
-			#load file
-			#
-			#
-		}
-		else 	# Must be a list of nodes
-		{
-			@nodes = split /\s/, $event{"$receivedtrap"}[5];
-		}
-
-		foreach $a (@nodes)
-		{	
-			if ($a =~ /(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IP address
-			{
-				if ( $a eq @var[1])     # compare against ip
+	                        elsif (lc $a eq lc @var[0])	# NODES entry is a host name.  Do lowercase compare	
 				{
 					$hostmatch = 1;
+					$multiple_event_passes++;
+					$processed = 1;
 				}
 			}
-                        elsif (lc $a eq lc @var[0])	# NODES entry is a host name.  Do lowercase compare	
-			{
-				$hostmatch = 1;
-			}
-		}
-	}
-
-	if ($hostmatch == 1 && $event{$receivedtrap}[1] ne "IGNORE")
-	{
-	
-		# Trap received exists in our list of trap definitions
-		if ($DEBUGGING >= 1)
-		{
-			print "\nTrap defined, processing...\n\n";
-		}
-		# Variable substitution for FORMAT string
-		
-		$_ = $event{"$receivedtrap"}[3];	# FORMAT string
-	
-		&substitute;
-	
-		$message = "$receivedtrap $event{$receivedtrap}[2] \"$event{$receivedtrap}[1]\" @var[0] - $_\n";
-	
-		if ($enablestdout == 1)
-		{
-			print "$message";
 		}
 	
-		if ($enablelog == 1)
+		if ($hostmatch == 1 && $event2[1] ne "IGNORE")
 		{
-			if (open LOGFILE, ">>$logfile")
+			#print "multiple_event_passes is $multiple_event_passes\n";
+			#print "multiple_event is $multiple_event\n";
+			if (($multiple_event == 0) && ($multiple_event_passes > 1))
 			{
-				print LOGFILE scalar(localtime)." $message";
-				close LOGFILE;
+				last;	# Don't look any further - stop
+				print "stop!!\n";
 			}
-			else
-			{
-				warn "Cannot open logfile: $!";
-			}
-		}
-
-		if ($enablesyslog == 1)
-		{
-			if (Sys::Syslog::openlog('TRAPD', '',$syslogfacility) )
-			{
-				Sys::Syslog::syslog ($sysloglevel, $message,1);
-				Sys::Syslog::closelog();
-			}
-			else
-			{
-				warn "Cannot open logfile: $!";
-			}
-		}
-		
-		#
-		# Variable substitution for EXEC string
-		#
-	
-		if ($event{"$receivedtrap"}[4] ne '' && $event{$receivedtrap}[1] ne "LOGONLY")
-		{
 			
-			$_ = $event{"$receivedtrap"}[4];	# EXEC string
+			
+			# Trap received exists in our list of trap definitions
+			if ($DEBUGGING >= 1)
+			{
+				print "\nTrap defined, processing...\n\n";
+			}
+			# Variable substitution for FORMAT string
+			
+			$_ = $event2[3];	# FORMAT string
 		
 			&substitute;
-	
-			$page = $_;
 		
-			if ($enableexec == 1)
+			$message = "$receivedtrap $event2[2] \"$event2[1]\" @var[0] - $_\n";
+		
+			if ($enablestdout == 1)
 			{
-				if ($DEBUGGING >= 1)
-				{	
-					print "EXEC command:$page\n";
+				print "$message";
+			}
+		
+			if ($enablelog == 1)
+			{
+				if (open LOGFILE, ">>$logfile")
+				{
+					print LOGFILE scalar(localtime)." $message";
+					close LOGFILE;
 				}
-				# Send page
-				system $page;
+				else
+				{
+					warn "Cannot open logfile: $!";
+				}
+			}
+	
+			if ($enablesyslog == 1)
+			{
+				if (Sys::Syslog::openlog('TRAPD', '',$syslogfacility) )
+				{
+					Sys::Syslog::syslog ($sysloglevel, $message,1);
+					Sys::Syslog::closelog();
+				}
+				else
+				{
+					warn "Cannot open logfile: $!";
+				}
+			}
+			
+			#
+			# Variable substitution for EXEC string
+			#
+		
+			if ($event2[4] ne '' && $event2[1] ne "LOGONLY")
+			{
+				
+				$_ = $event2[4];	# EXEC string
+			
+				&substitute;
+		
+				$page = $_;
+			
+				if ($enableexec == 1)
+				{
+					if ($DEBUGGING >= 1)
+					{	
+						print "EXEC command:$page\n";
+					}
+					# Send page
+					system $page;
+				}
+			}
+			elsif ($DEBUGGING >= 1)
+			{
+				if ($event2[1] eq "LOGONLY")
+				{
+					print "\n\nTrap set to LOGONLY...\n\n";
+				}
 			}
 		}
-		elsif ($DEBUGGING >= 1)
+		else
 		{
-			if ($event{$receivedtrap}[1] eq "LOGONLY")
+			if ($DEBUGGING >= 1)
 			{
-				print "\n\nTrap set to LOGONLY...\n\n";
+				if ($event2[1] eq "IGNORE")
+				{
+					print "\n\nTrap set to IGNORE...\n\n";
+				}
+				else
+				{
+					print "\n\nTrap defined, but host @var[0] does not match...\n\n";
+				}
 			}
 		}
-	}
-	else
-	{
-		if ($DEBUGGING >= 1)
-		{
-			if ($event{$receivedtrap}[1] eq "IGNORE")
-			{
-				print "\n\nTrap set to IGNORE...\n\n";
-			}
-			else
-			{
-				print "\n\nTrap defined, but host @var[0] does not match...\n\n";
-			}
-		}
-	}
+	
+	} #while defined..
 }
 
 sub substitute
@@ -462,7 +554,7 @@ sub substitute
 	s(\$A)(@var[4])g;
 
 	# $S - Event name
-	s(\$S)($event{"$receivedtrap"}[0])g;
+	s(\$S)($event2[0])g;
 	
 	# $# - Number of variable-bindings in the trap
 	s(\$#)($#entvar)g;
@@ -471,7 +563,7 @@ sub substitute
 	s(\$\$)(\$)g;
 
 	# $s - Severity
-	s(\$s)($event{"$receivedtrap"}[2])g;
+	s(\$s)($event2[2])g;
 
 	# $r - Hostname
 	s(\$r)(@var[0])g;
@@ -647,8 +739,23 @@ sub loadsnmpttconf
 			{			
 				# At least the mandatory FORMAT line was defined, so we'll keep it
 				# Stuff all elements into a one hash
-				$event{@temp[2]} = [@temp[1],@temp[3],@temp[4],$lineformat,$lineexec,$linenodes];
-	
+				# $event{@temp[2]} = [@temp[1],@temp[3],@temp[4],$lineformat,$lineexec,$linenodes];
+
+				if (!defined(@{ $event{@temp[2]} }[0])) 
+				{  
+					@{ $event{@temp[2]} }[0] = 0;
+				}
+
+				$countx = @{ $event{@temp[2]} }[0];
+				#print "countx $countx\n";
+				@{ $event{@temp[2]} }[1+$countx]= @temp[1];
+				@{ $event{@temp[2]} }[2+$countx]= @temp[3];
+				@{ $event{@temp[2]} }[3+$countx]= @temp[4];
+				@{ $event{@temp[2]} }[4+$countx]= $lineformat;
+				@{ $event{@temp[2]} }[5+$countx]= $lineexec;
+				@{ $event{@temp[2]} }[6+$countx]= $linenodes;
+				@{ $event{@temp[2]} }[0]= 7+ @{ $event{@temp[2]} }[0];
+				
 				$tempcount2++;		# Temporary counter of the number of EVENTS found with at
 							# least a FORMAT line specified
 			}
@@ -676,8 +783,16 @@ sub loadsnmpttconf
 		print "Printing out all the events in hash table:\n\n";
 		foreach $key (sort keys %event)
 		{
-			print "hash: $key => $event{$key}[0],$event{$key}[1],$event{$key}[2],$event{$key}[3]\n";
+			#print "hash: $key => $event{$key}[0],$event{$key}[1],$event{$key}[2],$event{$key}[3]\n";
 			#			
+			
+			$l=0;
+			while (defined($event{$key}[$l+1]))
+			{	
+				print  "ahash: $key => $event{$key}[1+$l],$event{$key}[2+$l],$event{$key}[3+$l],$event{$key}[4+$l]\n";
+			$l+=7;
+			}
+
 		}
 		print "Finished printing out all events in hash table\n";
 	}
@@ -886,7 +1001,7 @@ sub searchfortrap
 		}
 		
 		&processtrap;
-		$processed = 1;
+		#$processed = 1;
 	}
 	else
 	{
@@ -919,7 +1034,7 @@ sub searchfortrap
 			{
 				$receivedtrap = $receivedtraptemp.'.*';	# Set $receivedtrap to matching trap with wildcard
 				&processtrap;
-				$processed = 1;
+				#$processed = 1;
 				last;	# found, so stop this while loop
 			}
 			$counter++;
