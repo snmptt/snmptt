@@ -290,7 +290,8 @@ report the correct number of enterprise variables (was 1 lower than it
 should have been)</li>
   <li>Added <a href="http://www.nagios.org">Nagios</a> / <a
  href="http:/www.netsaint.org">Netsaint</a> integration documentation</li>
-  <li>PID file created (/var/run/snmptt.pid) when running in daemon
+  <li>PID file created (/var/run/snmptt.pid or ./snmptt.pid) when
+running in daemon
 mode on Linux / Unix.&nbsp; snmptt-init.d script updated to remove the
 pid file when stopping.<br>
   </li>
@@ -1009,7 +1010,9 @@ SNMPTT sleeps between spool directory polling. </p>
 <p>Note:&nbsp; When running on a <b>non</b> Windows platform, SNMPTT
 will fork to the background and create a pid file in <span
  style="font-weight: bold;">/var/run/snmptt.pid</span> if <b>daemon_fork</b>
-is set to 1.<br>
+is set to 1.&nbsp; If the user is not able to create the <span
+ style="font-weight: bold;">/var/run/snmptt.pid</span> file, it will
+attempt to create one in the current working directory.<br>
 </p>
 <p>Sending the HUP signal to SNMPTT when running as a daemon will cause
 it to reload the configuration file including the .ini file, any
