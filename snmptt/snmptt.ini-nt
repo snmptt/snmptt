@@ -1,5 +1,5 @@
 #
-# SNMPTT 0.8 Configuration File
+# SNMPTT 0.9.1 Configuration File
 #
 # Windows NT
 #
@@ -208,11 +208,15 @@ log_file = c:\\snmp\\snmptt.log
 # as the file could grow large quickly.  Used primarily for troubleshooting.  If
 # you have defined a trap in snmptt.conf, but it is not executing, enable this to
 # see if it is being considered an unknown trap due to an incorrect entry or 
-# simply missing from the snmptt.conf file
+# simply missing from the snmptt.conf file.
+# Unknown traps can be logged either a text file, a SQL table or both.
+# See SQL section to define SQL table to log unknown traps to.
 unknown_trap_log_enable = 0
 
 # Unknown trap log file location.  The COMPLETE path and filename.  
 # Ex: 'c:\\snmp\\snmpttunknown.log'
+# Leave blank to disable logging to text file if logging to SQL is enabled
+# for unknown traps
 unknown_trap_log_file = c:\\snmp\\snmpttunknown.log
 
 # Set to 1 to enable logging of *TRAPS* to the event log.
@@ -267,6 +271,11 @@ mysql_dbi_database = snmptt
 # MySQL: Table to use
 mysql_dbi_table = snmptt
 
+# MySQL: Table to use for unknown traps
+# Leave blank to disable logging of unknown traps to MySQL
+# Note: unknown_trap_log_enable must be enabled.
+mysql_dbi_table_unknown = snmptt_unknown
+
 # MySQL: Username to use
 mysql_dbi_username = snmpttuser
 
@@ -301,6 +310,11 @@ postgresql_dbi_database = snmptt
 # PostgreSQL: Table to use
 postgresql_dbi_table = snmptt
 
+# PostgreSQL: Table to use for unknown traps
+# Leave blank to disable logging of unknown traps to PostgreSQL
+# Note: unknown_trap_log_enable must be enabled.
+postgresql_dbi_table_unknown = snmptt_unknown
+
 # PostgreSQL: Username to use
 postgresql_dbi_username = snmpttuser
 
@@ -317,6 +331,11 @@ dbd_odbc_dsn = snmptt
 # DBD:ODBC: Table to use
 dbd_odbc_table = snmptt
 
+# DBD:ODBC: Table to use for unknown traps
+# Leave blank to disable logging of unknown traps to DBD:ODBC
+# Note: unknown_trap_log_enable must be enabled.
+dbd_odbc_table_unknown = snmptt_unknown
+
 # DBD:ODBC: Username to use
 dbd_odbc_username = snmptt
 
@@ -332,6 +351,11 @@ sql_win32_odbc_dsn = snmptt
 
 # WinWinODBC: Table to use
 sql_win32_odbc_table = snmptt
+
+# DBD:ODBC: Table to use for unknown traps
+# Leave blank to disable logging of unknown traps to DBD:ODBC
+# Note: unknown_trap_log_enable must be enabled.
+sql_win32_odbc_table_unknown = snmptt_unknown
 
 # WinODBC: Username to use
 sql_win32_odbc_username = snmptt

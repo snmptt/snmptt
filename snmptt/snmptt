@@ -979,50 +979,10 @@ sub processtrap
 			
 			$_ = $event2[3];	# FORMAT string
 		
-			$receivedtrap_trans = $receivedtrap;	# Default to numeric OID of received trap
-	
-			if ($net_snmp_perl_enable == 1 && $translate_log_trap_oid)
-			{
-			  # Try to convert to text
-			  if ($DEBUGGING >= 2) {
-			    print "\nOID of trap: $receivedtrap.  Will attempt to translate to text\n";
-			  }
-			  my $temp2 = my_translateObj("$receivedtrap",$translate_log_trap_oid);
-			  if (defined ($temp2) ) {
-			    if ($DEBUGGING >= 2) {
-			      print "  Translated to $temp2\n";
-			    }
-			    $receivedtrap_trans = $temp2;
-			  }
-			  else {
-			    # Could not translate default to numeric
-			    if ($DEBUGGING >= 2) {
-			      print "  Could not translate - defaulting to numeric\n";
-			    }
-			  }
-			}
-			
-			$enterprise_trans = $var[6];	# Default to numeric enterprise
-			if ($net_snmp_perl_enable == 1 && $var[6] ne '')
-			{
-			  if ($DEBUGGING >= 2) {
-			    print "\nOID of enterprise: $var[6].  Will attempt to translate to text\n";
-			  }
-			  my $temp = my_translateObj("$var[6]",$translate_enterprise_oid_format);
-			  if (defined ($temp) ) {
-			    if ($DEBUGGING >= 2) {
-			      print "  Translated to $temp\n";
-			    }
-			    $enterprise_trans = $temp;
-			  }
-			  else 
-			  {
-			    # Could not translate default to numeric
-			    if ($DEBUGGING >= 2) {
-			      print "  Could not translate - defaulting to numeric\n";
-			    }
-			  }
-			}
+			# Translate if enabled, and if we can
+			$receivedtrap_trans = &translate_log_trap_oid_sub($receivedtrap);
+
+			$enterprise_trans = &translate_enterprise_oid_format_sub($var[6]);
 
 			&substitute;
 		
@@ -2634,26 +2594,194 @@ sub searchfortrap
 		
 		if ($unknown_trap_log_enable == 1)
 		{
-			if (open LOGFILE, ">>$unknown_trap_log_file")
-			{	
-				print LOGFILE scalar($trap_date_time),": Unknown trap ($var[3]) received from $var[0] at: \n";
-				#print out all standard variables
-				for ($i=0;$i <= $#var;$i++)
-				{
-					print 	LOGFILE "Value $i: $var[$i]\n";
+			if ($unknown_trap_log_file ne "") {
+				if (open LOGFILE, ">>$unknown_trap_log_file")
+				{	
+					print LOGFILE scalar($trap_date_time),": Unknown trap ($var[3]) received from $var[0] at: \n";
+					#print out all standard variables
+					for ($i=0;$i <= $#var;$i++)
+					{
+						print 	LOGFILE "Value $i: $var[$i]\n";
+					}
+					#print out all enterprise specific variables
+					for ($i=0;$i <= $#entvar;$i++)
+					{
+						print LOGFILE "Ent Value $i: $entvarname[$i]=$entvar[$i]\n";
+					}
+					print LOGFILE "\n\n";
+					close LOGFILE;
 				}
-				#print out all enterprise specific variables
-				for ($i=0;$i <= $#entvar;$i++)
+				else
 				{
-					print LOGFILE "Ent Value $i: $entvarname[$i]=$entvar[$i]\n";
+					warn "Can not open log_file: $!";
 				}
-				print LOGFILE "\n\n";
-				close LOGFILE;
 			}
-			else
+
+			if ( ($mysql_dbi_enable == 1) ||
+		   	     ($postgresql_dbi_enable == 1) ||
+     			     ($dbd_odbc_enable == 1) ||
+     			     ($sql_win32_odbc_enable == 1) ) {
+
+				if ($DEBUGGING >= 1)
+				{
+					print "Logging unknown trap to SQL\n";
+				}
+
+				# Translate if enabled, and if we can
+				$receivedtrap_trans = &translate_log_trap_oid_sub($receivedtrap);
+			
+				$enterprise_trans = &translate_enterprise_oid_format_sub($var[6]);
+
+				$db_enterprise;
+				if ($net_snmp_perl_enable == 1 && $db_translate_enterprise == 1)
+				{
+	      				$db_enterprise = $enterprise_trans;
+				}
+				else
+				{
+	      				$db_enterprise = $var[6];
+				}
+
+				$_ = '$-*';
+				
+				&substitute;
+				
+				$message_short = $_;
+			}
+			
+			if ($mysql_dbi_enable == 1 && defined ($dbh_mysql) && $mysql_dbi_table_unknown ne "")
 			{
-				warn "Can not open log_file: $!";
+				
+				# Backslash any quotes
+				my $message_short2 = $message_short;
+				$message_short2 =~ s(\')(\\\')g;   #'
+				$message_short2 =~ s(\")(\\\")g;   #"
+
+				my $community = $var[5];
+				$community =~ s(\')(\\\')g;   #'
+				$community =~ s(\")(\\\")g;   #"				
+				
+				unless (defined ($dbh_mysql->do(
+					"INSERT INTO $mysql_dbi_table_unknown (trapoid, enterprise, 
+					community, hostname, agentip, uptime, traptime, 
+					formatline) VALUES (
+					\'$receivedtrap_trans'\,\'$db_enterprise\',
+					\'$community\',\'$agent_dns_name\',\'$var[4]\',
+					\'$var[2]\',\'".$trap_date_time."\',
+					\'$message_short2\')" ) ) )
+					{
+					  warn "MySQL error: Unable to perform INSERT INTO: ".$dbh_mysql->errstr."\n";
+
+					  if ($syslog_system_enable == 1)
+					  {
+					    syslog_system("MySQL error: Unable to perform INSERT INTO: ".$dbh_mysql->errstr);
+					  }
+					  
+					  if ($eventlog_system_enable == 1)
+					  {
+					    eventlog_system("MySQL error: Unable to perform INSERT INTO: ".$dbh_mysql->errstr,
+					    		15,$eventlog_error);
+					  }
+				 }
 			}
+
+			if ($postgresql_dbi_enable == 1 && defined ($dbh_postgresql) && $postgresql_dbi_table_unknown ne "")
+			{
+				# Backslash any quotes
+				my $message_short2 = $message_short;
+				$message_short2 =~ s(\')(\\\')g;   #'
+				$message_short2 =~ s(\")(\\\")g;   #"
+
+				my $community = $var[5];
+				$community =~ s(\')(\\\')g;   #'
+				$community =~ s(\")(\\\")g;   #"
+				
+				unless (defined ($dbh_postgresql->do(
+					"INSERT INTO $postgresql_dbi_table (trapoid, enterprise, 
+					community, hostname, agentip, traptime, 
+					formatline) VALUES (
+					\'$receivedtrap_entry'\,
+					\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
+					\'$var[2]\',\'".$trap_date_time."\',
+					\'$message_short2\')" ) ) )
+					{
+					  warn "Postgres error: Unable to perform INSERT INTO: ".$dbh_postgresql->errstr."\n";
+
+					  if ($syslog_system_enable == 1)
+					  {
+					    syslog_system("Postgres error: Unable to perform INSERT INTO: ".$dbh_postgresql->errstr);
+					  }
+					  
+					  if ($eventlog_system_enable == 1)
+					  {
+					    eventlog_system("Postgres error: Unable to perform INSERT INTO: ".$dbh_postgresql->errstr,
+					    		19,$eventlog_error);
+					  }
+				 }
+			}
+			
+			if ($dbd_odbc_enable == 1 && defined ($dbh_odbc) && $dbd_odbc_table_unknown ne "")
+			{
+				# Double any single quotes
+				my $message_short2 = $message_short;
+				$message_short2 =~ s(\')('')g;     #'
+
+				my $community = $var[5];
+				$community =~ s(\')('')g;   #'
+				
+				unless (defined ($dbh_odbc->do(
+					"INSERT INTO $dbd_odbc_table (trapoid, enterprise, 
+					community, hostname, agentip, uptime, traptime, 
+					formatline) VALUES (
+					\'$receivedtrap_entry'\,
+					\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
+					\'$var[2]\',\'".$trap_date_time."\',
+					\'$message_short2\')" ) ) )
+					{
+					  warn "DBI DBD::ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr."\n";
+
+					  if ($syslog_system_enable == 1)
+					  {
+					    syslog_system("DBI DBD::ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr);
+					  }
+					  
+					  if ($eventlog_system_enable == 1)
+					  {
+					    eventlog_system("DBI DBD::ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr,
+					    		16,$eventlog_error);
+					  }
+
+					}
+			}				 
+			
+			if ($sql_win32_odbc_enable == 1 && defined ($dbh_win32_odbc) && $sql_win32_odbc_table_unknown ne "")
+			{
+				# Double any single quotes
+				my $message_short2 = $message_short;
+				$message_short2 =~ s(\')('')g;     #'
+
+				my $community = $var[5];
+				$community =~ s(\')('')g;   #'
+				
+				# if defined, there's an error
+				if (defined ($dbh_win32_odbc->Sql
+				        ("INSERT INTO $sql_win32_odbc_table (trapoid, enterprise, 
+					community, hostname, agentip, uptime, traptime, 
+					formatline) VALUES (
+					\'$receivedtrap_entry'\,
+					\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
+					\'$var[2]\',\'".$trap_date_time."\',
+					\'$message_short2\')" ) ) )
+				{					
+				  warn "Unable to perform INSERT INTO: ".Win32::ODBC::Error()."\n";
+				  
+				  if ($eventlog_system_enable == 1)
+				  {
+				    eventlog_system("Win32::ODBC error: Unable to perform INSERT INTO: ".Win32::ODBC::Error(),
+				    17,$eventlog_error);
+				  }
+				}
+			}	
 		}
 	}
 	
@@ -2830,6 +2958,7 @@ sub loadsnmpttini {
 	$mysql_dbi_port = $cfg->val('SQL', 'mysql_dbi_port');
 	$mysql_dbi_database = $cfg->val('SQL', 'mysql_dbi_database');
 	$mysql_dbi_table = $cfg->val('SQL', 'mysql_dbi_table');
+	$mysql_dbi_table_unknown = $cfg->val('SQL', 'mysql_dbi_table_unknown');
 	$mysql_dbi_username = $cfg->val('SQL', 'mysql_dbi_username');
 	$mysql_dbi_password = $cfg->val('SQL', 'mysql_dbi_password');
 
@@ -2840,18 +2969,21 @@ sub loadsnmpttini {
 	$postgresql_dbi_port = $cfg->val('SQL', 'postgresql_dbi_port');
 	$postgresql_dbi_database = $cfg->val('SQL', 'postgresql_dbi_database');
 	$postgresql_dbi_table = $cfg->val('SQL', 'postgresql_dbi_table');
+	$postgresql_dbi_table_unknown = $cfg->val('SQL', 'postgresql_dbi_table_unknown');
 	$postgresql_dbi_username = $cfg->val('SQL', 'postgresql_dbi_username');
 	$postgresql_dbi_password = $cfg->val('SQL', 'postgresql_dbi_password');
 	
 	$dbd_odbc_enable = $cfg->val('SQL', 'dbd_odbc_enable');
 	$dbd_odbc_dsn = $cfg->val('SQL', 'dbd_odbc_dsn');
 	$dbd_odbc_table = $cfg->val('SQL', 'dbd_odbc_table');
+	$dbd_odbc_table_unknown = $cfg->val('SQL', 'dbd_odbc_table_unknown');
 	$dbd_odbc_username = $cfg->val('SQL', 'dbd_odbc_username');
 	$dbd_odbc_password = $cfg->val('SQL', 'dbd_odbc_password');
 	
 	$sql_win32_odbc_enable = $cfg->val('SQL', 'sql_win32_odbc_enable');
 	$sql_win32_odbc_dsn = $cfg->val('SQL', 'sql_win32_odbc_dsn');
 	$sql_win32_odbc_table = $cfg->val('SQL', 'sql_win32_odbc_table');
+	$sql_win32_odbc_table_unknown = $cfg->val('SQL', 'sql_win32_odbc_table_unknown');
 	$sql_win32_odbc_username = $cfg->val('SQL', 'sql_win32_odbc_username');
 	$sql_win32_odbc_password = $cfg->val('SQL', 'sql_win32_odbc_password');
 	
@@ -2916,6 +3048,7 @@ sub loadsnmpttini {
 	if (! defined ($mysql_dbi_port)) { $mysql_dbi_port = '3306'} ;
 	if (! defined ($mysql_dbi_database)) { $mysql_dbi_database = ''} ;
 	if (! defined ($mysql_dbi_table)) { $mysql_dbi_table = ''} ;
+	if (! defined ($mysql_dbi_table_unknown)) { $mysql_dbi_table_unknown = ''} ;
 	if (! defined ($mysql_dbi_username)) { $mysql_dbi_username = ''} ;
 	if (! defined ($mysql_dbi_password)) { $mysql_dbi_password = ''} ;
 	if (! defined ($postgresql_dbi_enable)) { $postgresql_dbi_enable = 0} ;
@@ -2925,16 +3058,19 @@ sub loadsnmpttini {
 	if (! defined ($postgresql_dbi_port)) { $postgresql_dbi_port = '5432'} ;
 	if (! defined ($postgresql_dbi_database)) { $postgresql_dbi_database = ''} ;
 	if (! defined ($postgresql_dbi_table)) { $postgresql_dbi_table = ''} ;
+	if (! defined ($postgresql_dbi_table_unknown)) { $postgresql_dbi_table_unknown = ''} ;
 	if (! defined ($postgresql_dbi_username)) { $postgresql_dbi_username = ''} ;
 	if (! defined ($postgresql_dbi_password)) { $postgresql_dbi_password = ''} ;
 	if (! defined ($dbd_odbc_enable)) { $dbd_odbc_enable = 0} ;
 	if (! defined ($dbd_odbc_dsn)) { $dbd_odbc_dsn = ''} ;
 	if (! defined ($dbd_odbc_table)) { $dbd_odbc_table = ''} ;
+	if (! defined ($dbd_odbc_table_unknown)) { $dbd_odbc_table_unknown = ''} ;
 	if (! defined ($dbd_odbc_username)) { $dbd_odbc_username = ''} ;
 	if (! defined ($dbd_odbc_password)) { $dbd_odbc_password = ''} ;
 	if (! defined ($sql_win32_odbc_enable)) { $sql_win32_odbc_enable = 0} ;
 	if (! defined ($sql_win32_odbc_dsn)) { $sql_win32_odbc_dsn = ''} ;
 	if (! defined ($sql_win32_odbc_table)) { $sql_win32_odbc_table = ''} ;
+	if (! defined ($sql_win32_odbc_table_unknown)) { $sql_win32_odbc_table_unknown = ''} ;
 	if (! defined ($sql_win32_odbc_username)) { $sql_win32_odbc_username = ''} ;
 	if (! defined ($sql_win32_odbc_password)) { $sql_win32_odbc_password = ''} ;
 	if (! defined ($DEBUGGING)) { $DEBUGGING = 0} ;
@@ -3781,4 +3917,60 @@ sub translate_symbolic_to_oid
   }
   return $temp;
 }
+
+sub translate_log_trap_oid_sub
+{	
+	my $trap_oid_temp = shift;
+	
+	if ($net_snmp_perl_enable == 1 && $translate_log_trap_oid)
+	{
+		# Try to convert to text
+		if ($DEBUGGING >= 2) {
+			print "\nOID of trap: $trap_oid_temp.  Will attempt to translate to text\n";
+		}
+		my $temp2 = my_translateObj("$trap_oid_temp",$translate_log_trap_oid);
+		if (defined ($temp2) ) {
+			if ($DEBUGGING >= 2) {
+  				print "  Translated to $temp2\n";
+			}
+			$trap_oid_temp = $temp2;
+		}
+		else {
+			# Could not translate default to numeric
+			if ($DEBUGGING >= 2) {
+  				print "  Could not translate - defaulting to numeric\n";
+			}
+		}
+	}
+	return $trap_oid_temp;
+}
+
+sub translate_enterprise_oid_format_sub
+{
+	my $enterprise_oid_temp = shift;
+
+	if ($net_snmp_perl_enable == 1 && $var[6] ne '')
+	{
+		if ($DEBUGGING >= 2) {
+			print "\nOID of enterprise: $var[6].  Will attempt to translate to text\n";
+		}
+		my $temp = my_translateObj("$var[6]",$translate_enterprise_oid_format);
+		if (defined ($temp) ) {
+			if ($DEBUGGING >= 2) {
+  				print "  Translated to $temp\n";
+			}
+			$enterprise_oid_temp = $temp;
+		}
+		else 
+		{
+			# Could not translate default to numeric
+			if ($DEBUGGING >= 2) {
+  				print "  Could not translate - defaulting to numeric\n";
+			}
+		}
+	}
+	return $enterprise_oid_temp;
+
+}
+
 
