@@ -189,7 +189,7 @@ if ($eventlog_system_enable == 1 || $eventlog_enable == 1)
 	$eventlog_information = 4;	# EVENTLOG_INFORMATION_TYPE
 }
 
-
+$debug_file_used = 0;
 if ($DEBUGGING >= 1)
 {
 	if ($DEBUGGING_FILE ne '') 
@@ -198,10 +198,11 @@ if ($DEBUGGING >= 1)
 			or warn "could not open debug output file ($!)";
 	
 		select DEBUGFILE;	# change default output to debug file
+		$debug_file_used = 1;
 	}
 	
 	# print out time
-	print "SNMPTT $snmptt_version started: ",scalar(localtime),"\n\n"
+	print "********** SNMPTT $snmptt_version started: ",scalar(localtime),"**********\n\n"
 }
 
 if ($syslog_system_enable == 1 && $daemon == 1)
@@ -791,12 +792,23 @@ sub processtrap
 			
 			$message = "$receivedtrap_trans $event2[2] \"$event2[1]\" $var[0] - $message_short\n";
 			
-			if ($stdout_enable == 1 || $DEBUGGING >= 1)
+			if ($stdout_enable == 1)
+			{
+			  select STDOUT;
+			  print STDOUT "$message";
+
+			  if ($debug_file_used == 1)
+			  {
+			    select DEBUGFILE;
+			  }
+			}
+
+			if ($DEBUGGING >= 1)
 			{
 				print "$message_short\n";
 				print "\n$message";
 			}
-
+			
 			if ($log_enable == 1)
 			{
 				$trap_attempted_to_log++;	
@@ -1197,7 +1209,10 @@ sub substitute
   {
     my $val = $entvar[$i-1];
     
-    print "\nVariable $entvarname[$i-1] with value $entvar[$i-1]\n";
+    if ($DEBUGGING >= 2)
+    {
+      print "\nVariable $entvarname[$i-1] with value $entvar[$i-1]\n";
+    }
     
     # This will translate (if enabled) any OIDs found in the VALUE (not the variable name) to the textual  
     # name if possible.  For example, if the value was 'A UPS Alarm (.1.3.6.1.4.1.534.1.7.12) has cleared.', 
@@ -1521,7 +1536,7 @@ sub loadsnmpttconf
 	
 	if ($DEBUGGING >= 1)
 	{
-		print "\nProcessing memory copy of $snmpttconffile\n";
+		print "\nProcessing memory copy of configuration files\n";
 	}
 	
 	$currentline=0;
@@ -1698,7 +1713,7 @@ sub loadsnmpttconf
 			print "  Warning:  EVENT entries were found that did not contain the mandatory FORMAT line!\n";
 			print "  These EVENTS will be ignored!\n";
 		}
-		print "Finished processing memory copy of $snmpttconffile\n\n";
+		print "Finished processing memory copy of configuration files\n\n";
 	}
 	
 	if ($DEBUGGING >= 2)
@@ -1728,6 +1743,11 @@ sub readtrap
 	@entvar = ();
 	@entvarname = ();
 
+	if ($DEBUGGING >= 2) 
+	{	  
+	  print "Reading trap\n";
+	}
+	
 	if ( $daemon == 1)
 	{
 	  chomp($trap_date_time_epoch = (<$input>));	# Pull time trap was spooled
@@ -1791,6 +1811,31 @@ sub readtrap
 	
 	  if ($variable_fix == 0 )
 	  {
+	    # Check to see if OID passed from snmptrapd is fully numeric.  If not, try to translate
+	    if (! ($temp1 =~ /^(\.\d+)+$/)) 
+	    {
+	      # Not numeric
+	      if ($net_snmp_perl_enable == 1)
+	      {
+		# Try to convert to numerical
+		if ($DEBUGGING >= 2) {
+		  print "\n  Symbolic trap variable name detected ($temp1).  Will attempt to translate to a numerical OID\n";
+		}
+		my $temp3 = &SNMP::translateObj("$temp1");
+		if (defined ($temp3) ) {
+		  if ($DEBUGGING >= 2) {
+		    print "    Translated to $temp3\n";
+		  }
+		  $temp1 = $temp3;
+		}
+		else {
+		  # Could not translate default to numeric
+		  if ($DEBUGGING >= 2) {
+		    print "  Could not translate - will add to hash table anyways\n";
+		  }
+		}
+	      }
+	    }
 	    # If the value is blank, set it to (null)
 	    if ($temp2 eq "")
 	    {
@@ -1855,7 +1900,7 @@ sub readtrap
 	if ($DEBUGGING >= 2)
 	{
 		# Print out all items passed from snmptrapd
-		print "Items passed from snmptrapd:\n";
+		print "\nItems passed from snmptrapd:\n";
 		for ($i=0;$i <= $#tempvar;$i++)
 		{
 			print "value $i: $tempvar[$i]\n\n";

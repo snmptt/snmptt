@@ -1,3 +1,6 @@
+April 15th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added support for symbolic OIDs from snmptrapd
+
 April 12th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added support for translate_trap_oid
 - Added support for symbolic OIDs on EVENT line
