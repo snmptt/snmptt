@@ -530,7 +530,11 @@ files to load</li>
   <li> Replace <b>SNMPTT</b> and <b>SNMPTTCONVERTMIB</b> with the new
 versions contained in
 the v0.8 package</li>
-  <li> Backup your <b>snmptt.ini </b>file, replace it with the new
+  <li>Replace your <span style="font-weight: bold;">/etc/rc.d/init.d/snmptt</span>
+file (<span style="font-weight: bold;">cp snmptt-init.d
+/etc/rc.d/init.d/snmptt</span>).&nbsp; Make sure file is executable (<span
+ style="font-weight: bold;">chmod +x /etc/rc.d/init.d/snmptt</span>)</li>
+  <li>Backup your <b>snmptt.ini </b>file, replace it with the new
 version, and make any necessary configuration changes to it</li>
   <li> In your snmptt.ini file, configure <span
  style="font-weight: bold;">translate_log_trap_oid</span> with <span
@@ -544,11 +548,17 @@ version, and make any necessary configuration changes to it</li>
 to 1 if you want the NODES files to be loaded each time an event is
 processed which is how previous versions worked<br>
   </li>
-  <li>In your snmptt.conf files, replace any $A with $aA unless you
+  <li>In your snmptt.conf files, replace any <span
+ style="font-weight: bold;">$A</span> with <span
+ style="font-weight: bold;">$aA</span> unless you
 want agent host names to be used instead of IP addresses</li>
-  <li>In your snmptt.conf files, replace any $E with $e unless you
+  <li>In your snmptt.conf files, replace any <span
+ style="font-weight: bold;">$E</span> with <span
+ style="font-weight: bold;">$e</span> unless you
 want Enterprise trap OID in symbolic format</li>
-  <li>In your snmptt.conf files, replace any $O with $o unless you
+  <li>In your snmptt.conf files, replace any <span
+ style="font-weight: bold;">$O</span> with <span
+ style="font-weight: bold;">$o</span> unless you
 want Trap OID in symbolic format</li>
   <li>In your snmptt.conf files, append a <span
  style="font-weight: bold;">g</span> to the end of all REGEX lines to
