@@ -1053,7 +1053,7 @@ sub searchfortrap
 		{
 			if (open LOGFILE, ">>$unknowntraplogfile")
 			{	
-				print LOGFILE scalar(localtime),": Unknown trap ($receivedtrap) received from @var[0] at: \n";
+				print LOGFILE scalar(localtime),": Unknown trap (@var[3]) received from @var[0] at: \n";
 				#print out all standard variables
 				for ($i=0;$i <= $#var;$i++)
 				{
