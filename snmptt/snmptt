@@ -3028,10 +3028,10 @@ sub searchfortrap
 				$community =~ s(\")(\\\")g;   #"
 				
 				unless (defined ($dbh_postgresql->do(
-					"INSERT INTO $postgresql_dbi_table (trapoid, enterprise, 
-					community, hostname, agentip, traptime, 
+					"INSERT INTO $postgresql_dbi_table_unknown (trapoid, enterprise, 
+					community, hostname, agentip, uptime, traptime, 
 					formatline) VALUES (
-					\'$receivedtrap_entry'\,
+					\'$receivedtrap_trans'\,
 					\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
 					\'$var[2]\',\'".$trap_date_time."\',
 					\'$message_short2\')" ) ) )
@@ -3061,10 +3061,10 @@ sub searchfortrap
 				$community =~ s(\')('')g;   #'
 				
 				unless (defined ($dbh_odbc->do(
-					"INSERT INTO $dbd_odbc_table (trapoid, enterprise, 
+					"INSERT INTO $dbd_odbc_table_unknown (trapoid, enterprise, 
 					community, hostname, agentip, uptime, traptime, 
 					formatline) VALUES (
-					\'$receivedtrap_entry'\,
+					\'$receivedtrap_trans'\,
 					\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
 					\'$var[2]\',\'".$trap_date_time."\',
 					\'$message_short2\')" ) ) )
@@ -3096,7 +3096,7 @@ sub searchfortrap
 				
 				# if defined, there's an error
 				if (defined ($dbh_win32_odbc->Sql
-				        ("INSERT INTO $sql_win32_odbc_table (trapoid, enterprise, 
+				        ("INSERT INTO $sql_win32_odbc_table_unknown (trapoid, enterprise, 
 					community, hostname, agentip, uptime, traptime, 
 					formatline) VALUES (
 					\'$receivedtrap_entry'\,
@@ -3487,7 +3487,9 @@ sub syslog_system {
   else
   {
     warn "Can not open log_file: $!";
+    print "Can not open syslog.  Message to be logged: $message\n" if ($DEBUGGING >= 1);
   }
+  
 }
 
 sub eventlog_system {

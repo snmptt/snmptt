@@ -1,3 +1,7 @@
+Aug 16th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed missing _unknown in unknown logging for PostgreSQL, ODBC
+  and Win32::ODBC.  Thanks to mike at mccartney.net 
+
 Aug 15th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Moved xx_ping_on_insert check before if (defined ($dbh..))
 
