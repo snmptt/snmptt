@@ -112,6 +112,7 @@ exec_enable = 1
 
 [SQL]
 # MySQL: Set to 1 to enable logging to a MySQL database via DBI (Linux / Windows)
+# This requires DBI::
 mysql_dbi_enable = 0
 
 # MySQL: Database to use
@@ -126,8 +127,24 @@ mysql_dbi_username = snmpttuser
 # MySQL: Password to use
 mysql_dbi_password = password
 
-# ODBC: Set to 1 to enable logging to a SQL / Access database via ODBC on Windows.  
-# (Windows only - uses Win32::ODBC)
+# ODBC: Set to 1 to enable logging to a database via ODBC using DBD::ODBC.  
+# This requires both DBI:: and DBD::ODBC
+dbd_odbc_enable = 0
+
+# DBD:ODBC: Database to use
+dbd_odbc_dsn = snmptt
+
+# DBD:ODBC: Table to use
+dbd_odbc_table = snmptt
+
+# DBD:ODBC: Username to use
+dbd_odbc_username = snmptt
+
+# DBD:DBC:: Password to use
+dbd_odbc_password = password
+
+# Win32 ODBC: Set to 1 to enable logging to a database via ODBC on Windows.  
+# This requires Win32::ODBC (Windows only)
 sql_win32_odbc_enable = 0
 
 # WinODBC: Database to use

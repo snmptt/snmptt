@@ -1,3 +1,9 @@
+February 24th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added support for logging of traps using DBD::ODBC
+- Cleaned up MySQL code
+- Fixed bug with Win32::ODBC connection not being closed on exit of 
+  SNMPTT.
+
 February 22nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added support for logging traps to the NT Event Log
 - Added syslog and NT Event Log support for SNMPTT 'system' events 

@@ -220,7 +220,7 @@ if ($mysql_dbi_enable == 1)
 {
 	require DBI;
 	
-	unless ($dbhmysql = DBI->connect("DBI:mysql:$mysql_dbi_database",$mysql_dbi_username,$mysql_dbi_password) )
+	unless ($dbh_mysql = DBI->connect("DBI:mysql:$mysql_dbi_database",$mysql_dbi_username,$mysql_dbi_password) )
 	{
 	  warn "MySQL error: Unable to connect to database: $DBI::errstr\n";
 	  if ($syslog_system_enable == 1)
@@ -235,10 +235,29 @@ if ($mysql_dbi_enable == 1)
 	}
 }
 
+if ($dbd_odbc_enable == 1)
+{
+	require DBI;
+	
+	unless ($dbh_odbc = DBI->connect("DBI:ODBC:$dbd_odbc_dsn",$dbd_odbc_username,$dbd_odbc_password) )
+	{
+	  warn "DBI DBD:ODBC error: Unable to connect to DSN: $DBI::errstr\n";
+	  if ($syslog_system_enable == 1)
+	  {
+	    syslog_system("DBI DBD:ODBC error: Unable to connect to DSN: $DBI::errstr");
+	  }
+	  if ($eventlog_system_enable == 1)
+	  {
+	    eventlog_system("DBI DBD:ODBC error: Unable to connect to DSN: $DBI::errstr",12,$eventlog_error);
+	  }
+
+	}
+}
+
 if ($sql_win32_odbc_enable == 1)
 {
 	require Win32::ODBC;
-	unless ($dbhodbc = new Win32::ODBC("DSN=$sql_win32_odbc_dsn","UID=$sql_win32_odbc_username","PWD=$sql_win32_odbc_password") )
+	unless ($dbh_win32_odbc = new Win32::ODBC("DSN=$sql_win32_odbc_dsn","UID=$sql_win32_odbc_username","PWD=$sql_win32_odbc_password") )
 	{
 	  warn "SQL error: Unable to connect to DSN $sql_win32_odbc_dsn:" . Win32::ODBC::Error() . "\n";
 
@@ -466,11 +485,15 @@ else
 
 if (defined $dbimysql)
 {
-	$dbhmysql->disconnect;
+	$dbh_mysql->disconnect;
 }
-if (defined $dbiodbc)
+if (defined $dbh_odbc)
 {
-	$dbhodbc->close();
+	$dbh_odbc->disconnect;
+}
+if (defined $dbh_win32_odbc)
+{
+	$dbh_win32_odbc->Close();
 }
 
 exit();
@@ -718,60 +741,66 @@ sub processtrap
 			    eventlog_system($message,2,$eventlog_warning);
 			  }
 			}
-			
-			if ($mysql_dbi_enable == 1 && defined ($dbhmysql))
+
+			if ($mysql_dbi_enable == 1 && defined ($dbh_mysql))
 			{
 				$message = $_;
-				
-				unless ($sth = $dbhmysql->prepare(
-					"INSERT $mysql_dbi_table (eventname, eventid, enterprise, community, 
-					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES 
-					(?,?,?,?,?,?,?,?,?,?,?)") )
+
+				unless (defined ($dbh_mysql->do(
+					"INSERT INTO $mysql_dbi_table (eventname, eventid, enterprise, community, 
+					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
+					\'$event2[0]\',\'$receivedtrap'\,\'@var[6]\',\'@var[5]\',\'@var[0]\',\'@var[4]\',
+					\'$event2[1]\',\'$event2[2]\',\'@var[2]\',\'".$trap_date_time."\',
+					\'$message\')" ) ) )
 					{
-					  warn "MySQL error: Unable to prepare query: ".$dbhmysql->errstr."\n";
+					  warn "MySQL error: Unable to perform INSERT INTO: ".$dbh_mysql->errstr."\n";
 
 					  if ($syslog_system_enable == 1)
 					  {
-					    syslog_system("MySQL error: Unable to prepare query: ".$dbhmysql->errstr);
+					    syslog_system("MySQL error: Unable to perform INSERT INTO: ".$dbh_mysql->errstr);
 					  }
 					  
 					  if ($eventlog_system_enable == 1)
 					  {
-					    eventlog_system("MySQL error: Unable to prepare query: ".$dbhmysql->errstr,
-					    		15,$eventlog_information);
+					    eventlog_system("MySQL error: Unable to perform INSERT INTO: ".$dbh_mysql->errstr,
+					    		15,$eventlog_error);
+					  }
+				 }
+			}
+			
+			if ($dbd_odbc_enable == 1 && defined ($dbh_odbc))
+			{
+				$message = $_;
+				
+				unless (defined ($dbh_odbc->do(
+					"INSERT INTO $dbd_odbc_table (eventname, eventid, enterprise, community, 
+					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
+					\'$event2[0]\',\'$receivedtrap'\,\'@var[6]\',\'@var[5]\',\'@var[0]\',\'@var[4]\',
+					\'$event2[1]\',\'$event2[2]\',\'@var[2]\',\'".$trap_date_time."\',
+					\'$message\')" ) ) )
+					{
+					  warn "DBI DBD:ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr."\n";
+
+					  if ($syslog_system_enable == 1)
+					  {
+					    syslog_system("DBI DBD:ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr);
+					  }
+					  
+					  if ($eventlog_system_enable == 1)
+					  {
+					    eventlog_system("DBI DBD:ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr,
+					    		15,$eventlog_error);
 					  }
 
 					}
-
-				 if (defined $sth) {
-				   unless ($sth->execute($event2[0],$receivedtrap,@var[6],@var[5],@var[0],@var[4],
-				   		$event2[1],$event2[2],@var[2],$trap_date_time,$message) )
-				   {
-				     warn "MySQL error: Unable to execute query: ".$dbhmysql->errstr."\n";
-				     
-				     if ($syslog_system_enable == 1)
-				     {
-				       syslog_system("MySQL error: Unable to execute query: ".$dbhmysql->errstr);
-				     }
-				     
-				     if ($eventlog_system_enable == 1)
-				     {
-				       eventlog_system("MySQL error: Unable to execute query: ".$dbhmysql->errstr,
-				       16,$eventlog_information);
-				     }
-				     
-				   }
-				   
-				   $sth->finish;
-				 }
 			}				 
 			
-			if ($sql_win32_odbc_enable == 1 && defined ($dbhodbc) )
+			if ($sql_win32_odbc_enable == 1 && defined ($dbh_win32_odbc) )
 			{
 				$message = $_;
 				
 				# if defined, there's an error
-				if (defined ($dbhodbc->Sql
+				if (defined ($dbh_win32_odbc->Sql
 				        ("INSERT INTO $sql_win32_odbc_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
 					\'$event2[0]\',\'$receivedtrap'\,\'@var[6]\',\'@var[5]\',\'@var[0]\',\'@var[4]\',
@@ -1676,6 +1705,12 @@ sub loadsnmpttini {
 	$mysql_dbi_table = $cfg->val('SQL', 'mysql_dbi_table');
 	$mysql_dbi_username = $cfg->val('SQL', 'mysql_dbi_username');
 	$mysql_dbi_password = $cfg->val('SQL', 'mysql_dbi_password');
+
+	$dbd_odbc_enable = $cfg->val('SQL', 'dbd_odbc_enable');
+	$dbd_odbc_dsn = $cfg->val('SQL', 'dbd_odbc_dsn');
+	$dbd_odbc_table = $cfg->val('SQL', 'dbd_odbc_table');
+	$dbd_odbc_username = $cfg->val('SQL', 'dbd_odbc_username');
+	$dbd_odbc_password = $cfg->val('SQL', 'dbd_odbc_password');
 	
 	$sql_win32_odbc_enable = $cfg->val('SQL', 'sql_win32_odbc_enable');
 	$sql_win32_odbc_dsn = $cfg->val('SQL', 'sql_win32_odbc_dsn');
@@ -1726,6 +1761,11 @@ sub loadsnmpttini {
 	if (! defined ($mysql_dbi_table)) { $mysql_dbi_table = ''} ;
 	if (! defined ($mysql_dbi_username)) { $mysql_dbi_username = ''} ;
 	if (! defined ($mysql_dbi_password)) { $mysql_dbi_password = ''} ;
+	if (! defined ($dbd_odbc_enable)) { $dbd_odbc_enable = 0} ;
+	if (! defined ($dbd_odbc_dsn)) { $dbd_odbc_dsn = ''} ;
+	if (! defined ($dbd_odbc_table)) { $dbd_odbc_table = ''} ;
+	if (! defined ($dbd_odbc_username)) { $dbd_odbc_username = ''} ;
+	if (! defined ($dbd_odbc_password)) { $dbd_odbc_password = ''} ;
 	if (! defined ($sql_win32_odbc_enable)) { $sql_win32_odbc_enable = 0} ;
 	if (! defined ($sql_win32_odbc_dsn)) { $sql_win32_odbc_dsn = ''} ;
 	if (! defined ($sql_win32_odbc_table)) { $sql_win32_odbc_table = ''} ;

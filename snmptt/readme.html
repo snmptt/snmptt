@@ -10,7 +10,7 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.5.1</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; February 22nd, 2003
+<br>This file was last updated on:&nbsp; February 24th, 2003
 <p>&nbsp;<a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote>&nbsp;<a href="#What is it">What is it?</a>
@@ -136,8 +136,12 @@ Optional: Sys::Syslog module</li>
 Optional: DBI module.&nbsp; Required for MySQL support in Linux etc</li>
 
 <li>
+Optional: DBD::ODBC module.&nbsp; Required for ODBC (SQL etc) access on
+Linux / Windows (Win32::ODBC not required if using DBD::ODBC)</li>
+
+<li>
 Optional: Win32::ODBC module.&nbsp; Required for ODBC (SQL etc) access
-on Windows</li>
+on Windows (DBD::ODBC not required if using Win32::ODBC)</li>
 
 <li>
 Optional: NET-SNMP Perl module.&nbsp; Only required if translation of integers
@@ -162,11 +166,21 @@ tags in MIB files.</blockquote>
 <p><b><font size=+1>0.6 - ???, 2003</font></b>
 <ul>
 <li>
+Added support for logging of traps using DBD::ODBC</li>
+
+<li>
+Fixed bug with Win32::ODBC connection not being closed on exit of SNMPTT</li>
+
+<li>
+MySQL code cleanup</li>
+
+<li>
 Added support for logging traps to the NT Event Log</li>
 
 <li>
 Added syslog and NT Event Log support for SNMPTT 'system' events such as
-startup, shutdown, errors handling trap spool directory and files etc</li>
+startup, shutdown, errors handling spool directory / files, database connectivity
+errors etc</li>
 
 <li>
 Added separate debug file for snmptthandler</li>
@@ -441,7 +455,7 @@ section for Windows</a>.</blockquote>
 <a NAME="LoggingDatabase"></a><b><font size=+2>Logging - Database</font></b>
 <p>Translated traps can also be sent to a database.&nbsp; MySQL (tested
 under Linux) and ODBC (testing under Windows NT) can be used.
-<p><b><font size=+1>MySQL</font></b>
+<p><b><font size=+1>DBI::MySQL</font></b>
 <p>To configure SNMPTT for MySQL, modify the following variables in the
 snmptt.ini file.
 <blockquote><b>mysql_dbi_enable</b>
@@ -470,7 +484,39 @@ Permissions etc should also be defined.
 All variables are INSERTted into the database as standard text including
 the date and time.&nbsp; The variable lengths I have chosen above should
 be sufficient, but they may need to be increased depending on your environment.
-<p><b><font size=+1>ODBC</font></b>
+<p><b><font size=+1>DBD::ODBC</font></b>
+<p>SNMPTT can access ODBC data sources using either the DBD::ODBC module
+on Linux and Windows, or the WIN32::ODBC module on Windows.
+<p>To configure SNMPTT for ODBC access using the module DBD::ODBC, modify
+the following variables in the snmptt script.
+<blockquote><b>dbd_odbc_enable = 1;</b>
+<br><b>dbd_odbc_dsn = 'snmptt';</b>
+<br><b>dbd_odbc_table = 'snmptt';</b>
+<br><b>dbd_odbc_username = 'snmptt';</b>
+<br><b>dbd_odbc_password = 'password';</b></blockquote>
+Note:&nbsp; Sample values are defined in the default ini file.
+<p>The following MS SQL Server script can create the table inside an existing
+database.&nbsp; Permissions etc should also be defined.
+<blockquote><b><tt>CREATE TABLE snmptt (</tt></b>
+<br><b><tt>eventname character(50) NULL,</tt></b>
+<br><b><tt>eventid&nbsp; character(50) NULL,</tt></b>
+<br><b><tt>enterprise character(50) NULL,</tt></b>
+<br><b><tt>community character(20) NULL,</tt></b>
+<br><b><tt>hostname character(100) NULL,</tt></b>
+<br><b><tt>agentip&nbsp; character(16) NULL,</tt></b>
+<br><b><tt>category character(20) NULL,</tt></b>
+<br><b><tt>severity character(20) NULL,</tt></b>
+<br><b><tt>uptime&nbsp; character(20) NULL,</tt></b>
+<br><b><tt>traptime character(30) NULL,</tt></b>
+<br><b><tt>formatline character(255) NULL)</tt></b></blockquote>
+All variables are inserted into the database using '<b>INSERT INTO</b>'
+as text including the date and time.&nbsp; The variable lengths I have
+chosen above should be sufficient, but they may need to be increased depending
+on your environment.
+<br>&nbsp;
+<p><b><font size=+1>Win32::ODBC</font></b>
+<p>SNMPTT can access ODBC data sources using either the DBD::ODBC module
+on Linux and Windows, or the WIN32::ODBC module on Windows.
 <p>To configure SNMPTT for MS SQL via ODBC on Windows, modify the following
 variables in the snmptt script.
 <blockquote><b>sql_win32_odbc_enable = 1;</b>
@@ -493,9 +539,10 @@ database.&nbsp; Permissions etc should also be defined.
 <br><b><tt>uptime&nbsp; character(20) NULL,</tt></b>
 <br><b><tt>traptime character(30) NULL,</tt></b>
 <br><b><tt>formatline character(255) NULL)</tt></b></blockquote>
-All variables are INSERTted into the database as standard text including
-the date and time.&nbsp; The variable lengths I have chosen above should
-be sufficient, but they may need to be increased depending on your environment.
+All variables are inserted into the database using '<b>INSERT INTO</b>'
+as text including the date and time.&nbsp; The variable lengths I have
+chosen above should be sufficient, but they may need to be increased depending
+on your environment.
 <br>&nbsp;
 <p><a NAME="LoggingUnknown"></a><b><font size=+2>Logging - Unknown traps</font></b>
 <p>Logging of non recognized traps is also possible.&nbsp; This would be
@@ -592,8 +639,7 @@ loops back up to 'reads traps passed from spool directory'</li>
 </ul>
 Using SNMPTTHANDLER and SNMPTT in daemon mode, a large number of traps
 per minute should be handled easily.
-<p>Running SNMPTT with the --daemon command line option or setting the
-<b>mode</b>
+<p>Running SNMPTT with the --daemon command line option or setting the<b>mode</b>
 variable in the <b>snmptt.ini</b> file is set to <b>daemon</b> will cause
 SNMPTT to run in daemon mode.
 <p>By setting the .ini variable <b>use_trap_time</b> to <b>1</b> (default),
@@ -1028,14 +1074,14 @@ cd into the directory where snmptt-eventlog.mc is located (included with
 SNMPTT) and execute the following commands:</li>
 
 <li>
-mc snmptt-eventlog.mc</li>
+<b>mc snmptt-eventlog.mc</b></li>
 
 <li>
-rc /r snmptt-eventlog.rc</li>
+<b>rc /r snmptt-eventlog.rc</b></li>
 
 <li>
-link /nodefaultlib /INCREMENTAL:NO /release /nologo -base:0x60000000 -machine:i386
--dll -noentry -out:snmptt-eventlog.dll snmptt-eventlog.res</li>
+<b>link /nodefaultlib /INCREMENTAL:NO /release /nologo -base:0x60000000
+-machine:i386 -dll -noentry -out:snmptt-eventlog.dll snmptt-eventlog.res</b></li>
 
 <li>
 Install the DLL as described above</li>
