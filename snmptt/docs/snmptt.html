@@ -932,7 +932,7 @@ see 'Compiling' below.</p>
 <li>Inside of the <b>SNMPTT</b> key, create a new <span style=
 "font-weight: bold;">String</span> Value called
 <b>EventMessageFile</b>.&nbsp; Give it a value of
-<b>%windir%\system32\snmptt-eventlog.dll<./b></li>
+<b>%windir%\system32\snmptt-eventlog.dll.</b></li>
 <li>Inside of the <b>SNMPTT</b> key, create a new <span style=
 "font-weight: bold;">DWORD</span> Value called
 <b>TypesSupported</b>.&nbsp; Give it a value of <b>7</b>.</li>
@@ -1226,12 +1226,13 @@ the snmptt.ini file.</p>
 <b>mysql_dbi_table<br /></b><b>mysql_dbi_table_unknown</b><br />
 <b>mysql_dbi_username</b><br />
 <b>mysql_dbi_password</b></blockquote>
-Note:&nbsp; Sample values are defined in the default ini
+<p>Note:&nbsp; Sample values are defined in the default ini
 file.&nbsp; Defining <span style=
 "font-weight: bold;">mysql_dbi_table_unknown</span> is
-optional.<br />
+optional.</p>
 <p>The following MySQL script can create the database and
-table.&nbsp; Permissions etc should also be defined.</p>
+table.&nbsp; Permissions etc should also be defined.  Run '<b>mysql</b>' as
+root and enter:</p>
 <blockquote><b>CREATE DATABASE snmptt;</b><br />
 <b>USE snmptt;</b>
 <p><b>DROP TABLE snmptt;;</b><br />
@@ -1264,10 +1265,15 @@ enterprise VARCHAR(100),</b><br />
 <b>traptime VARCHAR(30),</b><br />
 <b>formatline VARCHAR(255));</b></p>
 </blockquote>
-All variables are INSERTted into the database as standard text
+<p>All variables are INSERTted into the database as standard text
 including the date and time.&nbsp; The variable lengths I have
 chosen above should be sufficient, but they may need to be
-increased depending on your environment.<br />
+increased depending on your environment.</p>
+<p>To add a user account called '<b>snmptt</b>' with a password of
+'<b>mytrap</b>' for use by SNMPTT,
+use the following SQL statement:</p>
+<blockquote><b>GRANT ALL PRIVILEGES ON *.* TO 'snmptt'@'localhost' IDENTIFIED
+BY 'mytrap' WITH GRANT OPTION;</b></blockquote>
 <br />
 <h4><a id="LoggingDatabase-PostgreSQL" name=
 "LoggingDatabase-PostgreSQL"></a>DBD::PgPP (PostgreSQL)</h4>
