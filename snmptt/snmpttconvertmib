@@ -202,8 +202,9 @@ unless (open INPUTFILE, "<$input")
 
 while (<INPUTFILE>)
 {
-	chomp;				#remove <cr> at end of line	
-	push(@mibfile, $_);		#add to each line to @trapconf array
+	chomp;				# remove <cr> at end of line
+	s/\015//;			# Remove any DOS carriage returns
+	push(@mibfile, $_);		# add to each line to @trapconf array
 }
 
 if ($DEBUGGING >= 1)
@@ -293,7 +294,6 @@ while ($currentline <= $#mibfile)
 			# (SNMPv2 NOTIFICATIONS have the enterprise in the ::= line)
 			if ($line3 =~ /ENTERPRISE\s+(.*)/)
 			{
-				print "Enterprise: $1\n";
 				$enterprise = $1;
 				$enterprisefound =1;
 			}
@@ -1091,4 +1091,4 @@ foreach $key (sort keys %SNMP::MIB)
 }
 
 
-	
+	i
