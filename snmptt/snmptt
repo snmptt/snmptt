@@ -223,7 +223,7 @@ if ($net_snmp_perl_enable == 1)
 	  $ENV{'MIBS'} = $mibs_environment;
 	}
 	&SNMP::initMib();
-	$SNMP::best_guess = 1;
+	$SNMP::best_guess = 2;
 	$SNMP::use_long_names = 0;
 }
 
