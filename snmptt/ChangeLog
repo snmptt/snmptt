@@ -1,3 +1,7 @@
+March 18th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed bug with MySQL database not closing correctly at shutdown due to 
+  previous MySQL changes
+
 March 13th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with handling trap data that contains spaces but is not inside of quotes
   for traps received from snmptrapd 4.2.3
