@@ -1983,7 +1983,6 @@ sub readtrap
 	  if ($var[0] =~ /\./)      # Contain a . ?
 	  {
 	    @var[0] = $var[0] =~ /^([^\.]+?)\./;
-	    print "xxxx\n";
 	  }
 	}
 
