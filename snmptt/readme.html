@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.6.1</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; March 31st, 2003
+This file was last updated on:&nbsp; April 1st, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -152,10 +152,10 @@ or if translation of integers is enabled</li>
 All development and testing was done on Mandrake Linux 8.1 using
 UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).&nbsp; I have
 also tested the program with Windows 2000 using the native version of
-NET-SNMP compiled with MSVC++ and also under Cygwin with gcc etc.&nbsp;
-Note:&nbsp; The Net-SNMP Perl module works fine under Cygwin, but I have
-not been able to get the Perl module working with MSVC++.&nbsp; See the
-FAQ section for information on Cygwin.<br>
+NET-SNMP 5.0.8 compiled with MSVC++ and also under Cygwin with gcc
+etc.&nbsp; Note:&nbsp; The Net-SNMP Perl module works fine under native
+Windows and with Cygwin.&nbsp; See the FAQ section for information on
+compiling Net-SNMP with Perl support.<br>
 <br>
 Both SNMP V1 and V2 traps have been tested.
 <p>UCD-SNMP v4.2.3 appears to have a bug that prevents it from working
@@ -168,15 +168,15 @@ does not have this problem.<br>
 <p>Note: </p>
 <blockquote>SNMPTT only requies the the NET-SNMP Perl module if you
 want to have variable names translated into text, or you enable the
-translation of integer values (translate_integers = 1) to enumeration
-tags.</blockquote>
+translation of integer values (<span style="font-weight: bold;">translate_integers
+= 1</span>) to enumeration tags.</blockquote>
 <p><br>
 <a name="Whats-New"></a><b><font size="+2">What's New</font></b> </p>
 <p><b><font size="+1">0.7 - ??</font></b><b><font size="+1">, 2003</font></b></p>
 <ul>
   <li>Fixed bug that would prevent the translation of integer values to
-enumeration tags and variable name substitutions from working when
-using Net-SNMP 5.0.x<br>
+enumeration tags and variable name substitutions when using Net-SNMP
+5.0.x<br>
   </li>
   <li>NODES entry can now contain a CIDR address (eg: 192.168.10.0/23),
 or a network range (192.168.10.0-192.168.11.255)<br>
@@ -187,12 +187,13 @@ CIDR addresses, network ranges and filenames</li>
   <ul>
     <li>FORMAT / EXEC line can now contain any of the following:</li>
     <ul>
-      <li>--#SUMMARY <span style="font-weight: bold;">or </span>DESCRIPTION(use<span
- style="font-weight: bold;"></span>DESCRIPTION only if --#SUMMARY does
-not exist)<br>
+      <li>--#SUMMARY <span style="font-weight: bold;">or </span>DESCRIPTION
+(use<span style="font-weight: bold;"></span> DESCRIPTION only if
+--#SUMMARY does not exist)<br>
       </li>
-      <li>description <span style="font-weight: bold;">or </span>--#SUMMARY(use--#SUMMARYonly
-if <span style="font-weight: bold;"></span>DESCRIPTION does not exist)</li>
+      <li>description <span style="font-weight: bold;">or </span>--#SUMMARY
+(use --#SUMMARYonly if <span style="font-weight: bold;"></span>DESCRIPTION
+does not exist)</li>
       <li>--#SUMMARY <span style="font-weight: bold;">and </span><span
  style="font-weight: bold;"></span>DESCRIPTION </li>
       <li><span style="font-weight: bold;"></span>DESCRIPTION <span
@@ -200,12 +201,12 @@ if <span style="font-weight: bold;"></span>DESCRIPTION does not exist)</li>
       </li>
     </ul>
     <li>When using the DESCRIPTION to build the FORMAT / EXEC line, can
-now choose between using the first line of the DESCRIPTION field, or
-the first <span style="font-style: italic;">x</span> number of sentences<br>
+now choose between using the first line of the DESCRIPTION field, or the
+first <span style="font-style: italic;">x</span> number of sentences<br>
     </li>
     <li>The use of the --#SUMMARY and DESCRIPTION line for the FORMAT /
-EXEC line can now be disabled</li>
-    <li>The default of using the $* wildcard can now be disabled</li>
+EXEC line can be disabled</li>
+    <li>The default of using the $* wildcard can be disabled</li>
     <li>Conversion of the DESCRIPTION section to SDESC / EDESC can be
 disabled</li>
     <li>EXEC line can be specified on the command line</li>
@@ -1526,8 +1527,8 @@ which will dump all received variables. <br>
 </p>
 <p style="font-weight: bold;">* Note:&nbsp; This can be changed by
 specifying a --format=n command line option.&nbsp; See the
-snmpttconvertmib help screen for all possible command line options (snmpttconvertmib
---h).</p>
+snmpttconvertmib help screen for all possible command line options
+(snmpttconvertmib --h).</p>
 <p><b><font size="+1">SNMP V1 files (TRAP-TYPE) - Perl module method:</font></b> <br>
 </p>
 <p>When the Perl module is used, the only differences are:<br>
@@ -1667,8 +1668,9 @@ do wrong?</b> </p>
 <p>A:&nbsp; You probably didn't start snmptrapd correctly.&nbsp; Make
 sure it is started using: </p>
 <blockquote><b>snmptrapd -On</b></blockquote>
-If it is not started with -On, then it will not pass traps using
-numeric OIDs and SNMPTT will not process them.
+If it is not started with <span style="font-weight: bold;">-On</span>,
+then it will not pass traps using numeric OIDs and SNMPTT will not
+process them.
 <p>As an alternative, you can edit your <b>snmp.conf</b> file to
 include the line: <b>printNumericOids 1.&nbsp; </b>This setting will
 take effect no matter what is used on the command line. </p>
@@ -1682,12 +1684,15 @@ with the <b>joe</b> text editor will show <b><u>M</u></b>'s at the end
 of each line.&nbsp; To strip them out and craete a new file, type: </p>
 <p><b>cat <i>mib-file</i> | tr -d '\015' &gt; <i>mib-file.new</i></b> <br>
 &nbsp; <br>
-Note: This should no longer be required as snmpttconvert and
-snmpttconvertmib now automatically remove \015 characters while reading
-the input file.<br>
+Note: This should no longer be required as <span
+ style="font-weight: bold;">snmpttconvert </span>and <span
+ style="font-weight: bold;">snmpttconvertmib </span>now automatically
+remove <span style="font-weight: bold;">\015</span> characters while
+reading the input file.<br>
 </p>
-<p><b>Q:&nbsp; I have disabled syslog support in SNMPTT, but my syslog
-(or NT Event Log) is still filling up with trap messages.&nbsp; How do I
+<p><b><br>
+Q:&nbsp; I have disabled syslog support in SNMPTT, but my syslog (or NT
+Event Log) is still filling up with trap messages.&nbsp; How do I
 disable them?</b> <br>
 <b>Q:&nbsp; I am using syslog (or NT Event Log) to log trap messages,
 but there are two log entries for each trap received.&nbsp; How do I
@@ -1740,23 +1745,168 @@ under Windows NT.&nbsp;&nbsp; What should I do?</span></b></p>
 <p>A:&nbsp; You have at least two options:</p>
 <ol>
   <li>Download Net-SNMP and compile using MSVC++ as described in the
-README.WIN32 file.&nbsp; This should create a working snmptrapd, but I
-have not heard of anyone getting the Perl module to compile using MSVC++.</li>
-  <li>Install Cygwin, download Net-SNMP and compile using gcc as
-described in the README.WIN32 file.&nbsp; The Perl module appears to
+README.WIN32 file.&nbsp; This should create a working snmptrapd.&nbsp;
+The Perl module in Net-SNMP 5.0.8 does seem to compile as explained in
+the documentation.&nbsp; For a workaround, see the question: <b><span
+ style="font-weight: bold;">How to I enable the Perl support for
+UCD-SNMP / NET-SNMP under Windows</span></b><span
+ style="font-weight: bold;">?</span></li>
+  <li>Install Cygwin, download Net-SNMP (5.0.8) and compile using gcc
+as described in the README.WIN32 file.&nbsp; The Perl module appears to
 work fine under Cygwin.&nbsp; <br>
   </li>
 </ol>
 <p><b><span style="font-weight: bold;"><br>
-Q:&nbsp; I want to enable the Perl support for UCD-SNMP / NET-SNMP
-under Windows</span></b><span style="font-weight: bold;"> but I don't
-know how.&nbsp; Do you?</span><br>
+Q:&nbsp; How to I enable the Perl support for UCD-SNMP / NET-SNMP under
+Windows</span></b><span style="font-weight: bold;">?</span></p>
+<p style="font-weight: bold; text-decoration: underline;">Native
+Windows:</p>
+<p>The following steps should allow you to compile the Perl module for
+Net-SNMP 5.0.8 when using MSVC++ 6.0:<br>
 </p>
-<p>A:&nbsp; If I ever find someone who has managed to get it to compile
-using MSVC++, I will add the steps in here.<br>
+<div style="margin-left: 40px;">MS VC++ 6.0 with SP5<br>
+Build (release)<br>
+&nbsp;&nbsp;&nbsp; libsnmp<br>
+&nbsp;&nbsp;&nbsp; snmptranslate<br>
+&nbsp;&nbsp;&nbsp; snmptrapd<br>
 <br>
-I&nbsp; have been able to get it to compile under Cygwin, including the
-Net-SNMP Perl module support.&nbsp; The following steps should work:<br>
+(this is all you should need - compile more apps if you want)<br>
+<br>
+Install to c:\usr etc as per README.win32 docs<br>
+<br>
+Install regex win32 package (gnu_regex.exe) from
+http://people.delphiforums.com/gjc/gnu_regex.html<br>
+&nbsp;&nbsp;&nbsp; copy gnu_regex.lib "C:\Program Files\Microsoft
+Visual Studio\VC98\Lib"<br>
+&nbsp;&nbsp;&nbsp; copy gnu_regex.dll c:\winnt<br>
+&nbsp;&nbsp;&nbsp; copy regex.h "C:\Program Files\Microsoft Visual
+Studio\VC98\include"<br>
+<br>
+These instructions assume net-snmp-5.0.8 is in c:\net-snmp-5.0.8, Perl
+is installed in c:\Perl, and Net-SNMP was installed to c:\usr.<br>
+<br>
+vcvars32.bat<br>
+<br>
+SET
+INCLUDE=%INCLUDE%;c:\net-snmp-5.0.8\include;c:\net-snmp-5.0.8\win32;c:\net-snmp-5.0.8\include\net-snmp<br>
+<br>
+SET LIB=%LIB%;c:\usr\lib;<br>
+<br>
+cd net-snmp-5.0.8\perl<br>
+<br>
+c:\perl\bin\perl Makefile.PL CAPI=TRUE<br>
+<br>
+cd default_store<br>
+c:\perl\bin\perl Makefile.PL CAPI=TRUE<br>
+cd ..<br>
+<br>
+edit default_store\Makefile and add to the LDLOADLIBS line libsnmp.lib:<br>
+LDLOADLIBS =&nbsp; .... libsnmp.lib<br>
+<br>
+edit oid\Makefile:<br>
+LDLOADLIBS = .... libsnmp.lib and add to the LDLOADLIBS line
+libsnmp.lib:<br>
+<br>
+edit snmp/Makefile: .... c:\usr\lib\libsnmp.lib<br>
+LDLOADLIBS = .... libsnmp.lib and add to the LDLOADLIBS line
+libsnmp.lib:<br>
+<br>
+net-snmp-5.0.8\include\net-snmp\library\system.h<br>
+Change:<br>
+&nbsp;&nbsp;&nbsp; #ifdef WIN32<br>
+to:<br>
+&nbsp;&nbsp;&nbsp; #ifndef _MSC_VER<br>
+&nbsp;&nbsp;&nbsp; #ifdef WIN32<br>
+<br>
+Change:<br>
+&nbsp;&nbsp;&nbsp;
+#endif&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/* WIN32 */<br>
+to:<br>
+&nbsp;&nbsp;&nbsp;
+#endif&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/* WIN32 */<br>
+&nbsp;&nbsp;&nbsp; #endif&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; /* _MSC_VER */<br>
+<br>
+net-snmp-5.0.8\perl\snmp\snmp.xs:<br>
+Change:<br>
+&nbsp;&nbsp;&nbsp; #include &lt;signal.h&gt;<br>
+to:<br>
+&nbsp;&nbsp;&nbsp; #ifndef _MSC_VER<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; #include &lt;signal.h&gt;<br>
+&nbsp;&nbsp;&nbsp; #endif<br>
+<br>
+Change:<br>
+&nbsp;&nbsp;&nbsp; #include &lt;unistd.h&gt;<br>
+to:<br>
+&nbsp;&nbsp;&nbsp; #ifndef _MSC_VER<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; #include &lt;unistd.h&gt;<br>
+&nbsp;&nbsp;&nbsp; #endif<br>
+<br>
+net-snmp-5.0.8\perl\<br>
+<br>
+cd default_store<br>
+nmake CAPI=TRUE<br>
+<br>
+cd ..\OID<br>
+nmake CAPI=TRUE<br>
+<br>
+cd ..\SNMP<br>
+nmake CAPI=TRUE<br>
+<br>
+cd .. (net-snmp-5.0.8)<br>
+<br>
+md c:\perl\lib\SNMP<br>
+md c:\perl\lib\NetSNMP<br>
+<br>
+md c:\perl\lib\auto\NetSNMP<br>
+md c:\perl\lib\auto\NetSNMP\default_store\<br>
+md c:\perl\lib\auto\NetSNMP\OID\<br>
+<br>
+md c:\Perl\site\lib\auto\SNMP<br>
+md c:\Perl\site\lib\auto\NetSNMP<br>
+md c:\Perl\site\lib\auto\NetSNMP\default_store<br>
+md c:\Perl\site\lib\auto\NetSNMP\OID<br>
+<br>
+copy SNMP\blib\lib\auto\SNMP\autosplit.ix c:\perl\lib\auto\SNMP\<br>
+copy default_store\blib\lib\auto\NetSNMP\default_store\autosplit.ix
+c:\Perl\site\lib\auto\NetSNMP\default_store\<br>
+copy blib\lib\auto\NetSNMP\OID\autosplit.ix
+c:\Perl\site\lib\auto\NetSNMP\OID\<br>
+<br>
+copy SNMP\SNMP.pm c:\perl\lib\<br>
+copy default_store\default_store.pm c:\perl\lib\NetSNMP\<br>
+copy oid\oid.pm c:\perl\lib\NetSNMP\<br>
+<br>
+copy blib\arch\auto\SNMP\SNMP.dll c:\Perl\site\lib\auto\SNMP\<br>
+copy blib\arch\auto\NetSNMP\default_store\default_store.dll
+c:\Perl\site\lib\auto\NetSNMP\default_store\<br>
+copy blib\arch\auto\NetSNMP\OID\oid.dll
+c:\Perl\site\lib\auto\NetSNMP\OID\<br>
+<br>
+See if the module will load in Perl:<br>
+<br>
+<div style="margin-left: 40px;">perl<br>
+use SNMP;<br>
+</div>
+<br>
+For a more complete test, run the following script:<br>
+<br>
+<div style="margin-left: 40px;">use SNMP;<br>
+$ENV{'MIBS'} = 'ALL';<br>
+print "sysDescr: " . &amp;SNMP::translateObj('sysDescr') . "\n";<br>
+</div>
+<br>
+The output should be:<br>
+<br>
+<div style="margin-left: 40px;">sysDescr: .1.3.6.1.2.1.1.1<br>
+</div>
+&nbsp; <br>
+</div>
+<p><span style="font-weight: bold; text-decoration: underline;">Cygwin:</span></p>
+<p> I&nbsp; have been able to get it to compile under Cygwin, including
+the Net-SNMP Perl module support.&nbsp; The following steps should work:<br>
 </p>
 <div style="margin-left: 40px;">Install a recent Cygwin.&nbsp; (Cygwin
 from around the first week of March 2003 seems to work fine)<br>
@@ -1807,10 +1957,22 @@ See if the module will load in Perl:<br>
 <br>
 <div style="margin-left: 40px;">perl<br>
 use SNMP;<br>
+</div>
 <br>
+For a more complete test, run the following script:<br>
+<br>
+<div style="margin-left: 40px;">use SNMP;<br>
+$ENV{'MIBS'} = 'ALL';<br>
+print "sysDescr: " . &amp;SNMP::translateObj('sysDescr') . "\n";<br>
 </div>
+<br>
+The output should be:<br>
+<br>
+<div style="margin-left: 40px;">sysDescr: .1.3.6.1.2.1.1.1<br>
 </div>
-<p> <b>Q:&nbsp; I have enable net_snmp_perl_enable but the variable
+&nbsp;<br>
+</div>
+<p> <b>Q:&nbsp; I have enabled net_snmp_perl_enable but the variable
 names are not being translated into text using $v<i>n, $-n, $+n, $-* or
 $+*</i>.&nbsp; How do I troubleshoot it?</b> <br>
 <b>Q:&nbsp; I have enabled translate_integers but the integer values
