@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.6.1</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; April 16th, 2003
+This file was last updated on:&nbsp; April 17th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -146,16 +146,17 @@ module.&nbsp; Required for ODBC (SQL etc) access on Windows (DBD::ODBC
 not required if using Win32::ODBC)</li>
   <li> Optional: <a
  href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">Net-SNMP
-Perl module</a>.&nbsp; Only required to translate variable names ($vn)
-or if translation of integers is enabled</li>
+Perl module</a>.&nbsp; Only required for features that perform
+conversions between symbolic and numeric OIDs<br>
+  </li>
 </ul>
 All development and testing was done on Mandrake Linux 8.1 using
-UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).&nbsp; I have
-also tested the program with Windows 2000 using the native version of
-Net-SNMP 5.0.8 compiled with MSVC++ and also under Cygwin with gcc
-etc.&nbsp; Note:&nbsp; The Net-SNMP Perl module works fine under native
-Windows and with Cygwin.&nbsp; See the FAQ section for information on
-compiling Net-SNMP with Perl support.<br>
+UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm) an Net-SNMP
+5.0.8.&nbsp; I have also tested the program with Windows 2000 using the
+native version of Net-SNMP 5.0.8 compiled with MSVC++ and also under
+Cygwin with gcc etc.&nbsp; Note:&nbsp; The Net-SNMP Perl module works
+fine under native Windows and with Cygwin.&nbsp; See the FAQ section
+for information on compiling Net-SNMP with Perl support.<br>
 <br>
 Both SNMP V1 and V2 traps have been tested.
 <p>UCD-SNMP v4.2.3 appears to have a bug that prevents it from working
@@ -190,9 +191,9 @@ requires the UCD-SNMP / Net-SNMP Perl module<br>
   </li>
   <li> Added the configuration options <b>translate_trap_oid</b> and <span
  style="font-weight: bold;">translate_oids </span>to have the trap OID
-and OID values contained in the trap variables to be converted from
-numerical OID to symbolic form before logging.&nbsp; This feature
-requires the UCD-SNMP / Net-SNMP Perl module</li>
+and OID values contained in the trap variables converted from numerical
+OID to symbolic form before logging.&nbsp; This feature requires the
+UCD-SNMP / Net-SNMP Perl module</li>
   <li>Added support for logging of traps using PostgreSQL via DBI /
 DBD::PgPP</li>
   <li>Added REGEX keyword support to allow user definable search and
@@ -204,8 +205,8 @@ or a network range (192.168.10.0-192.168.11.255)<br>
   <li>NODES entry can now contain a mix of host names, IP addresses,
 CIDR addresses, network ranges and filenames</li>
   <li>Added the ability to force a reload of the configuration files
-while running in daemon mode by adding a file called <span
- style="font-weight: bold;">!reload</span> to the spool directory</li>
+while running in daemon mode by placing a file called <span
+ style="font-weight: bold;">!reload</span> in the spool directory</li>
   <li>Fixed bug that prevented quoted text from being logged correctly
 to SQL databases</li>
   <li>Fixed bug that would prevent the translation of integer values to
