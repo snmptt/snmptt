@@ -2394,7 +2394,6 @@ sub translate_oids_sub
 	{
 	  chop $temp;
 	}
-	$string =~ s/\s+//g;
 	$string =~ s/$oid/$temp/g;
 	if ($oid_found == 1 && $DEBUGGING >= 2)
 	{
