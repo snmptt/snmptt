@@ -151,8 +151,13 @@ or if translation of integers is enabled</li>
 </ul>
 All development and testing was done on Mandrake Linux 8.1 using
 UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).&nbsp; I have
-also tested the program with Windows 2000 using NET-SNMP.&nbsp; Both
-SNMP V1 and V2 traps have been tested.
+also tested the program with Windows 2000 using the native version of
+NET-SNMP compiled with MSVC++ and also under Cygwin with gcc etc.&nbsp;
+Note:&nbsp; The Net-SNMP Perl module works fine under Cygwin, but I
+have not been able to get the Perl module working with MSVC++.&nbsp;
+See the FAQ section for information on Cygwin.<br>
+<br>
+Both SNMP V1 and V2 traps have been tested.
 <p>UCD-SNMP v4.2.3 appears to have a bug that prevents it from working
 correctly with SNMPTT.&nbsp; UCD-SNMP v4.2.1, v4.2.4 and v4.2.5 appear
 to work fine.&nbsp; If you need to use UCD-SNMP v4.2.3 (for example you
@@ -1632,15 +1637,83 @@ be in /usr/src/RPM/SOURCES</li>
   <li> Go into the sub directory perl/SNMP</li>
   <li> Follow the instructions in the README file</li>
 </ol>
-<p><b><br>
-<span style="font-weight: bold;">Q:&nbsp; I want to enable the Perl
-support for UCD-SNMP / NET-SNMP under Windows</span></b><span
- style="font-weight: bold;"> but I don't know how.&nbsp; Do you?</span><br>
+<p><br>
+<b><span style="font-weight: bold;">Q:&nbsp; I want to use Net-SNMP
+under Windows NT.&nbsp;&nbsp; What should I do?</span></b></p>
+<p>A:&nbsp; You have at least two options:</p>
+<ol>
+  <li>Download Net-SNMP and compile using MSVC++ as described in the
+README.WIN32 file.&nbsp; This should create a working snmptrapd, but I
+have not heard of anyone getting the Perl module to compile using
+MSVC++.</li>
+  <li>Install Cygwin, download Net-SNMP and compile using gcc as
+described in the README.WIN32 file.&nbsp; The Perl module appears to
+work fine under Cygwin.&nbsp; <br>
+  </li>
+</ol>
+<p><b><span style="font-weight: bold;"><br>
+Q:&nbsp; I want to enable the Perl support for UCD-SNMP / NET-SNMP
+under Windows</span></b><span style="font-weight: bold;"> but I don't
+know how.&nbsp; Do you?</span><br>
 </p>
 <p>A:&nbsp; If I ever find someone who has managed to get it to compile
-under a newer Net-SNMP, I will add the steps in here.<br>
+using MSVC++, I will add the steps in here.<br>
 <br>
+I&nbsp; have been able to get it to compile under Cygwin, including the
+Net-SNMP Perl module support.&nbsp; The following steps should work:<br>
 </p>
+<div style="margin-left: 40px;">Install a recent Cygwin.&nbsp; (Cygwin
+from around the first week of March 2003 seems to work fine)<br>
+<br>
+Just install the basics, including Perl, development etc<br>
+<br>
+Downloaded new Net-SNMP 5.0.8<br>
+Followed the README.win32 with:<br>
+<br>
+./configure --with-mib-modules="host agentx smux examples/example" \<br>
+&nbsp;&nbsp;&nbsp;&nbsp; --with-out-mib-modules=host/hr_network \<br>
+&nbsp;&nbsp;&nbsp; --with-libs="-lregex -liphlpapi"<br>
+<br>
+If you get an error saying your system can't compile, you have two
+choices:<br>
+<br>
+1.&nbsp; Remove the -lregex line.&nbsp; This will obviously disable
+regex functionality in Net-SNMP.&nbsp; This may be bad.<br>
+<br>
+2.&nbsp; Install the regex library:<br>
+<div style="margin-left: 40px;"><br>
+Downloaded Regex source from
+http://mirrors.sunsite.dk/cygwin/release/regex/regex-4.4-2-src.tar.bz2<br>
+<br>
+Do a 'make lib'<br>
+Copy lib*.so /lib<br>
+</div>
+<br>
+Try again with Net-SNMP:<br>
+<br>
+./configure --with-mib-modules="host agentx smux examples/example" \<br>
+&nbsp;&nbsp;&nbsp;&nbsp; --with-out-mib-modules=host/hr_network \<br>
+&nbsp;&nbsp;&nbsp; --with-libs="-lregex -liphlpapi"<br>
+<br>
+make<br>
+make install<br>
+<br>
+Ran snmpget and it appeared to work (no errors).<br>
+<br>
+Now the perl:<br>
+<br>
+cd perl<br>
+perl Makefile.PL<br>
+make<br>
+make install<br>
+<br>
+See if the module will load in Perl:<br>
+<br>
+<div style="margin-left: 40px;">perl<br>
+use SNMP;<br>
+<br>
+</div>
+</div>
 <p> <b>Q:&nbsp; I have enable net_snmp_perl_enable but the variable
 names are not being translated into text using $v<i>n, $-n, $+n, $-* or
 $+*</i>.&nbsp; How do I troubleshoot it?</b> <br>
