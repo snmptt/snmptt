@@ -1,0 +1,2 @@
+Doing a sig HUP to reload doesn't seem to work 100%.  Should stop and
+restart SNMPTT instead until the bug is found
