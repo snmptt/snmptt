@@ -33,6 +33,7 @@ This file was last updated on:&nbsp; May 27th, 2003
   <a href="#Command-line-arguments">Command line arguments</a> <br>
   <a href="#SNMPTT.CONF-Configuration-file-format">SNMPTT.CONF
 Configuration file format</a> <br>
+&nbsp;&nbsp; <a href="#Variable-substitutions">Variable-substitutions</a><br>
   <a href="#SNMPTT.CONF-Configuration-file-Notes">SNMPTT.CONF
 Configuration file Notes</a> <br>
   <a href="#DNS">Name resolution / DNS</a><br>
@@ -109,7 +110,8 @@ DBD::ODBC or Win32::ODBC modules</li>
 <ul>
   <li> (Developed using) Perl 5.6.1</li>
   <li> Required: <a href="http://www.net-snmp.org">Net-SNMP</a>
-(formerly known as UCD-SNMP).&nbsp; Specifically <b>snmptrapd</b></li>
+(formerly known as UCD-SNMP).&nbsp; Specifically <b>snmptrapd.</b><br>
+  </li>
   <li> Required: <a
  href="http://search.cpan.org/search?module=Text::ParseWords">Text::ParseWords</a>
 (included with most distributions including ActivePerl)</li>
@@ -148,16 +150,14 @@ not required if using Win32::ODBC)</li>
   <li> Optional: <a
  href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">Net-SNMP
 Perl module</a>.&nbsp; Only required for features that perform
-conversions between symbolic and numeric OIDs<br>
-  </li>
+conversions between symbolic and numeric OIDs.&nbsp; Net-SNMP 5.0.8 with <a
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">patch
+722075</a>, or Net-SNMP 5.0.9 recommended. </li>
 </ul>
 All development and testing was done on Mandrake Linux 8.1 using
-UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm) an Net-SNMP
-5.0.8.&nbsp; I have also tested the program with Windows 2000 using the
-native version of Net-SNMP 5.0.8 compiled with MSVC++ and also under
-Cygwin with gcc etc.&nbsp; Note:&nbsp; The Net-SNMP Perl module works
-fine under native Windows and with Cygwin.&nbsp; See the FAQ section for
-information on compiling Net-SNMP with Perl support.<br>
+UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm) and Net-SNMP
+5.0.8 on Mandrake 9 / Windows 2000 (both native and Cygwin).&nbsp; See
+the FAQ section for information on compiling Net-SNMP with Perl support.<br>
 <br>
 Both SNMP V1 and V2 traps have been tested.
 <p>UCD-SNMP v4.2.3 appears to have a bug that prevents it from working
@@ -181,9 +181,9 @@ traps using symbolic form, or you enable the options <span
  size="+1">, 2003</font></b></p>
 <ul>
   <li>Added <span style="font-weight: bold;">trapoid </span>column
-for database logging to contain the actual trap received while <span
- style="font-weight: bold;">eventid </span>will contain the actual
-matched entry from the .conf file (which could be a wildcard OID)<br>
+for database logging to contain the actual trap received.&nbsp; The <span
+ style="font-weight: bold;">eventid</span> column will contain the
+actual matched entry from the .conf file (which could be a wildcard OID)<br>
   </li>
   <li>Fixed bug that prevented some variables from displaying the
 correct values because the received trap OID was replaced with the
@@ -197,6 +197,9 @@ agent IP address.</li>
 prints the numeric OID</li>
   <li>Variable $O now prints the trap in symbolic form.&nbsp; $o prints
 the numeric OID</li>
+  <li> Added new variable substitution <b>$n</b> to print the actual
+matched entry from the .conf file (which could be a wildcard OID)<br>
+  </li>
   <li>Added the configuration option <span style="font-weight: bold;">dns_enable</span>
 to enable DNS lookups on host and agent IP addresses</li>
   <li>If DNS is enabled, NODES entries are resolved to IP addresses and
@@ -977,8 +980,8 @@ in the snmptt.ini file.&nbsp; For example:<br>
 (5.0.8 at the time of this writing) and everything before it does not
 support including the module name (eg: <span style="font-weight: bold;">IF-MIB::</span>)
 when translating an OID.&nbsp; A patch is available for 5.0.8 that will
-appear in later releases of Net-SNMP.&nbsp; The patch can be downloaded
-from the <a
+appear in later releases of Net-SNMP (5.0.9+).&nbsp; The patch can be
+downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.&nbsp; If the version of Net-SNMP you are using does not
 support this feature and the event OID is specified with the module
@@ -1034,8 +1037,8 @@ the syslog level or NT Event Log type to the severity level.</blockquote>
   <blockquote><b>FORMAT</b> format_string
     <p>The format string is used to generate the text that will be
 logged to any of the supported logging methods. </p>
-    <p>Variable substitution is performed on this string using the
-following variables: </p>
+    <p><a name="Variable-substitutions"></a>Variable substitution is
+performed on this string using the following variables: </p>
     <blockquote>$A - Trap agent host name <b>(see Note 1)</b><br>
 $aA - Trap agent IP address<br>
 $c - Category <br>
@@ -1044,7 +1047,9 @@ $E - Enterprise trap OID in symbolic format <br>
 $e&nbsp; - Enterprise trap OID in number format <br>
 $G&nbsp; - Generic trap number (0 if enterprise trap) <br>
 $S&nbsp; - Specific trap number (0 if generic trap) <br>
-$N&nbsp; - Event name defined <br>
+$N&nbsp; - Event name defined in .conf file of matched entry<br>
+$n&nbsp; - Event OID defined in .conf file of matched entry (could be a
+wildcard OID)<br>
 $O - Trap OID in symbolic format <b>(see Note 4)</b><br>
 $o - Trap OID in numerical format <b>(see Note 4)</b><br>
 $R, $r&nbsp; - Hostname <b>(see Note 1)</b> <br>
@@ -1138,8 +1143,8 @@ everything before it does not support including the module name (eg: <span
  style="font-weight: bold;">IF-MIB::</span>) when translating an OID
 and most of the 5.0.x versions do not properly tranlsate numeric OIDs to
 long symbolic names.&nbsp; A patch is available for 5.0.8 that will
-appear in later releases of Net-SNMP.&nbsp; The patch can be downloaded
-from the <a
+appear in later releases of Net-SNMP (5.0.9+).&nbsp; The patch can be
+downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.<br>
     <br>
@@ -1159,8 +1164,8 @@ everything before it does not support including the module name (eg: <span
  style="font-weight: bold;">IF-MIB::</span>) when translating an OID
 and most of the 5.0.x versions do not properly tranlsate numeric OIDs to
 long symbolic names.&nbsp; A patch is available for 5.0.8 that will
-appear in later releases of Net-SNMP.&nbsp; The patch can be downloaded
-from the <a
+appear in later releases of Net-SNMP (5.0.9+).&nbsp; The patch can be
+downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.</blockquote>
   </blockquote>
@@ -2117,7 +2122,8 @@ file to the location specified in the snmptt.ini file (probably <span
   <li>Add <span style="font-weight: bold;">snmptt.conf.generic</span>
 to the <span style="font-weight: bold;">snmptt_conf_files</span> section
 of <span style="font-weight: bold;">snmptt.ini</span>.</li>
-  <li>Test SNMPTT by typing:&nbsp; snmptt &lt; sample-trap.generic</li>
+  <li>Test SNMPTT by typing:&nbsp; <span style="font-weight: bold;">snmptt
+&lt; sample-trap.generic</span></li>
   <li>Check the logs files etc for a sample linkDown trap<br>
   </li>
 </ol>
@@ -2132,7 +2138,9 @@ After a trap is received, take a look at the file to try to determine
 what is going wrong.&nbsp; Disable both logs when you are finished. <br>
 </p>
 <p>To make troubleshooting a particular trap easier when working in
-daemon mode, try the following:</p>
+daemon mode, try the following.&nbsp; This will prevent you have having
+to continuously generate the trap on the host.<br>
+</p>
 <ol>
   <li>Shut down SNMPTT</li>
   <li>Generate the trap</li>
@@ -2171,21 +2179,7 @@ patch is available from the Net-SNMP web site for 5.0.8 to allow it to
 handle other symbolic names such as module::symbolic name (eg:
 SNMPv2-MIB::coldTrap) etc.&nbsp; The patch can be downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
-patch page</a>.</p>
-<p><b>Q:&nbsp; When I try to convert a MIB, it will not convert
-properly.&nbsp; Why?</b> </p>
-<p>A:&nbsp; If you are using Unix and transferred the MIB file from
-Windows (or downloaded a ZIP file containing the MIB), you need to make
-sure it does not contain DOS carriage returns.&nbsp; Displaying the file
-with the <b>joe</b> text editor will show <b><u>M</u></b>'s at the end
-of each line.&nbsp; To strip them out and craete a new file, type: </p>
-<p><b>cat <i>mib-file</i> | tr -d '\015' &gt; <i>mib-file.new</i></b> <br>
-&nbsp; <br>
-Note: This should no longer be required as <span
- style="font-weight: bold;">snmpttconvert </span>and <span
- style="font-weight: bold;">snmpttconvertmib </span>now automatically
-removes <span style="font-weight: bold;">\015</span> characters while
-reading the input file.<br>
+patch page</a>.&nbsp; Net-SNMP 5.0.9 and higher will contain this patch.<br>
 </p>
 <p><b><br>
 Q:&nbsp; I have disabled syslog support in SNMPTT, but my syslog (or NT
@@ -2216,9 +2210,9 @@ to prevent TRAP messages from being logged to syslog, but allowing
 system messages to continue to be logged.&nbsp; The patch is available
 from the <a
  href="http://sourceforge.net/tracker/?func=detail&amp;atid=312694&amp;aid=695312&amp;group_id=12694">Net-SNMP
-patch section</a>.&nbsp; This patch should be included in the 5.1 (not
-5.0.8) release of Net-SNMP.&nbsp; With this patch, snmptrapd should be
-started using: </p>
+patch section</a>.&nbsp; This patch will be available in Net-SNMP 5.1
+when it's release.&nbsp; With this patch, snmptrapd should be started
+using: </p>
 <blockquote><b>snmptrapd -On -t</b></blockquote>
 <p><br>
 <b>Q:&nbsp; I want to enable the Perl support for UCD-SNMP / Net-SNMP
@@ -2259,25 +2253,27 @@ Windows:</p>
 <p style="margin-left: 40px;">To compile Net-SNMP 5.0.8 under Windows
 using MSVC++ 6.0, apply this <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=715603&amp;group_id=12694&amp;atid=312694">patch</a>
-and read the updated perl\SNMP\README file.<br>
+and read the updated perl\SNMP\README file or use Net-SNMP 5.0.9 or
+higher.<br>
 </p>
 <div style="margin-left: 40px;">The program <span
  style="font-weight: bold;">snmptt-net-snmp-test</span> can be used to
 perform various translations to test the functionality of the installed
-UCD-SNMP / NE-SNMP Perl module.&nbsp; The value of <span
+UCD-SNMP / Net-SNMP Perl module.&nbsp; The value of <span
  style="font-weight: bold;">best_guess</span> can be specified on the
 command line to determine how translations should occur.</div>
 <p><span style="font-weight: bold; text-decoration: underline;">Cygwin:</span></p>
 <p style="margin-left: 40px;">To compile Net-SNMP 5.0.8 under Windows
 using Cygwin, apply this <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=715603&amp;group_id=12694&amp;atid=312694">patch</a>
-and read the updated perl\SNMP\README file.&nbsp; The only update that
-applies to Cygwin is the section on Cygwin in the README file. <br>
+and read the updated perl\SNMP\README file or use Net-SNMP 5.0.9 or
+higher..&nbsp; The only update that applies to Cygwin is the section on
+Cygwin in the README file. <br>
 </p>
 <p style="margin-left: 40px;">The program <span
  style="font-weight: bold;">snmptt-net-snmp-test</span> can be used to
 perform various translations to test the functionality of the installed
-UCD-SNMP / NE-SNMP Perl module.&nbsp; The value of <span
+UCD-SNMP / Net-SNMP Perl module.&nbsp; The value of <span
  style="font-weight: bold;">best_guess</span> can be specified on the
 command line to determine how translations should occur. </p>
 <p> <b>Q:&nbsp; I have enabled net_snmp_perl_enable but the variable
@@ -2322,8 +2318,8 @@ writing) and everything before it does not support including the module
 name (eg: <span style="font-weight: bold;">IF-MIB::</span>) when
 translating an OID and most of the 5.0.x versions do not properly
 tranlsate numeric OIDs to long symbolic names.&nbsp; A patch is
-available for 5.0.8 that will appear in later releases of
-Net-SNMP.&nbsp; The patch can be downloaded from the <a
+available for 5.0.8 that will appear in later releases of Net-SNMP
+(5.0.9+).&nbsp; The patch can be downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.<br>
 <br>
@@ -2365,28 +2361,23 @@ UCD-SNMP / Net-SNMP programs you are using, if any. <br>
 &nbsp; <br>
 <b>Q:&nbsp; Does SNMPTT use DNS?</b><br>
 <br>
-No.&nbsp; SNMPTT is passed both the host name and the IP address from <span
- style="font-weight: bold;">snmptrapd</span>.&nbsp; Because of this, <span
- style="font-weight: bold;">SNMPTT </span>does not need to perform any
-DNS queries to resolve host names to IP addresses.&nbsp; When a host is
-compared to a network range or IP address for <span
- style="font-weight: bold;">NODES </span>list comparisons, the IP
-address passed from <span style="font-weight: bold;">snmptrapd </span>is
-used, as opposed to doing a DNS query of the host name.<br>
-&nbsp; <br>
+Only if it is enabled.&nbsp; See the <a
+ href="file:///I:/cvs/snmptt/readme.html#DNS">Name Resolution / DNS</a>
+section.<br>
+<br>
 <b><br>
 Q:&nbsp; Why doesn't the snmptt-init.d script work with Debian?</b><br>
 <br>
 The snmptt-init.d script provided with SNMPTT was written for Mandrake
 and RedHat.&nbsp; To make the script work with Debian without requiring
-any re-writing of the script, copy /etc/init.d/skeleton to
-/etc/init.d/functions.<br>
+any re-writing of the script, copy <span style="font-weight: bold;">/etc/init.d/skeleton</span>
+to <span style="font-weight: bold;">/etc/init.d/functions</span>.<br>
 <p><b><br>
 Q:&nbsp; Is there a front-end alarm browser available for SNMPTT?</b> </p>
 <p>A:&nbsp; Take a look at <a
  href="http://sourceforge.net/projects/snmptt-gui">SNMPTT-GUI</a>.&nbsp;
 SNMPTT-GUI aims to provide a web based frontend for SNMPTT.&nbsp; The
-gui is made up of server side perl cgi scripts with client side
+GUI is made up of server side perl cgi scripts with client side
 javascripts which interfaces to a SQL database using DBI::ODBC. </p>
 <p>SNMPTT-GUI questions should be directed to the project admins on the <a
  href="http://sourceforge.net/projects/snmptt-gui/">SNMPTT-GUI
