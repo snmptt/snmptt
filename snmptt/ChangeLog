@@ -1,3 +1,6 @@
+February 28th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added more entries to snmptt-eventlog.mc (total of 30) and recompiled DLL
+
 February 27th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed error messages for SQL and NT event ID numbers.  Udpated docs
 
