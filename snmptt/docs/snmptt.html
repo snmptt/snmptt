@@ -265,7 +265,7 @@ module is recommended.<br /></span></blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
 <h3><b>0.9.2</b> <b>- ??, 2004</b></h3>
 <ul>
-  <li>Added <b>mysql_ping_interval</b> option to set how often the database will be 'pinged' to ensure the connection is available.  If an error is returned, it will attempt to reconnect to the database.  The database will also be pinged before attempting to do an INSERT even if <b>mysql_ping_interval</b> is disabled.  This should prevent SNMPTT from having to be restarted if the SQL server is not available due to an outage.</li>
+  <li>Added <b>mysql_ping_insert</b> option to 'ping' the database before doing an INSERT and <b>mysql_ping_interval</b> option to periodically ping the database.  These two options will help ensure the connection to the database remains available.  If an error is returned, it will attempt to reconnect to the database.  This should prevent SNMPTT from having to be restarted if the SQL server is not available due to an outage or a connection timeout due to no activity.</li>
   <li>Added variable substitutions <b>$Fa</b>, <b>$Ff</b>, <b>$Fn</b>, <b>$Fr</b>, <b>$Ft</b>, for alarm (bell), form feed (FF), newline (LF, NL), return (CR) and tab (HT, TAB)</li>
   <li>Added variable substitution <b>$D</b> to dump the description text from the MIB file for FORMAT and EXEC lines.  Can be enabled or disabled using the <b>mib_descriptions_enable</b> <b>snmptt.ini</b> option.</li>
   <li>Fixed bug with MySQL 'gone away' errors when running SNMPTT as non-root due to connection being terminated when 

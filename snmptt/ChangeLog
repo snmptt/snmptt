@@ -1,3 +1,8 @@
+June 23th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Added config option mysql_ping_insert to enable / disable pinging the
+  database before an INSERT.
+- Changed ping_mysql subroutine to mysql_ping
+
 June 18th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - MySQL:  Now does a ping before trying to do the INSERT even if
   mysql_ping_interval is disabled.
