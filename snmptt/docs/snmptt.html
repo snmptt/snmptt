@@ -1063,17 +1063,21 @@ which causes SNMPTT to reload.
 "Configuration-Options"></a>Configuration Options - snmptt.ini</h2>
 <p>As mentioned throughout this document, configuration options are
 set by editing the <b>snmptt.ini</b> file.</p>
-<p>For Linux / Unix, the <b>snmptt.ini</b> file should be located
-in either <b>/etc/snmp/</b> or <b>/etc/</b>.&nbsp; SNMPTT will
-search for the the file in both directories in that order.</p>
+<p>For Linux / Unix, the following directories are searched to locate <b>snmptt.ini</b>:</p>
+<blockquote>
+  <b>/etc/snmp/</b><br />
+  <b>/etc/</b><br />
+  <b>/usr/local/etc/snmp/</b><br />
+  <b>/usr/local/etc/</b><br />
+</blockquote>
 <p>For Windows, the file should be in <b>%SystemRoot%\</b>.&nbsp;
-For example, <b>c:\winnt</b>.</p>
+For example, <b>c:\winnt</b> or <b>c:\windows</b>.</p>
 <p>The location of the ini file can be set on the command line
 using the <b>-ini=</b> parameter.&nbsp; See <a href=
 "#Command-line-arguments">Command Line Arguments</a>.</p>
 <p>A sample <b>snmptt.ini</b> is provided in this package.&nbsp;
 For Windows NT, be sure to copy the <b>snmptt.ini-nt</b> file to
-<b>%SystemRoot%\snmptt.ini</b>.&nbsp; For Windows NT, be sure to
+<b>%SystemRoot%\snmptt.ini</b>.&nbsp; Be sure to
 remove the <span style="font-weight: bold;">-nt</span> from the end
 of the filename.</p>
 <p style="text-decoration: underline;"><span style=

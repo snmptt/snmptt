@@ -2994,7 +2994,12 @@ sub findsnmpttini
 	##############################################################################
 	# Load config file start
 	# 
-	# For Linux / Unix, try /etc/snmp/snmptt.ini first, /etc/snmptt.ini second.
+	# For Linux / Unix, try in order:
+        #   /etc/snmp/snmptt.ini
+        #   /etc/snmptt.ini
+        #   /usr/local/etc/snmp/snmptt.ini
+        #   /usr/local/etc/snmptt.ini
+        #   
 	#
 	# For Windows, try %SystemRoot%\snmptt.ini only.
 	# 
@@ -3015,6 +3020,16 @@ sub findsnmpttini
 		  elsif ( open( CONFIG, '/etc/snmptt.ini' ) )
 		  {
 		    $configfile = '/etc/snmptt.ini';
+		    close CONFIG;
+		  }
+		  elsif ( open( CONFIG, '/usr/local/etc/snmp/snmptt.ini' ) )
+		  {
+		    $configfile = '/usr/local/etc/snmp/snmptt.ini';
+		    close CONFIG;
+		  }
+		  elsif ( open( CONFIG, '/usr/local/etc/snmptt.ini' ) )
+		  {
+		    $configfile = '/usr/local/etc/snmptt.ini';
 		    close CONFIG;
 		  }
 		}
@@ -3040,6 +3055,9 @@ sub loadsnmpttini {
 	if( open( CONFIG, $configfile ) ) {
 	  close CONFIG;
 	  $cfg = new Config::IniFiles( -file => $configfile);
+	  if ($DEBUGGING >= 0) {
+	  	print "Config file $configfile loaded\n";
+	  }
 	}
 	else
 	{
