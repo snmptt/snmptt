@@ -151,8 +151,7 @@ if ($ini ne '')
 else
 {	
  	if ($^O ne "MSWin32") {
- 	  #  my $configfile = '/etc/snmp/snmptt.ini'
-	  $configfile = '/home/aburge2/cvs/snmptt/snmptt.ini';
+ 	  $configfile = '/etc/snmp/snmptt.ini'
 	}
 	else {
 	  $configfile = '%sysdir%\\snmptt.ini';
@@ -1259,6 +1258,8 @@ sub loadsnmpttini {
 	
 	# TrapFiles
 	@snmpttconffiles = $cfg->val('TrapFiles', 'snmpttconffiles');
+	
+	$cfg->Delete;
 	
 	# print "Config file loaded\n";
 	
