@@ -248,6 +248,10 @@ if ($DEBUGGING >= 1)
 
 if ($daemon == 1)
 {
+	$SIG{HUP} = \&signal_handler_reload;
+
+	$timetoreload = 0;
+		
 	&loadsnmpttconf;	# Load SNMPTT.CONF file
 	
 	while (1)
@@ -288,6 +292,16 @@ if ($daemon == 1)
 			print "Sleeping for $sleep seconds\n\n";
 		}
 		sleep $sleep;
+
+		if ($timetoreload == 1)
+		{
+			if ($DEBUGGING >= 1)
+			{
+				print "Reloading configuration file\n\n";
+			}
+			&loadsnmpttconf;	# Load SNMPTT.CONF file
+			$timetoreload = 0;
+		}
 	}
 }
 else
@@ -1085,3 +1099,10 @@ sub searchfortrap
 	}
 }
 	
+sub signal_handler_reload {
+	#
+	# Daemon reload
+	#
+	$timetoreload = 1;
+}
+

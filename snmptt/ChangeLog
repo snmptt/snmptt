@@ -1,4 +1,6 @@
 August 29th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Added HUP signal to daemon mode to force reload of configuration
+  file(s).  Thanks to Stefan Mohr.
 - You can now have multiple definitions of the same trap.  Giving
   each entry a different NODES list will allow you to define
   actions for a particular trap based on the node.
