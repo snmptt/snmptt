@@ -334,13 +334,13 @@ if ($net_snmp_perl == 0)
 	      }
 	      else
 	      {
+                $line4 =~ s/--.*//; # Remove any trailing comments
 		$templine = $templine . $line4;
 		$currentline++; # Increment to the next line
 		$line4 = $mibfile[$currentline];
 	      }
 	    }
 	  }
-	  $templine =~ s/(--.*)//; # Remove any trailing comments
 	  $templine =~ s/\s//g;	# Remove any white space
 	  $templine =~ /\{(.*)\}/;
 	  @variables = split /\,/, $1;
