@@ -1,3 +1,10 @@
+April 23rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added my_getType and my_mapEnum functions.  Both attempt to use the
+  numeric OID first.  If that fails, then it converts the OID to a short
+  symbolic and uses that.  UCD-SNMP works with numeric, Net-SNMP 5.0.8 
+  does not.  Newer versions of Net-SNMP will work with numeric.  Numeric
+  is preferred as there is no chance of matching the wrong object.
+
 April 22st, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Add getType test to snmptt-net-snmp-test
 - If DNS is enabled, NODES entries are resolved to IP addresses before
