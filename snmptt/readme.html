@@ -171,7 +171,8 @@ the very least use the <b>snmptrapd</b> program from v4.2.5.
 <blockquote>SNMPTT only requies the the NET-SNMP Perl module if you enable
 the translation of integer values (translate_integers = 1) to enumeration
 tags in MIB files or want to have variable names translated into text from
-the MIB files.</blockquote>
+the
+MIB files.</blockquote>
 
 <p><br><a NAME="Whats New"></a><b><font size=+2>What's New</font></b>
 <p><b><font size=+1>0.6 - ???, 2003</font></b>
@@ -749,36 +750,57 @@ The syntax of the snmptt.conf file&nbsp; is:
 
 <blockquote><b>EVENT:</b>
 <blockquote><b>EVENT</b> event_name event_OID "category" severity
-<p>event_name: Unique text label (alias) <b><u>containing no spaces</u></b>
-<p>event_OID: Object identifier string in dotted format notation <b><u>containing
+<p><b>event_name:</b>
+<blockquote>Unique text label (alias) <b><u>containing no spaces</u></b>.&nbsp;
+This would match the name on the TRAP-TYPE or NOTIFICATION-TYPE line in
+the MIB file when converted using <b>snmpttconvertmib</b>.</blockquote>
+<b>event_OID:</b>
+<blockquote>Object identifier string in dotted format notation <b><u>containing
 no spaces</u></b> as received by snmptrapd.
-<p>For example, a Compaq (1.3.6.1.4.1.232) cpqHoGenericTrap trap (11001)
-would be written as:
+<p>For example, a Compaq (enterprise 1.3.6.1.4.1.232) cpqHoGenericTrap
+trap (trap 11001) would be written as:
 <p>1.3.6.1.4.1.232.0.11001.
-<p>Note: SNMP V1 traps are in the format of enterprise ID (1.3.6.1.4.1.232)
-followed by a 0, and then followed by the trap number
-<br>(11001).
-<p>Wildcards can also be used.&nbsp; For example:
+<p><b>Note:</b>
+<blockquote>SNMP V1 traps are in the format of enterprise ID (1.3.6.1.4.1.232)
+followed by a 0, and then followed by the trap number (11001).
+<p>There can be multiple entries for the same trap OID in the configuration
+file.&nbsp; If <b>multiple_event</b> is enabled in the snmptt.ini, then
+it will process all matching traps.&nbsp; If <b>multiple_event</b> is disabled,
+only the first matching entry will be used.</blockquote>
+Wildcards can also be used.&nbsp; For example:
 <p>1.3.6.1.4.1.232.1.2.*
-<p>Note: Specific trap matches are performed before wildcards so if you
-have an entry for 1.3.6.1.4.1.232.1.2.5 AND 1.3.6.1.4.1.232.1.2.*, it will
-process the .5 trap when received
-<p>category: Character string enclosed in double "s.&nbsp; Used when logging
+<p><b>Note:</b>
+<blockquote>Specific trap matches are performed before wildcards so if
+you have an entry for 1.3.6.1.4.1.232.1.2.5 AND 1.3.6.1.4.1.232.1.2.*,
+it will process the .5 trap when received even if the wildcard is defined
+first.
+<p>Wildcard matches are only matched if there are NO exact matches.&nbsp;
+This takes into consideration the NODES list.&nbsp; Therefore, if there
+is a matching trap, but the NODES list prevents it from being considered
+a match, the wildcard entry will only be used if there are no other exact
+matches.</blockquote>
+</blockquote>
+<b>category:</b>
+<blockquote>Character string enclosed in double "s.&nbsp; Used when logging
 output (see above).
-<p>If the category is "IGNORE", no action will take place even if the snmptt.conf
-contains FORMAT and / or EXEC statements.
-<p>If the category is "LOGONLY", the trap will be logged as usual, but
-the EXEC statement will be ignored.
+<p>If the category is "<b>IGNORE</b>", no action will take place even if
+the snmptt.conf contains FORMAT and / or EXEC statements.
+<p>If the category is "<b>LOGONLY</b>", the trap will be logged as usual,
+but the EXEC statement will be ignored.
 <p>Note:&nbsp;&nbsp; If you plan on using an external program such as Netsaint
 for logging, paging etc, you probably do not want any traps defined with
-LOGONLY
-<p>severity: Character string of the severity of the event.&nbsp; Used
-in the output when logging.&nbsp; Example: Minor, Major, Normal, Critical,
-Warning
-<br>&nbsp;</blockquote>
+<b>LOGONLY</b> as the EXEC line would be used to submit a passive service
+check.</blockquote>
+<b>severity:</b>
+<blockquote>Character string of the severity of the event.&nbsp; Used in
+the output when logging.&nbsp; Example: Minor, Major, Normal, Critical,
+Warning.&nbsp; The <b>snmptt.ini</b> contains options to match the syslog
+level or NT Event Log type to the severity level.</blockquote>
+</blockquote>
 <b>FORMAT:</b>
 <blockquote><b>FORMAT</b> format_string
-<p>Format string to be used when logging to snmptt.log and/or syslog.
+<p>The format string is used to generate the text that will be logged to
+any of the supported logging methods.
 <p>Variable substitution is performed on this string using the following
 variables:
 <blockquote>$A, $aA - Trap agent IP address
@@ -812,10 +834,15 @@ name:value</i><b>(**) (***)</b>
 name (variable type):value</i> <b>(**) (***)</b></blockquote>
 Example:
 <p>FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6
-<p>Note: The trap OID, severity, category and hostname will always be prepended
-to the FORMAT string in both the text log and syslog.&nbsp; The text log
-will also have the date prepended at the beginning.
-<p>* Note:
+<p>Note:
+<blockquote>For the text log file, the output will be formatted as:
+<blockquote><b><i>date time trap-OID severity category hostname - format</i></b></blockquote>
+For all other log files except MySQL, DBD::ODBC and Win32::ODBC, the output
+will be formatted as:
+<blockquote><b><i>trap-OID severity category hostname - format</i></b></blockquote>
+For MySQL, DBD::ODBC and Win32::ODBC, the <b>formatline</b> column will
+contain only the <b>format</b> text.</blockquote>
+* Note:
 <blockquote>If you are using DNS, the host name may resolve to the Fully
 Qualified Domain Name (FQDN) by snmptrapd.&nbsp; For example: barney.bedrock.com.
 <p>Adding an entry for the host in your /etc/hosts file or c:\%systemroot%\system32\drivers\etc\hosts
@@ -867,12 +894,12 @@ setting the <b>mibs_enviroment</b> variable in <b>snmptt.ini</b> to <b>ALL</b>
 and arguments to pass to the program.
 <p>EXEC uses same variable substitution as the FORMAT line.
 <p>Example:
-<p>EXEC /usr/bin/qpage -f TRAP alex "$r: $x $X - NIC switchover to slot
-$3, port $4 from slot $5, port $6"
-<p>or
-<p>EXEC c:\snmp\pager netops "$r: $x $X - NIC switchover to slot $3, port
-$4 from slot $5, port $6"
-<p>Note: Unlike the FORMAT line, nothing is prepended to the message.&nbsp;
+<blockquote>EXEC /usr/bin/qpage -f TRAP alex "$r: $x $X - NIC switchover
+to slot $3, port $4 from slot $5, port $6"</blockquote>
+or
+<blockquote>EXEC c:\snmp\pager netops "$r: $x $X - NIC switchover to slot
+$3, port $4 from slot $5, port $6"</blockquote>
+Note: Unlike the FORMAT line, nothing is prepended to the message.&nbsp;
 If you would like to include the hostname and date in the page above, you
 must use the variables such as $r, $x and $X.
 <br>&nbsp;</blockquote>

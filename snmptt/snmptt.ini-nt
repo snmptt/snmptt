@@ -13,9 +13,10 @@ mode = standalone
 
 # Set to 1 to allow multiple trap definitions to be executed for the same trap.
 # Set to 0 to have it stop after the first match.
-# Note: Wildcard matches are only matched if there are NO exact matches.  This includes
-# 	exact matches based on the NODES list (eg: Exact trap match, but NODE list used
-# 	and host does not match.  Wildcard entry could still match).
+# Note: Wildcard matches are only matched if there are NO exact matches.  This takes
+# 	into consideration the NODES list.  Therefore, if there is a matching trap, but
+#	the NODES list prevents it from being considered a match, the wildcard entry will
+#	only be used if there are no other exact matches.
 multiple_event = 1
 
 # Set to 0 to enable the use of FQDN (Fully Qualified Domain Names).  If a host name is
