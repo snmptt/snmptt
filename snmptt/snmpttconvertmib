@@ -109,34 +109,36 @@ if ($help == 1)
   $USAGE = qq/Usage:
   snmpttconvertmib [<options>]
 Options:
-  --debug=n                            Set debug level (1 or 2)
-  --help                               Display this message
-  --version                            Display author and version information
-  --net_snmp_perl                      Use NET-SNMP Perl integration instead of
-				       NET-SNMP snmptranslate utility
-  --in=filename                        Input file
-  --out=filename                       Output file
-  --mibdir=dir                         Directory for mib files when net_snmp_perl is enabled*
-  --nodes=name or file                 If specified, will insert a NODES line after FORMAT or EXEC.
-				       The host name(s) separated by spaces, or the name of the
-				       nodes file.  Use quotes for multiple entries.  See NODES section
-				       in readme.html for examples
-  --no_description		       Do not save the description
-  --no_format_summary		       Do not use the --#SUMMARY lines for FORMAT \/ EXEC
-  --no_format_desc		       Do not use the description line for FORMAT \/ EXEC.
-  --format=n			       FORMAT \/ EXEC order preference
-				       0 = --#SUMMARY or description
-				       1 = description or --#SUMMARY
-				       2 = --#SUMMARY and description
-				       3 = description and --#SUMMARY
-  --format_desc=n		       How to convert the description line for FORMAT \/ EXEC
-				       0 = First line of description
-				       n = n sentence(s) of description
-  --no_desc_wildcard		       To prevent \$* from being appended to the end of description text
-				       when used on the FORMAT \/ EXEC lines.  A wildcard is only used if
-				       the description line contained no variable definitions (\%n).
-  --exec=command                       Command line to use for EXEC line.  Use quotes.  Example:
-    				       "EXEC qpage -f TRAP notifygroup1"
+  --debug=n              Set debug level (1 or 2)
+  --help                 Display this message
+  --version              Display author and version information
+  --net_snmp_perl        Use NET-SNMP Perl integration instead of
+			 NET-SNMP snmptranslate utility
+  --in=filename          Input file
+  --out=filename         Output file
+  --mibdir=dir           Directory for mib files when net_snmp_perl is enabled*
+  --nodes=name or file   If specified, will insert a NODES line after FORMAT or 
+  			 EXEC.  The host name(s) separated by spaces, or the 
+			 name of the nodes file.  Use quotes for multiple
+			 entries.  See NODES section in readme.html for examples
+  --no_description	 Do not save the description
+  --no_format_summary	 Do not use the --#SUMMARY lines for FORMAT \/ EXEC
+  --no_format_desc	 Do not use the description line for FORMAT \/ EXEC.
+  --format=n		 FORMAT \/ EXEC order preference
+			   0 = --#SUMMARY or description
+			   1 = description or --#SUMMARY
+			   2 = --#SUMMARY and description
+			   3 = description and --#SUMMARY
+  --format_desc=n	 How to convert the description line for FORMAT \/ EXEC
+			   0 = First line of description
+			   n = n sentence(s) of description
+  --no_desc_wildcard	 To prevent \$* from being appended to the end of 
+  			 description text when used on the FORMAT \/ EXEC 
+			 lines.  A wildcard is only used if the description 
+			 line contained no variable definitions (\%n).
+  --exec=command         Command line to use for EXEC line.  Use quotes.  
+  			 Example:
+    			   "EXEC qpage -f TRAP notifygroup1"
 					 
 * Note:  If net_snmp_perl is enabled, then the directory path for the MIB file directory is
 required.  Not specifying a --mibdir will use the default of \/usr\/share\/snmp\/mibs\/.
