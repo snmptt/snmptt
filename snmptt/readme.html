@@ -7,7 +7,7 @@
    <title>SNMP Trap Translator</title>
 </head>
 <body>
-<a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
+<a href="http://sourceforge.net"><img SRC="file:////bink/alex/cvs/snmptt/sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.5.1</font></b>
 <br><b>(SNMPTT)</b>
 <br>This file was last updated on:&nbsp; March 13th, 2003
@@ -899,7 +899,8 @@ setting the <b>mibs_enviroment</b> variable in <b>snmptt.ini</b> to <b>ALL</b>
 <b>EXEC:</b>
 <blockquote>[<b>EXEC</b> command_string]
 <p>Optional string containing command to execute when trap is received
-and arguments to pass to the program.
+and
+arguments to pass to the program.
 <p>EXEC uses same variable substitution as the FORMAT line.
 <p>Example:
 <blockquote>EXEC /usr/bin/qpage -f TRAP alex "$r: $x $X - NIC switchover
@@ -1091,7 +1092,9 @@ with:
 script if you have one and change
 <br>&nbsp;&nbsp;&nbsp;&nbsp; the <b>OPTIONS</b> to <b>"-On"</b>. <b>The
 -On is required otherwise snmptt will NOT recognize the traps.</b>
-<br>&nbsp;
+<p>&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
+file to include the line: <b>printNumericOids 1.&nbsp; </b>This setting
+will take effect no matter what is used on the command line.
 <p><a NAME="Installation - Windows"></a><b><font size=+2>Installation -
 Windows</font></b>
 <p>1.&nbsp; <b><u>Read this entire file to understand how snmptt works</u></b>
@@ -1114,7 +1117,9 @@ file by adding the following line:
 5.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD -On.
 <b>The
 -On is required otherwise snmptt will NOT recognize the traps.</b>
-<br>&nbsp;
+<p>&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
+file to include the line: <b>printNumericOids 1.&nbsp; </b>This setting
+will take effect no matter what is used on the command line.
 <p><b><u><font size=+1>Windows NT EventLog:</font></u></b>
 <p>If you have enabled Windows Event Log support, then you must install
 an Event Message File to prevent "Event Message Not Found" messages from
@@ -1479,7 +1484,9 @@ it is started using:
 <blockquote><b>snmptrapd -On</b></blockquote>
 If it is not started with -On, then it will not pass traps using numeric
 OIDs and SNMPTT will not process them.
-<br>&nbsp;
+<p>As an alternative, you can edit your <b>snmp.conf</b> file to include
+the line: <b>printNumericOids 1.&nbsp; </b>This setting will take effect
+no matter what is used on the command line.
 <p><b>Q:&nbsp; I have disabled syslog support in SNMPTT, but my syslog
 (or NT Event Log) is still filling up with trap messages.&nbsp; How do
 I disable them?</b>
