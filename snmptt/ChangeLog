@@ -1,6 +1,6 @@
 October 27th, 2003: Alex Burger <alex_b@users.sourceforge.net>
-- Syslog messages now use snmptt[pid] instead of SNMPTT (system messages)
-  and TRAPD (traps)
+- Syslog messages now use snmptt[pid] instead of TRAPD (traps) and
+  snmptt-sys[pid] instead of SNMPTT (system messages)
 
 October 10th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added daemon_uid support to change user snmptt runs as after
