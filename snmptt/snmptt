@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v0.1
+# SNMPTT v0.1.1
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -173,6 +173,15 @@ if (DEBUGGING >= 1)
 
 if (DEBUGGING >= 2)
 {
+	print "0:		hostname\n";
+	print "1:		ip address\n";
+	print "2:		uptime\n";
+ 	print "3:		trapname / OID\n";
+	print "4:		ip address from trap agent\n";
+	print "5:		trap community string\n";
+	print "6:		enterprise\n";
+	print "0+:		passed variables\n\n";	
+	
 	#print out all standard variables
 	for ($i=0;$i <= $#var;$i++)
 	{
@@ -213,18 +222,20 @@ open SNMPTTCONF, $snmpttconffile
 
 if (DEBUGGING >= 1)
 {
-	print "\nLoading @ARGV\n";
+	print "\nLoading $snmpttconffile\n";
 }
 
+$tempcount = 0;
 while (<SNMPTTCONF>)
 {
 	chomp;				#remove <cr> at end of line	
 	push(@snmpttconf, $_);		#add to each line to @trapconf array
+	$tempcount++;
 }
 
 if (DEBUGGING >= 1)
 {
-	print "Finished loading\n\n";
+	print "Finished loading $tempcount lines from $snmpttconffile\n\n";
 }
 
 # Process each line of snmptt.conf loaded into @snmpttconf array.
@@ -232,10 +243,12 @@ if (DEBUGGING >= 1)
 
 if (DEBUGGING >= 1)
 {
-	print "\nProcessing file\n";
+	print "\nProcessing memory copy of $snmpttconffile\n";
 }
 
 $currentline=0;
+$tempcount=0;
+$tempcount2=0;
 
 while ($currentline <= $#snmpttconf)
 {
@@ -257,6 +270,8 @@ while ($currentline <= $#snmpttconf)
 		# 3: FORMAT string
 		# 4: EXEC string
 		# 5: NODES string
+		
+		$tempcount++;		# Temporary counter of the number of EVENTS found
 		
 		# Divide up line taking into consideration strings in quotes
 		$temp = join "::", shellwords($line);                
@@ -306,7 +321,10 @@ while ($currentline <= $#snmpttconf)
 		{			
 			# At least the mandatory FORMAT line was defined, so we'll keep it
 			# Stuff all elements into a one hash
-			$event{@temp[2]} = [@temp[1],@temp[3],@temp[4],$lineformat,$lineexec,$linenodes];		
+			$event{@temp[2]} = [@temp[1],@temp[3],@temp[4],$lineformat,$lineexec,$linenodes];
+
+			$tempcount2++;		# Temporary counter of the number of EVENTS found with at
+						# least a FORMAT line specified
 		}
 
 		# Change currentline back so the next increment will re-evalutate the last line which
@@ -317,17 +335,25 @@ while ($currentline <= $#snmpttconf)
 }
 if (DEBUGGING >= 1)
 {
-	print "Finished processing file\n";
+	print "$tempcount EVENTs found\n";
+	print "$tempcount2 EVENTs found that contain at least the mandatory FORMAT line\n";
+	if($tempcount2<$tempcount)
+	{
+		print "  Warning:  EVENT entries were found that did not contain the mandatory FORMAT line!\n";
+		print "  These EVENTS will be ignored!\n";
+	}
+	print "Finished processing memory copy of $snmpttconffile\n\n";
 }
 
 if (DEBUGGING >= 2)
 {
-	# Print out all the hashed events
+	print "Printing out all the events in hash table:\n\n";
 	foreach $key (sort keys %event)
 	{
 		print "hash: $key => $event{$key}[0],$event{$key}[1],$event{$key}[2],$event{$key}[3]\n";
 		#			
 	}
+	print "Finished printing out all events in hash table";
 }
 
 # Variables of trap received by SNMPTRAPD:
@@ -369,11 +395,20 @@ $processed = 0;
 # Check for exact match
 if (exists $event{"@var[3]"})
 {
+	if (DEBUGGING >= 1)
+	{
+		print "Exact match of trap found in EVENT hash table\n\n";
+	}
+	
 	&processtrap;
 	$processed = 1;
 }
+else
+{
+	print "Exact match of trap NOT found in EVENT hash table\n\n";
+}
 
-# Check for wildcard match if not already processed
+# Check for wildcard match in hash table if not already processed
 if ($processed == 0)
 {
 	$receivedtrap = @var[3];
@@ -388,7 +423,7 @@ if ($processed == 0)
 
 		if (DEBUGGING >= 2)
 		{
-			print "Drilling down looking for this wildcards in the snmptt.conf\n";
+			print "Drilling down looking for wildcards in the EVENT hash table\n";
 			print $receivedtrap.".\*\n\n";
 		}
 		
@@ -487,7 +522,7 @@ sub processtrap
 		# Trap received exists in our list of trap definitions
 		if (DEBUGGING >= 1)
 		{
-			print "\n\nTrap defined, processing...\n\n";
+			print "\nTrap defined, processing...\n\n";
 		}
 		# Variable substitution for FORMAT string
 		
