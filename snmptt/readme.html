@@ -197,17 +197,26 @@ OID to symbolic form before logging.&nbsp; This feature requires the
 UCD-SNMP / Net-SNMP Perl module</li>
   <li>Added support for logging of traps using PostgreSQL via DBI /
 DBD::PgPP</li>
-  <li>Added REGEX keyword support to allow user definable search and
-replace on FORMAT / EXEC lines<br>
+  <li>Added <span style="font-weight: bold;">REGEX </span>keyword
+support to allow user definable search and replace on <span
+ style="font-weight: bold;">FORMAT </span>/ <span
+ style="font-weight: bold;">EXEC </span>lines<br>
   </li>
-  <li>NODES entry can now contain a CIDR address (eg: 192.168.10.0/23),
-or a network range (192.168.10.0-192.168.11.255)<br>
+  <li><span style="font-weight: bold;">NODES </span>entry can now
+contain a CIDR address (eg: 192.168.10.0/23), or a network range
+(192.168.10.0-192.168.11.255)<br>
   </li>
-  <li>NODES entry can now contain a mix of host names, IP addresses,
-CIDR addresses, network ranges and filenames</li>
+  <li><span style="font-weight: bold;">NODES </span>entry can now
+contain a mix of host names, IP addresses, CIDR addresses, network
+ranges and filenames</li>
   <li>Added the ability to force a reload of the configuration files
 while running in daemon mode by placing a file called <span
  style="font-weight: bold;">!reload</span> in the spool directory</li>
+  <li>Added <span style="font-weight: bold;">snmptt-net-snmp-test</span>
+program to perform various translations of numeric and symbolic OIDS to
+assist with determining if the installed Perl module<br>
+will function as expected with <span style="font-weight: bold;">SNMPTT</span><br>
+  </li>
   <li>Fixed bug that prevented quoted text from being logged correctly
 to SQL databases</li>
   <li>Fixed bug that would prevent the translation of integer values to
@@ -1964,10 +1973,8 @@ under Windows NT.&nbsp;&nbsp; What should I do?</span></b></p>
 <ol>
   <li>Download Net-SNMP and compile using MSVC++ as described in the
 README.WIN32 file.&nbsp; This should create a working snmptrapd.&nbsp;
-The Perl module in Net-SNMP 5.0.8 does seem to compile as explained in
-the documentation.&nbsp; For a workaround, see the question: <b><span
- style="font-weight: bold;">How to I enable the Perl support for
-UCD-SNMP / Net-SNMP under Windows</span></b><span
+See the question: <b><span style="font-weight: bold;">How to I enable
+the Perl support for UCD-SNMP / Net-SNMP under Windows</span></b><span
  style="font-weight: bold;">?</span></li>
   <li>Install Cygwin, download Net-SNMP (5.0.8) and compile using gcc
 as described in the README.WIN32 file.&nbsp; The Perl module appears to
@@ -1979,36 +1986,30 @@ Q:&nbsp; How to I enable the Perl support for UCD-SNMP / Net-SNMP under
 Windows</span></b><span style="font-weight: bold;">?</span></p>
 <p style="font-weight: bold; text-decoration: underline;">Native
 Windows:</p>
-<p>To compile Net-SNMP 5.0.8 under Windows using MSVC++ 6.0, apply this <a
+<p style="margin-left: 40px;">To compile Net-SNMP 5.0.8 under Windows
+using MSVC++ 6.0, apply this <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=715603&amp;group_id=12694&amp;atid=312694">patch</a>
 and read the updated perl\SNMP\README file.<br>
 </p>
-<p>After installation, see if the module will load in Perl:<br>
-</p>
-<div style="margin-left: 40px;">perl<br>
-use SNMP;<br>
-</div>
-<br>
-For a more complete test, run the following script:<br>
-<br>
-<div style="margin-left: 40px;"> use SNMP;<br>
-$ENV{'MIBS'} = 'ALL';<br>
-$ENV{'MIBDIR=c:\usr\mibs\'};&nbsp;&nbsp;  &nbsp;&nbsp; # May not be
-needed<br>
-print "sysDescr: " . &amp;SNMP::translateObj('sysDescr') . "\n";<br>
-</div>
-<br>
-The output should be:<br>
-<br>
-<div style="margin-left: 40px;"> sysDescr: .1.3.6.1.2.1.1.1<br>
-</div>
-&nbsp; <br>
+<div style="margin-left: 40px;">The program <span
+ style="font-weight: bold;">snmptt-net-snmp-test</span> can be used to
+perform various translations to test the functionality of the installed
+UCD-SNMP / NE-SNMP Perl module.&nbsp; The value of <span
+ style="font-weight: bold;">best_guess</span> can be specified on the
+command line to determine how translations should occur.</div>
 <p><span style="font-weight: bold; text-decoration: underline;">Cygwin:</span></p>
-<p>To compile Net-SNMP 5.0.8 under Windows using Cygwin, apply this <a
+<p style="margin-left: 40px;">To compile Net-SNMP 5.0.8 under Windows
+using Cygwin, apply this <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=715603&amp;group_id=12694&amp;atid=312694">patch</a>
 and read the updated perl\SNMP\README file.&nbsp; The only update that
-applies to Cygwin is the section on Cygwin in the README file.&nbsp;<br>
+applies to Cygwin is the section on Cygwin in the README file. <br>
 </p>
+<p style="margin-left: 40px;">The program <span
+ style="font-weight: bold;">snmptt-net-snmp-test</span> can be used to
+perform various translations to test the functionality of the installed
+UCD-SNMP / NE-SNMP Perl module.&nbsp; The value of <span
+ style="font-weight: bold;">best_guess</span> can be specified on the
+command line to determine how translations should occur. </p>
 <p> <b>Q:&nbsp; I have enabled net_snmp_perl_enable but the variable
 names are not being translated into text using $v<i>n, $-n, $+n, $-* or
 $+*</i>.&nbsp; How do I troubleshoot it?</b> <br>
@@ -2040,8 +2041,8 @@ translate properly because SNMPTRAPD does not pass them correctly to
 SNMPTT.&nbsp; Upgrade to a newer version of snmptrapd. <br>
 &nbsp; <br>
 </p>
-<p><b>Q:&nbsp; I set translate_oids or translate_trap_oid to 2 or 4 in
-snmptt.ini, but the trap is being logged in numerical form.&nbsp; Why?<br>
+<p><b>Q:&nbsp; I set translate_oids or translate_trap_oid, but the trap
+is being logged in numerical form.&nbsp; Why?<br>
 </b><b>Q:&nbsp; I set </b><b>translate_oids or </b><b>translate_trap_oid
 to 1 or 3 in snmptt.ini, but the trap is not being logged with a long
 symbolic name.&nbsp; Why?</b><br>
@@ -2055,6 +2056,12 @@ available for 5.0.8 that will appear in later releases of
 Net-SNMP.&nbsp; The patch can be downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.<br>
+<br>
+The program <span style="font-weight: bold;">snmptt-net-snmp-test</span>
+can be used to perform various translations to test the functionality of
+the installed UCD-SNMP / NE-SNMP Perl module.&nbsp; The value of <span
+ style="font-weight: bold;">best_guess</span> can be specified on the
+command line to determine how translations should occur.<br>
 <br>
 <p><b>Q:&nbsp; I converted a MIB using snmpttconvertmib (default
 snmptranslate mode) but the OIDs are appearing as text instead of being

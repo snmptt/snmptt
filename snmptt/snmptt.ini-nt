@@ -50,8 +50,8 @@ net_snmp_perl_enable = 0
 # For Net-SNMP 5.1, or any Net-SNMP with patch 722075 applied, set this value to 2.
 # A value of 2 is equivalent to -IR on Net-SNMP command line utilities.
 # UCD-SNMP and Net-SNMP 5.0.8 and previous may not be able to translate certain formats of
-# symbolic names such as SNMPv2-MIB::sysDescr.  Net-SNMP 5.1 or patch 722075 will allow
-# all possibilities to be translated.
+# symbolic names such as RFC1213-MIB::sysDescr.  Net-SNMP 5.1 or patch 722075 will allow
+# all possibilities to be translated.  See the FAQ section in the README for more info
 net_snmp_perl_best_guess = 0
 
 # This parameter configures how the OID of the received trap is handled when outputting to 
