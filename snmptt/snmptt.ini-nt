@@ -255,6 +255,9 @@ eventlog_system_enable = 0
 # Note: net_snmp_perl_enable *must* be enabled
 db_translate_enterprise = 0
 
+# FORMAT line to use for unknown traps.  If not defined, defaults to $-*.
+db_unknown_trap_format = '$-*'
+
 # MySQL: Set to 1 to enable logging to a MySQL database via DBI (Linux / Windows)
 # This requires DBI:: and DBD::mysql
 mysql_dbi_enable = 0

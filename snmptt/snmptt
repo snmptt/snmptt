@@ -2642,7 +2642,7 @@ sub searchfortrap
 	      				$db_enterprise = $var[6];
 				}
 
-				$_ = '$-*';
+				$_ = $db_unknown_trap_format;
 				
 				&substitute;
 				
@@ -2953,6 +2953,7 @@ sub loadsnmpttini {
 	
 	# SQL
 	$db_translate_enterprise = $cfg->val('SQL', 'db_translate_enterprise');
+	$db_unknown_trap_format = $cfg->val('SQL', 'db_unknown_trap_format');
 	$mysql_dbi_enable = $cfg->val('SQL', 'mysql_dbi_enable');
 	$mysql_dbi_host = $cfg->val('SQL', 'mysql_dbi_host');
 	$mysql_dbi_port = $cfg->val('SQL', 'mysql_dbi_port');
@@ -3043,6 +3044,7 @@ sub loadsnmpttini {
 	if (! defined ($eventlog_system_enable)) { $eventlog_system_enable = 0} ;	
 	if (! defined ($exec_enable)) { $exec_enable = 1} ;
 	if (! defined ($db_translate_enterprise)) { $db_translate_enterprise = 0} ;
+	if (! defined ($db_unknown_trap_format)) { $db_unknown_trap_format = '$-*'} ;
 	if (! defined ($mysql_dbi_enable)) { $mysql_dbi_enable = 0} ;
 	if (! defined ($mysql_dbi_host)) { $mysql_dbi_host = 'localhost'} ;
 	if (! defined ($mysql_dbi_port)) { $mysql_dbi_port = '3306'} ;
