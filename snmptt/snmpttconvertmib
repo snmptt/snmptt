@@ -148,10 +148,15 @@ while ($currentline <= $#mibfile)
 					if ($1 =~ /\s*(.*)\s*/)
 					{
 						#print ("2\n");
-						$descriptionline1 = $1;
+						# Remove any quotes
+						$_ = $1;
+						s(\")()g;
+						# "								
+						$descriptionline1 = $_;
 						$temp1 = 1;
-						push (@description, "$1\n");
-						#print "Line 1a: $1 \n";
+
+						push (@description, "$_\n");
+						#print "Line 1a: $_ \n";
 					}
 				}
 				
@@ -213,9 +218,14 @@ while ($currentline <= $#mibfile)
 					{
 						# Remove beginning and trailing white space
 						$line4 =~ (/\s*(.*)\s*/);
-						$descriptionline1 = $1;
-						push (@description, "$1\n");
-						#print "Line 1b: $1 \n";
+						# Remove any quotes
+						$_ = $1;
+						s(\")()g;
+						# "								
+						$descriptionline1 = $_;
+						
+						push (@description, "$_\n");
+						#print "Line 1b: $_ \n";
 						$temp1 = 1;
 					}
 					else
@@ -224,8 +234,13 @@ while ($currentline <= $#mibfile)
 						$line4 =~ (/\s*(.*)\s*/);
 						if ($1 ne "")
 						{
-							push (@description, "$1\n");
-							#print "c:$1\n";
+							# Remove any quotes
+							$_ = $1;
+							s(\")()g;
+							# "
+														
+							push (@description, "$_\n");
+							#print "c:$_\n";
 						}
 					}
 
@@ -264,7 +279,7 @@ while ($currentline <= $#mibfile)
 			
 			$trapsummary = $_;
 			
-			# Use trapsummary line for FORMAT and EXEC
+			# Use trapsummary line
 			if ($trapsummary ne "")
 			{
 				print OUTPUTFILE "FORMAT $trapsummary\n";
@@ -273,7 +288,7 @@ while ($currentline <= $#mibfile)
 					print OUTPUTFILE "$defaultexec $defaultexecquote$trapsummary$defaultexecquote\n"
 				}		
 			}
-			# If trapsummary blank, use trapsummary line for FORMAT and EXEC
+			# If trapsummary blank, use trapsummary line
 			elsif ($descriptionline1 ne "")
 			{
 				print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
@@ -283,7 +298,7 @@ while ($currentline <= $#mibfile)
 				}
 				#print OUTPUTFILE "EXEC $descriptionline1 \$*\n";
 			}
-			# If descriptionline1 is also blank, just use $* for FORMAT and EXEC
+			# If descriptionline1 is also blank, just use $*
 			else
 			{
 				print OUTPUTFILE "FORMAT \$*\n";
