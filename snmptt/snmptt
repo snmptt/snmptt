@@ -387,7 +387,7 @@ if ($daemon == 1)
 		  open(PID, ">$working_dir/snmptt.pid");
 		}
 
-		if (defined (PID))
+		if (defined (PID) && $pid != 0)
 		{
 		  print(PID "$pid\n");
 		  close(PID);
