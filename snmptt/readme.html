@@ -2723,8 +2723,7 @@ Sourceforge page</a>. <br>
 </p>
 <p><b> Q:&nbsp; When I convert a MIB file using snmpttconvertmib
 --net_snmp_perl, no traps / notifications appear in the output
-file.&nbsp; When I use the snmptranslate method it works fine.&nbsp;
-Why?</b><br>
+file.&nbsp; When I use the snmptranslate method it works fine.&nbsp; Why?</b><br>
 <br>
 A:&nbsp; There appears to be a bug in both UCD-SNMP and Net-SNMP that
 prevents TRAPS / NOTIFICATIONS from being parsed correctly if the MIB
@@ -2741,8 +2740,9 @@ should be used until the bug has been fixed.<br>
 operator (_) errors.<br>
 </b><br>
 A:&nbsp; You need to enable support for underlines / undercores in MIB
-files.&nbsp; See the snmp.conf man page.&nbsp; Support can be enabled
-by adding this line to your <span style="font-weight: bold;">~/.snmp/snmp.conf</span>file:&nbsp;<br>
+files.&nbsp; See the snmp.conf man page.&nbsp; Support can be enabled by
+adding this line to your <span style="font-weight: bold;">~/.snmp/snmp.conf</span>
+file:&nbsp;<br>
 </p>
 <div style="margin-left: 40px; font-weight: bold;">mibAllowUnderline 1<br>
 </div>
