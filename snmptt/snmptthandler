@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTHANDLER v0.2.1
+# SNMPTTHANDLER v0.3
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -190,7 +190,7 @@ while (defined($line = <>))
 
 sub showversion
 {
-	printf "\nSNMPTTHANDLER v0.2\n";
+	printf "\nSNMPTTHANDLER v0.3\n";
 	printf "(c) 2002 Alex Burger\n\n";
 }
 
