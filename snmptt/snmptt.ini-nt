@@ -1,0 +1,121 @@
+#
+# SNMPTT 0.3.3 Configuration File
+#
+# Windows NT
+#
+
+[General]
+# Set to either 'standalone' or 'daemon'
+# standalone: snmptt called from snmptrapd.conf
+# daemon: snmptrapd.conf calls snmptthandler
+# Ignored by Windows.  See documentation
+mode = standalone
+
+# Set to 1 to allow multiple trap definitions to be executed for the same trap.
+# Set to 0 to have it stop after the first match.
+# Note: Wildcard matches are only matched if there are NO exact matches.  This includes
+# 	exact matches based on the NODES list (eg: Exact trap match, but NODE list used
+# 	and host does not match.  Wildcard entry could still match).
+multiple_event = 1
+
+[DaemonMode]
+# Set to 1 to have snmptt fork to the background when run in daemon mode
+# Ignored by Windows.  See documentation
+daemon_fork = 1
+
+# Directory to read received traps from.  Ex: c:\\snmp\\snmptt\\spool\\ 
+# Don't forget the trailing slashes!
+spool_directory = c:\\snmp\\spool\\
+
+# Amount of time in seconds to sleep between processing spool files
+sleep = 5
+
+[Logging]
+# Set to 1 to enable messages to be sent to standard output, or 0 to disable.
+# Would normally be disabled unless you are piping this program to another
+stdout_enable = 0
+
+# Set to 1 to enable text logging.  Make sure you specify a logfile location
+log_enable = 1
+
+# Log file location.  The COMPLETE path and filename.  Ex: 'c:\\snmp\\snmptt.log'
+log_file = c:\\snmp\\snmptt.log
+
+# Set to 1 to enable logging of unknown traps.  This should normally be left off
+# as the file could grow large quickly.  Used primarily for troubleshooting.  If
+# you have defined a trap in snmptt.conf, but it is not executing, enable this to
+# see if it is being considered an unknown trap due to an incorrect entry or 
+# simply missing from the snmptt.conf file
+unknown_trap_log_enable = 0
+
+# Unknown trap log file location.  The COMPLETE path and filename.  
+# Ex: 'c:\\snmp\\snmpttunknown.log'
+unknown_trap_log_file = c:\\snmp\\snmpttunknown.log
+
+# Set to 1 to enable logging to syslog.  If you do not have the Sys::Syslog module
+# then disable this.  Windows users should disable this.
+syslog_enable = 0
+
+# Syslog facility to use.  For example: 'local0'
+syslog_facility = local0
+
+# Syslog level to use.  For example: 'warning'
+syslog_level = warning
+
+[Exec]
+
+# Set to 1 to allow EXEC statements to execute.  Should normally be left on unless you
+# want to temporarily disable all EXEC commands
+exec_enable = 1
+
+[SQL]
+# MySQL: Set to 1 to enable logging to a MySQL database via DBI (Linux / Windows)
+mysql_dbi_enable = 0
+
+# MySQL: Database to use
+mysql_dbi_database = snmptt
+
+# MySQL: Table to use
+mysql_dbi_table = snmptt
+
+# MySQL: Username to use
+mysql_dbi_username = snmpttuser
+
+# MySQL: Password to use
+mysql_dbi_password = password
+
+# ODBC: Set to 1 to enable logging to a SQL / Access database via ODBC on Windows.  
+# (Windows only - uses Win32::ODBC)
+sql_win32_odbc_enable = 0
+
+# WinODBC: Database to use
+sql_win32_odbc_dsn = snmptt
+
+# WinWinODBC: Table to use
+sql_win32_odbc_table = snmptt
+
+# WinODBC: Username to use
+sql_win32_odbc_username = snmptt
+
+# WinODBC:: Password to use
+sql_win32_odbc_password = password
+
+[Debugging]
+# 0 - do not output messages
+# 1 - output some basic messages
+# 2 - out all messages
+DEBUGGING = 0
+
+# Debugging file
+# Location of debugging output file.  Leave blank to default to STDOUT (good for
+# standalone mode, or daemon mode without forking)
+DEBUGGINGFILE = ''
+# DEBUGGING_FILE = c:\\snmp\\snmptt.debug
+
+[TrapFiles]
+# A list of snmptt.conf files (this is NOT the snmptrapd.conf file).  The COMPLETE path 
+# and filename.  Ex: 'c:\\snmp\\snmptt.conf'
+snmptt_conf_files = <<END
+c:\\snmp\\snmptt.conf
+END
+
