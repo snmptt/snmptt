@@ -250,10 +250,12 @@ while ($currentline <= $#mibfile)
 			
 			#print "j is $j\n";
 			
+			# Change the %s or %d etc into $1 etc (starts at $1)
 			$_ = $trapsummary;
 			for ($j=0; $j<= $#arguments; $j++)
 			{
-				s(%[a-zA-Z])(\$@arguments[$j]);
+				$variable = (@arguments[$j])+1;
+				s(%[a-zA-Z])(\$$variable);
 			}
 			
 			#print "new summary: $_\n";
