@@ -732,15 +732,35 @@ sub processtrap
 			{	
 				if ($a =~ /^(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IP address / cidr / range
 				{
-				  #if ( $a eq $var[1])     # compare against ip
-				  if ( checkip($var[1], $a) == 1)
+				  #if ( $a eq $var[1])     # compare against agent ip
+				  if ( checkip($var[4], $a) == 1)
 				  {				  
 				    $nodesmatch = 1;
 				    #$hostmatch = 1;
 				    #$processed = 1;
 				  }
 				}
-	                        elsif (lc $a eq lc $agent_dns_name)	# NODES entry is a host name.  Do lowercase compare	
+				elsif ($dns_enable == 1)	# Resolve NODES entry to IP address, and compare
+				{
+				  my $temp = gethostbyname($a);
+				  if (defined($temp))
+				  {
+				    $temp = Socket::inet_ntoa(scalar($temp));
+				    if ($DEBUGGING => 1)
+				    {
+				      print "    NODES entry ($a) resolved to: $temp\n";
+				    }
+				    if ( checkip($var[4], $temp) == 1)
+				    {
+				      $nodesmatch = 1;
+				    }
+				  }
+				  else
+				  {
+				    print "    NODES entry ($a) could NOT be resolved.\n";
+				  }
+				}
+	                        elsif (lc $a eq lc $agent_dns_name)	# NODES entry is a host name.  Do lowercase compare
 				{
 				  $nodesmatch = 1;
 				  #$hostmatch = 1;
@@ -1521,7 +1541,7 @@ sub substitute
   
   # $A, $a - Trap agent IP address
   s(\$aA)($var[4])g;		# IP address
-  s(\$A)($agent_dns_name)g;		# hostname
+  s(\$A)($agent_dns_name)g;	# hostname
   
   # $T - Uptime
   s(\$T)($var[2])g;

@@ -1,3 +1,8 @@
+April 21st, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- If DNS is enabled, NODES entries are resolved to IP addresses before
+  comparing.  Will allow for aliases / CNAMES to match etc.
+- NODES match uses agent IP instead of host IP
+
 April 20th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - If agent IP address missing, copies IP from host IP address
 - If host name not resolved, resolves via DNS if enabled
