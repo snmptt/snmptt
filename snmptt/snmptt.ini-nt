@@ -44,10 +44,30 @@ END
 #       the loading of the MIBS at startup.
 net_snmp_perl_enable = 0
 
-# Set to 0 to disable converting OID values to text as defined in the MIB files
-# Set to 1 to enable converting OID values to text as defined in the MIB files
+# This parameter configures how the OID of the received trap is handled when outputting to 
+# a log file / database, and when using the $o / $O variable substitution.
+# Set to 0 to use the default of numerical OID
+# Set to 1 to translate the trap OID to short text (symbolic form) (eg: linkUp)
+# Set to 2 to translate the trap OID to short text with module name (eg: IF-MIB::linkUp)
+# Set to 3 to translate the trap OID to long text (eg: ...snmpTraps.linkUp)
+# Set to 4 to translate the trap OID to long text with module name (eg: 
+# IF-MIB::...snmpTraps.linkUp)
+# Note: The output of the long format will vary depending on the version of Net-SNMP you
+#       are using.
+# Note: net_snmp_perl_enable *must* be enabled
+translate_trap_oid = 0
+
+# This parameber configures how the OID contained in the VALUE of the variable bindings
+# are handled.  It does not apply to the actual trap OID, or the OID from using the 
+# $o / $O variable substitution.  See trap_oid_format for modifying the trap OID.
+# Set to 0 to disable translating OID values to text (symbolic form)
+# Set to 1 to translate OID values to short text (symbolic form) (eg: BuildingAlarm)
+# Set to 2 to translate OID values to short text with module name (eg: UPS-MIB::BuildingAlarm)
+# Set to 3 to translate OID values to long text (eg: ...upsAlarm.BuildingAlarm)
+# Set to 4 to translate OID values to long text with module name (eg: 
+# UPS-MIB::...upsAlarm.BuildingAlarm)
 # For example, if the value contained: 'A UPS Alarm (.1.3.6.1.4.1.534.1.7.12) has cleared.',
-# it could be translated to: 'A UPS Alarm (xupsBuildingAlarm) has cleared.'
+# it could be translated to: 'A UPS Alarm (UPS-MIB::BuildingAlarm) has cleared.'
 # Note: net_snmp_perl_enable *must* be enabled
 translate_oids = 1
 
@@ -56,7 +76,7 @@ translate_oids = 1
 # Set to 1 to enable converting INTEGER values to enumeration tags as defined in the 
 # MIB files
 # Note: net_snmp_perl_enable *must* be enabled
-translate_integers = 0
+translate_integers = 1
 
 # Allows you to set the MIBS environment variable used by SNMPTT
 # Leave blank or comment out to have the systems enviroment settings used

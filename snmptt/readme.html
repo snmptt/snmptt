@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.6.1</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; April 3rd, 2003
+This file was last updated on:&nbsp; April 12th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -168,12 +168,23 @@ does not have this problem.<br>
 <p>Note: </p>
 <blockquote>SNMPTT only requies the the NET-SNMP Perl module if you
 want to have variable names translated into text, or you enable the
-translation of integer values (<span style="font-weight: bold;">translate_integers
-= 1</span>) to enumeration tags.</blockquote>
+options <span style="font-weight: bold;">translate_integers,
+translate_trap_oid </span>or <span style="font-weight: bold;">translate_oids.<br>
+  </span></blockquote>
 <p><br>
 <a name="Whats-New"></a><b><font size="+2">What's New</font></b> </p>
 <p><b><font size="+1">0.7 - ??</font></b><b><font size="+1">, 2003</font></b></p>
 <ul>
+  <li>Added the ability to read <span style="font-weight: bold;">snmptt.conf</span>
+files that contain symbolic trap OIDs such as <span
+ style="font-weight: bold;">linkDown</span> and <span
+ style="font-weight: bold;">IF-MIB::linkUp</span>.&nbsp; This feature
+requires the UCD-SNMP / NET-SNMP Perl module</li>
+  <li> Added the configuration options <b>translate_trap_oid</b> and <span
+ style="font-weight: bold;">translate_oids </span>to allow the trap
+OID and OID values contained in the trap variables to be converted from
+numerical OID to symbolic form before logging.&nbsp; This feature
+requires the UCD-SNMP / NET-SNMP Perl module</li>
   <li>Added REGEX keyword support to allow user definable search and
 replace on FORMAT / EXEC lines<br>
   </li>
@@ -182,9 +193,6 @@ to SQL databases</li>
   <li>Back ticks (`) in recived trap is now replaced with forward ticks
 (')<br>
   </li>
-  <li> Added ability to translate OID values to text as defined in the
-MIB files.&nbsp; This feature requires the UCD-SNMP / NET-SNMP Perl
-module</li>
   <li>Fixed bug that would prevent the translation of integer values to
 enumeration tags and variable name substitutions when using Net-SNMP
 5.0.x<br>
@@ -194,6 +202,8 @@ or a network range (192.168.10.0-192.168.11.255)<br>
   </li>
   <li>NODES entry can now contain a mix of host names, IP addresses,
 CIDR addresses, network ranges and filenames</li>
+  <li> Added support for logging of traps using PostgreSQL via DBI /
+DBD::PgPP</li>
   <li>Snmpttconvertmib</li>
   <ul>
     <li>FORMAT / EXEC line can now contain any of the following:</li>
@@ -227,9 +237,6 @@ disabled</li>
     <li>NODES line can be specified on the command line<br>
     </li>
   </ul>
-  <li> Added support for logging of traps using PostgreSQL via DBI /
-DBD::PgPP<br>
-  </li>
 </ul>
 <p><br>
 <b><font size="+1">0.6 - March </font></b><b><font size="+1">25th, 2003</font></b></p>
@@ -796,7 +803,7 @@ The syntax of the snmptt.conf file&nbsp; is:
   <p>[<b>NODES</b> sources_list]<br>
   </p>
   <p>[<b style="font-weight: bold;">REGEX</b><span
- style="font-weight: bold;"> (&nbsp;&nbsp;&nbsp; )(&nbsp; &nbsp; )</span>] </p>
+ style="font-weight: bold;"> (&nbsp;&nbsp;&nbsp; )(&nbsp; &nbsp; )</span>]</p>
   <p>[<b>SDESC</b>] <br>
 [<b>EDESC</b>] </p>
   <p>Note: Lines starting with a # will be ignored. </p>
@@ -811,12 +818,34 @@ file!</p>
 This would match the name on the TRAP-TYPE or NOTIFICATION-TYPE line in
 the MIB file when converted using <b>snmpttconvertmib</b>.</blockquote>
     <b>event_OID:</b>
-    <blockquote>Object identifier string in dotted format notation <b><u>containing
-no spaces</u></b> as received by snmptrapd.
+    <blockquote>Object identifier string in dotted format or symbolic
+notation <b><u>containing no spaces</u></b>.
       <p>For example, a Compaq (enterprise 1.3.6.1.4.1.232)
 cpqHoGenericTrap trap (trap 11001) would be written as: </p>
-      <p>1.3.6.1.4.1.232.0.11001. </p>
-      <p><b>Note:</b> </p>
+      <p style="margin-left: 40px;">1.3.6.1.4.1.232.0.11001.<br>
+      </p>
+      <p>Symbolic names can also be used if the UCD-SNMP / NET-SNMP
+Perl module is installed and enabled by setting <b>net_snmp_perl_enable</b>
+in the snmptt.ini file.&nbsp; For example:<br>
+      </p>
+      <p style="margin-left: 40px;">linkDown<br>
+      </p>
+      <p style="margin-left: 40px;">IF-MIB::linkDown</p>
+      <p>Note:<br>
+      </p>
+      <div style="margin-left: 40px;">The current version of Net-SNMP
+(5.0.8 at the time of this writing) and everything before it does not
+support including the module name (eg: <span style="font-weight: bold;">IF-MIB::</span>)
+when translating an OID.&nbsp; A patch is available for 5.0.8 that
+should appear in later releases of Net-SNMP.&nbsp; The patch can be
+downloaded from the <a
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=720261&amp;group_id=12694&amp;atid=312694">Net-SNMP
+patch page</a>.&nbsp; If the version of Net-SNMP you are using does not
+support this feature and the event OID is specified with the module
+name, the event definition will be <span
+ style="font-weight: bold; text-decoration: underline;">ignored</span>.<br>
+      </div>
+      <p></p>
       <blockquote>SNMP V1 traps are in the format of enterprise ID
 (1.3.6.1.4.1.232) followed by a 0, and then followed by the trap number
 (11001).
@@ -826,8 +855,9 @@ configuration file.&nbsp; If <b>multiple_event</b> is enabled in the <span
 matching traps.&nbsp; If <b>multiple_event</b> is disabled, only the
 first matching entry will be used.</p>
       </blockquote>
-Wildcards can also be used.&nbsp; For example:
-      <p>1.3.6.1.4.1.232.1.2.* </p>
+Wildcards in dotted format notation can&nbsp; also be used.&nbsp; For
+example:
+      <p style="margin-left: 40px;">1.3.6.1.4.1.232.1.2.* </p>
       <p><b>Note:</b> </p>
       <blockquote>Specific trap matches are performed before wildcards
 so if you have an entry for 1.3.6.1.4.1.232.1.2.5 AND
@@ -872,8 +902,8 @@ $E, $e&nbsp; - Enterprise trap OID in number format <br>
 $G&nbsp; - Generic trap number (0 if enterprise trap) <br>
 $S&nbsp; - Specific trap number (0 if generic trap) <br>
 $N&nbsp; - Event name defined <br>
-$O, $o - Trap OID in number format <br>
-$R, $r&nbsp; - Hostname <b>(*)</b> <br>
+$O, $o - Trap OID in number format <b>(see Note 4)</b><br>
+$R, $r&nbsp; - Hostname <b>(see Note 1)</b> <br>
 $aR, $ar - IP address <br>
 $s&nbsp; - Severity <br>
 $T&nbsp; - Uptime:&nbsp; Time since network entity was initialized <br>
@@ -882,17 +912,19 @@ $x&nbsp; - Current date <br>
 $# - Number of (how many) variable-bindings in the trap <br>
 $$&nbsp; - Print a $ <br>
 $@ - Number of seconds since the epoch <br>
-$<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) <b>(**)</b> <br>
+$<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) <b>(see Note
+2,5)</b><br>
 $+<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) in the format
-of <i>variable name:value</i> <b>(**) (***)</b> <br>
+of <i>variable name:value</i> <b>(see Note 2,3</b><b>,5</b><b>)</b><br>
 $-<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) in the format
-of <i>variable name (variable type):value</i> <b>(**) (***)</b> <br>
-$v<i>n</i>&nbsp; - Expand variable name of the variable-binding n (1-<i>n</i>)<b>(***)</b> <br>
-$*&nbsp; - Expand all variable-bindings <br>
+of <i>variable name (variable type):value</i> <b>(see Note 2,3</b><b>,5</b><b>)</b><br>
+$v<i>n</i>&nbsp; - Expand variable name of the variable-binding n (1-<i>n</i>)<b>(see
+Note 3)</b><br>
+$*&nbsp; - Expand all variable-bindings <b>(see Note 5)</b><br>
 $+*&nbsp; - Expand all variable-bindings in the format of <i>variable
-name:value</i><b>(**) (***)</b> <br>
+name:value </i><b>(see Note 2,3</b><b>,5</b><b>)</b><br>
 $-*&nbsp; - Expand all variable-bindings in the format of <i>variable
-name (variable type):value</i> <b>(**) (***)</b></blockquote>
+name (variable type):value</i> <b>(see Note 2,3</b><b>,5</b><b>)</b></blockquote>
 Example:
     <p>FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6 </p>
     <p>Note: </p>
@@ -904,7 +936,7 @@ output will be formatted as:
       <blockquote><b><i>trap-OID severity category hostname - format</i></b></blockquote>
 For MySQL, DBD::ODBC and Win32::ODBC, the <b>formatline</b> column will
 contain only the <b>format</b> text.</blockquote>
-* Note:
+Note (1):
     <blockquote>If you are using DNS, the host name may resolve to the
 Fully Qualified Domain Name (FQDN) by snmptrapd.&nbsp; For example:
 barney.bedrock.com.
@@ -915,7 +947,7 @@ sending the short name instead (barney).&nbsp; You can also enable the <b>strip_
 any FQDN host.&nbsp; See the <span style="font-weight: bold;">snmptt.ini</span>
 file for details.</p>
     </blockquote>
-** Note:
+Note (2):
     <blockquote>If&nbsp; <b>translate_integers</b> is enabled in the <b>snmptt.ini</b>
 file, SNMPTT will attempt to convert integer values received in traps
 into text by performing a lookup in the MIB file.<br>
@@ -936,7 +968,7 @@ MIBS to be initialized at SNMPTT startup. </p>
 stand-alone mode, it may take longer to process each trap due to the
 initialization of the MIB files. </p>
     </blockquote>
-*** Note:
+Note (3):
     <blockquote>$v<i>n</i>, $+<i>n</i> and $-<i>n</i> variable names and
 variable type are translated into the text name by performing a lookup
 in the MIB file.&nbsp; You must have the UCD-SNMP / NET-SNMP Perl module
@@ -952,8 +984,36 @@ mibs.&nbsp; This is configured in the UCD-SNMP / Net-SNMP <b>snmp.conf</b>
 file.&nbsp; Alternatively, you can try setting the <b>mibs_enviroment</b>
 variable in <b>snmptt.ini</b> to <b>ALL</b> (no quotes) to force all
 MIBS to be initialized at SNMPTT startup. <br>
-&nbsp;</p>
+      </p>
     </blockquote>
+    <p> Note (4):<br>
+    </p>
+    <div style="margin-left: 40px;">If&nbsp; <b>translate_trap_oid</b>
+is enabled in the <b>snmptt.ini</b> file, SNMPTT will attempt to convert
+the numeric OID of the received trap into symbolic form such as
+IF-MIB::linkDown.&nbsp; You must have the UCD-SNMP / NET-SNMP Perl
+module installed for this to work and you must enable support for it by
+enabling <b>net_snmp_perl_enable</b> in the snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b>
+is not enabled, it will default to using the numeric OID.&nbsp; <br>
+    <br>
+The current version of Net-SNMP (5.0.8 at the time of this writing) and
+everything before it does not support including the module name (eg:
+IF-MIB::) when translating an OID.&nbsp; A patch is available for 5.0.8
+that should appear in later releases of Net-SNMP.&nbsp; The patch can be
+downloaded from the <a
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=720261&amp;group_id=12694&amp;atid=312694">Net-SNMP
+patch page</a>. <br>
+    </div>
+    <p> Note (5):<br>
+    </p>
+    <blockquote> If&nbsp; <b>translate_oids</b> is enabled in the <b>snmptt.ini</b>
+file, SNMPTT will attempt to convert any numeric OIDs found inside the
+variables passed inside the trap to symbolic form.&nbsp; The format will
+always be the short name (eg: driveStatus).&nbsp; You must have the
+UCD-SNMP / NET-SNMP Perl module installed for this to work and you must
+enable support for it by enabling <b>net_snmp_perl_enable</b> in the
+snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b> is not enabled,
+it will default to using the numeric OID.</blockquote>
   </blockquote>
   <b>EXEC:</b>
   <blockquote>[<b>EXEC</b> command_string]
@@ -1066,8 +1126,8 @@ room high temperature)<br>
 REGEX (\s+)( )<br>
   </span><br>
 FORMAT line after:&nbsp; <span style="font-weight: bold;">The big UPS
-has detected a building alarm. Cause: UPS1 Alarm #14: Computer ROOM
-high temperature</span><br>
+has detected a building alarm. Cause: UPS1 Alarm #14: Computer ROOM high
+temperature</span><br>
   </div>
   <p style="margin-left: 40px;">Each REGEX line is processed in order
 from top to bottom.<br>
@@ -1834,217 +1894,36 @@ Q:&nbsp; How to I enable the Perl support for UCD-SNMP / NET-SNMP under
 Windows</span></b><span style="font-weight: bold;">?</span></p>
 <p style="font-weight: bold; text-decoration: underline;">Native
 Windows:</p>
-<p>The following steps should allow you to compile the Perl module for
-Net-SNMP 5.0.8 when using MSVC++ 6.0:<br>
+<p>To compile Net-SNMP 5.0.8 under Windows using MSVC++ 6.0, apply this <a
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=715603&amp;group_id=12694&amp;atid=312694">patch</a>
+and read the updated perl\SNMP\README file.<br>
 </p>
-<div style="margin-left: 40px;">MS VC++ 6.0 with SP5<br>
-Build (release)<br>
-&nbsp;&nbsp;&nbsp; libsnmp<br>
-&nbsp;&nbsp;&nbsp; snmptranslate<br>
-&nbsp;&nbsp;&nbsp; snmptrapd<br>
-<br>
-(this is all you should need - compile more apps if you want)<br>
-<br>
-Install to c:\usr etc as per README.win32 docs<br>
-<br>
-Install regex win32 package (gnu_regex.exe) from
-http://people.delphiforums.com/gjc/gnu_regex.html<br>
-&nbsp;&nbsp;&nbsp; copy gnu_regex.lib "C:\Program Files\Microsoft
-Visual Studio\VC98\Lib"<br>
-&nbsp;&nbsp;&nbsp; copy gnu_regex.dll c:\winnt<br>
-&nbsp;&nbsp;&nbsp; copy regex.h "C:\Program Files\Microsoft Visual
-Studio\VC98\include"<br>
-<br>
-These instructions assume net-snmp-5.0.8 is in c:\net-snmp-5.0.8, Perl
-is installed in c:\Perl, and Net-SNMP was installed to c:\usr.<br>
-<br>
-vcvars32.bat<br>
-<br>
-SET
-INCLUDE=%INCLUDE%;c:\net-snmp-5.0.8\include;c:\net-snmp-5.0.8\win32;c:\net-snmp-5.0.8\include\net-snmp<br>
-<br>
-SET LIB=%LIB%;c:\usr\lib;<br>
-<br>
-cd net-snmp-5.0.8\perl<br>
-<br>
-c:\perl\bin\perl Makefile.PL CAPI=TRUE<br>
-<br>
-cd default_store<br>
-c:\perl\bin\perl Makefile.PL CAPI=TRUE<br>
-cd ..<br>
-<br>
-edit default_store\Makefile and add to the LDLOADLIBS line libsnmp.lib:<br>
-LDLOADLIBS =&nbsp; .... libsnmp.lib<br>
-<br>
-edit oid\Makefile:<br>
-LDLOADLIBS = .... libsnmp.lib and add to the LDLOADLIBS line
-libsnmp.lib:<br>
-<br>
-edit snmp/Makefile: .... c:\usr\lib\libsnmp.lib<br>
-LDLOADLIBS = .... libsnmp.lib and add to the LDLOADLIBS line
-libsnmp.lib:<br>
-<br>
-net-snmp-5.0.8\include\net-snmp\library\system.h<br>
-Change:<br>
-&nbsp;&nbsp;&nbsp; #ifdef WIN32<br>
-to:<br>
-&nbsp;&nbsp;&nbsp; #ifndef _MSC_VER<br>
-&nbsp;&nbsp;&nbsp; #ifdef WIN32<br>
-<br>
-Change:<br>
-&nbsp;&nbsp;&nbsp;
-#endif&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-/* WIN32 */<br>
-to:<br>
-&nbsp;&nbsp;&nbsp;
-#endif&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-/* WIN32 */<br>
-&nbsp;&nbsp;&nbsp; #endif&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; /* _MSC_VER */<br>
-<br>
-net-snmp-5.0.8\perl\snmp\snmp.xs:<br>
-Change:<br>
-&nbsp;&nbsp;&nbsp; #include &lt;signal.h&gt;<br>
-to:<br>
-&nbsp;&nbsp;&nbsp; #ifndef _MSC_VER<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; #include &lt;signal.h&gt;<br>
-&nbsp;&nbsp;&nbsp; #endif<br>
-<br>
-Change:<br>
-&nbsp;&nbsp;&nbsp; #include &lt;unistd.h&gt;<br>
-to:<br>
-&nbsp;&nbsp;&nbsp; #ifndef _MSC_VER<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; #include &lt;unistd.h&gt;<br>
-&nbsp;&nbsp;&nbsp; #endif<br>
-<br>
-net-snmp-5.0.8\perl\<br>
-<br>
-cd default_store<br>
-nmake CAPI=TRUE<br>
-<br>
-cd ..\OID<br>
-nmake CAPI=TRUE<br>
-<br>
-cd ..\SNMP<br>
-nmake CAPI=TRUE<br>
-<br>
-cd .. (net-snmp-5.0.8)<br>
-<br>
-md c:\perl\lib\SNMP<br>
-md c:\perl\lib\NetSNMP<br>
-<br>
-md c:\perl\lib\auto\NetSNMP<br>
-md c:\perl\lib\auto\NetSNMP\default_store\<br>
-md c:\perl\lib\auto\NetSNMP\OID\<br>
-<br>
-md c:\Perl\site\lib\auto\SNMP<br>
-md c:\Perl\site\lib\auto\NetSNMP<br>
-md c:\Perl\site\lib\auto\NetSNMP\default_store<br>
-md c:\Perl\site\lib\auto\NetSNMP\OID<br>
-<br>
-copy SNMP\blib\lib\auto\SNMP\autosplit.ix c:\perl\lib\auto\SNMP\<br>
-copy default_store\blib\lib\auto\NetSNMP\default_store\autosplit.ix
-c:\Perl\site\lib\auto\NetSNMP\default_store\<br>
-copy blib\lib\auto\NetSNMP\OID\autosplit.ix
-c:\Perl\site\lib\auto\NetSNMP\OID\<br>
-<br>
-copy SNMP\SNMP.pm c:\perl\lib\<br>
-copy default_store\default_store.pm c:\perl\lib\NetSNMP\<br>
-copy oid\oid.pm c:\perl\lib\NetSNMP\<br>
-<br>
-copy blib\arch\auto\SNMP\SNMP.dll c:\Perl\site\lib\auto\SNMP\<br>
-copy blib\arch\auto\NetSNMP\default_store\default_store.dll
-c:\Perl\site\lib\auto\NetSNMP\default_store\<br>
-copy blib\arch\auto\NetSNMP\OID\oid.dll
-c:\Perl\site\lib\auto\NetSNMP\OID\<br>
-<br>
-See if the module will load in Perl:<br>
-<br>
+<p>After installation, see if the module will load in Perl:<br>
+</p>
 <div style="margin-left: 40px;">perl<br>
 use SNMP;<br>
 </div>
 <br>
 For a more complete test, run the following script:<br>
 <br>
-<div style="margin-left: 40px;">use SNMP;<br>
+<div style="margin-left: 40px;"> use SNMP;<br>
 $ENV{'MIBS'} = 'ALL';<br>
+$ENV{'MIBDIR=c:\usr\mibs\'};&nbsp;&nbsp;  &nbsp;&nbsp; # May not be
+needed<br>
 print "sysDescr: " . &amp;SNMP::translateObj('sysDescr') . "\n";<br>
 </div>
 <br>
 The output should be:<br>
 <br>
-<div style="margin-left: 40px;">sysDescr: .1.3.6.1.2.1.1.1<br>
+<div style="margin-left: 40px;"> sysDescr: .1.3.6.1.2.1.1.1<br>
 </div>
 &nbsp; <br>
-</div>
 <p><span style="font-weight: bold; text-decoration: underline;">Cygwin:</span></p>
-<p> I&nbsp; have been able to get it to compile under Cygwin, including
-the Net-SNMP Perl module support.&nbsp; The following steps should work:<br>
+<p>To compile Net-SNMP 5.0.8 under Windows using Cygwin, apply this <a
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=715603&amp;group_id=12694&amp;atid=312694">patch</a>
+and read the updated perl\SNMP\README file.&nbsp; The only update that
+applies to Cygwin is the section on Cygwin in the README file.&nbsp;<br>
 </p>
-<div style="margin-left: 40px;">Install a recent Cygwin.&nbsp; (Cygwin
-from around the first week of March 2003 seems to work fine)<br>
-<br>
-Just install the basics, including Perl, development etc<br>
-<br>
-Downloaded new Net-SNMP 5.0.8<br>
-Followed the README.win32 with:<br>
-<br>
-./configure --with-mib-modules="host agentx smux examples/example" \<br>
-&nbsp;&nbsp;&nbsp;&nbsp; --with-out-mib-modules=host/hr_network \<br>
-&nbsp;&nbsp;&nbsp; --with-libs="-lregex -liphlpapi"<br>
-<br>
-If you get an error saying your system can't compile, you have two
-choices:<br>
-<br>
-1.&nbsp; Remove the -lregex line.&nbsp; This will obviously disable
-regex functionality in Net-SNMP.&nbsp; This may be bad.<br>
-<br>
-2.&nbsp; Install the regex library:<br>
-<div style="margin-left: 40px;"><br>
-Downloaded Regex source from
-http://mirrors.sunsite.dk/cygwin/release/regex/regex-4.4-2-src.tar.bz2<br>
-<br>
-Do a 'make lib'<br>
-Copy lib*.so /lib<br>
-</div>
-<br>
-Try again with Net-SNMP:<br>
-<br>
-./configure --with-mib-modules="host agentx smux examples/example" \<br>
-&nbsp;&nbsp;&nbsp;&nbsp; --with-out-mib-modules=host/hr_network \<br>
-&nbsp;&nbsp;&nbsp; --with-libs="-lregex -liphlpapi"<br>
-<br>
-make<br>
-make install<br>
-<br>
-Ran snmpget and it appeared to work (no errors).<br>
-<br>
-Now the perl:<br>
-<br>
-cd perl<br>
-perl Makefile.PL<br>
-make<br>
-make install<br>
-<br>
-See if the module will load in Perl:<br>
-<br>
-<div style="margin-left: 40px;">perl<br>
-use SNMP;<br>
-</div>
-<br>
-For a more complete test, run the following script:<br>
-<br>
-<div style="margin-left: 40px;">use SNMP;<br>
-$ENV{'MIBS'} = 'ALL';<br>
-print "sysDescr: " . &amp;SNMP::translateObj('sysDescr') . "\n";<br>
-</div>
-<br>
-The output should be:<br>
-<br>
-<div style="margin-left: 40px;">sysDescr: .1.3.6.1.2.1.1.1<br>
-</div>
-&nbsp;<br>
-</div>
 <p> <b>Q:&nbsp; I have enabled net_snmp_perl_enable but the variable
 names are not being translated into text using $v<i>n, $-n, $+n, $-* or
 $+*</i>.&nbsp; How do I troubleshoot it?</b> <br>
@@ -2074,10 +1953,35 @@ MIB file
 <p>If you are using UCD-SNMP v4.2.3, then the variables will not
 translate properly because SNMPTRAPD does not pass them correctly to
 SNMPTT.&nbsp; Upgrade to a newer version of snmptrapd. <br>
-&nbsp; </p>
+&nbsp; <br>
+</p>
+<p><b>Q:&nbsp; I set translate_oids or translate_trap_oid to 2 or 4 in
+snmptt.ini, but the trap is being logged in numerical form.&nbsp; Why?<br>
+</b></p>
+A:&nbsp; The current version of Net-SNMP (5.0.8 at the time of this
+writing) and everything before it does not support including the module
+name (eg: <span style="font-weight: bold;">IF-MIB::</span>) when
+translating an OID.&nbsp; A patch is available for 5.0.8 that should
+appear in later releases of Net-SNMP.&nbsp; The patch (720261) can be
+downloaded from the <a
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=720261&amp;group_id=12694&amp;atid=312694">Net-SNMP
+patch page</a>.<br>
+<br>
+<p><b>Q:&nbsp; I set </b><b>translate_oids or </b><b>translate_trap_oid
+to 1 or 3 in snmptt.ini, but the trap is not being logged with a long
+symbolic name.&nbsp; Why?<br>
+</b></p>
+A:&nbsp; The current version of Net-SNMP (5.0.8 at the time of this
+writing) and some versions before do not properly tranlsate numeric OIDs
+to long symbolic names.&nbsp; A patch is available for 5.0.8 that
+should appear in later releases of Net-SNMP.&nbsp; The patch (xxxx) can
+be downloaded from the <a
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=720261&amp;group_id=12694&amp;atid=312694">Net-SNMP
+patch page</a>.<br>
+<br>
 <p><b>Q:&nbsp; I converted a MIB using snmpttconvertmib (default
 snmptranslate mode) but the OIDs are appearing as text instead of being
-numberical.&nbsp; Why?</b> </p>
+numerical.&nbsp; Why?</b> </p>
 <blockquote><b>For example:</b></blockquote>
 <blockquote><b>EVENT linkUp
 .iso.org.dod.internet.snmpV2.snmpModules.snmpMIB.snmpMIBObjects.snmpTraps.linkUp
@@ -2127,9 +2031,6 @@ javascripts which interfaces to a SQL database using DBI::ODBC. </p>
 Sourceforge page</a>. <br>
 &nbsp; <br>
 </p>
-&nbsp;<br>
-<br>
-<br>
 <p><br>
 &nbsp; <br>
 &nbsp; <br>

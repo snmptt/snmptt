@@ -1,3 +1,7 @@
+April 12th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added support for translate_trap_oid
+- Added support for symbolic OIDs on EVENT line
+
 April 2nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Replace all back ticks with forward ticks on received trap
 - Prepend a backslash to ' and " characters when logging to SQL 
