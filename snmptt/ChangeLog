@@ -1,3 +1,6 @@
+July 5th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Add SEC documentation
+
 June 25th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Changed mysql_ping_insert to mysql_ping_on_insert.
 - Added $Fz variable which outputs the processed FORMAT line for use in 
@@ -6,6 +9,8 @@ June 25th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Removed mib_descriptions_enable and replaced with description_mode and
   description_clean.  Can now use the description from either the 
   SNMPTT.CONF or the MIB files.
+- Snmpttconvertmib:  Bug:  Was not parsing OBJECTS lines, only 
+  VARIABLES lines.
 
 June 24th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Removed references from sub substitute2.

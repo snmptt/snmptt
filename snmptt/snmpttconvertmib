@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v0.4
+# SNMPTTCONVERTMIB v0.5
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -347,9 +347,9 @@ if (1)
           $enterprisefound =1;
         }
 
-        if ($line3 =~ /VARIABLES(.*)/s)
+        if ( ($line3 =~ /VARIABLES(.*)/s) || ($line3 =~ /OBJECTS(.*)/s) )
         {
-	  # If there is more text after the word VARIABLES, assume it's the start of
+	  # If there is more text after the word VARIABLES or OBJECTS, assume it's the start of
 	  # the variable list
 	  my $templine = "";
 	  if ($1 ne "")
