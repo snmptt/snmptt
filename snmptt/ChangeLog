@@ -2,6 +2,9 @@ September 4rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Finished fix for translate_value_oids_sub.  Both while loops now
   have a break out to prevent an infinit loop, although it should
   not occur..
+- When using e modifier with REGEX, force a new package to prevent
+  user from accessing internal snmptt variables, and prevent access
+  to the main:: package variables.
 
 September 3rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added support for i, g and e modifiers for REGEX

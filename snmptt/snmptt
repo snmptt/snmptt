@@ -1588,7 +1588,12 @@ sub substitute
       { 
 	if ($allow_unsafe_regex == 1)
 	{
-	  $modifiers2 = $modifiers2 | 4; 
+	  $modifiers2 = $modifiers2 | 4;
+	  
+	  # Append a package declaration to the beginning to prevent global variables from being
+	  # visible.  Also remove any attempts to access variables from the main:: package.
+	  $regex_temp2[1] = "package regexisoloate;$regex_temp2[1]";
+	  $regex_temp2[1] =~ s/\$main::/\$/gi;	# Remove attempts to access the main package
 	}
 	else
 	{
