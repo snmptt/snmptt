@@ -728,16 +728,16 @@ sub processtrap
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES 
 					(?,?,?,?,?,?,?,?,?,?,?)") )
 					{
-					  warn "MySQL error: Unable to prepare query: ".$dbh->errstr."\n";
+					  warn "MySQL error: Unable to prepare query: ".$dbhmysql->errstr."\n";
 
 					  if ($syslog_system_enable == 1)
 					  {
-					    syslog_system("MySQL error: Unable to prepare query: ".$dbh->errstr);
+					    syslog_system("MySQL error: Unable to prepare query: ".$dbhmysql->errstr);
 					  }
 					  
 					  if ($eventlog_system_enable == 1)
 					  {
-					    eventlog_system("MySQL error: Unable to prepare query: ".$dbh->errstr,
+					    eventlog_system("MySQL error: Unable to prepare query: ".$dbhmysql->errstr,
 					    		15,$eventlog_information);
 					  }
 
@@ -751,12 +751,12 @@ sub processtrap
 				     
 				     if ($syslog_system_enable == 1)
 				     {
-				       syslog_system("MySQL error: Unable to execute query: ".$dbh->errstr);
+				       syslog_system("MySQL error: Unable to execute query: ".$dbhmysql->errstr);
 				     }
 				     
 				     if ($eventlog_system_enable == 1)
 				     {
-				       eventlog_system("MySQL error: Unable to execute query: ".$dbh->errstr,
+				       eventlog_system("MySQL error: Unable to execute query: ".$dbhmysql->errstr,
 				       16,$eventlog_information);
 				     }
 				     
