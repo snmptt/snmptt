@@ -1,3 +1,7 @@
+June 17th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Removed escape_sequences_enable option and replaced it with variable
+  substitutions $Fa, $Ff, $Fn, $Fr and $Ft.
+
 June 11th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Added mysql_ping_interval option to set how often the MySQL server
   should be 'pinged'.  If the 'ping' fails, it will attempt to re-connect

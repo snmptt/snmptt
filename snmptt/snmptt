@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v0.9.1
+# SNMPTT v0.9.2
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -46,7 +46,7 @@
 ##############################################################################
 #
 
-$snmptt_version = "v0.9.1";
+$snmptt_version = "v0.9.2";
 
 sub showversion
 {
@@ -1525,6 +1525,7 @@ sub substitute
   # Perform substitution on $_ variable
 
   # Wildcards - $*, $+*, $-*
+  # Expand to $1 $2 $3 etc
   my $temp_wildcard1 = ();
   my $temp_wildcard2 = ();
   my $temp_wildcard3 = ();
@@ -1543,9 +1544,14 @@ sub substitute
     chop ($temp_wildcard3);
   }
   
-  s(\$\*)($temp_wildcard1)g;
+  #s(\$\*)($temp_wildcard1)g;
+  &substitute2 ("\$\*", \$temp_wildcard1);
+
   s(\$\+\*)($temp_wildcard2)g;
+  &substitute2 ("\$\+\*", \$temp_wildcard2);
+
   s(\$-\*)($temp_wildcard3)g;
+  &substitute2 ("\$-\*", \$temp_wildcard3);
   
   # $v - Names of variable-bindings 
   # Count down backwards to make sure 10 is not mistaken for $1
@@ -1558,11 +1564,13 @@ sub substitute
       {
 	$temp = $entvarname[$i-1];
       }
-      s(\$v$i)($temp)g;
+      #s(\$v$i)($temp)g;
+      &substitute2 ("\$v$i", \$temp);
     }
     else
     {
-      s(\$v$i)($entvarname[$i-1])g;
+      #s(\$v$i)($entvarname[$i-1])g;
+      &substitute2 ("\$v$i", \$entvarname[$i-1]);
     }
   }
   
@@ -1637,7 +1645,8 @@ sub substitute
     
     if ($net_snmp_perl_enable == 1)
     {
-      s(\$$i)($val)g;			# $n	      
+      #s(\$$i)($val)g;			# $n	      
+      &substitute2 ("\$$i", \$val);
 
       # Translate for $+n and $-n
       my $temp = my_translateObj($entvarname[$i-1],$translate_varname_oid_format);
@@ -1652,44 +1661,54 @@ sub substitute
 	$temp2 = "unknown";
       }
             
-      s(\$\+$i)($temp:$val)g;		# $+n
+      #s(\$\+$i)($temp:$val)g;		# $+n
+      &substitute2 ("\$\+$i", \"$temp:$val");
 
-      s(\$-$i)($temp ($temp2):$val)g;	# $-n
+      #s(\$-$i)($temp ($temp2):$val)g;	# $-n
+      &substitute2 ("\$-$i", \"$temp ($temp2):$val");
     }
     else
     {
-      s(\$$i)($val)g;				# $n
-      s(\$\+$i)($entvarname[$i-1]:$val)g;		# $+n
+      #s(\$$i)($val)g;				# $n
+      &substitute2 ("\$$i", \$val);
       
-      s(\$-$i)($entvarname[$i-1] (unknown):$val)g;	# $-n
+      #s(\$\+$i)($entvarname[$i-1]:$val)g;		# $+n
+      &substitute2 ("\$\+$i", \"$entvarname[$i-1]:$val");      
+
+      #s(\$-$i)($entvarname[$i-1] (unknown):$val)g;	# $-n
+      &substitute2 ("\$-$i", \"$entvarname[$i-1] (unknown):$val");
     }
   }
   
   # $c - Category
-  s(\$c)($event2[1])g;
+  #s(\$c)($event2[1])g;
+  &substitute2 ("\$c", \$event2[1]);
   
   # $C - Trap community string
-  s(\$C)($var[5])g;
+  #s(\$C)($var[5])g;
+  &substitute2 ("\$C", \$var[5]);
   
   # $E - Enterprise trap (symbolic)
-  s(\$E)($enterprise_trans)g;
+  #s(\$E)($enterprise_trans)g;
+  &substitute2 ("\$E", \$enterprise_trans);
   
   # $e - Enterprise trap (numerical)
-  s(\$e)($var[6])g;
+  #s(\$e)($var[6])g;
+  &substitute2 ("\$e", \$var[6]);
   
   # $N - Event name
-  s(\$N)($event2[0])g;
+  #s(\$N)($event2[0])g;
+  &substitute2 ("\$N", \$event2[0]);
 
   # $i - Event OID
-  s(\$i)($receivedtrap_entry)g;
+  #s(\$i)($receivedtrap_entry)g;
+  &substitute2 ("\$i", \$receivedtrap_entry);
   
   # $# - Number of variable-bindings in the trap
   my $entvar_temp = $#entvar+1;
-  s(\$#)($entvar_temp)g;
-  
-  # $$ - Print a $
-  s(\$\$)(\$)g;
-  
+  #s(\$#)($entvar_temp)g;
+  &substitute2 ("\$#", \$entvar_temp);
+   
   # $O - Received trap (symbolic)
   if ($net_snmp_perl_enable == 1)
   {
@@ -1701,7 +1720,8 @@ sub substitute
       if ($DEBUGGING >= 2) {
 	print "  Translated to $temp\n";
       }
-      s(\$O)($temp)g;
+      #s(\$O)($temp)g;
+      &substitute2 ("\$O", \$temp);
     }
     else 
     {
@@ -1709,43 +1729,60 @@ sub substitute
       if ($DEBUGGING >= 2) {
 	print "  Could not translate - defaulting to numeric\n";
       }
-      s(\$O)($temp)g;
+      #s(\$O)($temp)g;
+      &substitute2 ("\$O", \$temp);
     }
   }
   else
   {
-    s(\$O)($receivedtrap)g;
+    #s(\$O)($receivedtrap)g;
+    &substitute2 ("\$O", \$receivedtrap);
   }
 
   # $o - Received trap (numerical)
-  s(\$o)($receivedtrap)g;	
+  #s(\$o)($receivedtrap)g;
+  &substitute2 ("\$o", \$receivedtrap);  
   
   # $s - Severity
-  s(\$s)($event2[2])g;
+  #s(\$s)($event2[2])g;
+  &substitute2 ("\$s", \$event2[2]);
   
   # $AR, $ar - IP address
-  s(\$aR)($var[1])g;
-  s(\$ar)($var[1])g;
+  #s(\$aR)($var[1])g;
+  &substitute2 ("\$aR", \$var[1]);
+  
+  #s(\$ar)($var[1])g;
+  &substitute2 ("\$ar", \$var[1]);
   
   # $R, $r - Hostname
-  s(\$R)($var[0])g;
-  s(\$r)($var[0])g;
+  #s(\$R)($var[0])g;
+  &substitute2 ("\$R", \$var[0]);
+  
+  #s(\$r)($var[0])g;
+  &substitute2 ("\$r", \$var[0]);
   
   # $A, $a - Trap agent IP address
-  s(\$aA)($var[4])g;		# IP address
-  s(\$A)($agent_dns_name)g;	# hostname
+  #s(\$aA)($var[4])g;		# IP address
+  &substitute2 ("\$aA", \$var[4]);
+  
+  #s(\$A)($agent_dns_name)g;	# hostname
+  &substitute2 ("\$A", \$agent_dns_name);
   
   # $T - Uptime
-  s(\$T)($var[2])g;
+  #s(\$T)($var[2])g;
+  &substitute2 ("\$T", \$var[2]);
   
   # $x - Current date
-  s(\$x)($trap_date)g;	
+  #s(\$x)($trap_date)g;	
+  &substitute2 ("\$x", \$trap_date);
   
   # $X - Current time
-  s(\$X)($trap_time)g;	
+  #s(\$X)($trap_time)g;	
+  &substitute2 ("\$X", \$trap_time);
   
   # $@ - Current time since epoch (Jan 1, 1904 for Mac, Jan 1, 1900 for most others)
-  s(\$@)($trap_date_time_epoch)g;
+  #s(\$@)($trap_date_time_epoch)g;
+  &substitute2 ("\$@", \$trap_date_time_epoch);
   
   # iso(1) org(3) dod(6) internet(1) snmpV2(6) snmpModules(3) snmpMIB(1) snmpMIBObjects(1) 5
   # SNMPv2 Generic?  1=coldStart....5=authenticationFailure, 6=egpNeighborLoss so 0=enterprise?
@@ -1754,7 +1791,8 @@ sub substitute
     # It's a generic trap
       
     # $S - Specific trap number - 0
-    s(\$S)(0)g;
+    #s(\$S)(0)g;
+    &substitute2 ("\$S", \"0");
     
     # $G - Generic trap number - last #
     my $temp = $_; 		# Save old $_
@@ -1762,7 +1800,8 @@ sub substitute
     /(\d+)$/;
     my $temp2 = $1;
     $_ = $temp;		# Restore old $_
-    s(\$G)($temp2)g;
+    #s(\$G)($temp2)g;
+    &substitute2 ("\$G", \$temp2);
   }
   else
   {
@@ -1774,10 +1813,12 @@ sub substitute
     /(\d+)$/;
     my $temp2 = $1;
     $_ = $temp;		# Restore old $_
-    s(\$S)($temp2)g;
+    #s(\$S)($temp2)g;
+    &substitute2 ("\$S", \$temp2);
     
     # $G - Generic trap number - 0
     s(\$G)(0)g;	  
+    &substitute2 ("\$G", \"0");
   }	
 
   # $D - Description from MIB file (NOT from snmptt.conf)
@@ -1786,26 +1827,33 @@ sub substitute
     if ($mib_descriptions_enable >= 2) {
       $description_temp =~ s/\n\s+/\n/g;
     }
-    s(\$D)($description_temp)g;
+    #s(\$D)($description_temp)g;
+    &substitute2 ("\$D", \$description_temp);
   }
   else {
-    s(\$D)()g;
+    #s(\$D)()g;
+    &substitute2 ("\$D", \"");
   }
 
-  # Escape characters:
-  # \t		tab                   (HT, TAB)
-  # \n		newline               (LF, NL)
-  # \r		return                (CR)
-  # \f		form feed             (FF)
-  # \a		alarm (bell)          (BEL)
-  if ($escape_sequences_enable == 1) {
-    s(\\t)(\t)g;
-    s(\\n)(\n)g;
-    s(\\r)(\r)g;
-    s(\\f)(\f)g;
-    s(\\a)(\a)g;
-  }
-  
+  # Formatting
+  # alarm (bell)          (BEL)
+  &substitute2 ("\$Fa", \"\a");
+
+  # form feed             (FF)
+  &substitute2 ("\$Ff", \"\f");
+
+  # newline               (LF, NL)
+  &substitute2 ("\$Fn", \"\n");
+
+  # return                (CR)
+  &substitute2 ("\$Fr", \"\r");
+
+  # tab                   (HT, TAB)
+  &substitute2 ("\$Ft", \"\t");
+
+  # $$ - Print a $
+  s(\$\$)(\$)g;
+
   # Do user defined REGEX on $message
   
   if ($DEBUGGING >= 2 && defined($event2[6][0]))
@@ -1962,6 +2010,47 @@ sub substitute
       }
     }
   }
+}
+
+# sub substitute2 (left, right)
+#
+# left:  inside of double quotes with escapes.  eg: "\$a"
+# right: is a reference to a scalar or constant.  eg: \$name, \"hello", \"hi$namebye"
+#
+# Only substitute if there is an odd number of $ or \ symbols before the 
+# substitute variable (eg: a in $a).  If there is an even number (0,2,4 etc)
+# then do NOT substitute.  If there is an odd number (1,3,5 etc) then
+# substitute.  For example, if $a converted to x:
+# $a      = x
+# $$a     = $a
+# $$$a    = $x
+# $$$$a   = $$a
+# $$$$$a  = $$x
+# 
+# We need variable length look behind pattern matching to do this, but Perl
+# does not support it.  As an alternative we can reverse the string, do a
+# substitute with look ahead, and reverse it back.
+#
+sub substitute2 {
+  my $left = shift;
+  my $right = shift;
+
+  $string_r = reverse $_;
+  $left_r = reverse $left;
+  $left_r =~ s/\\/\\\\/g;               # escape \
+  $left_r =~ s/\$/\\\$/g;               # escape $
+  $left_r =~ s/\*/\\\*/g;               # escape *
+  $left_r =~ s/\+/\\\+/g;               # escape +
+  $right_r = reverse $$right;
+
+  # The format is:
+  # s/a\$((?=(\$\$)*(?!\$)))/b/g;
+  # where 'a\$' is the reverse of what to look for and 'b' is what to replace 
+  # it with (reversed).
+
+  $string_r =~ s/$left_r((?=(\$\$)*(?!\$)))/$right_r/g;
+
+  $_ = reverse $string_r;
 }
 
 sub loadsnmpttconf
@@ -3096,7 +3185,6 @@ sub loadsnmpttini {
 	$remove_backslash_from_quotes = $cfg->val('General', 'remove_backslash_from_quotes');
 	$dynamic_nodes = $cfg->val('General', 'dynamic_nodes');
 	$mib_descriptions_enable = $cfg->val('General', 'mib_descriptions_enable');
-	$escape_sequences_enable = $cfg->val('General', 'escape_sequences_enable');
         
 	# DaemonMode
 	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -3207,7 +3295,6 @@ sub loadsnmpttini {
 	if (! defined ($remove_backslash_from_quotes)) { $remove_backslash_from_quotes = 0} ;
 	if (! defined ($dynamic_nodes)) { $dynamic_nodes = 0} ;
 	if (! defined ($mib_descriptions_enable)) { $mib_descriptions_enable = 0} ;
-	if (! defined ($escape_sequences_enable)) { $escape_sequences_enable = 0} ;
 
         if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($daemon_uid)) { $daemon_uid = ''} ;
@@ -4342,4 +4429,5 @@ sub ping_mysql {
     print "MYSQL Ping\n"
   }
 }
+
 
