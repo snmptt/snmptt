@@ -1,11 +1,11 @@
 June 15th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Using UCD-SNMP v4.2.3, data passed from SNMPTRAPD was not
-  being handled correctly.  Data being passed from SNMPTRAPD only
-  contained one item per line instead of two.  This appears to
-  be a bug with v4.2.3 as it does not happen with v4.2.1 or 
-  v4.2.5.  SNMPTT can work around it but v4.2.3 should NOT be
-  used with SNMPTT especially if SNMP V2 traps are being used.
-
+  being handled correctly.  Data being passed only contained
+  one item per line instead of two.  This appears to be a
+  bug with v4.2.3 as it does not happen with v4.2.1 or 
+  v4.2.5.  SNMPTT can now work around it but v4.2.3 should NOT 
+  be used with SNMPTT especially if SNMP V2 traps are being 
+  used.
 - Fixed bug when receiving SNMP V2 traps.  SNMPTT was assuming
   the last three variables were the agent IP, community name
   and enterprise, which was incorrect.  It now looks for 
