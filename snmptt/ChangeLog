@@ -1,3 +1,11 @@
+Aug 10th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Added database ping support to PostgreSQL and DBD::ODBC.  Added debug
+  logging improvements for database connect and INSERT sections.  Thanks
+  to mike at mccartney.net.
+
+Debug output now prints out $n variable number beside 'Ent Value x' such as 
+  'Ent Value 2 ($3):' to reduce confusion when troubleshooting.
+
 Aug 9th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Debug output now prints out $n variable number beside 'Ent Value x' such as 
   'Ent Value 2 ($3):' to reduce confusion when troubleshooting.

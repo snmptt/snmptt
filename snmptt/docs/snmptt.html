@@ -14,7 +14,7 @@
 <title>SNMP Trap Translator</title>
 </head>
 <body>
-<h1>SNMP Trap Translator v0.9.3</h1>
+  <h1>SNMP Trap Translator v0.9.4</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
 This file was last updated on:&nbsp; July 14th, 2004
 <p><a href="#License">License</a></p>
@@ -237,7 +237,7 @@ Net-SNMP Perl module</a>.&nbsp; Only required for features that
 perform conversions between symbolic and numeric OIDs.&nbsp;
 Net-SNMP 5.0.8+ with <a href=
 "http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
-patch 722075</a>, or Net-SNMP 5.1.1 recommended.&nbsp;&nbsp; This
+patch 722075</a>, or Net-SNMP 5.1.1 or higher is recommended.&nbsp;&nbsp; This
 is NOT the same as the Net::SNMP module availabe from
 CPAN.<br /></li>
 </ul>
@@ -262,13 +262,13 @@ or you enable the options <b>translate_integers</b>,
 <b>translate_trap_oid</b> or <b>translate_oids</b>.  Although not required, using the Perl 
 module is recommended.<br /></span></blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
-<h3><b>0.9.2</b> <b>- ??, 2004</b></h3>
+<h3><b>0.9.4</b> <b>- ??, 2004</b></h3>
 <ul>
-  <li>Added <b>mysql_ping_on_insert</b> option to 'ping' the database before doing an INSERT and <b>mysql_ping_interval</b> option to periodically ping the database.  These two options will help ensure the connection to the database remains available.  If an error is returned, it will attempt to reconnect to the database.  This should prevent SNMPTT from having to be restarted if the SQL server is not available due to an outage or a connection timeout due to no activity.</li>
+  <li>SQL database connections are now opened after forking to the background when running in daemon mode, and after changing users when running SNMPTT as a non-root user.  This should prevent 'gone away' and other connection problems with SQL databases due to lost handles.</li>
+  <li>Added <b>mysql_ping_on_insert</b>, <b>postgresql_ping_on_insert</b> and <b>dbd_odbc_ping_on_insert</b> options to 'ping' the database before doing an INSERT.  Also added the options <b>mysql_ping_interval</b>, <b>postgresql_ping_interval</b> and <b>dbd_odbc_ping_interval</b> to periodically ping the database.  These options will help ensure the connection to the database remains available.  If an error is returned, it will attempt to reconnect to the database.  This should prevent SNMPTT from having to be restarted if the SQL server is not available due to an outage or a connection timeout due to no activity.</li>
   <li>Added variable substitution <b>$Fz</b> which when used on an EXEC line will dump the translated FORMAT line.  This will allow for simplified EXEC lines when they are the same as the FORMAT line (minus the command to execute of course).</li>
   <li>Added variable substitutions <b>$Fa</b>, <b>$Ff</b>, <b>$Fn</b>, <b>$Fr</b>, <b>$Ft</b>, for alarm (bell), form feed (FF), newline (LF, NL), return (CR) and tab (HT, TAB)</li>
   <li>Added variable substitution <b>$D</b> to dump the description text for FORMAT and EXEC lines.  The descriptions can be pulled from either the SNMPTT.CONF or MIB files.  This is controlled by the <b>description_mode</b> and <b>description_clean</b> <b>snmptt.ini</b> options.</li>
-  <li>SQL database connections are now opened after changing users when running SNMPTT as a non-root user.  This should prevent 'gone away' errors with MySQL.</li>
   <li>Added support for logging unknown traps to a SQL table</li>
   <li>Added logging of statistical information for <b>total traps received</b>, <b>total traps translated</b>, <b>total traps ignored</b> and <b>total unknown traps</b>. Statistics logged at shut down, and optionally at a defined interval defined
   by the new <b>snmptt.ini</b> variable <b>statistics_interval</b>.  Logging can also be forced by sending the SIGUSR1 
@@ -276,8 +276,8 @@ module is recommended.<br /></span></blockquote>
   <li>Added the error number reported by MySQL to MySQL errors (system syslog, eventlog etc)</li>
   <li>Added <b>/usr/local/etc/snmp</b> and <b>/usr/local/etc</b> paths to the list of default directories searched for <b>snmptt.ini</b> under Unix</li>
   <li>Added some friendly error messages when required Perl modules are not available</li>
-  <li>Fixed bug with with handling traps in symbolic format
-  (snmptrapd without -On)</li>
+  <li>Fixed bug with with handling traps in symbolic format (snmptrapd without -On)</li>
+  <li>Fixed bug with with using printing $ symbols in FORMAT and EXEC lines</li>
   <li>Added <a href="http://kodu.neti.ee/%7Eristo/sec/">Simple Event Correlator (SEC)</a> integration documentation</li>
   <li>SNMPTTConvertMIB:</li>
   <ul>
@@ -634,16 +634,15 @@ configuration files to load</li>
 <li>Initial release</li>
 </ul>
 <h2><a id="Upgrading" name="Upgrading"></a>Upgrading</h2>
-<h3><b>v0.9 to v0.9.2</b></h3>
-<p>To upgrade from v0.8 to v0.9, you should:</p>
+<h3><b>v0.9 to v0.9.4</b></h3>
+<p>To upgrade from v0.8 to v0.9.4, you should:</p>
 <ol>
-<li>Replace <span style="font-weight: bold;">snmptt</span> with the
-new version contained in the v0.9 package.&nbsp; Make sure the file
-is executable (<span style="font-weight: bold;">chmod +x
-<span style="font-style: italic;">filename</span></span>)</li>
+  <li>Replace <b>snmptt</b> and <b>snmpttconvertmib</b> with the
+  new versions contained in the v1.0 package.&nbsp; Make sure the files
+  are executable (<b>chmod +x <i>filename</i></b>).</li>
 <li>Backup your <b>snmptt.ini</b> file, replace it with the new
 version, and make any necessary configuration changes to it</li>
-<li>If you are using a MySQL and do not want the database to be pinged before each INSERT, set <b>mysql_ping_on_insert</b> to 0 in <b>snmptt.ini</b>.  If you do not want the database to be pinged periodically, set set <b>mysql_ping_interval</b> to 0 in <b>snmptt.ini</b>.</li>
+<li>If you are using a MySQL, PostgreSQL or ODBC (via DBD::ODBC) and do not want the database to be pinged before each INSERT, set <b>mysql_ping_on_insert</b>, <b>postgresql_ping_on_insert</b> or <b>dbd_odbc_ping_on_insert</b> to 0 in <b>snmptt.ini</b>.  If you do not want the database to be pinged periodically, set <b>mysql_ping_interval</b>, <b>postgresql_ping_interval</b> or <b>dbd_odbc_ping_interval</b> to 0 in <b>snmptt.ini</b>.</li>
 <li>Enable any new features in <span style=
 "font-weight: bold;">snmptt.ini</span> as required</li>
 <li>Test and report any issues to alex_b@users.sourceforge.net, or
@@ -1245,12 +1244,13 @@ file.&nbsp; Defining <span style=
 "font-weight: bold;">mysql_dbi_table_unknown</span> is
 optional.</p>
 <p>The following MySQL script can create the database and
-table.&nbsp; Permissions etc should also be defined.  Run '<b>mysql</b>' as
+table.  Permissions etc should also be defined.  Run '<b>mysql</b>' as
 root and enter:</p>
 <blockquote><b>CREATE DATABASE snmptt;</b><br />
 <b>USE snmptt;</b>
 <p><b>DROP TABLE snmptt;;</b><br />
 <b>CREATE TABLE snmptt (</b><br />
+<b>id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,</b><br />
 <b>eventname VARCHAR(50),</b><br />
 <b>eventid VARCHAR(50),</b><br />
 <b>trapoid VARCHAR(100),<br />
@@ -1264,9 +1264,9 @@ enterprise VARCHAR(100),</b><br />
 <b>traptime VARCHAR(30),</b><br />
 <b>formatline VARCHAR(255));</b></p>
 </blockquote>
-If logging of unknown traps to a SQL table is required, create the
-<span style="font-weight: bold;">snmptt_unknown</span> table
-using:<br />
+<p>If you do not want the auto-incrementing id column, remove the 'id INT...' line.</p>
+<p>If logging of unknown traps to a SQL table is required, create the <b>snmptt_unknown</b> table
+using:</p>
 <blockquote><b>USE snmptt;</b>
 <p><b>DROP TABLE snmptt_unknown;;</b><br />
 <b>CREATE TABLE snmptt_unknown (</b><br />
@@ -1306,31 +1306,33 @@ variables in the snmptt.ini file.</p>
 
 <b>postgres</b><b>ql_dbi_username</b><br />
 <b>postgres</b><b>ql_dbi_password</b></blockquote>
-Note:&nbsp; Sample values are defined in the default ini
-file.&nbsp; Defining&nbsp;<span style=
-"font-weight: bold;"><b>postgres</b><b>ql</b></span><span style=
-"font-weight: bold;">_dbi_table_unknown</span> is optional.
-<p>The following PostgreSQL script can create the database and
-table (not tested!).&nbsp; Permissions etc should also be
-defined.</p>
-<blockquote><b>su - postgres<br />
-createdb snmptt<br />
-psql snmptt<br /></b>
-<p><b>DROP TABLE snmptt;</b><br />
-<b>CREATE TABLE snmptt (</b><br />
-<b>eventname VARCHAR(50),</b><br />
-<b>eventid VARCHAR(50),</b> <b><br />
-trapoid VARCHAR(100),<br />
-enterprise VARCHAR(100),</b><br />
-<b>community VARCHAR(20),</b><br />
-<b>hostname VARCHAR(100),</b><br />
-<b>agentip&nbsp; VARCHAR(16),</b><br />
-<b>category VARCHAR(20),</b><br />
-<b>severity VARCHAR(20),</b><br />
-<b>uptime&nbsp; VARCHAR(20),</b><br />
-<b>traptime VARCHAR(30),</b><br />
-<b>formatline VARCHAR(255));<br />
-\q<br /></b></p>
+<p>Note: Sample values are defined in the default ini file.  Defining <b>postgres_dbi_table_unknown</b> is optional.</p>
+<p>The following shell / PostgreSQL commands will drop the existing database
+if it exists and then delete the existing snmptt user.  It will then create a new snmptt
+database, a new snmptt user (prompting for a password) and then create the table.  Run these commands as root.</p>
+<blockquote>
+  <p><b>su - postgres<br />
+    dropdb snmptt<br />
+    dropuser snmptt<br /></p>
+    <p>createuser -P snmptt<br />
+    createdb -O snmptt snmptt<br />
+    psql snmptt<br /></p>
+    <p>DROP TABLE snmptt;<br />
+    CREATE TABLE snmptt (<br />
+    eventname VARCHAR(50),<br />
+    eventid VARCHAR(50), <br />
+    trapoid VARCHAR(100),<br />
+    enterprise VARCHAR(100),<br />
+    community VARCHAR(20),<br />
+    hostname VARCHAR(100),<br />
+    agentip&nbsp; VARCHAR(16),<br />
+    category VARCHAR(20),<br />
+    severity VARCHAR(20),<br />
+    uptime&nbsp; VARCHAR(20),<br />
+    traptime VARCHAR(30),<br />
+    formatline VARCHAR(255));<br /></p>
+    <p>GRANT ALL ON snmptt TO snmptt;<br />
+    \q<br /></b></p>
 </blockquote>
 If logging of unknown traps to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_unknown</span> table
@@ -1346,7 +1348,8 @@ enterprise VARCHAR(100),</b><br />
 <b>agentip&nbsp; VARCHAR(16),</b><br />
 <b>uptime&nbsp; VARCHAR(20),</b><br />
 <b>traptime VARCHAR(30),</b><br />
-<b>formatline VARCHAR(255));<br />
+<b>formatline VARCHAR(255));<br /></p>
+  <p>GRANT ALL ON snmptt_unknown TO snmptt;<br />
 \q<br /></b></p>
 </blockquote>
 All variables are INSERTted into the database as standard text
@@ -1693,13 +1696,11 @@ example:</p>
 <p style="margin-left: 40px;">linkDown</p>
 <p style="margin-left: 40px;">IF-MIB::linkDown</p>
 <p>Note:</p>
-<div style="margin-left: 40px;">The current version of Net-SNMP
-(5.0.9 at the time of this writing) and everything before it does
+<div style="margin-left: 40px;">Net-SNMP 5.0.9 and earlier does
 not support including the module name (eg: <span style=
 "font-weight: bold;">IF-MIB::</span>) when translating an
-OID.&nbsp; A patch is available for 5.0.8+ that will appear in
-later releases of Net-SNMP (5.1.1).&nbsp; The patch is available
-from the contrib folder, or it can be downloaded from the <a href=
+OID.&nbsp; A patch is available for 5.0.8+ that is included in Net-SNMP 5.1.1 and higher.  The patch is available
+from the <a href=
 "http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
 Net-SNMP patch page</a>.&nbsp; If the version of Net-SNMP you are
 using does not support this feature and the event OID is specified
@@ -1879,14 +1880,11 @@ support for it by enabling <b>net_snmp_perl_enable</b> in the
 snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b> is not
 enabled, it will default to using the numeric OID.&nbsp;<br />
 <br />
-The current version of Net-SNMP (5.0.8 at the time of this writing)
-and everything before it does not support including the module name
+Net-SNMP 5.0.9 and earlier does not support including the module name
 (eg: <span style="font-weight: bold;">IF-MIB::</span>) when
 translating an OID and most of the 5.0.x versions do not properly
 tranlsate numeric OIDs to long symbolic names.&nbsp; A patch is
-available for 5.0.8+ that will appear in later releases of Net-SNMP
-(5.1.1).&nbsp; The patch is available from the contrib folder, or
-it can be downloaded from the <a href=
+available for 5.0.8+ that is included in Net-SNMP 5.1.1 and higher.  The patch is available from the <a href=
 "http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
 Net-SNMP patch page</a>.</div>
 <br />
@@ -1900,14 +1898,11 @@ enabling <b>net_snmp_perl_enable</b> in the snmptt.ini file.&nbsp;
 If <b>net_snmp_perl_enable</b> is not enabled, it will default to
 using the numeric OID.&nbsp;<br />
 <br />
-The current version of Net-SNMP (5.0.9 at the time of this writing)
-and everything before it does not support including the module name
+Net-SNMP 5.0.9 and earlier does not support including the module name
 (eg: <span style="font-weight: bold;">IF-MIB::</span>) when
 translating an OID and most of the 5.0.x versions do not properly
 tranlsate numeric OIDs to long symbolic names.&nbsp; A patch is
-available for 5.0.8+ that will appear in later releases of Net-SNMP
-(5.1.1).&nbsp; The patch is available from the contrib folder, or
-it can be downloaded from the <a href=
+available for 5.0.8+ that is inlcuded in Net-SNMP 5.1.1 and higher.  The patch is available from the <a href=
 "http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
 Net-SNMP patch page</a>.</blockquote>
 <p>Note (6):</p>

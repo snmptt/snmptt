@@ -1,5 +1,5 @@
 #
-# SNMPTT 0.9.3 Configuration File
+# SNMPTT 0.9.4 Configuration File
 #
 # Windows NT
 #
@@ -369,6 +369,26 @@ postgresql_dbi_username = snmpttuser
 # PostgreSQL: Password to use
 postgresql_dbi_password = password
 
+# PostgreSQL: Whether or not to 'ping' the database before attempting an INSERT
+# to ensure the connection is still valid.  If *any* error is generate by 
+# the ping such as 'Unable to connect to database', it will attempt to 
+# re-create the database connection.
+# Set to 0 to disable
+# Set to 1 to enable
+# Note:  This has no effect on postgresql_ping_interval.
+postgresql_ping_on_insert = 1
+
+# PostgreSQL: How often in seconds the database should be 'pinged' to ensure the
+# connection is still valid.  If *any* error is generate by the ping such as 
+# 'Unable to connect to database', it will attempt to re-create the database
+# connection.  Set to 0 to disable pinging.
+# Note:  This has no effect on postgresql_ping_on_insert.
+# disabled = 0
+# 5 minutes = 300
+# 15 minutes = 900
+# 30 minutes = 1800
+postgresql_ping_interval = 300
+
 # ODBC: Set to 1 to enable logging to a database via ODBC using DBD::ODBC.  
 # This requires both DBI:: and DBD::ODBC
 dbd_odbc_enable = 0
@@ -387,8 +407,28 @@ dbd_odbc_table_unknown = snmptt_unknown
 # DBD:ODBC: Username to use
 dbd_odbc_username = snmptt
 
-# DBD:DBC:: Password to use
+# DBD:ODBC:: Password to use
 dbd_odbc_password = password
+
+# DBD:ODBC: Whether or not to 'ping' the database before attempting an INSERT
+# to ensure the connection is still valid.  If *any* error is generate by 
+# the ping such as 'Unable to connect to database', it will attempt to 
+# re-create the database connection.
+# Set to 0 to disable
+# Set to 1 to enable
+# Note:  This has no effect on dbd_odbc_ping_interval.
+dbd_odbc_ping_on_insert = 1
+
+# DBD:ODBC:: How often in seconds the database should be 'pinged' to ensure the
+# connection is still valid.  If *any* error is generate by the ping such as 
+# 'Unable to connect to database', it will attempt to re-create the database
+# connection.  Set to 0 to disable pinging.
+# Note:  This has no effect on dbd_odbc_ping_on_insert.
+# disabled = 0
+# 5 minutes = 300
+# 15 minutes = 900
+# 30 minutes = 1800
+dbd_odbc_ping_interval = 300
 
 # Win32 ODBC: Set to 1 to enable logging to a database via ODBC on Windows.  
 # This requires Win32::ODBC (Windows only)
