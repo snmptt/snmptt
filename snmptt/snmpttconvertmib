@@ -156,7 +156,7 @@ if ($debug == 2)
 $input = $in;
 $output = $out;
 
-print "nodes: $nodes\n";
+#print "nodes: $nodes\n";
 
 if (($input eq "") || ($output eq ""))
 {
