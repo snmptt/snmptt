@@ -1,4 +1,7 @@
 June 11th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Added mysql_ping_interval option to set how often the MySQL server
+  should be 'pinged'.  If the 'ping' fails, it will attempt to re-connect
+  to the database.
 - Added escape_sequences_enable option to enable the use of 
   common escape sequences in FORMAT and EXEC lines.
 - Added variable substitution $D to dump the description text from 

@@ -265,8 +265,7 @@ module is recommended.<br /></span></blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
 <h3><b>0.9.1</b> <b>- ??, 2004</b></h3>
 <ul>
-  <li></li>
-  <li></li>
+  <li>Added <b>mysql_ping_interval</b> option to set how often the database will be 'pinged' to ensure the connection is available.  If an error is returned, it will attempt to reconnect to the database.  This should prevent SNMPTT from having to be restarted if the SQL server is not available due to an outage.</li>
   <li>Added <b>escape_sequences_enable</b> option to <b>snmptt.ini</b> to enable the use of common escape sequences in FORMAT and EXEC lines 
   such as <b>\n</b> <b>\t</b> etc</li>
   <li>Added variable substitution <b>$D</b> to dump the description text from the MIB file for FORMAT and EXEC lines.  Can be enabled or disabled using the <b>mib_descriptions_enable</b> <b>snmptt.ini</b> option.</li>
