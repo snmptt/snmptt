@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.6.1</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; April 15th, 2003
+This file was last updated on:&nbsp; April 16th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -68,9 +68,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA&nbsp;
 &nbsp; </p>
 <p><a name="What-is-it"></a><b><font size="+2">What is it?</font></b> </p>
 <p>SNMPTT (SNMP Trap Translator) is a SNMP trap handler written in Perl
-for use with the NET-SNMP / UCD-SNMP snmptrapd program (<a
+for use with the Net-SNMP / UCD-SNMP snmptrapd program (<a
  href="http://www.net-snmp.org">http://www.net-snmp.org)</a>. </p>
-<p>The NET-SNMP package has the ability to log SNMP traps to
+<p>The Net-SNMP package has the ability to log SNMP traps to
 syslog.&nbsp; The format of the log is basically variable = value,
 variable = value, variable = value etc.&nbsp; A more descriptive /
 friendly trap message can be created using SNMPTT's variable
@@ -107,7 +107,7 @@ DBD::ODBC or Win32::ODBC modules</li>
 <a name="Requirements"></a><b><font size="+2">Requirements</font></b> </p>
 <ul>
   <li> (Developed using) Perl 5.6.1</li>
-  <li> Required: <a href="http://www.net-snmp.org">NET-SNMP</a>
+  <li> Required: <a href="http://www.net-snmp.org">Net-SNMP</a>
 (formerly known as UCD-SNMP).&nbsp; Specifically <b>snmptrapd</b></li>
   <li> Required: <a
  href="http://search.cpan.org/search?module=Text::ParseWords">Text::ParseWords</a>
@@ -145,14 +145,14 @@ module.&nbsp; Required for ODBC (SQL etc) access on Linux / Windows
 module.&nbsp; Required for ODBC (SQL etc) access on Windows (DBD::ODBC
 not required if using Win32::ODBC)</li>
   <li> Optional: <a
- href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">NET-SNMP
+ href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">Net-SNMP
 Perl module</a>.&nbsp; Only required to translate variable names ($vn)
 or if translation of integers is enabled</li>
 </ul>
 All development and testing was done on Mandrake Linux 8.1 using
 UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).&nbsp; I have
 also tested the program with Windows 2000 using the native version of
-NET-SNMP 5.0.8 compiled with MSVC++ and also under Cygwin with gcc
+Net-SNMP 5.0.8 compiled with MSVC++ and also under Cygwin with gcc
 etc.&nbsp; Note:&nbsp; The Net-SNMP Perl module works fine under native
 Windows and with Cygwin.&nbsp; See the FAQ section for information on
 compiling Net-SNMP with Perl support.<br>
@@ -166,27 +166,33 @@ very least use the <b>snmptrapd</b> program from v4.2.5.&nbsp; Net-SNMP
 does not have this problem.<br>
 </p>
 <p>Note: </p>
-<blockquote>SNMPTT only requies the the NET-SNMP Perl module if you
-want to have variable names translated into text, or you enable the
-options <span style="font-weight: bold;">translate_integers,
-translate_trap_oid </span>or <span style="font-weight: bold;">translate_oids.<br>
+<blockquote>SNMPTT only requies the the Net-SNMP Perl module if you
+want to have variable names translated into symbolic form, want to be
+able to have <span style="font-weight: bold;">snmptrapd </span>pass
+traps using symbolic form, or you enable the options <span
+ style="font-weight: bold;">translate_integers, translate_trap_oid </span>or<span
+ style="font-weight: bold;">translate_oids.<br>
   </span></blockquote>
 <p><br>
 <a name="Whats-New"></a><b><font size="+2">What's New</font></b> </p>
 <p><b><font size="+1">0.7 - ??</font></b><b><font size="+1">, 2003</font></b></p>
 <ul>
+  <li>Fixes a vulnerability by replacing back ticks (`) in recived
+traps with with forward ticks (').&nbsp; This prevents data contained
+in traps from being executed when using the EXEC feature<br>
+  </li>
   <li>Added the ability for traps passed from <span
  style="font-weight: bold;">snmptrapd </span>or loaded from the <span
  style="font-weight: bold;">snmptt.conf</span> files to contain symbolic
 OIDs such as <span style="font-weight: bold;">linkDown</span> and <span
  style="font-weight: bold;">IF-MIB::linkUp</span>.&nbsp; This feature
-requires the UCD-SNMP / NET-SNMP Perl module<br>
+requires the UCD-SNMP / Net-SNMP Perl module<br>
   </li>
   <li> Added the configuration options <b>translate_trap_oid</b> and <span
  style="font-weight: bold;">translate_oids </span>to have the trap OID
 and OID values contained in the trap variables to be converted from
 numerical OID to symbolic form before logging.&nbsp; This feature
-requires the UCD-SNMP / NET-SNMP Perl module</li>
+requires the UCD-SNMP / Net-SNMP Perl module</li>
   <li>Added support for logging of traps using PostgreSQL via DBI /
 DBD::PgPP</li>
   <li>Added REGEX keyword support to allow user definable search and
@@ -200,8 +206,6 @@ CIDR addresses, network ranges and filenames</li>
   <li>Added the ability to force a reload of the configuration files
 while running in daemon mode by adding a file called <span
  style="font-weight: bold;">!reload</span> to the spool directory</li>
-  <li>Back ticks (`) in recived trap are now replaced with forward
-ticks (')</li>
   <li>Fixed bug that prevented quoted text from being logged correctly
 to SQL databases</li>
   <li>Fixed bug that would prevent the translation of integer values to
@@ -266,13 +270,13 @@ lost due to logging problems.</li>
   </ul>
   <li> Added ability to translate integer values to enumeration tags
 defined in MIB files.&nbsp; This feature requires the UCD-SNMP /
-NET-SNMP Perl module</li>
+Net-SNMP Perl module</li>
   <li> Added new variable substitutions: <b>$v<i>n</i></b> (variable
 name), <b>$+<i>n</i></b>(variable name:value), <b>$-<i>n</i></b>
 (variable name (type):value), <b>$+*</b> (same as $+<i>n</i> but
 wildcard), and <b>$-*</b> (same as $-<i>n</i> but wildcard).&nbsp;
 Translation of the variable name using the MIB requires the UCD-SNMP /
-NET-SNMP Perl module.</li>
+Net-SNMP Perl module.</li>
   <li> If a variable is passed from snmptrapd that is blank, snmptt will
 replace it with <span style="font-weight: bold;">(null)</span></li>
   <li>Fixed bug that would prevent variables numbered 10 or higher from
@@ -291,7 +295,7 @@ sample trap file</li>
     <li>Now uses new command line arguments (<span
  style="font-weight: bold;">snmpttconvertmib -h</span> for help).</li>
     <li>Can now use either <span style="font-weight: bold;">snmptranslate</span>
-or the SNMP Perl module (NET-SNMP) to process MIB files</li>
+or the SNMP Perl module (Net-SNMP) to process MIB files</li>
     <li>Can now add a NODES line when converting MIB files</li>
     <li> Now checks the version of <span style="font-weight: bold;">snmptranslate</span>
 before converting the mib to ensure <span style="font-weight: bold;">snmptranslate</span>
@@ -345,7 +349,7 @@ from MIB files</li>
   <li> Sample trap file (sample-trap) for testing</li>
   <li> Command line options to SNMPTT</li>
   <li> SNMPTT now strips UDP: and :<i>port</i> from IP addresses when
-using NET-SNMP 5.0+</li>
+using Net-SNMP 5.0+</li>
   <li> NODES files can now contain comments</li>
   <li> NODES files can now contain either host names or IP addresses</li>
   <li> You can now have multiple definitions of the same trap so that
@@ -368,7 +372,21 @@ files to load</li>
 <p><br>
 <a name="Upgrading"></a><b><font size="+2">Upgrading</font></b> <br>
 &nbsp; </p>
-<p><b><font size="+1">v0.5 to v0.6</font></b> </p>
+<p><b><font size="+1">v0.6 to v0.7</font></b> </p>
+<p>To upgrade from v0.6 to v0.7, you should: </p>
+<ol>
+  <li> Replace <b>SNMPTT</b> and <b>SNMPTTCONVERTMIB</b> with the new
+versions contained in the v0.6 package</li>
+  <li> Backup your <b>snmptt.ini </b>file, replace it with the new
+version, and make any necessary configuration changes to it</li>
+  <li> Enable any new features in <span style="font-weight: bold;">snmptt.ini</span>
+as required</li>
+  <li> Test and report any issues to alex_b@users.sourceforge.net, or
+open a bug report at <a
+ href="http://sourceforge.net/tracker/?group_id=51473&amp;atid=463393">Sourceforge</a>.</li>
+</ol>
+<p><br>
+<b><font size="+1">v0.5 to v0.6</font></b> </p>
 <p>To upgrade from v0.5 to v0.6, you should: </p>
 <ol>
   <li> Replace <b>SNMPTTHANDLER, SNMPTT</b> and <b>SNMPTTCONVERTMIB</b>
@@ -839,7 +857,7 @@ notation <b><u>containing no spaces</u></b>.
 cpqHoGenericTrap trap (trap 11001) would be written as: </p>
       <p style="margin-left: 40px;">1.3.6.1.4.1.232.0.11001.<br>
       </p>
-      <p>Symbolic names can also be used if the UCD-SNMP / NET-SNMP
+      <p>Symbolic names can also be used if the UCD-SNMP / Net-SNMP
 Perl module is installed and enabled by setting <b>net_snmp_perl_enable</b>
 in the snmptt.ini file.&nbsp; For example:<br>
       </p>
@@ -851,9 +869,9 @@ in the snmptt.ini file.&nbsp; For example:<br>
       <div style="margin-left: 40px;">The current version of Net-SNMP
 (5.0.8 at the time of this writing) and everything before it does not
 support including the module name (eg: <span style="font-weight: bold;">IF-MIB::</span>)
-when translating an OID.&nbsp; A patch is available for 5.0.8 that
-should appear in later releases of Net-SNMP.&nbsp; The patch can be
-downloaded from the <a
+when translating an OID.&nbsp; A patch is available for 5.0.8 that will
+appear in later releases of Net-SNMP.&nbsp; The patch can be downloaded
+from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.&nbsp; If the version of Net-SNMP you are using does not
 support this feature and the event OID is specified with the module
@@ -917,7 +935,7 @@ $E, $e&nbsp; - Enterprise trap OID in number format <br>
 $G&nbsp; - Generic trap number (0 if enterprise trap) <br>
 $S&nbsp; - Specific trap number (0 if generic trap) <br>
 $N&nbsp; - Event name defined <br>
-$O, $o - Trap OID in number format <b>(see Note 4)</b><br>
+$O, $o - Trap OID in numerical format <b>(see Note 4)</b><br>
 $R, $r&nbsp; - Hostname <b>(see Note 1)</b> <br>
 $aR, $ar - IP address <br>
 $s&nbsp; - Severity <br>
@@ -967,14 +985,14 @@ Note (2):
 file, SNMPTT will attempt to convert integer values received in traps
 into text by performing a lookup in the MIB file.<br>
       <br>
-You must have the UCD-SNMP / NET-SNMP Perl module installed for this to
+You must have the UCD-SNMP / Net-SNMP Perl module installed for this to
 work and you must enable support for it by enabling <b>net_snmp_perl_enable</b>
 in the snmptt.ini file. <br>
-      <p>For this feature to work, you must ensure UCD-SNMP / NET-SNMP
+      <p>For this feature to work, you must ensure UCD-SNMP / Net-SNMP
 is configured correctly with all the required MIBS.&nbsp; If the option
 is enabled, but the value can not be found, the integer value will be
 used.&nbsp; If the MIB files are present, but translations do not occur,
-ensure UCD-SNMP / NET-SNMP is correctly configured to process all the
+ensure UCD-SNMP / Net-SNMP is correctly configured to process all the
 required mibs.&nbsp; This is configured in the UCD-SNMP / Net-SNMP <b>snmp.conf</b>
 file.&nbsp; Alternatively, you can try setting the <b>mibs_enviroment</b>
 variable in <b>snmptt.ini</b> to <b>ALL</b> (no quotes) to force all
@@ -986,15 +1004,15 @@ initialization of the MIB files. </p>
 Note (3):
     <blockquote>$v<i>n</i>, $+<i>n</i> and $-<i>n</i> variable names and
 variable type are translated into the text name by performing a lookup
-in the MIB file.&nbsp; You must have the UCD-SNMP / NET-SNMP Perl module
+in the MIB file.&nbsp; You must have the UCD-SNMP / Net-SNMP Perl module
 installed for this to work and you must enable support for it by
 enabling <b>net_snmp_perl_enable</b> in the snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b>
 is not enabled, the $v<i>n</i> variable will be replaced with the text
 'variable<i>n</i>' where <i>n</i> is the variable number (1+).
       <p>For the name translation to work, you must ensure UCD-SNMP /
-NET-SNMP is configured correctly with all the required MIBS.&nbsp; If
+Net-SNMP is configured correctly with all the required MIBS.&nbsp; If
 the option is enabled and the correct name is not returned, ensure
-UCD-SNMP / NET-SNMP is correctly configured to process all the required
+UCD-SNMP / Net-SNMP is correctly configured to process all the required
 mibs.&nbsp; This is configured in the UCD-SNMP / Net-SNMP <b>snmp.conf</b>
 file.&nbsp; Alternatively, you can try setting the <b>mibs_enviroment</b>
 variable in <b>snmptt.ini</b> to <b>ALL</b> (no quotes) to force all
@@ -1006,30 +1024,41 @@ MIBS to be initialized at SNMPTT startup. <br>
     <div style="margin-left: 40px;">If&nbsp; <b>translate_trap_oid</b>
 is enabled in the <b>snmptt.ini</b> file, SNMPTT will attempt to convert
 the numeric OID of the received trap into symbolic form such as
-IF-MIB::linkDown.&nbsp; You must have the UCD-SNMP / NET-SNMP Perl
+IF-MIB::linkDown.&nbsp; You must have the UCD-SNMP / Net-SNMP Perl
 module installed for this to work and you must enable support for it by
 enabling <b>net_snmp_perl_enable</b> in the snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b>
 is not enabled, it will default to using the numeric OID.&nbsp; <br>
     <br>
 The current version of Net-SNMP (5.0.8 at the time of this writing) and
 everything before it does not support including the module name (eg: <span
- style="font-weight: bold;">IF-MIB::</span>) when translating an
-OID.&nbsp; A patch is available for 5.0.8 that should appear in later
-releases of Net-SNMP.&nbsp; The patch can be downloaded from the <a
+ style="font-weight: bold;">IF-MIB::</span>) when translating an OID
+and most of the 5.0.x versions do not properly tranlsate numeric OIDs to
+long symbolic names.&nbsp; A patch is available for 5.0.8 that will
+appear in later releases of Net-SNMP.&nbsp; The patch can be downloaded
+from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
-patch page</a>. <br>
+patch page</a>.<br>
     <br>
     </div>
     <p> Note (5):<br>
     </p>
-    <blockquote> If&nbsp; <b>translate_oids</b> is enabled in the <b>snmptt.ini</b>
+    <blockquote>If&nbsp; <b>translate_oids</b> is enabled in the <b>snmptt.ini</b>
 file, SNMPTT will attempt to convert any numeric OIDs found inside the
-variables passed inside the trap to symbolic form.&nbsp; The format will
-always be the short name (eg: driveStatus).&nbsp; You must have the
-UCD-SNMP / NET-SNMP Perl module installed for this to work and you must
-enable support for it by enabling <b>net_snmp_perl_enable</b> in the
-snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b> is not enabled, it
-will default to using the numeric OID.</blockquote>
+variables passed inside the trap to symbolic form.&nbsp; You must have
+the UCD-SNMP / Net-SNMP Perl module installed for this to work and you
+must enable support for it by enabling <b>net_snmp_perl_enable</b> in
+the snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b> is not
+enabled, it will default to using the numeric OID.&nbsp; <br>
+      <br>
+The current version of Net-SNMP (5.0.8 at the time of this writing) and
+everything before it does not support including the module name (eg: <span
+ style="font-weight: bold;">IF-MIB::</span>) when translating an OID
+and most of the 5.0.x versions do not properly tranlsate numeric OIDs to
+long symbolic names.&nbsp; A patch is available for 5.0.8 that will
+appear in later releases of Net-SNMP.&nbsp; The patch can be downloaded
+from the <a
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
+patch page</a>.</blockquote>
   </blockquote>
   <b>EXEC:</b>
   <blockquote>[<b>EXEC</b> command_string]
@@ -1298,7 +1327,7 @@ executable (<b>chmod +x snmptthandler</b>) </p>
  style="font-weight: bold;">/etc/</span> and edit the options inside the
 file. </p>
 <p>5a.&nbsp;&nbsp; For <b>standlone mode:&nbsp; </b>Modify the
-NET-SNMP <span style="font-weight: bold;">snmptrapd.conf</span> file by
+Net-SNMP <span style="font-weight: bold;">snmptrapd.conf</span> file by
 adding the following line: </p>
 <blockquote><b>traphandle default /usr/sbin/snmptt</b>
   <p>Note:&nbsp;&nbsp; It is possible to configure snmptrapd to execute <span
@@ -1306,7 +1335,7 @@ adding the following line: </p>
 received, but using the <span style="font-weight: bold;">default </span>option
 is preferred</p>
 </blockquote>
-5b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the NET-SNMP
+5b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
 snmptrapd.conf file by adding the following line:
 <blockquote><b>traphandle default /usr/sbin/snmptthandler</b>
   <p>Launch snmptt using: </p>
@@ -1338,10 +1367,10 @@ numeric form</span><br style="font-weight: bold;">
 SNMPTT from having to translate the symbolic name to numerical
 form.&nbsp; If</span><br style="font-weight: bold;">
 <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; the </span></b><span
- style="font-weight: bold;">UCD-SNMP / NET-SNMP Perl module is not
+ style="font-weight: bold;">UCD-SNMP / Net-SNMP Perl module is not
 installed, then you MUST use the <br>
 &nbsp;&nbsp;&nbsp;&nbsp; -On switch.&nbsp; Depending on the version of
-UCD-SNMP / NET-SNMP, some symbolic names<br>
+UCD-SNMP / Net-SNMP, some symbolic names<br>
 &nbsp;&nbsp;&nbsp;&nbsp; may not translate correctly.&nbsp; See the FAQ
 section for more info.<br>
 </span>
@@ -1356,12 +1385,12 @@ and copy <b>snmptt</b> and <b>snmptthandler</b> to it.&nbsp; </p>
 <p>3.&nbsp; Copy <b>snmptt.ini-nt</b> to <b>%SystemRoot%\snmptt.ini</b>
 (c:\winnt\snmptt.ini)<b> </b>and edit the options inside the file. </p>
 <p>4a.&nbsp;&nbsp; For <b>standlone mode:&nbsp; </b>Modify the
-NET-SNMP snmptrapd.conf file by adding the following line: </p>
+Net-SNMP snmptrapd.conf file by adding the following line: </p>
 <blockquote><b>traphandle default perl c:\snmp\snmptt</b></blockquote>
 <blockquote>Note:&nbsp;&nbsp; It is possible to configure snmptrapd to
 execute snmptt based on the specific trap received, but using the <span
  style="font-weight: bold;">default </span>option is preferred</blockquote>
-4b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the NET-SNMP
+4b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
 snmptrapd.conf file by adding the following line:
 <blockquote><b>traphandle default perl c:\snmp\snmptthandler</b>
   <p>Launch snmptt using: </p>
@@ -1375,10 +1404,10 @@ OIDs in numeric form</span><br style="font-weight: bold;">
 SNMPTT from having to translate the symbolic name to numerical
 form.&nbsp; If</span><br style="font-weight: bold;">
 <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; the </span></b><span
- style="font-weight: bold;">UCD-SNMP / NET-SNMP Perl module is not
+ style="font-weight: bold;">UCD-SNMP / Net-SNMP Perl module is not
 installed, then you MUST use the <br>
 &nbsp;&nbsp;&nbsp;&nbsp; -On switch.&nbsp; Depending on the version of
-UCD-SNMP / NET-SNMP, some symbolic names<br>
+UCD-SNMP / Net-SNMP, some symbolic names<br>
 &nbsp;&nbsp;&nbsp;&nbsp; may not translate correctly.&nbsp; See the FAQ
 section for more info.<br>
 </span><br>
@@ -1595,13 +1624,13 @@ script.</p>
 <p><br>
 <b><font size="+2">Requirements</font></b> </p>
 <ul>
-  <li> UCD-SNMP / NET-SNMP <a
+  <li> UCD-SNMP / Net-SNMP <a
  href="http://www.net-snmp.org/man/snmptranslate.html"><b>snmptranslate</b></a>
 utility</li>
 </ul>
 <div style="margin-left: 40px;">or</div>
 <ul>
-  <li> UCD-SNMP / NET-SNMP <b style="font-weight: bold;"><a
+  <li> UCD-SNMP / Net-SNMP <b style="font-weight: bold;"><a
  href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">Perl
 module</a></b><br>
   </li>
@@ -1617,18 +1646,18 @@ screen for all possible command line options (<span
 <ol>
   <li> Edit the options between OPTIONS START and OPTIONS END in
 snmpttconvertmib</li>
-  <li> Copy the MIB file to UCD-SNMP / NET-SNMP mibs folder</li>
+  <li> Copy the MIB file to UCD-SNMP / Net-SNMP mibs folder</li>
   <li> Type: <b>export MIBS=ALL</b> to ensure all the mibs will be read
 in by <b>snmptranslate</b></li>
   <li> Make sure the MIB file can be interpreted by <b>snmptranslate</b>
 correctly.&nbsp; Simply typing <b>snmptranslate</b> should tell you if
 it was able to read the mib file correctly.&nbsp; If it can't, an error
 will be produced at the top of the help screen.</li>
-  <li> If you are using <b>UCD-SNMP</b>, or <b>NET-SNMP v5.0.<span
+  <li> If you are using <b>UCD-SNMP</b>, or <b>Net-SNMP v5.0.<span
  style="text-decoration: underline;">1</span></b>, then add the
 folllowing to your snmp.conf file: <b>printNumericOids 1</b>
 (note:&nbsp; this will affect all snmp commands).&nbsp; This ensures the
-OIDs are returned in numerical format.&nbsp; Other versions of NET-SNMP
+OIDs are returned in numerical format.&nbsp; Other versions of Net-SNMP
 do not require this change, as <b>snmpttconvertmib</b> will use a
 command line switch to force it on when calling <b>snmptranslate</b>.</li>
   <li> Convert the mib file with: <b>snmpttconvertmib --in=<i>path-to-mib</i>
@@ -1678,7 +1707,7 @@ and <b>--#ARGUMENTS</b> line. </p>
 <p>The value for the <b>ENTERPRISE</b> is used when looking up the <b>TRAP-TYPE</b>.<b>SNMPTRANSLATE</b>
 is used with the following syntax to find the <b>OID</b> of the trap: </p>
 <p><b>snmptranslate -IR -Ts <i>enterprise</i>#.<i>trapname</i></b> </p>
-<p>Note: If&nbsp; NET-SNMP 5.0.2 or newer is detected, the command line
+<p>Note: If&nbsp; Net-SNMP 5.0.2 or newer is detected, the command line
 also includes the -On switch.&nbsp; See the <a
  href="file:///h:/cvs/snmptt/readme.html#FAQ-Troubleshooting">FAQ</a>.</p>
 <p>MIB files can become quite complex to read due to the use of IMPORT
@@ -1738,7 +1767,7 @@ in case they exist. </p>
 <p>The value for the <b>ENTERPRISE</b> is used when looking up the <b>NOTIFICATION-TYPE</b>.<b>SNMPTRANSLATE</b>
 is used with the following syntax to find the <b>OID</b> of the trap: </p>
 <p><b>snmptranslate -IR -Ts <i>enterprise</i>.<i>trapname</i></b> </p>
-<p>Note: If&nbsp; NET-SNMP 5.0.2 or newer is detected, the command line
+<p>Note: If&nbsp; Net-SNMP 5.0.2 or newer is detected, the command line
 also includes the -On switch.&nbsp; See the <a
  href="#FAQ-Troubleshooting">FAQ</a>.<br>
 </p>
@@ -1849,7 +1878,7 @@ process them.
 <p>As an alternative, you can edit your <b>snmp.conf</b> file to
 include the line: <b>printNumericOids 1.&nbsp; </b>This setting will
 take effect no matter what is used on the command line. </p>
-<p>Note:&nbsp; If the UCD-SNMP / NET-SNMP Perl module is installed and
+<p>Note:&nbsp; If the UCD-SNMP / Net-SNMP Perl module is installed and
 enabled, then SNMPTT should be able to handle traps passed using
 symbolic form.&nbsp; The Perl module (used by SNMPTT) in Net-SNMP 5.0.8
 and previous versions should be able to handle single symbolic names
@@ -1898,18 +1927,18 @@ a text file, start snmptrapd using: </p>
 This will cause <b>ALL</b> snmptrapd messages to be logged to the file
 which means all snmptrapd 'system' messages such as startup and shutdown
 will not be logged to syslog.
-<p>A patch for NET-SNMP 5.0.7 is available that adds a new switch (-t)
+<p>A patch for Net-SNMP 5.0.7 is available that adds a new switch (-t)
 to prevent TRAP messages from being logged to syslog, but allowing
 system messages to continue to be logged.&nbsp; The patch is available
 from the <a
  href="http://sourceforge.net/tracker/?func=detail&amp;atid=312694&amp;aid=695312&amp;group_id=12694">Net-SNMP
 patch section</a>.&nbsp; This patch should be included in the 5.1 (not
-5.0.8) release of NET-SNMP.&nbsp; With this patch, snmptrapd should be
+5.0.8) release of Net-SNMP.&nbsp; With this patch, snmptrapd should be
 started using: </p>
 <blockquote><b>snmptrapd -On -t</b></blockquote>
 <p><br>
-<b>Q:&nbsp; I want to enable the Perl support for UCD-SNMP / NET-SNMP
-under Linux, but I installed UCD-SNMP / NET-SNMP using RPMs.&nbsp;
+<b>Q:&nbsp; I want to enable the Perl support for UCD-SNMP / Net-SNMP
+under Linux, but I installed UCD-SNMP / Net-SNMP using RPMs.&nbsp;
 What's the easiest way to install the module without recompiling
 everything?</b> </p>
 <p>A:&nbsp; You should not have to re-compile the entire package.&nbsp;
@@ -1933,7 +1962,7 @@ README.WIN32 file.&nbsp; This should create a working snmptrapd.&nbsp;
 The Perl module in Net-SNMP 5.0.8 does seem to compile as explained in
 the documentation.&nbsp; For a workaround, see the question: <b><span
  style="font-weight: bold;">How to I enable the Perl support for
-UCD-SNMP / NET-SNMP under Windows</span></b><span
+UCD-SNMP / Net-SNMP under Windows</span></b><span
  style="font-weight: bold;">?</span></li>
   <li>Install Cygwin, download Net-SNMP (5.0.8) and compile using gcc
 as described in the README.WIN32 file.&nbsp; The Perl module appears to
@@ -1941,7 +1970,7 @@ work fine under Cygwin.&nbsp; <br>
   </li>
 </ol>
 <p><b><span style="font-weight: bold;"><br>
-Q:&nbsp; How to I enable the Perl support for UCD-SNMP / NET-SNMP under
+Q:&nbsp; How to I enable the Perl support for UCD-SNMP / Net-SNMP under
 Windows</span></b><span style="font-weight: bold;">?</span></p>
 <p style="font-weight: bold; text-decoration: underline;">Native
 Windows:</p>
@@ -1980,8 +2009,8 @@ names are not being translated into text using $v<i>n, $-n, $+n, $-* or
 $+*</i>.&nbsp; How do I troubleshoot it?</b> <br>
 <b>Q:&nbsp; I have enabled translate_integers but the integer values
 are not being translated into text.&nbsp;&nbsp; How do I troubleshoot it?</b> </p>
-<p>A:&nbsp; You must have the UCD-SNMP / NET-SNMP Perl module installed
-and working, and must ensure UCD-SNMP / NET-SNMP is configured correctly
+<p>A:&nbsp; You must have the UCD-SNMP / Net-SNMP Perl module installed
+and working, and must ensure UCD-SNMP / Net-SNMP is configured correctly
 with all the required MIBS. </p>
 <p>For starters, make sure the SNMP module is working.&nbsp; Type: </p>
 <blockquote>perl <br>
@@ -1990,7 +2019,7 @@ If you get an error after typing 'use SNMP', then the module is not
 installed correctly.&nbsp; Re-install the module and make sure you
 execute the tests while building.
 <p>If the MIB files are present, but translations do not occur, ensure
-UCD-SNMP / NET-SNMP is correctly configured to process all the required
+UCD-SNMP / Net-SNMP is correctly configured to process all the required
 mibs.&nbsp; This is configured in the snmp.conf file.&nbsp;
 Alternatively, you can try setting the <b>mibs_enviroment</b> variable
 in snmptt.ini to <b>ALL</b> (no quotes) to force all MIBS to be
@@ -2015,10 +2044,10 @@ symbolic name.&nbsp; Why?</b><br>
 A:&nbsp; The current version of Net-SNMP (5.0.8 at the time of this
 writing) and everything before it does not support including the module
 name (eg: <span style="font-weight: bold;">IF-MIB::</span>) when
-translating an OID and does nt properly tranlsate numeric OIDs to long
-symbolic names.&nbsp; A patch is available for 5.0.8 that should appear
-in later releases of Net-SNMP.&nbsp; The patch can be downloaded from
-the <a
+translating an OID and most of the 5.0.x versions do not properly
+tranlsate numeric OIDs to long symbolic names.&nbsp; A patch is
+available for 5.0.8 that will appear in later releases of
+Net-SNMP.&nbsp; The patch can be downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.<br>
 <br>

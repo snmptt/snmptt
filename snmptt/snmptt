@@ -223,7 +223,7 @@ if ($net_snmp_perl_enable == 1)
 	  $ENV{'MIBS'} = $mibs_environment;
 	}
 	&SNMP::initMib();
-	$SNMP::best_guess = 2;
+	$SNMP::best_guess = $net_snmp_perl_best_guess;
 	$SNMP::use_long_names = 0;
 }
 
@@ -1775,7 +1775,7 @@ sub readtrap
 	if ( $daemon == 1)
 	{
 	  chomp($trap_date_time_epoch = (<$input>));	# Pull time trap was spooled
-	  $trap_date_time_epoch =~ s(`)(')g;	#` Replace any back quotes with regular quotes
+	  $trap_date_time_epoch =~ s(`)(')g;	#` Replace any back ticks / quotes with regular quotes
 	}
 	else
 	{
@@ -1796,10 +1796,10 @@ sub readtrap
 	}
 	
 	chomp($tempvar[0]=<$input>);	# hostname
-	$tempvar[0] =~ s(`)(')g;	#` Replace any back quotes with regular quotes
+	$tempvar[0] =~ s(`)(')g;	#` Replace any back ticks / quotes with regular quotes
 	
 	chomp($tempvar[1]=<$input>);	# ip address
-	$tempvar[1] =~ s(`)(')g;	#` Replace any back quotes with regular quotes
+	$tempvar[1] =~ s(`)(')g;	#` Replace any back ticks / quotes with regular quotes
 	
 	# Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
 	# out just the IP address
@@ -1811,7 +1811,7 @@ sub readtrap
 	$linenum = 1;
 	while (defined($line = <$input>))
 	{
-	  $line =~ s(`)(')g;	#` Replace any back quotes with regular quotes
+	  $line =~ s(`)(')g;	#` Replace any back ticks / quotes with regular quotes
 	  my $temp1;
 	  my $temp2;
 
@@ -2303,6 +2303,7 @@ sub loadsnmpttini {
 	$strip_domain = $cfg->val('General', 'strip_domain');
 	@strip_domain_list = $cfg->val('General', 'strip_domain_list');
 	$net_snmp_perl_enable = $cfg->val('General', 'net_snmp_perl_enable');
+	$net_snmp_perl_best_guess = $cfg->val('General', 'net_snmp_perl_best_guess');
 	$translate_trap_oid = $cfg->val('General', 'translate_trap_oid');
 	$translate_oids = $cfg->val('General', 'translate_oids');
 	$translate_integers = $cfg->val('General', 'translate_integers');
@@ -2389,6 +2390,7 @@ sub loadsnmpttini {
 	if (! defined ($multiple_event)) { $multiple_event = 0} ;
 	if (! defined ($strip_domain)) { $strip_domain = 0} ;
 	if (! defined ($net_snmp_perl_enable)) { $net_snmp_perl_enable = 0} ;
+	if (! defined ($net_snmp_perl_best_guess)) { $net_snmp_perl_best_guess = 0} ;
 	if (! defined ($translate_trap_oid)) { $translate_trap_oid = 0} ;
 	if (! defined ($translate_oids)) { $translate_oids = 0} ;
 	if (! defined ($translate_integers)) { $translate_integers = 0} ;
