@@ -224,7 +224,7 @@ if ($net_snmp_perl_enable == 1)
 	}
 	&SNMP::initMib();
 	$SNMP::best_guess = $net_snmp_perl_best_guess;
-	$SNMP::use_long_names = 0;
+	$SNMP::use_long_names = 0;	# Set to 0, otherwise getType may fail when using a long name on 4.2.x
 	if ($DEBUGGING >= 1)
 	{
 	  print "********** Net-SNMP version $SNMP::VERSION Perl module enabled **********\n\n";
@@ -1381,7 +1381,7 @@ sub substitute
 	# the . if there is no number following it.  
 	# For any call to getType or mapEnum, use a copy of the text name without . or .#
 	# (do we really need to remove the last .number of a text name??) 
-	my $temp_textOID = SNMP::translateObj($entvarname[$i-1],1);
+	my $temp_textOID = SNMP::translateObj($entvarname[$i-1],0);
 	
 	# Chop off .# or just .
 	if ($temp_textOID =~ /(.*)\.\d*$/)
