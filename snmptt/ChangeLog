@@ -2,7 +2,9 @@ February 12th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Changed fqdn_enable ini parameter to strip_domain.  Strip_domain
   can now be 0, 1 or 2.  0 = do not strip domain name.  1 = strip
   domain name.  2 = strip domain name based on list of domains contained
-  in strip_domain_list ini parameter
+  in strip_domain_list ini parameter.  Defaults to 0.  Note: With 
+  fqdn_enable, it defaulted to disable (strip domain).  If you were using
+  the CVS version with fqdn_enable set to 0, change strip_domain to 1.
 - Added strip_domain_list paramater to ini file
 
 January 23rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
