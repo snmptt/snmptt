@@ -2230,7 +2230,8 @@ sub loadsnmpttconf
 			# Split line up into multiple elements of an array using the new delimiter
 			@temp = split ("::::",$temp);
 			
-			if (! ($temp[2] =~ /^(\.\d+)+$/) && ! ($temp[2] =~ /^(\.\d+)+\.\*$/))
+			if (! ($temp[2] =~ /^(\.\d+)+$/) && ! ($temp[2] =~ /^(\.\d+)+\.\*$/) && ! 
+                            ($temp[2] =~ /^(\.\*)$/) )
 			{
 			  # OID contains text, so it's not fully numerical
 			  if ($net_snmp_perl_enable == 1)

@@ -1,3 +1,10 @@
+November 19th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Allow for .* wildcard.  Only .x.* worked before.
+
+November 19th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.0.1
+- Change snmpttconvertmib to allow for DEFINITIONS::= (no spaces)
+
 Aug 30th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.0
 

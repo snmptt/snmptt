@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v1.0
+# SNMPTTCONVERTMIB v1.0.1
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -208,7 +208,7 @@ $mib_name = '';
 while ($currentline <= $#mibfile)
 {
   $line = $mibfile[$currentline];
-  if ($line =~ /(.*)DEFINITIONS\s+::=\s+BEGIN/)
+  if ($line =~ /(.*)DEFINITIONS\s*::=\s*BEGIN/)
   {
     $mib_name = $1;
     $mib_name =~ s/\s+//g;
@@ -216,7 +216,7 @@ while ($currentline <= $#mibfile)
   }
   $currentline++;
 }
-
+print "mib name: $mib_name\n";
 if ($mib_name eq '')
 {
   print "\n\nAborting!!!\n";
