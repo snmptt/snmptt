@@ -96,8 +96,10 @@ while ($currentline <= $#mibfile)
 	if ( $line =~ /(.*)\s+TRAP-TYPE.*/ )
 	{
 
-		if ( $line =~ /TRAP-TYPE.*FROM/ )
+		# If the TRAP-TYPE line starts with white space, it's probably a import line, so ignore
+		if ( $line =~ /^\s+TRAP-TYPE.*/ )
 		{
+			print "skipping a TRAP-TYPE line - probably an import line.\n";
 			$currentline++; # Increment to the next line
 			$line = @mibfile[$currentline]; # Get next line
 			next;
