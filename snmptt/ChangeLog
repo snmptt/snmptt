@@ -1,3 +1,10 @@
+January 24th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Traps received using symbolic format (snmptrapd without -On) 
+  were not being handled correctly.  Code in readtrap was looking
+  at wrong variable name.  Moved to function 
+  translate_symbolic_to_oid.  Called for trap OID variable value,
+  agent_address,  community and agent addrss variable names
+
 December 5th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_0.9.1
 - snmptt.conf file can now contain EXEC lines without FORMAT lines.

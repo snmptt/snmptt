@@ -2255,37 +2255,6 @@ sub readtrap
 	      }
 	    }
 
-	    # Check to see if OID passed from snmptrapd is fully numeric.  If not, try to translate
-	    if (! ($temp1 =~ /^(\.\d+)+$/)) 
-	    {
-	      # Not numeric
-	      # Try to convert to numerical
-	      if ($DEBUGGING >= 2) {
-		print "\n  Symbolic trap variable name detected ($temp1).  Will attempt to translate to a numerical OID\n";
-	      }
-	      if ($net_snmp_perl_enable == 1)
-	      {
-		my $temp3 = SNMP::translateObj("$temp1",0);
-		if (defined ($temp3) ) {
-		  if ($DEBUGGING >= 2) {
-		    print "    Translated to $temp3\n";
-		  }
-		  $temp1 = $temp3;
-		}
-		else {
-		  # Could not translate default to numeric
-		  if ($DEBUGGING >= 2) {
-		    print "  Could not translate - will leave as-is\n";
-		  }
-		}
-	      }
-	      else
-	      {
-		if ($DEBUGGING >= 2) {
-		  print "  Could not translate - Net-SNMP Perl module not enabled - will leave as-is\n";
-		}
-	      }
-	    }
 	    # If the value is blank, set it to (null)
 	    if ($temp2 eq "")
 	    {
@@ -2389,35 +2358,38 @@ sub readtrap
 	$var[4] = "";	# Clear ip address from trap agent
 	$var[5] = "";	# Clear trap community string
 	$var[6] = "";	# Clear enterprise
-	
+
+        # Check to see if OID passed from snmptrapd is fully numeric.  If not, try to translate
+        $var[3] = translate_symbolic_to_oid($var[3]);
+        
 	# Cycle through remaining variables searching for for agent IP (.1.3.6.1.6.3.18.1.3.0),
 	# community name (.1.3.6.1.6.3.18.1.4.0) and enterpise (.1.3.6.1.6.3.1.1.4.3.0)
 	# All others found are regular passed variables
 	$j=0;
 	for ($i=6;$i <= $#tempvar; $i+=2)
-	{
-		if ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.3.0$/)		# ip address from trap agent
-		{
-			$var[4] = $tempvar[$i+1];
-		}
-		elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.4.0$/)	# trap community string
-		{
-			$var[5] = $tempvar[$i+1];
-		}
-		elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.1.1.4.3.0$/)	# enterprise
-		{
-			$var[6] = $tempvar[$i+1];
-		}
-		else	# application specific variables
-		{
-			$entvarname[$j] = $tempvar[$i];
-			$entvar[$j] = $tempvar[$i+1];
-			$j++;
-		}
-		
+        {
+          $tempvar[$i] = translate_symbolic_to_oid($tempvar[$i]);	
+          if ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.3.0$/)		# ip address from trap agent
+          {
+            $var[4] = $tempvar[$i+1];
+          }
+          elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.4.0$/)	# trap community string
+          {
+            $var[5] = $tempvar[$i+1];
+          }
+          elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.1.1.4.3.0$/)	# enterprise
+          {
+            $var[6] = $tempvar[$i+1];
+          }
+          else	# application specific variables
+          {
+            $entvarname[$j] = $tempvar[$i];
+            $entvar[$j] = $tempvar[$i+1];
+            $j++;
+          }
 	}
-
-	if ($dns_enable == 1 && $var[0] =~  /^\d+\.\d+\.\d+\.\d+$/) # Only if it's not already resolved
+              
+     	if ($dns_enable == 1 && $var[0] =~  /^\d+\.\d+\.\d+\.\d+$/) # Only if it's not already resolved
 	{
 	  my $temp = gethostbyaddr(Socket::inet_aton($var[0]),Socket::AF_INET());
 	  if (defined ($temp))
@@ -3765,3 +3737,45 @@ sub process_nodes
   }
   return @nodes2;
 }
+
+# Used when reading received traps to convert the trap symbolic to numeric.
+# Also used to convert the variable 'names' for community, agent_address and
+# enterprise so they can be extracted by searching for the numerical OID
+sub translate_symbolic_to_oid
+{
+  my $temp = shift;
+  
+  # Check to see if OID passed from snmptrapd is fully numeric.  If not, try to translate
+  if (! ($temp =~ /^(\.\d+)+$/)) 
+  {
+    # Not numeric
+    # Try to convert to numerical
+    if ($DEBUGGING >= 2) {
+      print "\nSymbolic trap variable name detected ($temp).  Will attempt to translate to a numerical OID\n";
+    }
+    if ($net_snmp_perl_enable == 1)
+    {
+      my $temp3 = SNMP::translateObj("$temp",0);
+      if (defined ($temp3) ) {
+        if ($DEBUGGING >= 2) {
+          print "  Translated to $temp3\n\n";
+        }
+        $temp = $temp3;
+      }
+      else {
+        # Could not translate default to numeric
+        if ($DEBUGGING >= 2) {
+          print "  Could not translate - will leave as-is\n\n";
+        }
+      }
+    }
+    else
+    {
+      if ($DEBUGGING >= 2) {
+        print "  Could not translate - Net-SNMP Perl module not enabled - will leave as-is\n\n ";
+      }
+    }
+  }
+  return $temp;
+}
+
