@@ -258,8 +258,20 @@ mysql_dbi_password = password
 # This requires DBI:: and DBD::PgPP
 postgresql_dbi_enable = 0
 
-# PostgreSQL: Hostname of database server (optional - default 127.0.0.1)
-postgresql_dbi_host = 127.0.0.1
+# Set to 0 to use the DBD::PgPP module
+# Set to 1 to use the DBD::Pg module
+postgresql_dbi_module = 0
+
+# Set to 0 to disable host and port network support
+# Set to 1 to enable host and port network support
+# If set to 1, ensure PostgreSQL is configured to allow connections via TCPIP by setting 
+# tcpip_socket = true in the $PGDATA/postgresql.conf file, and adding the ip address of 
+# the SNMPTT server to $PGDATApg_hba.conf.  The common location for the config files for
+# RPM installations of PostgreSQL is /var/lib/pgsql/data.  
+postgresql_dbi_hostport_enable = 0
+
+# PostgreSQL: Hostname of database server (optional - default localhost)
+postgresql_dbi_host = localhost
 
 # PostgreSQL: Port number of database server (optional - default 5432)
 postgresql_dbi_port = 5432

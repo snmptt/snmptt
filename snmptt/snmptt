@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v0.7.2
+# SNMPTT v0.7.3
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -46,7 +46,7 @@
 ##############################################################################
 #
 
-$snmptt_version = "v0.7.2";
+$snmptt_version = "v0.7.3";
 
 sub showversion
 {
@@ -267,22 +267,43 @@ if ($mysql_dbi_enable == 1)
 if ($postgresql_dbi_enable == 1)
 {
 	require DBI;
-	require DBD::PgPP;
+	my $dbi_module;
+	my $connect_string;
 	
-	unless ($dbh_postgresql = DBI->connect("DBI:PgPP:dbname=$postgresql_dbi_database;
-                host=$postgresql_dbi_host;port=$postgresql_dbi_port",
-                $postgresql_dbi_username,$postgresql_dbi_password) )
+	if ($postgresql_dbi_module == 0)
 	{
+	  require DBD::PgPP;
+	  $dbi_module = "PgPP";
+	}
+	else
+	{
+	  require DBD::Pg;
+	  $dbi_module = "Pg";
+	}
+
+	if ($postgresql_dbi_hostport_enable == 0)
+	{
+	  # No network support
+	  $connect_string = "DBI:$dbi_module:dbname=$postgresql_dbi_database;";
+	}
+	else
+	{
+	  # Network support - include host and port
+	  $connect_string = "DBI:$dbi_module:dbname=$postgresql_dbi_database;host=$postgresql_dbi_host;port=$postgresql_dbi_port";
+	}
+	
+	unless ($dbh_postgresql = DBI->connect($connect_string,$postgresql_dbi_username,$postgresql_dbi_password) )
+        {
 	  warn "Postgres error: Unable to connect to database: $DBI::errstr\n";
 	  if ($syslog_system_enable == 1)
 	  {
 	    syslog_system("Postgres error: Unable to connect to database: $DBI::errstr");
-	  }
+  	  }
 	  if ($eventlog_system_enable == 1)
 	  {
 	    eventlog_system("Postgres error: Unable to connect to database: $DBI::errstr",18,$eventlog_error);
 	  }
-	}
+ 	}
 }
 
 
@@ -2543,6 +2564,8 @@ sub loadsnmpttini {
 	$mysql_dbi_password = $cfg->val('SQL', 'mysql_dbi_password');
 
 	$postgresql_dbi_enable = $cfg->val('SQL', 'postgresql_dbi_enable');
+	$postgresql_dbi_module = $cfg->val('SQL', 'postgresql_dbi_module');
+	$postgresql_dbi_hostport_enable = $cfg->val('SQL', 'postgresql_dbi_hostport_enable');
 	$postgresql_dbi_host = $cfg->val('SQL', 'postgresql_dbi_host');
 	$postgresql_dbi_port = $cfg->val('SQL', 'postgresql_dbi_port');
 	$postgresql_dbi_database = $cfg->val('SQL', 'postgresql_dbi_database');
@@ -2624,6 +2647,8 @@ sub loadsnmpttini {
 	if (! defined ($mysql_dbi_username)) { $mysql_dbi_username = ''} ;
 	if (! defined ($mysql_dbi_password)) { $mysql_dbi_password = ''} ;
 	if (! defined ($postgresql_dbi_enable)) { $postgresql_dbi_enable = 0} ;
+	if (! defined ($postgresql_dbi_module)) { $postgresql_dbi_module = 0} ;
+	if (! defined ($postgresql_dbi_hostport_enable)) { $postgresql_dbi_hostport_enable = 0} ;
 	if (! defined ($postgresql_dbi_host)) { $postgresql_dbi_host = 'localhost'} ;
 	if (! defined ($postgresql_dbi_port)) { $postgresql_dbi_port = '5432'} ;
 	if (! defined ($postgresql_dbi_database)) { $postgresql_dbi_database = ''} ;

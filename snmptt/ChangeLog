@@ -1,3 +1,8 @@
+August 14th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added support for DBD:Pg for PostgreSQL
+- Added postgresql_dbi_module and postgresql_dbi_hostport_enable 
+  options
+
 July 8th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Improve NODES handling of files to only load the NODES file
   once when dynamic is off - uses a hash to store the entries

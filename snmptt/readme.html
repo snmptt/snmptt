@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; August 12th, 2003
+This file was last updated on:&nbsp; August 14th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -160,6 +160,7 @@ module.&nbsp; Required for MySQL support<br>
   </li>
   <li> Optional: <a
  href="http://search.cpan.org/search?module=DBD::PgPP">DBD::PgPP</a>
+or <a href="http://search.cpan.org/search?dist=DBD-Pg">DBD:Pg</a>
 module.&nbsp; Required for PostgreSQL support<br>
   </li>
   <li> Optional: <a
@@ -212,6 +213,8 @@ enterprise variables</li>
   <li><span style="font-weight: bold;">REGEX </span>now supports
 substitution with captures</li>
   <li>Added support for remote MySQL and PostgreSQL databases</li>
+  <li>Added PostgreSQL support for <a
+ href="http://search.cpan.org/search?dist=DBD-Pg">DBD:Pg</a></li>
   <li>An EVENT can now contain mulitple EXEC lines</li>
   <li>An EVENT can now contain mulitple NODES lines</li>
   <li>Added the option <span style="font-weight: bold;">dynamic_nodes</span>
@@ -277,8 +280,7 @@ should have been)</li>
   <li>Snmpttconvertmib</li>
   <ul>
     <li>Now prints the variables contained in each trap definition
-unless
-      <span style="font-weight: bold;">--no_variables</span> is
+unless <span style="font-weight: bold;">--no_variables</span> is
 set.&nbsp; When using <span style="font-weight: bold;">--net_snmp_perl</span>
 it will also
 resolve the Syntax (INTEGER, OCTETSTR etc) and Description.&nbsp; If
@@ -766,6 +768,10 @@ on your environment.<br>
 <p>To configure SNMPTT for PostgreSQL, modify the following variables
 in the snmptt.ini file. </p>
 <blockquote><b>postgresql_dbi_enable</b> <br>
+  <span style="font-weight: bold;">postgresql_dbi_module</span><br
+ style="font-weight: bold;">
+  <span style="font-weight: bold;">postgresql_dbi_hostport_enable</span><br
+ style="font-weight: bold;">
   <b>postgresql_dbi_host<br>
   </b><b>postgresql_dbi_port</b><br>
   <b>postgres</b><b>ql_dbi_database</b> <br>
