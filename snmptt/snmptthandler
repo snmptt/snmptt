@@ -159,9 +159,16 @@ if ($DEBUGGING >= 1)
 
 $spoolfile = $spooldirectory.'#snmptt-trap-'.$s_pad.$usec_pad;
 
-open SPOOL, ">$spoolfile"
-	or die "Could not open debug output file ($!)";
+unless (open SPOOL, ">$spoolfile")
+{
+	if ($DEBUGGING >= 1)
+	{
+		print "Could write to file file $spoolfile!  Trap will be lost!\n";
+	}
+	die "Could not write to file $spoolfile!  Trap will be lost!\n";
+}
 
+	
 while (defined($line = <>))
 {
 	print SPOOL $line;

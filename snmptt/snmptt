@@ -257,9 +257,35 @@ if ($daemon == 1)
 	while (1)
 	{
 	
-		chdir($spooldirectory) or die "Unable to enter dir $spooldirectory:$!\n";
-		opendir(DIR, ".") or die "Unable to open $spooldirectory:$!\n";
-		my @filenames = readdir(DIR) or die "Unable to read $spooldirectory:$!\n";
+		
+		unless (chdir($spooldirectory))
+		{
+			if ($DEBUGGING >= 1)
+			{
+				print "Unable to enter dir $spooldirectory:$!\n";
+			}
+			warn "Unable to enter dir $spooldirectory:$!\n";
+		}
+
+		unless (opendir(DIR, "."))
+		{
+			if ($DEBUGGING >= 1)
+			{
+				print "Unable to open $spooldirectory:$!\n";
+			}
+			warn "Unable to open $spooldirectory:$!\n";
+		}
+	
+		unless (@filenames = readdir(DIR))
+		{
+		
+			if ($DEBUGGING >= 1)
+			{
+				print "Unable to read $spooldirectory:$!\n";
+			}
+			warn "Unable to read $spooldirectory:$!\n";
+		}
+
 		closedir(DIR);
 		
 		foreach my $file (@filenames)
@@ -272,16 +298,30 @@ if ($daemon == 1)
 				print "Processing file: $file\n";
 			}
 		
-			open FILE, $spooldirectory.$file
-				or die "Could not open debug output file ($!)";
+
+			unless (open FILE, $spooldirectory.$file)
+			{
+				if ($DEBUGGING >= 1)
+				{
+					print "Could not open trap file $spooldirectory$file: ($!)\n";
+				}
+				warn "Could not open trap file $spooldirectory$file: ($!)\n";
+			}
 		
 			$input = 'FILE';
 	
 			&readtrap;		# Read trap from STDIN or file
 	
 			&searchfortrap;		# Search for trap snmptt.conf (array)
-	
-			unlink($file) or die "Unable to delete $file:$!\n";
+
+			unless (unlink($file))
+			{
+				if ($DEBUGGING >= 1)
+				{
+					print "Unable to delete $file:$!\n";
+				}
+				warn "Unable to delete $file:$!\n";
+			}
 	
 			close FILE;
 			
@@ -607,6 +647,10 @@ sub loadsnmpttconf
 	# snmptt.conf loader.
 	# This section loads the snmptt.conf which defines the traps and text strings
 	# that will be used for variable substitution
+
+	# Flush variables in case this is a re-load during run
+	@snmpttconf = ();
+	undef %event;
 	
 	#Load entire snmptt.conf file into array @snmpttconf
 	open SNMPTTCONF, $snmpttconffile
@@ -677,8 +721,6 @@ sub loadsnmpttconf
 		}
 
 	}
-
-
 	
 	# Process each line of snmptt.conf loaded into @snmpttconf array.
 	# Add each EVENT to %event hash
@@ -820,6 +862,8 @@ sub loadsnmpttconf
 		}
 		print "Finished printing out all events in hash table\n";
 	}
+
+	close SNMPTTCONF;
 }
 
 sub readtrap
