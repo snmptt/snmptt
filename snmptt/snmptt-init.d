@@ -2,6 +2,9 @@
 # init file for snmptt
 # Alex Burger - 8/29/02
 #
+# chkconfig: - 50 50
+# description: Simple Network Management Protocol (SNMP) Daemon
+#
 # processname: /usr/sbin/snmptt
 # pidfile: /var/run/snmptt
 
