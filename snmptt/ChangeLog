@@ -1,12 +1,10 @@
 June 15th, 2002: Alex Burger <alex_b@users.sourceforge.net>
-- Data passed from SNMPTRAPD was not being handled correctly
-  when the passed data only contained one item per line instead
-  of two.  In my original testing I always received two items:
-  the variable name and the value (eg: sysUpTime and the actual
-  uptime).  When using ev2t for NT, only the value is passed
-  to snmptt.  This appears to be a problem with ucd-snmp as
-  a packet sniffer is able to decode the variable names 
-  correctly.  This is now handled correctly by SNMPTT
+- Using UCD-SNMP v4.2.3, data passed from SNMPTRAPD was not
+  being handled correctly.  Data being passed from SNMPTRAPD only
+  contained one item per line instead of two.  This appears to
+  be a bug with v4.2.3 as it does not happen with v4.2.1 or 
+  v4.2.5.  SNMPTT can work around it but v4.2.3 should NOT be
+  used with SNMPTT especially if SNMP V2 traps are being used.
 
 - SNMP V2 traps have problem as SNMPTT assumes that the agent 
   IP address, community name and enterprise will always 
