@@ -288,15 +288,39 @@ while ($currentline <= $#mibfile)
 					print OUTPUTFILE "$defaultexec $defaultexecquote$trapsummary$defaultexecquote\n"
 				}		
 			}
-			# If trapsummary blank, use trapsummary line
+			# If trapsummary blank, use descriptionline1 line
 			elsif ($descriptionline1 ne "")
 			{
-				print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
-				if ($defaultexec ne '')
+
+
+				if ($descriptionline1 =~ /%[a-zA-Z]/)
 				{
-					print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1 \$*$defaultexecquote\n"
+					# Sometimes the variables are in the first line of the description
+					# Change the %s or %d etc into $1 etc (starts at $1)
+					# There is no list of variables, so just put them in order starting at 1 and
+					# going up to 20
+					$_ = $descriptionline1;
+					for ($j=1; $j<= 20; $j++)
+					{
+						s(%[a-zA-Z])(\$$j);
+					}
+					$descriptionline1 = $_;
+					$descriptionlinehadvariables = 1;
+
+					print OUTPUTFILE "FORMAT $descriptionline1\n";
+					if ($defaultexec ne '')
+					{
+						print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1$defaultexecquote\n"
+					}
 				}
-				#print OUTPUTFILE "EXEC $descriptionline1 \$*\n";
+				else
+				{
+					print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
+					if ($defaultexec ne '')
+					{
+						print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1 \$*$defaultexecquote\n"
+					}
+				}
 			}
 			# If descriptionline1 is also blank, just use $*
 			else
