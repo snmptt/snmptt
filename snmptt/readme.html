@@ -180,8 +180,8 @@ eventlog levels based on the severity level defined in the snmptt.conf
 file</li>
 
 <li>
-Added variable expansion for variable names using $v<i>n.&nbsp; </i>This
-feature requires the UCD-SNMP / NET-SNMP Perl module</li>
+Added variable expansion for variable names using $v<i>n</i> and $+n.&nbsp;
+This feature requires the UCD-SNMP / NET-SNMP Perl module</li>
 
 <li>
 Fixed bug that would prevent variables numbered 10 or higher from being
@@ -783,6 +783,8 @@ variables:
 <br>$@ - Number of seconds since the epoch
 <br>$*&nbsp; - Expand all variable-bindings
 <br>$<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) <b>(**)</b>
+<br>$+<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) in the format
+of <i>variablename:value</i> <b>(**) (***)</b>
 <br>$v<i>n</i>&nbsp; - Expand variable name of the variable-binding n (1-<i>n</i>)
 <b>(***)</b></blockquote>
 Example:
@@ -819,13 +821,13 @@ to work and you must enable support for it by enabling <b>net_snmp_perl_enable</
 in the snmptt.ini file.
 <br>&nbsp;</blockquote>
 *** Note:
-<blockquote>$v<i>n</i> variable names are translated into the text name
-by performing a lookup in the MIB file.&nbsp; You must have the UCD-SNMP
-/ NET-SNMP Perl module installed for this to work and you must enable support
-for it by enabling <b>net_snmp_perl_enable</b> in the snmptt.ini file.&nbsp;
-If <b>net_snmp_perl_enable</b> is not enabled, the $v<i>n</i> variable
-will be replaced with the text 'variable<i>n</i>' where <i>n</i> is the
-variable number (1+).
+<blockquote>$v<i>n</i> and $+<i>n</i> variable names are translated into
+the text name by performing a lookup in the MIB file.&nbsp; You must have
+the UCD-SNMP / NET-SNMP Perl module installed for this to work and you
+must enable support for it by enabling <b>net_snmp_perl_enable</b> in the
+snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b> is not enabled, the
+$v<i>n</i> variable will be replaced with the text 'variable<i>n</i>' where
+<i>n</i> is the variable number (1+).
 <p>For the name translation to work, you must ensure UCD-SNMP / NET-SNMP
 is configured correctly with all the required MIBS.&nbsp; If the option
 is enabled and the correct name is not returned, ensure UCD-SNMP / NET-SNMP

@@ -977,7 +977,7 @@ sub substitute
 	# Perform substitution on $_ variable
 
 	# $v - Names of variable-bindings 
-	# Count down backwards to make sure $10 is not mistaken for $1
+	# Count down backwards to make sure 10 is not mistaken for $1
 	for($i=$#entvarname+1;$i > 0; $i--)
 	{
 	  if ($net_snmp_perl_enable == 1)
@@ -992,14 +992,15 @@ sub substitute
 	}
 
 	# $n - Variable-bindings
-	# Count down backwards to make sure $10 is not mistaken for $1
+	# Count down backwards to make sure 10 is not mistaken for $1
 	for($i=$#entvar+1;$i > 0; $i--)
 	{
+	  my $translate_basic = 0;
 	  if ($translate_integers == 1 && $net_snmp_perl_enable == 1)
 	  {
 	    if ($entvar[$i-1] =~ /\d+/)				# Check to see if value is numerical
 	    {
-	      if ($DEBUGGING >= 2)
+	  $translate_basic = 1;    if ($DEBUGGING >= 2)
 	      {
 		print "\nVariable $entvarname[$i-1] with value $entvar[$i-1] may be numerical\n";
 	      }
@@ -1016,22 +1017,39 @@ sub substitute
 		}
 		else						# Didn't get something
 		{
-		  s(\$$i)($entvar[$i-1])g;
+		  $translate_basic = 1;
 		}
 	      }
 	      else						# It's not an INTEGER after all
 	      {
-		s(\$$i)($entvar[$i-1])g;
+		$translate_basic = 1;
 	      }
 	    }
 	    else						# It's not numerical
 	    {
-	      s(\$$i)($entvar[$i-1])g;
+	      $translate_basic = 1;
 	    }
 	  }
 	  else	# translate_integers is disabled
 	  {
-	    s(\$$i)($entvar[$i-1])g;
+	    $translate_basic = 1;
+	  }
+
+	  if ($translate_basic == 1)
+	  {
+	    if ($net_snmp_perl_enable == 1)
+	    {
+	      s(\$$i)($entvar[$i-1])g;			# $n	      
+	      
+	      my $temp = &SNMP::translateObj($entvarname[$i-1],0);
+	      s(\$\+$i)($temp:$entvar[$i-1])g;		# $+n
+	    }
+	    else
+	    {
+	      s(\$$i)($entvar[$i-1])g;			# $n
+	      s(\$\+$i)(variable$i:$entvar[$i-1])g;	# $+n
+	    }
+	    
 	  }
 	}
 
