@@ -401,11 +401,74 @@ if ($daemon == 1)
 		   or die "Can't start a new session: $!";
 		umask 0;
 	}
+
+	# Change user if not Windows, and daemon_uid ini parameter not blank
+	if ($^O ne "MSWin32" && $daemon_uid ne '')
+	{
+	  my $daemon_uid_name = '';
+	  
+	  if ($daemon_uid =~ /\D/)
+	  {
+	    # no numbers found, so assume it's a textual name
+	    
+	    $daemon_uid_name = $daemon_uid;
+	    
+	    $daemon_uid = getpwnam($daemon_uid_name);
+	    if (!defined($daemon_uid))
+	    {
+	      syslog_system("Could not convert user id \'$daemon_uid_name\' to a numeric UID\n");
+	    }
+	  }
+	  
+	  # Change current uid to new_uid
+	  if (defined($daemon_uid))
+	  {
+	    if ($daemon_uid_name ne '')
+	    {
+	      syslog_system("Changing to UID: $daemon_uid_name \($daemon_uid\)");
+	      if ($DEBUGGING >= 1)
+	      {
+		print "Changing to UID: $daemon_uid_name \($daemon_uid\)\n";
+	      }
+	    }
+	    else
+	    {
+	      syslog_system("Changing to UID: $daemon_uid");
+	      if ($DEBUGGING >= 1)
+	      {
+		print "Changing to UID: $daemon_uid\n";
+	      }
+	    }
+	    
+	    # Close debug file before changing users and re-open after
+	    if (defined (DEBUGFILE))
+	    {
+	      close(DEBUGFILE);
+	    }
+	    
+	    $> = $daemon_uid;
+	    
+	    # Re-open debug file (if needed) as the new user
+	    if ($DEBUGGING >= 1)
+	    {
+	      if ($DEBUGGING_FILE ne '') 
+	      {
+		if (open DEBUGFILE, ">>$DEBUGGING_FILE")
+		{
+		  select DEBUGFILE;	# change default output to debug file
+		  $debug_file_used = 1;
+		}
+		else
+		{
+		  warn "could not open debug output file ($!)";
+		}
+	      }
+	    }
+	  }
+	}
 	
 	while (!$timetodie)
 	{
-	
-		
 		if (! (chdir($spool_directory)))
 		{
 		  if ($DEBUGGING >= 1)
@@ -2724,6 +2787,7 @@ sub loadsnmpttini {
 	
 	# DaemonMode
 	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
+	$daemon_uid = $cfg->val('DaemonMode', 'daemon_uid');
 	$spool_directory = $cfg->val('DaemonMode', 'spool_directory');
 	$sleep = $cfg->val('DaemonMode', 'sleep');
 	$use_trap_time = $cfg->val('DaemonMode', 'use_trap_time');
@@ -2824,6 +2888,7 @@ sub loadsnmpttini {
 	if (! defined ($dynamic_nodes)) { $dynamic_nodes = 0} ;
 	
 	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
+	if (! defined ($daemon_uid)) { $daemon_uid = ''} ;
 	if (! defined ($spool_directory)) { $spool_directory = ''} ;
 	if (! defined ($sleep)) { $sleep = 5} ;
 	if (! defined ($use_trap_time)) { $use_trap_time = 1} ;

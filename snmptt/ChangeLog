@@ -1,3 +1,7 @@
+October 10th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added daemon_uid support to change user snmptt runs as after
+  starting up
+
 October 9th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with MATCH statement integer range.  1-5 would match
   only 2-4 instead of 1-5.
