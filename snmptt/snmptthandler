@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTHANDLER v0.2
+# SNMPTTHANDLER v0.2.1
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -56,7 +56,8 @@ $help = '';
 $ini = '';
 
 GetOptions 	('version' => \$version, 
-		'debug' => \$debug,
+		'debug:i' => \$debug,
+		'debugfile=s' => \$debugfile,
 		'help' => \$help,
 		'ini=s' => \$ini);
 if ($version == 1)
@@ -71,6 +72,7 @@ $USAGE = qq/Usage:
     snmptthandler [<options>] 
 Options:
     --debug                              Enable debug mode
+    --debugfile=filename                 Set debug output file
     --help                               Display this message
     --ini=filename                       Set configuration file to load
     --version                            Display author and version information
@@ -85,7 +87,7 @@ Options:
 if ($debug == 1)
 {
 	$DEBUGGING = 1;
-	$daemoncmdline = 1;
+	$debugcmdline = 1
 }
 
 
@@ -226,21 +228,7 @@ sub loadsnmpttini {
 	  exit(1);
 	}
 	
-	# 
-	# Defaults Start
-	# 
-	$spool_directory = '';
-	if ($debugcmdline == 0) {
-	  $DEBUGGING = 0
-	}
-	if ($debugfilecmdline == 0) {
-	  $DEBUGGING_FILE = ''
-	}
-	#
-	# Defaults End
-	# 
-	
-	# General
+	# DaemonMode
 	$spool_directory = $cfg->val('DaemonMode', 'spool_directory');
 	
 	# Debugging
@@ -248,10 +236,21 @@ sub loadsnmpttini {
 	  $DEBUGGING = $cfg->val('Debugging', 'DEBUGGING');
 	}
 	if ($debugfilecmdline == 0) {
-	  $DEBUGGING_FILE = $cfg->val('Debugging', 'DEBUGGING_FILE');
+	  $DEBUGGING_FILE = $cfg->val('Debugging', 'DEBUGGING_FILE_HANDLER');
 	}
 	
 	$cfg->Delete;
+	
+	# 
+	# Defaults Start
+	# 
+	if (! defined ($spool_directory)) { $spool_directory = ''} ;
+	if (! defined ($DEBUGGING)) { $DEBUGGING = 0} ;
+	if (! defined ($DEBUGGING_FILE)) { $DEBUGGING_FILE = ''} ;
+	#
+	# Defaults End
+	# 
+
 	
 	# print "Config file loaded\n";
 	

@@ -1,3 +1,7 @@
+February 22nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added separate debug file for snmptthandler
+- Cleaned up defaults code for snmptthandler
+
 February 21st, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added ability to translate integer values to enumeration tags defined
   in MIB files.  Configure using snmptt.ini variables translate_integers

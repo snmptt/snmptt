@@ -146,8 +146,13 @@ DEBUGGING = 0
 # Debugging file
 # Location of debugging output file.  Leave blank to default to STDOUT (good for
 # standalone mode, or daemon mode without forking)
-DEBUGGINGFILE = ''
+DEBUGGING_FILE = ''
 # DEBUGGING_FILE = c:\\snmp\\snmptt.debug
+
+# Debugging file - SNMPTTHANDLER
+# Location of debugging output file.  Leave blank to default to STDOUT
+DEBUGGING_FILE_HANDLER = ''
+# DEBUGGING_FILE_HANDLER = c:\\snmp\\snmptthandler.debug
 
 [TrapFiles]
 # A list of snmptt.conf files (this is NOT the snmptrapd.conf file).  The COMPLETE path 
