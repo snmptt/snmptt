@@ -1,3 +1,6 @@
+May 14th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Added error number output for MySQL.
+
 May 13th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Add support for /usr/local/etc/snmp and /usr/local/etc.
 - Added help text for user when a Perl module is not found when loading
