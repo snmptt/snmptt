@@ -1,377 +1,409 @@
-SNMP TRAP TRANSLATOR (SNMPTT) and SNMPTTCONVERT
+   SNMP Trap Translator v0.1
+   (SNMPTT)
+   This file was last updated on:  June 15th, 2002
 
-Copyright 2002 Alex Burger 
-alex_b@users.sourceforge.net
-4/3/2002
+   License
+   =======
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   Copyright 2002 Alex Burger
+   alex_b@users.sourceforge.net
+   4/3/2002
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-******************************************************************************
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-SNMPTT v0.1
-===========
+   What is it?
+   ===========
 
-http://www.sourceforge.net/projects/snmptt
+   SNMPTT (SNMP Trap Translator) is a SNMP trap handler written in Perl for use with the
+   NET-SNMP / UCD-SNMP snmptrapd program ([2]http://www.net-snmp.org).
 
-Overview:
----------
+   The NET-SNMP package has the ability to log SNMP traps to syslog.  The format of the log
+   is basically variable = value, variable = value, variable = value etc.  A more descriptive
+   / friendly trap message can be created using SNMPTT's variable subtitution.
 
-SNMPTT (SNMP Trap Translator) is a snmp trap handler written in Perl for use 
-with the NET-SNMP / UCD-SNMP snmptrapd program which is available at 
-http://www.net-snmp.org.
+   For example, receiving the trap .1.3.6.1.4.1.232.0.3017 trap from a Compaq server running
+   the Compaq Insight Agents could result in the following message from SNMPTT:
 
-SNMPTT has the following features:
+   "Compaq Drive Array Spare Drive on controller 3, bus 0, bay 3 status is Failed."
 
--allows unique custom actions for each trap, defined in a text configuration 
- file
--translates received traps into a readable format by performing variable
- substitution
--outputs translated traps to standard output, text log file and / or syslog
--executes a user defined program when a trap is received
+   Variable substition works by defining a string such as:
 
+   "Compaq Drive Array Spare Drive on controller $4, bus $5, bay $6 status is $3."
 
-Requirements:
--------------
+   Each $number is replaced with the corresponding enterprise variable received in the trap
+   and is defined for each trap in the configuration file.  The order of the variables is
+   defined in the MIB or TRAP file which can be obtained from the vendor.
 
--(Tested with) Perl 5.6.1
--NET-SNMP (formerly known as UCD-SNMP)
--Required: Text::ParseWords (included with most distributions including 
- ActivePerl)
--Optional: Sys::Syslog
+   Downloading
+   ===========
 
-All development and testing was done on Mandrake Linux 8.1 using UCD-SNMP 
-v4.2.1 on Mandrake Linux 8.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).  I have 
-also tested the program with Windows 2000 using a test file without actually 
-using UCD-SNMP.  Windows users must disable the syslog feature as described 
-below.
+   SNMPTT can be downloaded from [3]http://www.sourceforge.net/projects/snmptt
 
-Note:  	This script does NOT require the NET-SNMP Perl module included in the 
-	NET-SNMP package
+   Features
+     * Allows unique custom actions for each trap, defined in a text configuration file
+     * Translates received traps into a readable format by performing variable substitution
+     * Outputs translated traps to standard output, text log file and / or syslog
+     * Executes a user defined program when a trap is received
 
+   Requirements
+   ============
 
-What it does:
--------------
+   -(Tested with) Perl 5.6.1
+   -NET-SNMP (formerly known as UCD-SNMP)
+   -Required: Text::ParseWords (included with most distributions including ActivePerl)
+   -Optional: Sys::Syslog module
 
-The NET-SNMP package has the ability to log SNMP traps to syslog.  The format 
-of the log is basically variable = value, variable = value, variable = value 
-etc.  A more descriptive / friendly trap message can be created using SNMPTT's
-variable subtitution.  
+   All development and testing was done on Mandrake Linux 8.1 using UCD-SNMP v4.2.1 on
+   Mandrake Linux 8.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).  I have also tested the program
+   with Windows 2000 using a test file without actually using UCD-SNMP.  Windows users must
+   disable the syslog feature as described below.  Both SNMP V1 and V2 traps have been
+   tested.
 
-For example, receiving the trap .1.3.6.1.4.1.232.0.3017 trap from a Compaq 
-server running the Compaq Insight Agents could result in the following message
-from SNMPTT:
+   UCD-SNMP v4.2.3 appears to have a bug that prevents it from working correctly with
+   SNMPTT.  UCD-SNMP v4.2.5 appears to work fine.
 
-"Compaq Drive Array Spare Drive on controller 3, bus 0, bay 3 status is 
-Failed."
+   Note:   This script does NOT require the NET-SNMP Perl module included in the NET-SNMP
+   package
 
-Variable substition works by defining a string such as:
+   Logging
+   =======
 
-"Compaq Drive Array Spare Drive on controller $4, bus $5, bay $6 status is $3."
+   Translated traps can be sent to a log file.  The format of the log entry is:
 
-Each $number is replaced with the corresponding enterprise variable received 
-in the trap and is defined for each trap in the configuration file.  The order
-of the variables is defined in the MIB file which can be obtained from the 
-vendor.
+   date trap-oid severity category hostname translated-trap
 
+   Translated traps can also be sent to syslog.  The format of the entries will be similar to
+   above without the date (as syslogd logs the date):
 
-Logging:
---------
+   trap-oid severity category hostname translated-trap
 
-Translated traps can be sent to a log file.  The format of the log entry is:
+   The syslog facility and level is configurable.
 
-date trap-oid severity category hostname translated-trap
+   Logging of non recognized traps is also possible.  This would be used mainly for
+   troubleshooting purposes.
 
-Translated traps can also be sent to syslog.  The format of the entries will 
-be similar to above without the date (as syslogd logs the date):
+   Executing an external program
+   =============================
 
-trap-oid severity category hostname translated-trap
+   An external program can also be launched when a trap is received.  The command line is
+   defined in the configuration file.  For example, to send a page using QPAGE
+   ([4]http://www.qpage.org), the following command line could be used:
 
-The syslog facility and level is configurable.
-
-Logging of non recognized traps is also possible.  This would be used mainly 
-for troubleshooting purposes.
-
-
-Executing another program:
---------------------------
-
-An external program can also be launched when a trap is received.  The command
-line is defined in the configuration file.  For example, to send a page using 
-QPAGE (http://www.qpage.org), the following command line could be used:
-
-qpage -f TRAP notifygroup1 "$r $x Compaq Drive Array Spare Drive on controller
-$4, bus $5, bay $6 status is $3."
-
-$r is translated to the hostname, and $x is the current time (described in 
-detail below)
-
-
-SNMPTT.CONF Configuration file format:
---------------------------------------
-
-The configuration file (defaults to /etc/snmp/snmptt.conf) contains a list of 
-all the defined traps.  
-
-The syntax of the snmptt.conf file is:
-
-	EVENT event_name event_OID "category" severity
- 
- 	FORMAT format_string
- 
- 	[EXEC command_string]
- 
- 	[NODES sources_list]
-
-	[SDESC]
-	[EDESC]
-
-  EVENT:
- 	event_name:	Unique text label (alias) containing no spaces
-
- 	event_OID:	Object identifier string in dotted format notation 
-			containing no spaces as received by snmptrapd.  
-			
-			For example, a Compaq (1.3.6.1.4.1.232) 
-			cpqHoGenericTrap trap (11001) would be written as: 
-			1.3.6.1.4.1.232.0.11001.  Note:	SNMP V1 traps are in 
-			the format of enterprise ID (1.3.6.1.4.1.232)
-			followed by a 0, and then followed by the trap number
-			(11001).
-
-			Wildcards can also be used.  For example: 
-			1.3.6.1.4.1.232.1.2.*
-			
-			Note: Specific trap matches are performed before 
-			wildcards so if you have an entry for 
-			1.3.6.1.4.1.232.1.2.5 AND 1.3.6.1.4.1.232.1.2.*, it
-			will process the .5 trap when received
-
- 	category:	Character string enclosed in double "s.  Used when
-			logging output (see above).  
-			
-			If the category is "IGNORE", no action will take place
-			even if	the snmptt.conf contains FORMAT and / or EXEC
-			statements.
-
-			If the category is "LOGONLY", the trap will be logged
-			as usual, but the EXEC statement will be ignored.  
-
-			Note:  	If you plan on using an external program such
-				as Netsaint for logging, paging etc, you
-				probably do not want any traps defined with
-				LOGONLY
-			
- 	severity:	Character string of the severity of the event.  Used 
-			in the output when logging.  Example: Minor, Major, 
-			Normal, Critical, Warning
-
-  FORMAT:		Format string to be used when logging to snmptt.log 
-  			and/or syslog.
- 			
-			Variable substitution is performed on this string 
-			using the following variables:
-
- 			$C  - Trap community string
-			$e  - Trap OID in number format
-			$E  - Trap OID in number format
-			$A  - Trap agent IP address
-			$S# - Number of variable-bindings in the trap
-			$$  - Print a $
-			$r  - Hostname
-			$s  - Severity
-			$S  - Event name
-			$x  - Current date & time
-			$*  - Expand all variable-bindings
-
-			Example:
-
-			FORMAT NIC switchover to slot $3, port $4 from slot 
-			$5, port $6
-
-			Note: The trap OID, severity, category and hostname 
-			will always be prepended to the FORMAT string in both 
-			the text log and syslog.  The text log will also have
-			the date prepended at the beginning.
-
-  EXEC: 		Optional string containing command to execute when 
-  			trap is received and arguments to pass to the program.
-			
-			EXEC uses same variable substitution as the FORMAT 
-			line.  
-
- 			Example:
-
-			EXEC /usr/bin/qpage -f TRAP alex "$r: $x - NIC 
-			switchover to slot $3, port $4 from slot $5, port $6"
-
-			or
-
-			EXEC c:\snmp\pager netops "$r: $x - NIC switchover to 
-			slot $3, port $4 from slot $5, port $6"
-
-			Note: Unlike the FORMAT line, nothing is prepended to
-			the message.  If you would like to include the 
-			hostname and date in the page above, you must use
-			the variables such as $r and $x.
- 		
-  NODES:		Optional string containing a list of source (host) 
-  			names separated by spaces that must match for this 
-			trap handle definition to be used.  If this keyword
- 			omitted then ALL sources will be accepted.
-
- 			Optionally a file can be specified which will contain 
-			the list of sources.
- 			This list must be specified with a full path
- 			
- 			Examples:
-
- 			NODES fred barney betty wilma
- 			NODES /etc/snmptt-nodes
-			 or
-			NODES c:\snmp\snmptt-nodes
-
-			where snmptt-nodes contains:
-			
-			fred
-			barney
-			betty
-			wilma
-
-			Note:   The names are NOT case sensitive.
-
-			Note:   If you are using DNS, the names may resolve
-				to the Fully Qualified 
-				Domain Name (FQDN) by snmptrapd.  For example:
-				barney.bedrock.com.  
-				Adding an entry for the host in your 
-				/etc/hosts file or
-				c:\%systemroot%\system32\drivers\etc\hosts 
-				should result in snmptrapd 
-				sending the short name instead (barney).
-
-  SDESC:		Optional start of a description.  All text between
-  			this line and the line EDESC will be ignored by snmptt.
-			This section can be used to enter comments about the 
-			trap for your own use.  If you use a SDESC, you MUST 
-			follow with a EDESC.
-
-  EDESC:		Used to end the description section.
-
-  			Ex:
-
-			SDESC
-			Trap used when power supply fails in 
-			a server.
-			EDESC
-  
-Note: An existing HP Openview trapd.conf can be used in most cases.  The file 
-must be a VERSION 3 file.  
-
-Some vendors (such as Compaq and Cisco ) provide a file that can be imported in
-to HP Openview using an HP Openview utility.  Snmpttconvert can be used to 
-convert the file to snmptt.conf format.
-
-Lines starting with a # will be ignored.
-
-Following is a sample of two defined traps in snmptt.conf:
-
-#
-EVENT COMPAQ_11003 .1.3.6.1.4.1.232.0.11003 "LOGONLY" Normal
-FORMAT Compaq Generic Trap: $*
-EXEC qpage -f TRAP notifygroup1 "Compaq Generic Trap: $*"
-NODES /etc/snmp/cpqnodes
-SDESC
-Generic test trap
-EDESC
-#
-#
-EVENT cpqDa3AccelBatteryFailed .1.3.6.1.4.1.232.0.3014 "Error Events" Critical
-FORMAT Battery status is $3.
-EXEC qpage -f TRAP notifygroup1 "$s $r $x: Battery status is $3"
-NODES ntserver1 ntserver2 ntserver3
-#
-#
-
-
-Limitations:
-------------
-
-The SNMPTRAPD program blocks when executing traphandle commands.  This means 
-that if the program called never quits, SNMPTRAPD will wait forever.  If a trap
-is received while the traphandler is running, it is buffered and will be processed when the traphandler finishes.  I do not know how large this buffer is.
-
-With a 600 Mhz PIII and a 9000 line snmptt.conf containing 566 unique traps 
-(EVENTs), it takes under a second to process the trap including logging and 
-executing the qpage program in my examples.
-
-A future improvement may be to separate the program into two separate programs.
-One that is called by the traphandler which receives the raw trap and saved 
-somewhere, and the other running as a daemon which processes the received 
-traps.  This would prevent any issues with blocking in SNMPTRAPD.
-
-The program called by SNMPTT (EXEC) also blocks the system.  If you call a 
-program that does not return, SNMPTT will be left waiting.  This could probably
-be fixed also by using two separate programs.
-
-
-Feedback:
----------
-
-Please send me any comments - good or bad - to alex_b@users.sourceforge.net.  If
-you have any problems including converting trap files, please send me an email
-and include the file you are trying to convert and I will try to take a look 
-at it.
-
-Please also send any patches or improvments so I can add them in to the CVS
-tree.
-
-This is my first Perl program, so it's probably not perfect.
-
-
-SNMPTTCONVERT v0.1:
-===================
-
-SNMPTTCONVERT is a simple Perl script which will read a file created for HP 
-Openview which is provided by most vendors including Compaq and Cisco.  The 
-file can contain multiple traps.
-
-For example, if the file ciscotrap.txt contained:
-
-rpsFailed {.1.3.6.1.4.1.437.1.1.3} 6 5 - "Status Events" 1
-Trap received from enterprise $E with $# arguments: sysName=$1
-SDESC
-"A redundant power source is connected to the switch but a failure exists in 
-the power system."
-EDESC
-
-Executing snmpttconvert ciscotrap.txt would output:
-
-#
-#
-#
-EVENT rpsFailed .1.3.6.1.4.1.437.1.1.3.0.5 "Status Events" Normal
-FORMAT Trap received from enterprise $E with $# arguments: sysName=$1
-#EXEC qpage -f TRAP notifygroup1 "Trap received from enterprise $E with $# 
-arguments: sysName=$1"
-SDESC
-"A redundant power source is connected to the switch but a failure exists in 
-the power system."
-EDESC
-
-The #EXEC line is added by default.  This can be changed by editing the 
-SNMPTTCONVERT script.  
+   qpage -f TRAP notifygroup1 "$r $x Compaq Drive Array Spare Drive on controller $4, bus $5,
+   bay $6 status is $3."
 
+   $r is translated to the hostname, and $x is the current time (described in detail below)
 
+   SNMPTT.CONF Configuration file format
+   =====================================
+
+   The configuration file (defaults to /etc/snmp/snmptt.conf) contains a list of all the
+   defined traps.
+
+   The syntax of the snmptt.conf file is:
+
+   Note:  The EVENT and FORMAT line are REQUIRED.  Commands in [] are optional.  Do NOT
+   include the []s in the configuration file!
+
+     EVENT event_name event_OID "category" severity
+
+     FORMAT format_string
+
+     [EXEC command_string]
+
+     [NODES sources_list]
+
+     [SDESC]
+     [EDESC]
+
+     Note: Lines starting with a # will be ignored.
+
+     EVENT:
+     ======
+
+     event_name: Unique text label (alias) containing no spaces
+
+     event_OID: Object identifier string in dotted format notation containing no spaces as
+     received by snmptrapd.
+
+     For example, a Compaq (1.3.6.1.4.1.232) cpqHoGenericTrap trap (11001) would be written
+     as:
+
+     1.3.6.1.4.1.232.0.11001.
+
+     Note: SNMP V1 traps are in the format of enterprise ID (1.3.6.1.4.1.232) followed by a
+     0, and then followed by the trap number
+     (11001).
+
+     Wildcards can also be used.  For example:
+
+     1.3.6.1.4.1.232.1.2.*
+
+     Note: Specific trap matches are performed before wildcards so if you have an entry for
+     1.3.6.1.4.1.232.1.2.5 AND 1.3.6.1.4.1.232.1.2.*, it will process the .5 trap when
+     received
+
+     category: Character string enclosed in double "s.  Used when logging output (see
+     above).
+
+     If the category is "IGNORE", no action will take place even if the snmptt.conf contains
+     FORMAT and / or EXEC statements.
+
+     If the category is "LOGONLY", the trap will be logged as usual, but the EXEC statement
+     will be ignored.
+
+     Note:   If you plan on using an external program such as Netsaint for logging, paging
+     etc, you probably do not want any traps defined with LOGONLY
+
+     severity: Character string of the severity of the event.  Used in the output when
+     logging.  Example: Minor, Major, Normal, Critical, Warning
+
+     FORMAT:
+     =======
+
+     Format string to be used when logging to snmptt.log and/or syslog.
+
+     Variable substitution is performed on this string using the following variables:
+
+     $C  - Trap community string
+     $e  - Trap OID in number format
+     $E  - Trap OID in number format
+     $A  - Trap agent IP address
+     $S# - Number of variable-bindings in the trap
+     $$  - Print a $
+     $r  - Hostname
+     $s  - Severity
+     $S  - Event name
+     $x  - Current date & time
+     $*  - Expand all variable-bindings
+
+     Example:
+
+     FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6
+
+     Note: The trap OID, severity, category and hostname will always be prepended to the
+     FORMAT string in both the text log and syslog.  The text log will also have the date
+     prepended at the beginning.
+
+     EXEC:
+     =====
+
+     Optional string containing command to execute when trap is received and arguments to
+     pass to the program.
+
+     EXEC uses same variable substitution as the FORMAT line.
+
+     Example:
+
+     EXEC /usr/bin/qpage -f TRAP alex "$r: $x - NIC switchover to slot $3, port $4 from slot
+     $5, port $6"
+
+     or
+
+     EXEC c:\snmp\pager netops "$r: $x - NIC switchover to slot $3, port $4 from slot $5,
+     port $6"
+
+     Note: Unlike the FORMAT line, nothing is prepended to the message.  If you would like
+     to include the hostname and date in the page above, you must use the variables such as
+     $r and $x.
+
+     NODES:
+     ======
+
+     Optional string containing a list of source (host) names separated by spaces that must
+     match for this trap handle definition to be used.  If this keyword omitted then ALL
+     sources will be accepted.
+
+     Optionally a file can be specified which will contain the list of sources.
+
+     This list must be specified with a full path
+
+     Examples:
+
+     NODES fred barney betty wilma
+     NODES /etc/snmptt-nodes
+       or
+     NODES c:\snmp\snmptt-nodes
+
+     where snmptt-nodes contains:
+
+     fred
+     barney
+     betty
+     wilma
+
+     Note:   The names are NOT case sensitive.
+
+     Note:   If you are using DNS, the names may resolve to the Fully Qualified Domain Name
+     (FQDN) by snmptrapd.  For example: barney.bedrock.com.
+
+     Adding an entry for the host in your /etc/hosts file or
+     c:\%systemroot%\system32\drivers\etc\hosts should result in snmptrapd sending the short
+     name instead (barney).
+
+     SDESC
+     =====
+
+     Optional start of a description.  All text between this line and the line EDESC will be
+     ignored by snmptt. This section can be used to enter comments about the trap for your
+     own use.  If you use a SDESC, you MUST follow with a EDESC.
+
+     EDESC
+     =====
+
+     Used to end the description section.
+
+     Example:
+
+     SDESC
+     Trap used when power supply fails in
+     a server.
+     EDESC
+
+   Sample SNMPTT.CONF file
+   =======================
+
+   Following is a sample of two defined traps in snmptt.conf:
+
+     #
+     EVENT COMPAQ_11003 .1.3.6.1.4.1.232.0.11003 "LOGONLY" Normal
+     FORMAT Compaq Generic Trap: $*
+     EXEC qpage -f TRAP notifygroup1 "Compaq Generic Trap: $*"
+     NODES /etc/snmp/cpqnodes
+     SDESC
+     Generic test trap
+     EDESC
+     #
+     #
+     EVENT cpqDa3AccelBatteryFailed .1.3.6.1.4.1.232.0.3014 "Error Events" Critical
+     FORMAT Battery status is $3.
+     EXEC qpage -f TRAP notifygroup1 "$s $r $x: Battery status is $3"
+     NODES ntserver1 ntserver2 ntserver3
+     #
+     #
+
+   Notes
+   =====
+
+   An existing HP Openview trapd.conf can be used in most cases.  The file must be a VERSION
+   3 file.
+
+   Some vendors (such as Compaq and Cisco ) provide a file that can be imported in to HP
+   Openview using an HP Openview utility.  Snmpttconvert can be used to convert the file to
+   snmptt.conf format.
+
+   Installation - Unix
+   ===================
+
+   1.  Read this entire file to understand how snmptt works
+
+   2.  Copy snmptt to /sbin and ensure it is executable (chmod +x snmptt)
+
+   3.  Edit the options between OPTIONS START and OPTIONS END in snmptt
+
+   4.  Modify the NET-SNMP snmptrapd.conf file by adding the following line:
+
+       traphandle default /sbin/snmptt
+
+         Note:   It is possible to configure snmptrapd to execute snmptt based on the trap
+                 received, but using the default option is preferred
+
+   5.  Start SNMPTRAPD using the command line:  SNMPTRAPD -On. The -On is required otherwise
+       snmptt will NOT recognize the traps.
+
+   Installation - Windows
+   ======================
+   1.  Read this entire file to understand how snmptt works
+
+   2.  Create the directory c:\snmp and copy snmptt to it
+
+   3.  Edit the options between OPTIONS START and OPTIONS END in snmptt
+
+   4.  Modify the NET-SNMP snmptrapd.conf file by adding the following line:
+
+       traphandle default perl c:\snmp\snmptt
+
+        Note:   It is possible to configure snmptrapd to execute snmptt based on the trap
+                received, but using the default option is preferred
+
+   5.  Start SNMPTRAPD using the command line:  SNMPTRAPD -On. The -On is required otherwise
+       snmptt will NOT recognize the traps.
+
+   Limitations
+   ===========
+
+   The SNMPTRAPD program blocks when executing traphandle commands.  This means that if the
+   program called never quits, SNMPTRAPD will wait forever.  If a trap is received while the
+   traphandler is running, it is buffered and will be processed when the traphandler
+   finishes.  I do not know how large this buffer is.
+
+   With a 600 Mhz PIII and a 9000 line snmptt.conf containing 566 unique traps (EVENTs), it
+   takes under a second to process the trap including logging and executing the qpage program
+   in my examples.
+
+   A future improvement may be to separate the program into two separate programs. One that
+   is called by the traphandler which receives the raw trap and saved somewhere, and the
+   other running as a daemon which processes the received traps.  This would prevent any
+   issues with blocking in SNMPTRAPD.
+
+   The program called by SNMPTT (EXEC) also blocks the system.  If you call a program that
+   does not return, SNMPTT will be left waiting.  This could probably be fixed also by using
+   two separate programs.
+
+   Feedback
+   ========
+
+   Please send me any comments - good or bad - to alex_b@users.sourceforge.net.  If you have
+   any problems including converting trap files, please send me an email and include the file
+   you are trying to convert and I will try to take a look at it.
+
+   Please also send any patches or improvments so I can add them in to the CVS tree.
+
+   This is my first real Perl program, so it's probably not perfect.
+
+   SNMP Trap Translator Convert v0.1
+   (SNMPTTCONVERT)
+   =================================
+
+   SNMPTTCONVERT is a simple Perl script which will read a file created for HP Openview which
+   is provided by most vendors including Compaq and Cisco.  The file can contain multiple
+   traps.
+
+   For example, if the file ciscotrap.txt contained:
+
+     rpsFailed {.1.3.6.1.4.1.437.1.1.3} 6 5 - "Status Events" 1
+     Trap received from enterprise $E with $# arguments: sysName=$1
+     SDESC
+     "A redundant power source is connected to the switch but a failure exists in
+     the power system."
+     EDESC
+
+   Executing snmpttconvert ciscotrap.txt would output:
+
+     #
+     #
+     #
+     EVENT rpsFailed .1.3.6.1.4.1.437.1.1.3.0.5 "Status Events" Normal
+     FORMAT Trap received from enterprise $E with $# arguments: sysName=$1
+     #EXEC qpage -f TRAP notifygroup1 "Trap received from enterprise $E with $# arguments:
+     sysName=$1"
+     SDESC
+     "A redundant power source is connected to the switch but a failure exists in
+     the power system."
+     EDESC
+
+   Note:  The #EXEC line is added by default.  This can be changed by editing the
+   SNMPTTCONVERT script.
 

@@ -2,63 +2,7 @@ SNMP TRAP TRANSLATOR (SNMPTT)  and SNMPTTCONVERT
 
 Copyright 2002 Alex Burger 
 alex_b@users.sourceforge.net
-4/3/2002
+5/15/2002
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-******************************************************************************
-
-Installation - Unix:
---------------------
-
-1.  Read the README to understand how snmptt works
-
-2.  Copy snmptt to /sbin and ensure it is executable (chmod +x snmptt)
-
-3.  Edit the options between OPTIONS START and OPTIONS END in snmptt
-
-4.  Modify the NET-SNMP snmptrapd.conf file by adding the following line:
-
-	traphandle default /sbin/snmptt
-
-	Note:  	It is possible to configure snmptrapd to execute snmptt based on 
-		the trap received, but using the default option is preferred
-		
-5.  Start SNMPTRAPD using the command line:  SNMPTRAPD -On.  The -On is required 
-    otherwise snmptt will NOT recognize the traps.
-
-
-
-Installation - Windows:
------------------------
-
-1.  Read the README to understand how snmptt works
-
-2.  Create the directory c:\snmp and copy snmptt to it
-
-3.  Edit the options between OPTIONS START and OPTIONS END in snmptt
-
-4.  Modify the NET-SNMP snmptrapd.conf file by adding the following line:
-
-	traphandle default perl c:\snmp\snmptt
-
-	Note:  	It is possible to configure snmptrapd to execute snmptt based on the
-		trap received, but using the default option is preferred
-		
-5.  Start SNMPTRAPD using the command line:  SNMPTRAPD -On.  The -On is required 
-    otherwise snmptt will NOT recognize the traps.
-
-
+See the README file.
 
