@@ -152,9 +152,9 @@ Options:
   			 description text when used on the FORMAT \/ EXEC 
 			 lines.  A wildcard is only used if the description 
 			 line contained no variable definitions (\%n).
-  --exec=command         Command line to use for EXEC line.  Use quotes.  
-  			 Example:
-    			   "qpage -f TRAP notifygroup1"
+  --exec=command         Command line to use for EXEC line.  Use SINGLE quotes
+                         with Unix.  Example:
+    			   'qpage -f TRAP notifygroup1'
 					 
 * Note:  If net_snmp_perl is enabled, then the directory path for the MIB file directory is
 required.  Not specifying a --mibdir will use the default of \/usr\/share\/snmp\/mibs\/.
