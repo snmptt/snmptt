@@ -31,7 +31,7 @@ Installation - Unix:
 
 4.  Modify the NET-SNMP snmptrapd.conf file by adding the following line:
 
-	traphandle default /sbin/snmptt/usr/bin/qpage -q 1 -C /etc/qpage.cf
+	traphandle default /sbin/snmptt
 
 	Note:  	It is possible to configure snmptrapd to execute snmptt based on 
 		the trap received, but using the default option is preferred

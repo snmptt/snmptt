@@ -117,6 +117,7 @@ while (defined($line = <>))
 	# without messing up quoted text and re-join using :: as the
 	# delimiter (Add a space to the end otherwise we loose lines 
 	# that contain just a 0)
+
 	$temp = join "::", shellwords($line)," ";                
 
 	# Chop off last two
@@ -127,6 +128,19 @@ while (defined($line = <>))
 	# Split using the new delimiter
 	@temp = split ("::",$temp);
 
+	# Normally it is expected that a line contains a variable name
+	# followed by a space followed by the value (except for the 
+	# first line which is the hostname and the second which is the
+	# IP address).  If there is no variable name on the line (only
+	# one string), then add a variable string called 'variable' so 
+	# it is handled correctly in the next section.
+        if (@temp[1] eq "")
+        {
+                print "only one string detected\n";
+                @temp[1] = @temp[0];
+                @temp[0] = "variable";
+        }
+
 	# Add two strings to @tempvar
 	push(@tempvar, @temp);
 }
@@ -134,6 +148,7 @@ while (defined($line = <>))
 if (DEBUGGING >= 2)
 {
 	# Print out all items passed from snmptrapd
+	print "Items passed from snmptrapd:\n";
 	for ($i=0;$i <= $#tempvar;$i++)
 	{
 		print "value $i: @tempvar[$i]\n\n";

@@ -1,8 +1,24 @@
+June 15th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Data passed from SNMPTRAPD was not being handled correctly
+  when the passed data only contained one item per line instead
+  of two.  In my original testing I always received two items:
+  the variable name and the value (eg: sysUpTime and the actual
+  uptime).  Some programs such as ev2t for NT did not pass the
+  variable name.  If a variable name is missing, it is replaced
+  with 'variable'.  This should be invisible to the user as the
+  variable names are not used for anything right now.  
+- SNMP V2 traps have an unrelated problem as SNMPTT assumes that
+  the agent IP address, community name and enterprise will always 
+  be passed last from SNMPTRAPD.  Ev2t for example does not pass
+  those variables when configured for SNMP V2c.  This needs
+  further investigation.
+
 June 13th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Bug fix with $s - Severity.  Thanks to Hugues Mertens
 - Started this ChangeLog
 
 April 30th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_0.1.1
 - Improved debugging output
 
 April 18th, 2002: Alex Burger <alex_b@users.sourceforge.net>
