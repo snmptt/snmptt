@@ -543,7 +543,7 @@ sub processtrap
 			{
 				if (open LOGFILE, ">>$log_file")
 				{
-					print LOGFILE scalar(localtime)." $message";
+					print LOGFILE $trap_date_time." $message";
 					close LOGFILE;
 				}
 				else
@@ -577,7 +577,7 @@ sub processtrap
 
 				 if (defined $sth) {
 					 $sth->execute($event2[0],$receivedtrap,@var[6],@var[5],@var[0],@var[4],$event2[1],
-					 $event2[2],@var[2],scalar(localtime),$message)
+					 $event2[2],@var[2],$trap_date_time,$message)
 					 or warn "Unable to execute our query: ".$dbhmysql->errstr."\n";
 
 				 	$sth->finish;
@@ -592,7 +592,7 @@ sub processtrap
 				        ("INSERT INTO $sql_win32_odbc_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
 					\'$event2[0]\',\'$receivedtrap'\,\'@var[6]\',\'@var[5]\',\'@var[0]\',\'@var[4]\',
-					\'$event2[1]\',\'$event2[2]\',\'@var[2]\',\'".scalar(localtime)."\',
+					\'$event2[1]\',\'$event2[2]\',\'@var[2]\',\'".$trap_date_time."\',
 					\'$message\')" ) )
 				{					
 					warn "Unable to perform INSERT INTO: ".Win32::ODBC::Error()."\n";
@@ -701,16 +701,13 @@ sub substitute
 	s(\$T)(@var[2])g;
 	
 	# $x - Current date
-	$mydate = strftime "%a %b %e %Y", localtime;
-	s(\$x)($mydate)g;	
+	s(\$x)($trap_date)g;	
 
-	# $x - Current time
-	$mytime = strftime "%H:%M:%S", localtime;
-	s(\$X)($mytime)g;	
+	# $X - Current time
+	s(\$X)($trap_time)g;	
 
 	# $@ - Current time since epoch (Jan 1, 1904 for Mac, Jan 1, 1900 for most others)
-	$mytime = time();
-	s(\$@)($mytime)g;
+	s(\$@)($trap_date_time_epoch)g;
 	
 	if ($receivedtrap =~ /^.1.3.6.1.6.3.1.1.5/)
         {
@@ -934,8 +931,30 @@ sub readtrap
 	@var = ();
 	@entvar = ();
 
-	chomp($tempvar[0]=<$input>);	#hostname
-	chomp($tempvar[1]=<$input>);	#ip address
+	if ( $daemon == 1)
+	{
+	  chomp($trap_date_time_epoch = (<$input>));	# Pull time trap was spooled
+	}
+	else
+	{
+	  $trap_date_time_epoch = time();		# Use current time as time trap was received
+	}
+	
+	if ( $daemon == 1 && $use_trap_time == 1 )	# Daemon mode only
+	{
+	  $trap_date_time = localtime($trap_date_time_epoch);
+	  $trap_date = strftime "%a %b %e %Y", localtime($trap_date_time_epoch);
+	  $trap_time = strftime "%H:%M:%S", localtime($trap_date_time_epoch);
+	}
+	else
+	{
+	  $trap_date_time = localtime();
+	  $trap_date = strftime "%a %b %e %Y", localtime();
+	  $trap_time = strftime "%H:%M:%S", localtime();
+	}
+	
+	chomp($tempvar[0]=<$input>);	# hostname
+	chomp($tempvar[1]=<$input>);	# ip address
 	
 	# Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
 	# out just the IP address
@@ -1193,7 +1212,7 @@ sub searchfortrap
 		{
 			if (open LOGFILE, ">>$unknown_trap_log_file")
 			{	
-				print LOGFILE scalar(localtime),": Unknown trap (@var[3]) received from @var[0] at: \n";
+				print LOGFILE scalar($trap_date_time),": Unknown trap (@var[3]) received from @var[0] at: \n";
 				#print out all standard variables
 				for ($i=0;$i <= $#var;$i++)
 				{
@@ -1282,44 +1301,8 @@ sub loadsnmpttini {
 	  }
 	  exit(1);
 	}
-	
-	# 
-	# Defaults Start
-	# 
-	$multiple_event = 0;
-	$fqdn_enable = 0;
-	$daemon_fork = 1;
-	$spool_directory = '';
-	$sleep = 5;
-	$stdout_enable = 0;
-	$log_enable = 1;
-	$log_file = '';
-	$unknown_trap_log_enable = 0;
-	$unknown_trap_log_file = '';
-	$syslog_enable = 0;
-	$syslog_facility = 'local0';
-	$syslog_level = 'warning';
-	$exec_enable = 1;
-	$mysql_dbi_enable = 0;
-	$mysql_dbi_database = '';
-	$mysql_dbi_table = '';
-	$mysql_dbi_username = '';
-	$mysql_dbi_password = '';
-	$sql_win32_odbc_enable = 0;
-	$sql_win32_odbc_dsn = '';
-	$sql_win32_odbc_table = '';
-	$sql_win32_odbc_username = '';
-	$sql_win32_odbc_password = '';
-	if ($debugcmdline == 0) {
-	  $DEBUGGING = 0
-	}
-	if ($debugfilecmdline == 0) {
-	  $DEBUGGING_FILE = ''
-	}
+
 	@snmptt_conf_files = '';
-	#
-	# Defaults End
-	# 
 	
 	# General
 	if ( ($cfg->val('General', 'mode') eq "daemon") || ($daemoncmdline == 1) )
@@ -1332,11 +1315,12 @@ sub loadsnmpttini {
 	
 	$multiple_event = $cfg->val('General', 'multiple_event');
 	$fqdn_enable = $cfg->val('General', 'fqdn_enable');
-	
+
 	# DaemonMode
 	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
 	$spool_directory = $cfg->val('DaemonMode', 'spool_directory');
 	$sleep = $cfg->val('DaemonMode', 'sleep');
+	$use_trap_time = $cfg->val('DaemonMode', 'use_trap_time');
 	
 	# Logging
 	$stdout_enable = $cfg->val('Logging', 'stdout_enable');
@@ -1376,6 +1360,41 @@ sub loadsnmpttini {
 	@snmptt_conf_files = $cfg->val('TrapFiles', 'snmptt_conf_files');
 	
 	$cfg->Delete;
+
+	# 
+	# Defaults Start
+	# 
+	if (! defined ($multiple_event)) { $multiple_event = 0} ;
+	if (! defined ($fqdn_enable)) { $fqdn_enable = 0} ;
+	if (! defined ($use_trap_time)) { $use_trap_time = 1} ;
+	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
+	if (! defined ($spool_directory)) { $spool_directory = ''} ;
+	if (! defined ($sleep)) { $sleep = 5} ;
+	if (! defined ($stdout_enable)) { $stdout_enable = 0} ;
+	if (! defined ($log_enable)) { $log_enable = 1} ;
+	if (! defined ($log_file)) { $log_file = ''} ;
+	if (! defined ($unknown_trap_log_enable)) { $unknown_trap_log_enable = 0} ;
+	if (! defined ($unknown_trap_log_file)) { $unknown_trap_log_file = ''} ;
+	if (! defined ($syslog_enable)) { $syslog_enable = 0} ;
+	if (! defined ($syslog_facility)) { $syslog_facility = 'local0'} ;
+	if (! defined ($syslog_level)) { $syslog_level = 'warning'} ;
+	if (! defined ($exec_enable)) { $exec_enable = 1} ;
+	if (! defined ($mysql_dbi_enable)) { $mysql_dbi_enable = 0} ;
+	if (! defined ($mysql_dbi_database)) { $mysql_dbi_database = ''} ;
+	if (! defined ($mysql_dbi_table)) { $mysql_dbi_table = ''} ;
+	if (! defined ($mysql_dbi_username)) { $mysql_dbi_username = ''} ;
+	if (! defined ($mysql_dbi_password)) { $mysql_dbi_password = ''} ;
+	if (! defined ($sql_win32_odbc_enable)) { $sql_win32_odbc_enable = 0} ;
+	if (! defined ($sql_win32_odbc_dsn)) { $sql_win32_odbc_dsn = ''} ;
+	if (! defined ($sql_win32_odbc_table)) { $sql_win32_odbc_table = ''} ;
+	if (! defined ($sql_win32_odbc_username)) { $sql_win32_odbc_username = ''} ;
+	if (! defined ($sql_win32_odbc_password)) { $sql_win32_odbc_password = ''} ;
+	if (! defined ($DEBUGGING)) { $DEBUGGING = 0} ;
+	if (! defined ($DEBUGGING_FILE)) { $DEBUGGING_FILE = ''} ;
+
+	#
+	# Defaults End
+	# 
 	
 	# print "Config file loaded\n";
 	

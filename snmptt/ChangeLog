@@ -1,3 +1,14 @@
+January 22nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Changed SNMPTTHANDLER to output the current date and time on the
+  first line of the spool file.
+- Changed SNMPTTHANDLER to v0.2
+- Added use_trap_time variable to config file for daemon mode to
+  have SNMPTT use either the time from the spool file, or the current
+  time.
+- Fixed code for default variable settings for .ini file.  Defaults
+  were not being set correctly if variable was not defined in .ini
+  file.
+
 January 20th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Cleaned up code for determining whether to run as a daemon or
   standalone mode.
