@@ -1,3 +1,7 @@
+May  27th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added trapoid database column to contain the actual trap OID received from
+  Net-SNMP.  eventid will contain what was matched in the .conf file.
+
 May  9th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug when using wildcards.  The received trap was reset to the 
   matching EVENT entry which contained the .*.  This caused things like

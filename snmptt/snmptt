@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v0.7.1
+# SNMPTT v0.7.2
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -46,7 +46,7 @@
 ##############################################################################
 #
 
-$snmptt_version = "v0.7.1";
+$snmptt_version = "v0.7.2";
 
 sub showversion
 {
@@ -1111,9 +1111,11 @@ sub processtrap
 				$community =~ s(\")(\\\")g;   #"				
 				
 				unless (defined ($dbh_mysql->do(
-					"INSERT INTO $mysql_dbi_table (eventname, eventid, enterprise, community, 
-					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap_trans'\,\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
+					"INSERT INTO $mysql_dbi_table (eventname, eventid, trapoid, enterprise, 
+					community, hostname, agentip, category, severity, uptime, traptime, 
+					formatline) VALUES (
+					\'$event2[0]\',\'$receivedtrap_entry'\,\'$receivedtrap_trans'\,\'$db_enterprise\',
+					\'$community\',\'$agent_dns_name\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
 					\'$message_short2\')" ) ) )
 					{
@@ -1150,9 +1152,11 @@ sub processtrap
 				$community =~ s(\")(\\\")g;   #"
 				
 				unless (defined ($dbh_postgresql->do(
-					"INSERT INTO $postgresql_dbi_table (eventname, eventid, enterprise, community, 
-					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap_trans'\,\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
+					"INSERT INTO $postgresql_dbi_table (eventname, eventid, trapoid, enterprise, 
+					community, hostname, agentip, category, severity, uptime, traptime, 
+					formatline) VALUES (
+					\'$event2[0]\',\'$receivedtrap_entry'\,\'$receivedtrap_trans'\,
+					\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
 					\'$message_short2\')" ) ) )
 					{
@@ -1189,9 +1193,11 @@ sub processtrap
 				$community =~ s(\")(\\\")g;   #"
 				
 				unless (defined ($dbh_odbc->do(
-					"INSERT INTO $dbd_odbc_table (eventname, eventid, enterprise, community, 
-					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap_trans'\,\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
+					"INSERT INTO $dbd_odbc_table (eventname, eventid, trapoid, enterprise, 
+					community, hostname, agentip, category, severity, uptime, traptime, 
+					formatline) VALUES (
+					\'$event2[0]\',\'$receivedtrap_entry'\,\'$receivedtrap_trans'\,
+					\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
 					\'$message_short2\')" ) ) )
 					{
@@ -1230,9 +1236,11 @@ sub processtrap
 				
 				# if defined, there's an error
 				if (defined ($dbh_win32_odbc->Sql
-				        ("INSERT INTO $sql_win32_odbc_table (eventname, eventid, enterprise, community, 
-					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$receivedtrap_trans'\,\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
+				        ("INSERT INTO $sql_win32_odbc_table (eventname, eventid, trapoid, enterprise, 
+					community, hostname, agentip, category, severity, uptime, traptime, 
+					formatline) VALUES (
+					\'$event2[0]\',\'$receivedtrap_entry'\,\'$receivedtrap_trans'\,
+					\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
 					\'$message_short2\')" ) ) )
 				{					
