@@ -459,6 +459,7 @@ if ($sql_win32_odbc_enable == 1)
 # Global variables for statistics
 my $g_total_traps_received = 0;
 my $g_total_traps_translated = 0;
+my $g_total_traps_ignored = 0;
 my $g_total_traps_unknown = 0;
 my $g_last_statistics_logged = $g_start_time;
 
@@ -798,15 +799,17 @@ if ($daemon == 1)
 		print "SNMPTT $snmptt_version shutdown: ",scalar(localtime),"\n\n";
                 print "Total traps received:    $g_total_traps_received\n";
                 print "Total traps translated:  $g_total_traps_translated\n";                
+                print "Total traps ignored:     $g_total_traps_ignored\n";                
                 print "Total unknown traps:     $g_total_traps_unknown\n\n";
 	}
 	
 	if ($syslog_system_enable == 1 &&  $daemon == 1)
 	{
 	  syslog_system("SNMPTT $snmptt_version shutdown");
-          syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total unknown traps=$g_total_traps_unknown");                
+          syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");                
           #syslog_system("Total traps received:    $g_total_traps_received");
           #syslog_system("Total traps translated:  $g_total_traps_translated");
+          #syslog_system("Total traps ignored      $g_total_traps_ignored");
           #syslog_system("Total unknown traps:     $g_total_traps_unknown");                
 	}
 	if ($eventlog_system_enable == 1 &&  $daemon == 1)
@@ -814,6 +817,7 @@ if ($daemon == 1)
 	  my $message = "SNMPTT $snmptt_version shutdown\n\n" . \
           "Total traps received:    $g_total_traps_received\n" . \
           "Total traps translated:  $g_total_traps_translated\n" . \
+          "Total traps ignored:     $g_total_traps_ignored\n" . \
           "Total unknown traps:     $g_total_traps_unknown\n";
           
           eventlog_system($message,1,$eventlog_information);
@@ -1539,18 +1543,23 @@ sub processtrap
 		}
 		else
 		{
-			if ($DEBUGGING >= 1)
-			{
-				if ($event2[1] eq "IGNORE")
-				{
-				  print "\nTrap set to IGNORE...\n\n";
-				}
-				else
-				{
-				  print "\nTrap defined, but NODES or MATCH check failed - skipping this EVENT entry..\n\n";
-				}
-			}
-		}
+                  if ($event2[1] eq "IGNORE") {
+                    # Statistics
+                    $g_total_traps_ignored++;
+                  }
+
+                  if ($DEBUGGING >= 1)
+                  {
+                    if ($event2[1] eq "IGNORE")
+                    {
+                      print "\nTrap set to IGNORE...\n\n";
+                    }
+                    else
+                    {
+                      print "\nTrap defined, but NODES or MATCH check failed - skipping this EVENT entry..\n\n";
+                    }
+                  }
+                }
 	
 	} #while defined..
 }
@@ -4175,18 +4184,20 @@ sub log_statistics {
   {
     print "Total traps received:    $g_total_traps_received\n";
     print "Total traps translated:  $g_total_traps_translated\n";                
+    print "Total traps ignored:     $g_total_traps_ignored\n";                
     print "Total unknown traps:     $g_total_traps_unknown\n\n";
   }
   
   if ($syslog_system_enable == 1)  
   { 
-    syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total unknown traps=$g_total_traps_unknown");                
+    syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");                
   }
   if ($eventlog_system_enable == 1)
   {
     my $message = "" . \
     "Total traps received:    $g_total_traps_received\n" . \
     "Total traps translated:  $g_total_traps_translated\n" . \
+    "Total traps ignored:     $g_total_traps_ignored:\n" . \
     "Total unknown traps:     $g_total_traps_unknown\n";
     
     eventlog_system($message,1,$eventlog_information);
