@@ -10,7 +10,7 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.5.1</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; March 11th, 2003
+<br>This file was last updated on:&nbsp; March 13th, 2003
 <p><a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote><a href="#What is it">What is it?</a>
@@ -171,8 +171,7 @@ the very least use the <b>snmptrapd</b> program from v4.2.5.
 <blockquote>SNMPTT only requies the the NET-SNMP Perl module if you enable
 the translation of integer values (translate_integers = 1) to enumeration
 tags in MIB files or want to have variable names translated into text from
-the
-MIB files.</blockquote>
+the MIB files.</blockquote>
 
 <p><br><a NAME="Whats New"></a><b><font size=+2>What's New</font></b>
 <p><b><font size=+1>0.6 - ???, 2003</font></b>
@@ -789,8 +788,8 @@ the snmptt.conf contains FORMAT and / or EXEC statements.
 but the EXEC statement will be ignored.
 <p>Note:&nbsp;&nbsp; If you plan on using an external program such as Netsaint
 for logging, paging etc, you probably do not want any traps defined with
-<b>LOGONLY</b> as the EXEC line would be used to submit a passive service
-check.</blockquote>
+<b>LOGONLY</b>
+as the EXEC line would be used to submit a passive service check.</blockquote>
 <b>severity:</b>
 <blockquote>Character string of the severity of the event.&nbsp; Used in
 the output when logging.&nbsp; Example: Minor, Major, Normal, Critical,
@@ -901,8 +900,7 @@ or
 $3, port $4 from slot $5, port $6"</blockquote>
 Note: Unlike the FORMAT line, nothing is prepended to the message.&nbsp;
 If you would like to include the hostname and date in the page above, you
-must use the variables such as $r, $x and $X.
-<br>&nbsp;</blockquote>
+must use the variables such as $r, $x and $X.</blockquote>
 <b>NODES:</b>
 <blockquote>[<b>NODES</b> sources_list]
 <p>Optional string containing a list of source (host) names separated by
@@ -1359,6 +1357,14 @@ the mib file correctly.&nbsp; If it can't, an error will be produced at
 the top of the help screen.</li>
 
 <li>
+If you are using <b>UCD-SNMP</b>, or <b>NET-SNMP v5.0.1</b>, then add the
+folllowing to your snmp.conf file: <b>printNumericOids 1</b> (note:&nbsp;
+this will affect all snmp commands).&nbsp; This ensures the OIDs are returned
+in numerical format.&nbsp; Other versions of NET-SNMP do not require this
+change, as <b>snmpttconvertmib</b> will use a command line switch to force
+it on when calling <b>snmptranslate</b>.</li>
+
+<li>
 Convert the mib file with: <b>snmpttconvertmib <i>path-to-mib</i> <i>output-file-name</i></b>.&nbsp;
 Note:&nbsp; the <b>output-file-name</b> is appended to, so remember to
 delete it first if needed.</li>
@@ -1548,6 +1554,33 @@ file
 <p>If you are using UCD-SNMP v4.2.3, then the variables will not translate
 properly because SNMPTRAPD does not pass them correctly to SNMPTT.&nbsp;
 Upgrade to a newer version of snmptrapd.
+<p><b>Q:&nbsp; I converted a MIB using snmpttconvertmib but the OIDs are
+appearing as text instead of being numberical.&nbsp; Why?</b>
+<blockquote><b>For example:</b></blockquote>
+
+<blockquote><b>EVENT linkUp .iso.org.dod.internet.snmpV2.snmpModules.snmpMIB.snmpMIBObjects.snmpTraps.linkUp
+"Status Events" Normal</b>
+<p><b>instead of</b>
+<p><b>EVENT linkUp .1.3.6.1.6.3.1.1.5.4 "Status Events" Normal</b></blockquote>
+
+<p><br>A:&nbsp; <b>Snmpttconvertmib</b> uses the <b>snmptranslate</b> command
+to convert MIB files.&nbsp; With Net-SNMP v5.0.2 and newer, setting the
+<b>-On</b> switch on the <b>snmptranslate</b> command causes the output
+to be in numerical format, which is what is needed for <b>snmpttconvertmib</b>.
+<p>With Net-SNMP v5.0.1 and all versions of UCD-SNMP, setting the -On switch
+will TOGGLE the setting of using numerical output.&nbsp; With Net-SNMP
+v5.0.2 and newer, setting the -On switch will FORCE the output to be numerical.
+<p><b>Snmpttconvermib</b> will use the -On switch <b>only</b> if it detects
+anything but UCD-SNMP or Net-SNMP v5.0.1.
+<p>If you are using UCD-SNMP, or Net-SNMP v5.0.1, the best option is to
+modify your <b>snmp.conf</b> file (for UCD-SNMP / Net-SNMP), and add or
+modify the line:
+<blockquote><b>printNumericOids 1</b></blockquote>
+This will cause all applications to output in numerical format including
+<b>snmptranslate</b>.&nbsp; Note: This will affect other UCD-SNMP / Net-SNMP
+programs you are using, if any.
+<br>&nbsp;
+<br>&nbsp;
 <br>&nbsp;
 <br>&nbsp;
 <br>&nbsp;

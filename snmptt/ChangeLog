@@ -1,3 +1,12 @@
+March 13th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- snmpttconvertmib now checks the version of snmptranslate before converting
+  the mib.  To ensure OIDs are outputted as numerical, the -On switch is added 
+  to the snmptranslate command when snmptranslate is v5.0.2 or newer.
+  Net-SNMP 5.0.2 and newer (more specifically, snmplib/mib.c version 5.7 or newer 
+  in CVS) uses the -On switch to SET numeric OID output.  Anything before 5.0.2 
+  is used to TOGGLE the setting.  For older than v5.0.2, the snmp.conf file should
+  contain the line:  printNumericOids 1
+
 March 9th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Cleaned up wildcard expansion code.  Added wildcard_expansion_separator
   variable

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v0.1.2
+# SNMPTTCONVERTMIB v0.1.3
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -58,6 +58,8 @@ if ((@ARGV[0] eq "") || (@ARGV[1] eq ""))
 	print "Syntax is: snmpttconvertmib inputmibfile outputfile\n\n";
 	die;
 }
+
+check_snmptranslate_version();
 
 print "\nFile to load is:	@ARGV[0]\n";
 print "File to APPEND TO:	@ARGV[1]\n";
@@ -291,7 +293,15 @@ while ($currentline <= $#mibfile)
 			$trapsummary = $traptype . ": " . $trapsummary;
 		}
 		
-		$trapoid = `snmptranslate -IR -Ts $enterprise#.$trapname`;
+		if ($snmptranslate_use_On == 1)
+		{
+		  $trapoid = `snmptranslate -IR -Ts -On $enterprise#.$trapname`;
+		}
+		else
+		{
+		  $trapoid = `snmptranslate -IR -Ts $enterprise#.$trapname`;
+		}
+		
 		chomp $trapoid;
 		if ($trapoid ne "")
 		{
@@ -600,7 +610,15 @@ while ($currentline <= $#mibfile)
 			$notificationsummary = $notificationtype . ": " . $notificationsummary;
 		}
 		
-		$notificationoid = `snmptranslate -IR -Ts $enterprise.$notificationname`;
+		if ($snmptranslate_use_On == 1)
+		{
+		  $notificationoid = `snmptranslate -On -IR -Ts $enterprise.$notificationname`;
+		}
+		else
+		{
+		  $notificationoid = `snmptranslate -IR -Ts $enterprise.$notificationname`;
+		}
+		
 		chomp $notificationoid;
 		if ($notificationoid ne "")
 		{
@@ -698,3 +716,29 @@ while ($currentline <= $#mibfile)
 	$currentline++; # Increment to the next line
 	$line2 = @mibfile[$currentline]; # Get next line
 }	
+
+
+sub check_snmptranslate_version
+{
+  $snmptranslate_use_On = 1;
+  
+  if (open SNMPTRANSLATE, "snmptranslate -V 2>&1|") 
+  {
+    $snmptranslatever = <SNMPTRANSLATE>;
+    close SNMPTRANSLATE;
+    
+    chomp ($snmptranslatever);
+    
+    print "snmptranslate version: " . $snmptranslatever. "\n";
+      
+    if ($snmptranslatever =~ /UCD/i || $snmptranslatever =~ /NET-SNMP version: 5.0.1/i)
+    {
+      $snmptranslate_use_On = 0;
+      if ($DEBUGGING >= 1)
+      {
+	print "snmptranslate is either UCD-SNMP, or NET-SNMP v5.0.1, so do not use the -On switch.  Version found: $snmptranslatever\n";
+      }
+    }
+  }
+}
+
