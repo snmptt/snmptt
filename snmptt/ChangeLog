@@ -1,3 +1,6 @@
+April 2nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Snmpttconvertmib: Replace any spaces with -'s in severity
+
 April 1st, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Snmpttconvertmib: Add --severity and --no_severity switches
 - Snmpttconvertmib: Combines multiple --#SUMMARY lines into one

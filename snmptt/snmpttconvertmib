@@ -163,6 +163,9 @@ required.  Not specifying a --mibdir will use the default of \/usr\/share\/snmp\
   exit(0);
 }
 
+# Replace any spaces with -'s in severity
+$severity =~ s/ /-/g;
+
 if ($debug == 1)
 {
   $DEBUGGING = 1;
