@@ -18,6 +18,13 @@ mode = standalone
 # 	and host does not match.  Wildcard entry could still match).
 multiple_event = 1
 
+# Set to 1 to enable the use of FQDN (Fully Qualified Domain Names).  If a host name is
+# passed to SNMPTT that contains a domain name, it will not be altered in any way by
+# SNMPTT.
+# Set to 0 to have SNMPTT strip the domain name from the host name passed to it.  For 
+# example, server01.domain.com would be changed to server01
+fqdn_enable = 0
+
 [DaemonMode]
 # Set to 1 to have snmptt fork to the background when run in daemon mode
 # Ignored by Windows.  See documentation

@@ -47,7 +47,7 @@
 #
 sub showversion
 {
-	print "\nSNMPTT v0.4\n";
+	print "\nSNMPTT v0.4.1\n";
 	print "(c) 2002 Alex Burger\n";
 	print "http://snmptt.sourceforge.net\n\n";
 }
@@ -678,11 +678,11 @@ sub substitute
 	# $s - Severity
 	s(\$s)($event2[2])g;
 	
-	# $AR, $ar - Hostname
+	# $AR, $ar - IP address
 	s(\$aR)(@var[1])g;
 	s(\$ar)(@var[1])g;
 
-	# $R, $r - IP address
+	# $R, $r - Hostname
 	s(\$R)(@var[0])g;
 	s(\$r)(@var[0])g;
 	
@@ -1025,6 +1025,15 @@ sub readtrap
 		
 	}
 	
+	# Strip domain name from hostname in @var[0] if fqdn_enable is set to 0 (disabled)
+	if ($fqdn_enable == 0)
+	{
+	  if (@var[0] =~ /\./)      # Contain a . ?
+	  {
+	    @var[0] = @var[0] =~ /^([^\.]+?)\./;
+	  }
+	}
+	
 	if ($DEBUGGING >= 1)
 	{
 		print "Trap received from @tempvar[0]: @tempvar[5]\n";
@@ -1272,6 +1281,7 @@ sub loadsnmpttini {
 	# 
         $daemonmode = 0;
 	$multiple_event = 0;
+	$fqdn_enable = 0;
 	$daemon_fork = 1;
 	$spool_directory = '';
 	$sleep = 5;
@@ -1313,6 +1323,7 @@ sub loadsnmpttini {
 	  $daemonmode = 1;
 	}
 	$multiple_event = $cfg->val('General', 'multiple_event');
+	$fqdn_enable = $cfg->val('General', 'fqdn_enable');
 	
 	# DaemonMode
 	if ($daemoncmdline == 0) {

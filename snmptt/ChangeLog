@@ -1,3 +1,7 @@
+January 6th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added fqdn_enable option to remove domain name from host name
+  passed to SNMPTT.  Defaults to stripping the domain name (0)
+
 December 3rd, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - By default, snmpttconvertmib will now prepend the --TYPE line 
   to the summary line.  Can be disabled in the script in the 
