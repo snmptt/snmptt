@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.6.1</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; April 12th, 2003
+This file was last updated on:&nbsp; April 15th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -175,6 +175,11 @@ translate_trap_oid </span>or <span style="font-weight: bold;">translate_oids.<br
 <a name="Whats-New"></a><b><font size="+2">What's New</font></b> </p>
 <p><b><font size="+1">0.7 - ??</font></b><b><font size="+1">, 2003</font></b></p>
 <ul>
+  <li>Added the ability for traps passed from <span
+ style="font-weight: bold;">snmptrapd </span>to contain symbolic OIDs
+such as <span style="font-weight: bold;">linkDown</span> and <span
+ style="font-weight: bold;">IF-MIB::linkUp</span>.&nbsp; This feature
+requires the UCD-SNMP / NET-SNMP Perl module</li>
   <li>Added the ability to read <span style="font-weight: bold;">snmptt.conf</span>
 files that contain symbolic trap OIDs such as <span
  style="font-weight: bold;">linkDown</span> and <span
@@ -1012,8 +1017,8 @@ variables passed inside the trap to symbolic form.&nbsp; The format will
 always be the short name (eg: driveStatus).&nbsp; You must have the
 UCD-SNMP / NET-SNMP Perl module installed for this to work and you must
 enable support for it by enabling <b>net_snmp_perl_enable</b> in the
-snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b> is not enabled,
-it will default to using the numeric OID.</blockquote>
+snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b> is not enabled, it
+will default to using the numeric OID.</blockquote>
   </blockquote>
   <b>EXEC:</b>
   <blockquote>[<b>EXEC</b> command_string]
@@ -1314,8 +1319,21 @@ immediately with: </p>
 the command line:&nbsp; <span style="font-weight: bold;">snmptrapd -On</span>.<br>
 &nbsp;&nbsp;&nbsp;&nbsp; You should be able to edit the <b>/etc/rc.d/init.d/snmptrapd</b>
 script if you have one and change <br>
-&nbsp;&nbsp;&nbsp;&nbsp; the <b>OPTIONS</b> to <b>"-On"</b>. <b>The
--On is required otherwise snmptt will NOT recognize the traps.</b>
+&nbsp;&nbsp;&nbsp;&nbsp; the <b>OPTIONS</b> to <b>"-On"</b>. <b><br>
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; Note:&nbsp;
+The -On is recommended.&nbsp; This will make snmptrapd pass OIDs in
+numeric form</span><br style="font-weight: bold;">
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; and prevent
+SNMPTT from having to translate the symbolic name to numerical
+form.&nbsp; If</span><br style="font-weight: bold;">
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; the </span></b><span
+ style="font-weight: bold;">UCD-SNMP / NET-SNMP Perl module is not
+installed, then you MUST use the <br>
+&nbsp;&nbsp;&nbsp;&nbsp; -On switch.&nbsp; Depending on the version of
+UCD-SNMP / NET-SNMP, some symbolic names<br>
+&nbsp;&nbsp;&nbsp;&nbsp; may not translate correctly.&nbsp; See the FAQ
+section for more info.<br>
+</span>
 <p>&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
 file to include the line: <b>printNumericOids 1.&nbsp; </b>This
 setting will take effect no matter what is used on the command line. </p>
@@ -1338,11 +1356,24 @@ snmptrapd.conf file by adding the following line:
   <p>Launch snmptt using: </p>
   <p><b>snmptt --daemon</b></p>
 </blockquote>
-5.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD -On. <b>The
--On is required otherwise snmptt will NOT recognize the traps.</b>
-<p>&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
+5.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD -On. <b><br>
+</b><b><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;
+Note:&nbsp; The -On is recommended.&nbsp; This will make snmptrapd pass
+OIDs in numeric form</span><br style="font-weight: bold;">
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; and prevent
+SNMPTT from having to translate the symbolic name to numerical
+form.&nbsp; If</span><br style="font-weight: bold;">
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; the </span></b><span
+ style="font-weight: bold;">UCD-SNMP / NET-SNMP Perl module is not
+installed, then you MUST use the <br>
+&nbsp;&nbsp;&nbsp;&nbsp; -On switch.&nbsp; Depending on the version of
+UCD-SNMP / NET-SNMP, some symbolic names<br>
+&nbsp;&nbsp;&nbsp;&nbsp; may not translate correctly.&nbsp; See the FAQ
+section for more info.<br>
+</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
 file to include the line: <b>printNumericOids 1.&nbsp; </b>This
-setting will take effect no matter what is used on the command line. </p>
+setting will take effect no matter what is used on the command line.
 <p><b><u><font size="+1">Windows NT EventLog:</font></u></b> </p>
 <p>If you have enabled Windows Event Log support, then you must install
 an Event Message File to prevent "Event Message Not Found" messages from
@@ -1807,8 +1838,16 @@ process them.
 <p>As an alternative, you can edit your <b>snmp.conf</b> file to
 include the line: <b>printNumericOids 1.&nbsp; </b>This setting will
 take effect no matter what is used on the command line. </p>
-<p><br>
-<b>Q:&nbsp; When I try to convert a MIB, it will not convert
+<p>Note:&nbsp; If the UCD-SNMP / NET-SNMP Perl module is installed and
+enabled, then SNMPTT should be able to handle traps passed using
+symbolic form.&nbsp; The Perl module (used by SNMPTT) in Net-SNMP 5.0.8
+and previous versions should be able to handle single symbolic names
+(eg: coldTrap).&nbsp; A patch is available from the Net-SNMP web site
+for 5.0.8 to allow it to handle other symbolic names such as
+module::symbolic name (eg: SNMPv2-MIB::coldTrap) etc.&nbsp; <br>
+<br>
+</p>
+<p><b>Q:&nbsp; When I try to convert a MIB, it will not convert
 properly.&nbsp; Why?</b> </p>
 <p>A:&nbsp; If you are using Unix and transferred the MIB file from
 Windows (or downloaded a ZIP file containing the MIB), you need to make
@@ -1973,9 +2012,9 @@ symbolic name.&nbsp; Why?<br>
 </b></p>
 A:&nbsp; The current version of Net-SNMP (5.0.8 at the time of this
 writing) and some versions before do not properly tranlsate numeric OIDs
-to long symbolic names.&nbsp; A patch is available for 5.0.8 that
-should appear in later releases of Net-SNMP.&nbsp; The patch (xxxx) can
-be downloaded from the <a
+to long symbolic names.&nbsp; A patch is available for 5.0.8 that should
+appear in later releases of Net-SNMP.&nbsp; The patch (xxxx) can be
+downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=720261&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.<br>
 <br>
