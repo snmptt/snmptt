@@ -1,7 +1,7 @@
 April 2nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Replace all back ticks with forward ticks on received trap
-- Escape ' and " when logging to SQL databases for community and format
-  line
+- Prepend a backslash to ' and " characters when logging to SQL 
+  databases (community and format line)
 - Added REGEX support for snmptt.conf
 - Added translate_oids option
 - Snmpttconvertmib: Replace any spaces with -'s in severity
