@@ -10,7 +10,7 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.3.3</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; November 11th, 2002
+<br>This file was last updated on:&nbsp; November 12th, 2002
 <p>&nbsp;<a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote>&nbsp;<a href="#What is it">What is it?</a>
@@ -18,7 +18,8 @@
 <br>&nbsp;<a href="#Features">Features</a>
 <br>&nbsp;<a href="#Requirements">Requirements</a>
 <br>&nbsp;<a href="#Whats New">Whats New</a>
-<br>&nbsp;<a href="#Configuration Options">Configuration Options</a>
+<br>&nbsp;<a href="#Upgrading">Upgrading</a>
+<br>&nbsp;<a href="#Configuration Options">Configuration Options - snmptt.ini</a>
 <br>&nbsp;<a href="#Logging - Standard">Logging - Standard</a>
 <br>&nbsp;<a href="#Logging - Database">Logging - Database</a>
 <br>&nbsp;<a href="#Executing an external program">Executing an external
@@ -115,6 +116,10 @@ ActivePerl)</li>
 Required: Getopt::Long (included with most distributions including ActivePerl)</li>
 
 <li>
+Required: Posix (included with most if not all distributions including
+ActivePerl)</li>
+
+<li>
 Required: Config::IniFiles</li>
 
 <li>
@@ -147,16 +152,29 @@ included in the NET-SNMP package.
 <p><b><font size=+1>0.4 - ??, 2002</font></b>
 <ul>
 <li>
+Variable substituion changes:</li>
+
+<ul>
+<li>
+$X = Date, $x = Time instead of $x being both date and time</li>
+
+<li>
+$N = Event name instead of $S</li>
+
+<li>
+Added $c, $@, $O, $o, $ar, $R, $aR, $G, $S</li>
+</ul>
+
+<li>
 Configuration moved to a .ini file</li>
 
 <li>
-MySQL support via DBI under Linux</li>
+MySQL support via DBI under Linux and Windows</li>
 
 <li>
 ODBC support via Win32::ODBC under Windows</li>
 </ul>
-
-<p><br><b><font size=+1>0.3 - September 11th, 2002</font></b>
+<b><font size=+1>0.3 - September 11th, 2002</font></b>
 <ul>
 <li>
 Daemon mode support for SNMPTT.&nbsp; When running as a daemon, SNMPTTHANDLER
@@ -209,7 +227,30 @@ UCD-SNMP v4.2.3 problem workaround</li>
 <li>
 Initial release</li>
 </ul>
-<a NAME="Configuration Options"></a><b><font size=+2>Configuration Options</font></b>
+
+<p><br><a NAME="Upgrading"></a><b><font size=+2>Upgrading</font></b>
+<p><b><font size=+1>v0.1, v0.2 or v0.3 to v0.4</font></b>
+<p>To upgrade from v0.1, v0.2 to v0.3 to v0.4, you should:
+<ol>
+<li>
+In your snmptt.conf file, replace all <b>$x</b> with <b>$x $X</b> (see
+Whats New section)</li>
+
+<li>
+In your snmptt.conf file, replace all <b>$S</b> with <b>$N (</b>see Whats
+New section)</li>
+
+<li>
+Configure the snmptt.ini as described in this file - configuration options
+are no longer stored in the snmptt and snmptthandler scripts</li>
+
+<li>
+If your snmptt.conf file contained a list of other snmptt.conf files instead
+of trap definitions, move that list to the snmptt.ini file</li>
+</ol>
+
+<p><br><a NAME="Configuration Options"></a><b><font size=+2>Configuration
+Options - snmptt.ini</font></b>
 <p>As mentioned throughout this document, configuration options are set
 by editing the <b>snmptt.ini</b> file.
 <p>For Linux / Unix, the <b>snmptt.ini</b> file should be located in either
@@ -314,10 +355,10 @@ an external program</font></b>
 command line is defined in the configuration file.&nbsp; For example, to
 send a page using QPAGE (<a href="http://www.qpage.org">http://www.qpage.org</a>),
 the following command line could be used:
-<blockquote><b>qpage -f TRAP notifygroup1 "$r $x Compaq Drive Array Spare
-Drive on controller $4, bus $5, bay $6 status is $3."</b></blockquote>
-$r is translated to the hostname, and $x is the current time (described
-in detail below)
+<blockquote><b>qpage -f TRAP notifygroup1 "$r $x $X Compaq Drive Array
+Spare Drive on controller $4, bus $5, bay $6 status is $3."</b></blockquote>
+$r is translated to the hostname, and $x is the current date, and $X is
+the current time (described in detail below)
 <p>To enable or diable the execution of EXEC definitions, edit the snmptt.ini
 file and modify the following variable:
 <blockquote><b>exec_enable</b></blockquote>
@@ -487,19 +528,25 @@ Warning
 <p>Format string to be used when logging to snmptt.log and/or syslog.
 <p>Variable substitution is performed on this string using the following
 variables:
-<blockquote>$C&nbsp; - Trap community string
-<br>$e&nbsp; - Trap OID in number format
-<br>$E&nbsp; - Trap OID in number format
-<br>$A&nbsp; - Trap agent IP address
-<br>$# - Number of variable-bindings in the trap starting at 1
-<br>$$&nbsp; - Print a $
-<br>$r&nbsp; - Hostname
+<blockquote>$A, $aA - Trap agent IP address
+<br>$c - Category
+<br>$C - Trap community string
+<br>$E, $e&nbsp; - Enterprise trap OID in number format
+<br>$G&nbsp; - Generic trap number (0 if enterprise trap)
+<br>$S&nbsp; - Specific trap number (0 if generic trap)
+<br>$N&nbsp; - Event name defined
+<br>$O, $o - Trap OID in number format
+<br>$R, $r&nbsp; - Hostname
+<br>$aR, $ar - IP address
 <br>$s&nbsp; - Severity
-<br>$S&nbsp; - Event name
 <br>$T&nbsp; - Uptime:&nbsp; Time since network entity was initialized
-<br>$x&nbsp; - Current date &amp; time
+<br>$X&nbsp; - Current time
+<br>$x&nbsp; - Current date
+<br>$# - Number of (how many) variable-bindings in the trap
+<br>$$&nbsp; - Print a $
+<br>$@ - Number of seconds since the epoch
 <br>$*&nbsp; - Expand all variable-bindings
-<br>$n&nbsp; - Expand variable-binding n (1-n)</blockquote>
+<br>$<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>)</blockquote>
 Example:
 <p>FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6
 <p>Note: The trap OID, severity, category and hostname will always be prepended
@@ -512,14 +559,14 @@ will also have the date prepended at the beginning.
 and arguments to pass to the program.
 <p>EXEC uses same variable substitution as the FORMAT line.
 <p>Example:
-<p>EXEC /usr/bin/qpage -f TRAP alex "$r: $x - NIC switchover to slot $3,
-port $4 from slot $5, port $6"
+<p>EXEC /usr/bin/qpage -f TRAP alex "$r: $x $X - NIC switchover to slot
+$3, port $4 from slot $5, port $6"
 <p>or
-<p>EXEC c:\snmp\pager netops "$r: $x - NIC switchover to slot $3, port
+<p>EXEC c:\snmp\pager netops "$r: $x $X - NIC switchover to slot $3, port
 $4 from slot $5, port $6"
 <p>Note: Unlike the FORMAT line, nothing is prepended to the message.&nbsp;
 If you would like to include the hostname and date in the page above, you
-must use the variables such as $r and $x.
+must use the variables such as $r, $x and $X.
 <br>&nbsp;</blockquote>
 <b>NODES:</b>
 <blockquote>[<b>NODES</b> sources_list]
@@ -616,7 +663,7 @@ file</font></b>
 <br>EVENT cpqDa3AccelBatteryFailed .1.3.6.1.4.1.232.0.3014 "Error Events"
 Critical
 <br>FORMAT Battery status is $3.
-<br>EXEC qpage -f TRAP notifygroup1 "$s $r $x: Battery status is $3"
+<br>EXEC qpage -f TRAP notifygroup1 "$s $r $x $X: Battery status is $3"
 <br>NODES ntserver1 ntserver2 ntserver3
 <br>#
 <br>#</blockquote>
@@ -651,8 +698,10 @@ EventCode $3 : Description $4"
 <br>#</blockquote>
 
 <p><br><a NAME="Notes"></a><b><font size=+2>Notes</font></b>
-<p>An existing HP Openview trapd.conf can be used in most cases.&nbsp;
-The file must be a VERSION 3 file.
+<p>An existing HP Openview trapd.conf can be used in most cases but the
+file must be a VERSION 3 file.&nbsp; SNMPTT does not support all the variables
+implemented in HPOV, but most are available.&nbsp; The following variables
+may or may not match exactly to HPOV: $O, $o, $r, $ar, $R, $aR.
 <p>Some vendors (such as Compaq and Cisco ) provide a file that can be
 imported in to HP Openview using an HP Openview utility.&nbsp; Snmpttconvert
 can be used to convert the file to snmptt.conf format.

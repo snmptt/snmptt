@@ -157,6 +157,7 @@ if ($debugfile ne '')
 ##############################################################################
 
 use Text::ParseWords;
+use POSIX qw(strftime);
 
 if ($syslog_enable == 1)
 {
@@ -650,21 +651,19 @@ sub substitute
 	{
 		s(\$$i)($entvar[$i-1])g;
 	}
+
+	# $c - Category
+	s(\$c)($event2[1])g;
 	
 	# $C - Trap community string
 	s(\$C)(@var[5])g;
 	
-	# $e - Trap as Object ID string of numbers
-	s(\$e)(@var[6])g;
-
-	# $E - Trap as Object ID string of numbers
+	# $E, $e - Enterprise trap as Object ID string of numbers
 	s(\$E)(@var[6])g;
+	s(\$e)(@var[6])g;
 	
-	# $A - Trap agent IP address
-	s(\$A)(@var[4])g;
-
-	# $S - Event name
-	s(\$S)($event2[0])g;
+	# $N - Event name
+	s(\$N)($event2[0])g;
 	
 	# $# - Number of variable-bindings in the trap
 	s(\$#)($#entvar)g;
@@ -672,19 +671,71 @@ sub substitute
 	# $$ - Print a $
 	s(\$\$)(\$)g;
 
+	# $O, $o - Received trap
+	s(\$O)($receivedtrap)g;
+	s(\$o)($receivedtrap)g;	
+	
 	# $s - Severity
 	s(\$s)($event2[2])g;
+	
+	# $AR, $ar - Hostname
+	s(\$aR)(@var[1])g;
+	s(\$ar)(@var[1])g;
 
-	# $r - Hostname
+	# $R, $r - IP address
+	s(\$R)(@var[0])g;
 	s(\$r)(@var[0])g;
-
+	
+	# $A, $a - Trap agent IP address
+	s(\$aA)(@var[4])g;
+	s(\$A)(@var[4])g;
+	
 	# $T - Uptime
 	s(\$T)(@var[2])g;
 	
+	# $x - Current date
+	$mydate = strftime "%a %b %e %Y", localtime;
+	s(\$x)($mydate)g;	
+
 	# $x - Current time
-	$now = scalar(localtime);
-	s(\$x)($now)g;
+	$mytime = strftime "%H:%M:%S", localtime;
+	s(\$X)($mytime)g;	
+
+	# $@ - Current time since epoch (Jan 1, 1904 for Mac, Jan 1, 1900 for most others)
+	$mytime = time();
+	s(\$@)($mytime)g;
 	
+	if ($receivedtrap =~ /^.1.3.6.1.6.3.1.1.5/)
+        {
+		# It's a generic trap
+
+		# $S - Specific trap number - 0
+		s(\$S)(0)g;
+
+		# $G - Generic trap number - last #
+		my $temp = $_; 		# Save old $_
+		$_ = $receivedtrap;
+		/(\d+)$/;
+		my $temp2 = $1;
+		$_ = $temp;		# Restore old $_
+		s(\$G)($temp2)g;
+	}
+	else
+	{
+		# It's an enterprise trap
+
+		# $S - Specific trap number - last #
+		my $temp = $_; 		# Save old $_
+		$_ = $receivedtrap;
+		/(\d+)$/;
+		my $temp2 = $1;
+		$_ = $temp;		# Restore old $_
+		s(\$S)($temp2)g;
+
+		# $G - Generic trap number - 0
+		s(\$G)(0)g;	  
+	}	
+
 	# $* - Expand all variable-bindings
 	s(\$\*)(@entvar)g;
 }

@@ -57,6 +57,9 @@ while ($currentline <= $#trapdconf)
 	$line = @trapdconf[$currentline];
 	
 	# $_ = 'COMPAQ_11001 {.1.3.6.1.4.1.232} 6 11001 A "LOGONLY" 1';
+	# enterprise = .1.3.6.1.4.1.232
+	# 6 means it's an enterprise trap so do enterprise.0.specific below
+	# specific = 11001
 
 	if ( $line =~ /(\w+)\s+\{(.*)\}\s+(\d+)\s+(\d+)\s+([CAMcam-])\s+(".+").*/ )
 	{

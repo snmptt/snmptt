@@ -1,4 +1,9 @@
 November 11th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Added $c, $@, $O, $o, $ar, $R, $aR, $G, $S, $X, $N
+- Modified: $x
+- Modified: $S was name, now is Specific
+
+November 11th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Updated snmptthandler to use .ini file 
 - Cleaned up variable names to be easier to read
 - Created snmptt.ini-nt file and tested under Windows NT
