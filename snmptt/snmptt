@@ -251,6 +251,9 @@ if ($net_snmp_perl_enable == 1)
     $ENV{'MIBS'} = $mibs_environment;
   }
   my $noperlwarning;
+  if ($mib_descriptions_enable >= 1) {
+    $SNMP::save_descriptions = 1;
+  }
   &SNMP::initMib();
   
   $SNMP::best_guess = $net_snmp_perl_best_guess;
@@ -1667,6 +1670,32 @@ sub substitute
     # $G - Generic trap number - 0
     s(\$G)(0)g;	  
   }	
+
+  # $D - Description from MIB file (NOT from snmptt.conf)
+  if ($net_snmp_perl_enable == 1 && $mib_descriptions_enable >= 1) {
+    my $description_temp = $SNMP::MIB{$event2[0]}->{description};
+    if ($mib_descriptions_enable >= 2) {
+      $description_temp =~ s/\n\s+/\n/g;
+    }
+    s(\$D)($description_temp)g;
+  }
+  else {
+    s(\$D)()g;
+  }
+
+  # Escape characters:
+  # \t		tab                   (HT, TAB)
+  # \n		newline               (LF, NL)
+  # \r		return                (CR)
+  # \f		form feed             (FF)
+  # \a		alarm (bell)          (BEL)
+  if ($escape_sequences_enable == 1) {
+    s(\\t)(\t)g;
+    s(\\n)(\n)g;
+    s(\\r)(\r)g;
+    s(\\f)(\f)g;
+    s(\\a)(\a)g;
+  }
   
   # Do user defined REGEX on $message
   
@@ -2957,7 +2986,9 @@ sub loadsnmpttini {
 	$allow_unsafe_regex = $cfg->val('General', 'allow_unsafe_regex');
 	$remove_backslash_from_quotes = $cfg->val('General', 'remove_backslash_from_quotes');
 	$dynamic_nodes = $cfg->val('General', 'dynamic_nodes');
-	
+	$mib_descriptions_enable = $cfg->val('General', 'mib_descriptions_enable');
+	$escape_sequences_enable = $cfg->val('General', 'escape_sequences_enable');
+        
 	# DaemonMode
 	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
 	$daemon_uid = $cfg->val('DaemonMode', 'daemon_uid');
@@ -3065,8 +3096,10 @@ sub loadsnmpttini {
 	if (! defined ($allow_unsafe_regex)) { $allow_unsafe_regex = 0} ;
 	if (! defined ($remove_backslash_from_quotes)) { $remove_backslash_from_quotes = 0} ;
 	if (! defined ($dynamic_nodes)) { $dynamic_nodes = 0} ;
-	
-	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
+	if (! defined ($mib_descriptions_enable)) { $mib_descriptions_enable = 0} ;
+	if (! defined ($escape_sequences_enable)) { $escape_sequences_enable = 0} ;
+
+        if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($daemon_uid)) { $daemon_uid = ''} ;
 	if (! defined ($spool_directory)) { $spool_directory = ''} ;
 	if (! defined ($sleep)) { $sleep = 5} ;

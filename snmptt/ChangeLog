@@ -1,7 +1,15 @@
+June 11th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Added escape_sequences_enable option to enable the use of 
+  common escape sequences in FORMAT and EXEC lines.
+- Added variable substitution $D to dump the description text from 
+  the MIB file.  Enabled using the mib_descriptions_enable snmptt.ini
+  variable.  Thanks to Toshiyuki Haginaga.
+
 June 7th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Moved database connection code to create_db_connections function.
   Function is now called AFTER changing users when running in 
   daemon mode to prevent 'MySQL gone away' errors on some systems.
+  Thanks to Toshiyuki Haginaga.
 
 May 24th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Added 'Total traps ignored' to stats.

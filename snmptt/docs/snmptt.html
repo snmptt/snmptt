@@ -1757,6 +1757,7 @@ this string using the following variables:</p>
 $aA - Trap agent IP address<br />
 $c - Category<br />
 $C - Trap community string<br />
+$D - Description text from MIB file <b>(see Note 6)</b><br />
 $E - Enterprise trap OID in symbolic format<br />
 $e&nbsp; - Enterprise trap OID in number format<br />
 $G&nbsp; - Generic trap number (0 if enterprise trap)<br />
@@ -1794,7 +1795,13 @@ $+*&nbsp; - Expand all variable-bindings in the format of
 2,3</b><b>,5</b><b>)</b><br />
 $-*&nbsp; - Expand all variable-bindings in the format of
 <i>variable name (variable type):value</i> <b>(see Note
-2,3</b><b>,5</b><b>)</b></blockquote>
+  2,3</b><b>,5</b><b>)</b><br />
+\a&nbsp; - alarm (bell) (BEL) <b>(see Note 7)</b><br />
+\f&nbsp; - form feed (FF) <b>(see Note 7)</b><br />
+\n&nbsp; - newline (LF, NL) <b>(see Note 7)</b><br />
+\r&nbsp; - return (CR) <b>(see Note 7)</b><br />
+\t&nbsp; - tab (HT, TAB) <b>(see Note 7)</b><br />
+</blockquote>
 Example:
 <p>FORMAT NIC switchover to slot $3, port $4 from slot $5, port
 $6</p>
@@ -1894,6 +1901,14 @@ available for 5.0.8+ that will appear in later releases of Net-SNMP
 it can be downloaded from the <a href=
 "http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
 Net-SNMP patch page</a>.</blockquote>
+<p>Note (6):</p>
+<blockquote>You must have the UCD-SNMP / Net-SNMP Perl module
+installed for this to work and you must enable support for it by
+enabling <b>mib_descriptions_enable</b> in the <b>snmptt.ini</b> file.&nbsp;
+The description is pulled from the MIB file, <b>not</b> from the 
+<b>snmptt.conf</b> file.</blockquote>
+<p>Note (7):</p>
+<blockquote>The escape sequences must be enabled using the option <b>escape_sequences_enable</b> in <b>snmptt.ini</b>.</blockquote>
 </blockquote>
 <h3><a id="SNMPTT.CONF-EXEC" name=
 "SNMPTT.CONF-EXEC"></a><b>EXEC:</b></h3>
