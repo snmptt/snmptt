@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; June 12th, 2003
+This file was last updated on:&nbsp; June 19th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -227,7 +227,10 @@ and $o is always the numerical trap OID</li>
   <li>$E follows <span style="font-weight: bold;">translate_enterprise_oid_format</span>,
 and $e is always the numerical enterprise OID</li>
   <li>The enterprise column when logging to a database now follows the <span
- style="font-weight: bold;">db_translate_enterprise</span> setting<br>
+ style="font-weight: bold;">db_translate_enterprise</span> setting</li>
+  <li>Fixed bug with <span style="font-weight: bold;">$#</span> to
+report the correct number of enterprise variables (was 1 lower than it
+should have been)<br>
   </li>
   <li>Snmpttconvertmib</li>
   <ul>
@@ -1307,7 +1310,7 @@ where:<br>
  style="font-weight: bold;">and </span>set the default evaluation mode
 for ALL matches<br>
   <span style="font-weight: bold;">$<span style="font-style: italic;">n</span> </span>is
-the enterprise variable<br>
+the enterprise variable starting with $1<br>
   <span style="font-weight: bold;"><span style="font-style: italic;">reg</span> </span>is
 a regular expression<br>
   <span style="font-weight: bold;">!</span> is used to negate the result
@@ -1850,10 +1853,10 @@ page sent, email sent etc.&nbsp; <span
 </span></p>
 <p><span style="font-weight: bold; text-decoration: underline;">One</span>
 service is defined for each Nagios host that is to receive traps from
-SNMPTT.&nbsp; The benefits of using only one service entry is that it
-is makes it easier to set up Nagios. Trying to define every possible
-trap for every host you have is not recommended.&nbsp; For example,
-after converting the MIBS from Compaq, there are over 340 traps
+SNMPTT.&nbsp; The benefits of using only one service entry is that it is
+makes it easier to set up Nagios. Trying to define every possible trap
+for every host you have is not recommended.&nbsp; For example, after
+converting the MIBS from Compaq, there are over 340 traps
 defined.&nbsp; Trying to define this for every Compaq server would not
 be a good idea as 40 servers * 340 traps = 13,600 service definitions.<br>
 </p>
@@ -1873,8 +1876,8 @@ the service must be defined as <span style="font-weight: bold;">volatile</span>.
 When a service is changed from an <span style="font-weight: bold;">OK </span>state
 to a <span style="font-weight: bold;">non-OK</span> state, contacts are
 notified etc.&nbsp; Normally, a service is Nagios is NOT defined
-volatile which means if another service check is performed and the
-state is <span style="text-decoration: underline;">STILL</span> <span
+volatile which means if another service check is performed and the state
+is <span style="text-decoration: underline;">STILL</span> <span
  style="font-weight: bold;">non-OK</span> then NO contacts are
 notified.&nbsp; Because there is only one service entry for the SNMP
 traps, we need to make sure we are contacted every time a trap comes in.<br>
@@ -2094,9 +2097,9 @@ Once a trap is received for a host, it will remain in the <span
  style="font-weight: bold;"></span>state.&nbsp; To clear the trap from
 the Nagios console, open the <span style="font-weight: bold;">TRAP </span>service
 and click '<span style="font-weight: bold;">Schedule an immediate check
-of this service</span>'.&nbsp; This will cause the defined service
-check to be run (<span style="font-weight: bold;">check-host-alive</span>
-in the example above) which will then change the status code to <span
+of this service</span>'.&nbsp; This will cause the defined service check
+to be run (<span style="font-weight: bold;">check-host-alive</span> in
+the example above) which will then change the status code to <span
  style="font-weight: bold;">OK</span> and clear the warning after a
 minute or so, assuming of course the system responds OK to the <span
  style="font-weight: bold;">check-host-alive</span> check.<br>

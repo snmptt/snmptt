@@ -1468,7 +1468,8 @@ sub substitute
   s(\$n)($receivedtrap_entry)g;
   
   # $# - Number of variable-bindings in the trap
-  s(\$#)($#entvar)g;
+  my $entvar_temp = $#entvar+1;
+  s(\$#)($entvar_temp)g;
   
   # $$ - Print a $
   s(\$\$)(\$)g;
@@ -2874,7 +2875,7 @@ sub match(match)
   my $result = 0;
 
   $match =~ /^\$(\d+):(.*)/;
-  $value = $entvar[$1];
+  $value = $entvar[$1-1];
   $match = $2;
 
   if ($value eq '' || $match eq '')
