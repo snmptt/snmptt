@@ -1,4 +1,7 @@
 March 27th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- NODES can now contain CIDR address and network ranges.  The NODES line
+  can now contain a mix of host names, IP addresses / network ranges 
+  and filenames.
 - Added option to disable the default of $* in snmpttconvertmib
   when there is no --#SUMMARY line, and the description does not
   contain any variables

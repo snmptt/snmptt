@@ -599,7 +599,8 @@ sub processtrap
 		@event2 = ();
 		
 		# Flush out @nodes
-		@nodes = ();	
+		@nodes = ();
+		@nodes2 = ();
 	
 		#	$event2[0]=$event{"$receivedtrap"}[0];	# 0: name of trap	
 		#	$event2[1]=$event{"$receivedtrap"}[1];	# 1: category
@@ -634,46 +635,59 @@ sub processtrap
 			  print "  Nodes defined for this entry...\n";
 			}	
 			
-			if ($event2[5] =~ /\\|\// )	# Contain a \ or /?  Must be a filename
+			# Put all the NODES entries into @nodes, and then go through them all and put
+			# them into @nodes2.  This is done so files that are in the NODES list can be
+			# read in and merged into @nodes2 to allow a NODES line to contain both host
+			# names / ip addresses AND filenames.
+			@nodes = split /\s/, $event2[5];
+			foreach my $a (@nodes)
 			{
-				if (open NODESFILE, $event2[5])
-				{
-					while (defined($line = <NODESFILE>))
-					{
-						chomp($line);
-						$line = $line;
-						
-						# Allow comment lines starting with a #
-						if (!($temp =~ /((^#)|(\s+#)).*/))
-						{
-							push (@nodes, $line);
-						}
-					}
-					close LOGFILE;
-				}
-				else
-				{
-					warn "Can not open NODES file: $event2[5] $!";
-				}
+			  # Contain a \ or /?  Must be a filename and not an IP address / network number
+			  if ( ($a =~ /\\|\//) && !($a =~ /\d+\.\d+\.\d+\.\d+/))
+			  {
+			    if (open NODESFILE, $a)
+			    {
+			      while (defined($line = <NODESFILE>))
+			      {
+				chomp($line);
 				
-				#load file
-				#
-				#
-			}
-			else 	# Must be a list of nodes
-			{
-				@nodes = split /\s/, $event2[5];
-			}
-	
-			foreach $a (@nodes)
-			{	
-				if ($a =~ /(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IP address
+				# Allow comment lines starting with a #
+				if (!($line =~ /((^#)|(\s+#)).*/))
 				{
-					if ( $a eq $var[1])     # compare against ip
-					{
-						$hostmatch = 1;
-						$processed = 1;
-					}
+				  my @temp2 = split /\s/, $line;
+				  foreach my $b (@temp2)
+				  {
+				    push (@nodes2, $b);
+				  }
+				}
+			      }
+			      close LOGFILE;
+			    }
+			    else
+			    {
+			      warn "Can not open NODES file: $event2[5] $!";
+			    }
+			  }
+			  else 	# Must be a single node
+			  {
+			    push (@nodes2, $a);
+			  }
+			}
+			if ($DEBUGGING >= 1)
+			{
+			  print "  NODES entries: @nodes2\n";
+			}
+
+			foreach my $a (@nodes2)
+			{	
+				if ($a =~ /^(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IP address / cidr / range
+				{
+				  #if ( $a eq $var[1])     # compare against ip
+				  if ( checkip($var[1], $a) == 1)
+				  {				  
+				    $hostmatch = 1;
+				    $processed = 1;
+				  }
 				}
 	                        elsif (lc $a eq lc $var[0])	# NODES entry is a host name.  Do lowercase compare	
 				{
@@ -2210,4 +2224,85 @@ sub eventlog_system {
   }
 }  
   
+sub checkip
+{
+  my $node1 = $_[0];		# Should be a plain IP address
+  my $node2 = $_[1];		# Can be a plain IP address, CIDR or range
+
+  # Remove all white space
+  $node1 =~ s/\s*//g;
+  $node2 =~ s/\s*//g;
+  
+  # Check for an exact match
+  if ($node1 eq $node2)
+  {
+    return 1;
+  }
+
+  #print "node1:$node1\n";
+  
+  # First is an IP address, and second IP address is a CIDR address
+  if ($node1 =~ /^\d+\.\d+\.\d+\.\d+$/ && $node2 =~ /(\d+)\.(\d+)\.(\d+)\.(\d+)\/(\d+)/)
+  {   
+    # Get IP address in binary
+    $node1 =~ /(\d+)\.(\d+)\.(\d+)\.(\d+)/;
+    my $node1_binary = dec2bin($1) . dec2bin($2) .dec2bin($3) .dec2bin($4);
+    
+    # Get CIDR network address in binary
+    $node2 =~ /(\d+)\.(\d+)\.(\d+)\.(\d+)\/(\d+)/;
+    my $cidr_binary = dec2bin($1) . dec2bin($2) .dec2bin($3) .dec2bin($4);
+    my $net_bits = $5;
+    my $host_bits = 32 - $net_bits;
+    my $cidr_binary = substr($cidr_binary, 0, $net_bits);
+    
+    # Get network number for ip_address
+    my $node1_binary_net = substr($node1_binary, 0, $net_bits);
+    
+    if ($node1_binary_net eq $cidr_binary)
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+  # First is an IP address, and second IP address is a network range
+  elsif ($node1 =~ /^\d+\.\d+\.\d+\.\d+$/ && $node2 =~ /(\d+)\.(\d+)\.(\d+)\.(\d+)-(\d+)\.(\d+)\.(\d+)\.(\d+)/)
+  {
+    # Get IP address in binary
+    $node1 =~ /(\d+)\.(\d+)\.(\d+)\.(\d+)/;
+    my $node1_binary = dec2bin($1) . dec2bin($2) .dec2bin($3) .dec2bin($4);
+    
+    # Get left network address in binary
+    $node2 =~ /(\d+)\.(\d+)\.(\d+)\.(\d+)-(\d+)\.(\d+)\.(\d+)\.(\d+)/;
+    my $left_binary = dec2bin($1) . dec2bin($2) .dec2bin($3) .dec2bin($4);
+    my $right_binary = dec2bin($5) . dec2bin($6) .dec2bin($7) .dec2bin($8);
+    
+    if (bin2dec($node1_binary) >= bin2dec($left_binary) &&
+    	bin2dec($node1_binary) <= bin2dec($right_binary))
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+  # Didn't match at all, so return 0.
+  else
+  {
+	  return 0;
+  }
+
+}
+
+sub dec2bin {
+    my $str = unpack("B8", pack("C", shift));
+    #$str =~ s/^0+(?=\d)//;   # otherwise you'll get leading zeros
+    return $str;
+}
+sub bin2dec {
+    return unpack("N", pack("B32", substr("0" x 32 . shift, -32)));
+}
 

@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.6.1</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; March 26th, 2003
+This file was last updated on:&nbsp; March 27th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -153,9 +153,9 @@ All development and testing was done on Mandrake Linux 8.1 using
 UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).&nbsp; I have
 also tested the program with Windows 2000 using the native version of
 NET-SNMP compiled with MSVC++ and also under Cygwin with gcc etc.&nbsp;
-Note:&nbsp; The Net-SNMP Perl module works fine under Cygwin, but I
-have not been able to get the Perl module working with MSVC++.&nbsp;
-See the FAQ section for information on Cygwin.<br>
+Note:&nbsp; The Net-SNMP Perl module works fine under Cygwin, but I have
+not been able to get the Perl module working with MSVC++.&nbsp; See the
+FAQ section for information on Cygwin.<br>
 <br>
 Both SNMP V1 and V2 traps have been tested.
 <p>UCD-SNMP v4.2.3 appears to have a bug that prevents it from working
@@ -174,6 +174,12 @@ tags.</blockquote>
 <a name="Whats-New"></a><b><font size="+2">What's New</font></b> </p>
 <p><b><font size="+1">0.7 - ??</font></b><b><font size="+1">, 2003</font></b></p>
 <ul>
+  <li>NODES entry can now contain a CIDR address (eg: 192.168.10.0/23),
+or a network range (192.168.10.0-192.168.11.255)<br>
+  </li>
+  <li>NODES entry can now contain a mix of host names, IP addresses,
+CIDR addresses, network ranges and filenames<br>
+  </li>
   <li>PostgreSQL support via DBI / DBD::PgPP <br>
   </li>
 </ul>
@@ -908,41 +914,69 @@ message.&nbsp; If you would like to include the hostname and date in the
 page above, you must use the variables such as $r, $x and $X.</blockquote>
   <b>NODES:</b>
   <blockquote>[<b>NODES</b> sources_list]
-    <p>Optional string containing a list of source (host) names
-separated by spaces that must match for this trap handle definition to
-be used.&nbsp; If this keyword omitted then ALL sources will be
+    <p>Optional string containing any combination of host names, IP
+addresses, CIDR network address, network IP address ranges, or a
+filename.&nbsp; If this keyword omitted then ALL sources will be
 accepted. </p>
-    <p>Optionally a file can be specified which will contain the list
-of sources.&nbsp; This file is loaded each time a trap is processed, so
-the file can be modified without restarting SNMPTT.<br>
+    <p>If a filename is specified, it must be specified with a full
+path.&nbsp; The file is loaded each time a trap is processed, so it can
+be modified without restarting SNMPTT.<br>
     </p>
-    <p>This list must be specified with a full path </p>
-    <p>Examples: </p>
+    <p></p>
+Examples:
     <blockquote>NODES fred barney betty wilma <br>
-NODES /etc/snmptt-nodes <br>
-&nbsp; or <br>
-NODES c:\snmp\snmptt-nodes</blockquote>
+&nbsp; or<br>
+NODES /etc/snmptt-nodes<br>
+&nbsp; or<br>
+NODES /etc/snmptt-nodes /etc/snmptt-nodes2<br>
+&nbsp; or<br>
+NODES 192.168.4.0/22 192.168.60.0-192.168.61.255 /etc/snmptt-nodes2<br>
+&nbsp; or<br>
+NODES fred /etc/snmptt-nodes pebbles /etc/snmptt-nodes2 barney<br>
+    </blockquote>
 where snmptt-nodes contains:
-    <blockquote>fred <br>
-barney <br>
+    <blockquote>fred<br>
+barney betty<br>
 # comment lines <br>
-192.168.1.1 <br>
+192.168.1.1 192.168.1.2 192.168.1.3<br>
 192.168.2.1 <br>
-betty <br>
-wilma</blockquote>
+192.168.50.0/22<br>
+192.168.60.0-192.168.61.255<br>
+wilma <br>
+    </blockquote>
 Notes:
-    <blockquote>The names are NOT case sensitive, comment lines are
-permitted by starting the line with a # and IP addresses can also be
-used.
-      <p>If you are using DNS, the names may resolve to the Fully
-Qualified Domain Name (FQDN) by snmptrapd which could prevent matches
-from occuring.&nbsp; For example: barney.bedrock.com. </p>
-      <p>Adding an entry for the host in your /etc/hosts file or
-c:\%systemroot%\system32\drivers\etc\hosts may result in snmptrapd
-sending the short name instead (barney).&nbsp; You can also enable the <b>strip_domain</b>
-/ <b>strip_domain_list</b> options to have SNMPTT strip the domain of
-any FQDN host.&nbsp; See the <span style="font-weight: bold;">snmptt.ini</span>
-file for details.</p>
+    <blockquote>The names are NOT case sensitive and comment lines are
+permitted by starting the line with a #.<br>
+      <br>
+CIDR network addresses must be specified using 4 octets followed by a /
+followed by the number of bits.&nbsp; For example: 172.16.0.0/24.&nbsp;
+Using 172.16/24 will NOT work.<br>
+      <br>
+Do not use any spaces between network ranges as they will be
+interpreted as two different values.&nbsp; For example,
+192.168.1.1&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp; 192.168.1.20 will not
+work.&nbsp; Use 192.168.1.1-192.168.1.20 instead.
+      <p>If you are using DNS, the names passed to SNMPTT may resolve
+to the Fully Qualified Domain Name (FQDN) by <span
+ style="font-weight: bold;">snmptrapd </span>which could prevent
+matches from occuring.&nbsp; For example: <span
+ style="font-weight: bold;">barney.bedrock.com.</span> </p>
+      <p>Adding an entry for the host in your <span
+ style="font-weight: bold;">/etc/hosts</span> file or <span
+ style="font-weight: bold;">c:\%systemroot%\system32\drivers\etc\hosts</span>
+may result in snmptrapd sending the short name instead (barney).&nbsp;
+You can also enable the <b>strip_domain</b> / <b>strip_domain_list</b>
+options to have SNMPTT strip the domain of any FQDN host.&nbsp; See the <span
+ style="font-weight: bold;">snmptt.ini</span> file for details.<br>
+      </p>
+      <p>SNMPTT is passed both the host name and the IP address from <span
+ style="font-weight: bold;">snmptrapd</span>.&nbsp; Because of this, <span
+ style="font-weight: bold;">SNMPTT </span>does not need to perform any
+DNS queries to resolve host names to IP addresses.&nbsp; When a host is
+compared to a network range or IP address, the IP address passed from <span
+ style="font-weight: bold;">snmptrapd </span>is used, as opposed to
+doing a DNS query of the host name.<br>
+      </p>
     </blockquote>
   </blockquote>
   <b>SDESC</b>
@@ -1644,8 +1678,7 @@ under Windows NT.&nbsp;&nbsp; What should I do?</span></b></p>
 <ol>
   <li>Download Net-SNMP and compile using MSVC++ as described in the
 README.WIN32 file.&nbsp; This should create a working snmptrapd, but I
-have not heard of anyone getting the Perl module to compile using
-MSVC++.</li>
+have not heard of anyone getting the Perl module to compile using MSVC++.</li>
   <li>Install Cygwin, download Net-SNMP and compile using gcc as
 described in the README.WIN32 file.&nbsp; The Perl module appears to
 work fine under Cygwin.&nbsp; <br>
@@ -1773,7 +1806,18 @@ modify the line: </p>
 This will cause all applications to output in numerical format
 including <b>snmptranslate</b>.&nbsp; Note: This will affect other
 UCD-SNMP / Net-SNMP programs you are using, if any. <br>
-&nbsp;
+&nbsp; <br>
+<b>Q:&nbsp; Does SNMPTT use DNS?</b><br>
+<br>
+No.&nbsp; SNMPTT is passed both the host name and the IP address from <span
+ style="font-weight: bold;">snmptrapd</span>.&nbsp; Because of this, <span
+ style="font-weight: bold;">SNMPTT </span>does not need to perform any
+DNS queries to resolve host names to IP addresses.&nbsp; When a host is
+compared to a network range or IP address for <span
+ style="font-weight: bold;">NODES </span>list comparisons, the IP
+address passed from <span style="font-weight: bold;">snmptrapd </span>is
+used, as opposed to doing a DNS query of the host name.<br>
+<br>
 <p><b>Q:&nbsp; Is there a front-end alarm browser available for SNMPTT?</b> </p>
 <p>A:&nbsp; Take a look at <a
  href="http://sourceforge.net/projects/snmptt-gui">SNMPTT-GUI</a>.&nbsp;
