@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v0.1.1
+# SNMPTTCONVERTMIB v0.1.2
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -415,7 +415,10 @@ while ($currentline <= $#mibfile)
 		$currentline++; # Increment to the next line
 		$line3 = @mibfile[$currentline];
 		
-		while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/ ) )
+		$end_of_definition = 0;
+		
+		while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/ )
+	      			&& $end_of_definition == 0)
 		{
 			# Keep going through the file until the next NOTIFICATION-TYPE or the end of the mib file
 			# is reached
@@ -580,6 +583,8 @@ while ($currentline <= $#mibfile)
 					s( )()g;
 					$enterprise = $_;
 					print "Enterprise: $enterprise\n";
+
+					$end_of_definition = 1;		# Move on to the next one
 				}
 				
 				

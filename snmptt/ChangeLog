@@ -1,4 +1,8 @@
 February 18th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed bug in snmpttconvertmib that would cause the last trap
+  (notification) converted from a v2 MIB file to contain an
+  incorrect DESCRIPTION and possibly FORMAT line when the last
+  thing in the MIB file is not the last trap definition
 - Values passed to snmptt that contained spaces but were not 
   inside of quotes were being treated as multiple variables / 
   values.  Replaced main readtrap code to fix this.
