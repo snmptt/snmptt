@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v0.3.1
+# SNMPTT v0.3.2
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -96,9 +96,41 @@ $syslogfacility = 'local0';
 # Syslog level to use.  For example: 'warning'
 $sysloglevel = 'warning';
 
+# MySQL: Set to 1 to enable logging to a MySQL database via DBI.  
+# Windows users should disable this.
+$enablemysqldbi = 1;
+
+# MySQL: Database to use
+$mysqldbidatabase = 'snmptt';
+
+# MySQL: Table to use
+$mysqldbitable = 'snmptt';
+
+# MySQL: Username to use
+$mysqldbiusername = 'root';
+
+# MySQL: Password to use
+$mysqldbipassword = 'password';
+
+# WinODBC: Set to 1 to enable logging to a SQL database via ODBC on Windows.  
+# Non-Windows users should disable this.
+$enablesqlodbc = 0;
+
+# WinODBC: Database to use
+$sqlodbcdsn = 'snmptt';
+
+# WinWinODBC: Table to use
+$sqlodbctable = 'snmptt';
+
+# WinODBC: Username to use
+$sqlodbcusername = 'snmptt';
+
+# WinODBC:: Password to use
+$sqlodbcpassword = 'password';
+
 # Set to 1 to allow EXEC statements to execute.  Should normally be left on unless you
 # want to temporarily disable all EXEC commands
-$enableexec = 1;
+$enableexec = 0;
 
 # Set to 1 to allow multiple trap definitions to be executed for the same trap.
 # Set to 0 to have it stop after the first match.
@@ -228,6 +260,22 @@ use Text::ParseWords;
 if ($enablesyslog == 1)
 {
 	require Sys::Syslog;
+}
+
+if ($enablemysqldbi == 1)
+{
+	require DBI;
+	$dbhmysql = DBI->connect("DBI:mysql:$mysqldbidatabase",$mysqldbiusername,$mysqldbipassword);
+	warn "Unable to connect: $DBI::errstr\n" unless (defined $dbhmysql);
+
+}
+
+if ($enablesqlodbc == 1)
+{
+	require Win32::ODBC;
+	$dbhodbc = new Win32::ODBC("DSN=$sqlodbcdsn","UID=$sqlodbcusername","PWD=$sqlodbcpassword");
+	warn "Unable to connect to DSN $sqlodbcdsn:" . Win32::ODBC::Error() . "\n" unless (defined $dbhodbc);
+
 }
 
 if ($DEBUGGING >= 1)
@@ -384,7 +432,16 @@ else
 
 	&searchfortrap;		# Search for trap snmptt.conf (array)
 }
-	
+
+if (defined $dbimysql)
+{
+	$dbhmysql->disconnect;
+}
+if (defined $dbiodbc)
+{
+	$dbhodbc->close();
+}
+
 exit();
 
 ####  MAIN SECTION END
@@ -530,7 +587,7 @@ sub processtrap
 			if (($multiple_event == 0) && ($multiple_event_passes > 1))
 			{
 				last;	# Don't look any further - stop
-				print "stop!!\n";
+				#print "stop!!\n";
 			}
 			
 			
@@ -577,6 +634,42 @@ sub processtrap
 					warn "Cannot open logfile: $!";
 				}
 			}
+			
+			if ($enablemysqldbi == 1)
+			{
+				$message = $_;
+				
+				$sth = $dbhmysql->prepare(
+					"INSERT $mysqldbitable (eventname, eventid, enterprise, community, 
+					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES 
+					(?,?,?,?,?,?,?,?,?,?,?)") or
+				 warn "Unable to prepare our query: ".$dbh->errstr."\n";
+
+				 if (defined $sth) {
+					 $sth->execute($event2[0],$trapreceived,@var[6],@var[5],@var[0],@var[4],$event2[1],
+					 $event2[2],@var[2],scalar(localtime),$message)
+					 or warn "Unable to execute our query: ".$dbhmysql->errstr."\n";
+
+				 	$sth->finish;
+				 }
+			}				 
+			
+			if ($enablesqlodbc == 1)
+			{
+				$message = $_;
+				
+				print "hello\n";
+				if (defined $dbhodbc->Sql
+				        ("INSERT $mysqldbitable (eventname, eventid, enterprise, community, 
+					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
+					\'$event2[0]\',\'$trapreceived'\,\'@var[6]\',\'@var[5]\',\'@var[0]\',\'@var[4]\',
+					\'$event2[1]\',\'$event2[2]\',\'@var[2]\',\'".scalar(localtime)."\',
+					\'$message\')" ) )
+				{					
+					warn "Unable to perform INSERT: ".Win32::ODBC::Error()."\n";
+		 	 	}
+			}				 
+
 			
 			#
 			# Variable substitution for EXEC string
