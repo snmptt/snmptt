@@ -1,3 +1,8 @@
+March 27th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added option to disable the default of $* in snmpttconvertmib
+  when there is no --#SUMMARY line, and the description does not
+  contain any variables
+
 March 26th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Translation of integers not working under Net-SNMP 5.0.8 under
   Cygwin.  Reasons:
@@ -12,7 +17,7 @@ March 26th, 2003: Alex Burger <alex_b@users.sourceforge.net>
   returns a short name some what correctly, but trails the textual name 
   with a .
 
-- Postgres SQL support via DBD::PgPP
+- PostgreSQL support via DBD::PgPP
 - Changed version to snmptt_0.6.1
 
 March 25th, 2003: Alex Burger <alex_b@users.sourceforge.net>

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v0.2
+# SNMPTTCONVERTMIB v0.2.1
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -41,6 +41,11 @@ $defaultexecquote = "\"";		# double (") quotes
 # Set this to 1 to have the --TYPE string prepended to the --SUMMARY string.
 # Set to 0 to disable
 $prepend_type = 1;
+
+# Set this to 1 to have append a $* to the end of the FORMAT and EXEC lines if there
+# is no --#SUMMARY information and the description line contains something, but does 
+# not have any variables in it.
+$default_wildcard = 1;
 
 #
 # OPTIONS END
@@ -531,11 +536,23 @@ while ($currentline <= $#mibfile)
 				}
 				else
 				{
-					print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
-					if ($defaultexec ne '')
-					{
-						print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1 \$*$defaultexecquote\n"
-					}
+				  if ($default_wildcard == 1)
+				  {
+				     print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
+				     if ($defaultexec ne '')
+				     {
+				       print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1 \$*$defaultexecquote\n";
+				     }
+				   }
+				   else
+				   {
+				     print OUTPUTFILE "FORMAT $descriptionline1\n";
+				     if ($defaultexec ne '')
+				     {
+				       print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1$defaultexecquote\n";
+				     }
+				   }
+				   
 				}
 			}
 			# If descriptionline1 is also blank, just use $*
@@ -853,11 +870,22 @@ foreach $key (sort keys %SNMP::MIB)
 				}
 				else
 				{
-					print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
-					if ($defaultexec ne '')
-					{
-						print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1 \$*$defaultexecquote\n"
-					}
+				  if ($default_wildcard == 1)
+				  {
+				    print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
+				    if ($defaultexec ne '')
+				    {
+				      print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1 \$*$defaultexecquote\n";
+				    }
+				  }
+				  else
+				  {
+				    print OUTPUTFILE "FORMAT $descriptionline1\n";
+				    if ($defaultexec ne '')
+				    {
+				      print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1$defaultexecquote\n";
+				    }
+				  }
 				}
 			}
 			# If descriptionline1 is also blank, just use $*
