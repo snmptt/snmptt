@@ -8,9 +8,9 @@
 </head>
 <body>
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
-<br><b><font size=+3>SNMP Trap Translator v0.3.3</font></b>
+<br><b><font size=+3>SNMP Trap Translator v0.4</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; November 13th, 2002
+<br>This file was last updated on:&nbsp; November 18th, 2002
 <p>&nbsp;<a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote>&nbsp;<a href="#What is it">What is it?</a>
@@ -149,7 +149,7 @@ the very least use the <b>snmptrapd</b> program from v4.2.5.
 <p>Note:&nbsp;&nbsp; This script does NOT require the NET-SNMP Perl module
 included in the NET-SNMP package.
 <p><a NAME="Whats New"></a><b><font size=+2>Whats New</font></b>
-<p><b><font size=+1>0.4 - ??, 2002</font></b>
+<p><b><font size=+1>0.4 - November 18th, 2002</font></b>
 <ul>
 <li>
 Variable substituion changes:</li>
@@ -778,19 +778,17 @@ from <b>c:\Program Files\Resource Kit *</b>
 <p>3.&nbsp;&nbsp;&nbsp; Install the SNMPTT service using:
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b> instsrv SNMPTT c:\winnt\system32\srvany.exe</b>
 <p>4.&nbsp;&nbsp;&nbsp; Configure the service:
-<br>&nbsp;
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Launch <b>REGEDIT</b>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Launch <b>REGEDIT</b>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Go to <b>HKLM\SYSTEM\CurrentControlSet\SNMPTT</b>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Create a key called:&nbsp;
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Create a key called: 
 <b>Parameters</b>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Inside of Parameters, create
 a Sting Value (REG_SZ) called <b>Application</b> with the value of: <b>c:\perl\bin\perl.exe</b>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Inside of Parameters, create
 a Sting Value (REG_SZ) called <b>AppParameters</b> with the value of: <b>c:\snmp\snmptt
 --daemon</b>
-<br>&nbsp;
-<br>5.&nbsp;&nbsp;&nbsp; Start the service from the control panel, or from
-a command prompt, type:&nbsp; <b>net start snmptt&nbsp;</b>
+<p>5.&nbsp;&nbsp;&nbsp; Start the service from the control panel, or from
+a command prompt, type:&nbsp; <b>net start snmptt</b>
 <p>To remove the service, type:&nbsp; <b>instsrv SNMPTT remove</b>
 <br>&nbsp;
 <p><a NAME="Limitations"></a><b><font size=+2>Limitations</font></b>
