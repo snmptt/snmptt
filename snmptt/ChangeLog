@@ -1,5 +1,11 @@
 March 25th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_0.6
+- Re-fixed bug in snmpttconvertmib that would cause the last trap
+  (notification) converted from a v2 MIB file to contain an
+  incorrect DESCRIPTION and possibly FORMAT line when the last
+  thing in the MIB file is not the last trap definition
+  (broken when merging code below).  Applied only to Perl module
+  version.
 
 March 24th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Can now specify a NODES entry with snmpttconvertmib

@@ -201,7 +201,7 @@ if ($net_snmp_perl == 0)
 
 while ($currentline <= $#mibfile)
 {
-	$line = @mibfile[$currentline];
+	$line = $mibfile[$currentline];
 	
 	# TRAP-TYPE (V1) / NOTIFICATION-TYPE (V2)
 	# 
@@ -226,7 +226,7 @@ while ($currentline <= $#mibfile)
 		{
 			print "skipping a TRAP-TYPE / NOTIFICATION-TYPE line - probably an import line.\n";
 			$currentline++; # Increment to the next line
-			$line = @mibfile[$currentline]; # Get next line
+			$line = $mibfile[$currentline]; # Get next line
 			next;
 		}
 		
@@ -249,7 +249,7 @@ while ($currentline <= $#mibfile)
 		}
 		
 		$currentline++; # Increment to the next line
-		$line3 = @mibfile[$currentline];
+		$line3 = $mibfile[$currentline];
 
 		$end_of_definition = 0;
 		
@@ -304,7 +304,7 @@ while ($currentline <= $#mibfile)
 				}
 				
 				$currentline++; # Increment to the next line
-				$line4 = @mibfile[$currentline];
+				$line4 = $mibfile[$currentline];
 	
 				# Assume the rest is the description up until a ::= or end of the file
 				while (! ($line4 =~ /::=/))
@@ -328,7 +328,7 @@ while ($currentline <= $#mibfile)
 						
 						# Increment to next line and continue with the loop
 						$currentline++; # Increment to the next line
-						$line4 = @mibfile[$currentline];
+						$line4 = $mibfile[$currentline];
 						next;
 					}
 				  	
@@ -351,7 +351,7 @@ while ($currentline <= $#mibfile)
 						
 						# Increment to next line and continue with the loop
 						$currentline++; # Increment to the next line
-						$line4 = @mibfile[$currentline];
+						$line4 = $mibfile[$currentline];
 						next;
 					}
 					# If next line is a --#ARGUMENTS, pull out the information and place in $arguments
@@ -361,12 +361,12 @@ while ($currentline <= $#mibfile)
 						
 						for($i=0;$i <= $#arguments;$i++)
 						{
-							#print "argument $i: @arguments[$i]\n";
+							#print "argument $i: $arguments[$i]\n";
 						}
 											
 						# Increment to next line and continue with the loop
 						$currentline++; # Increment to the next line
-						$line4 = @mibfile[$currentline];
+						$line4 = $mibfile[$currentline];
 						next;
 					}					
 					# If next line starts with a --#, ignore it and continue with the loop
@@ -374,7 +374,7 @@ while ($currentline <= $#mibfile)
 					if ($line4 =~ /--#/)
 					{
 						$currentline++; # Increment to the next line
-						$line4 = @mibfile[$currentline];
+						$line4 = $mibfile[$currentline];
 						next;
 					}
 					# If we did not find text after the word DESCRIPTION, then the NEXT
@@ -411,7 +411,7 @@ while ($currentline <= $#mibfile)
 					}
 
 					$currentline++; # Increment to the next line
-					$line4 = @mibfile[$currentline];
+					$line4 = $mibfile[$currentline];
 				}
 				#print "EDESC\n";
 				
@@ -439,7 +439,7 @@ while ($currentline <= $#mibfile)
 				}				
 			}
 			$currentline++; # Increment to the next line
-			$line3 = @mibfile[$currentline];
+			$line3 = $mibfile[$currentline];
 		}
 
 		# Combine Trap type and summary together to make new summary
@@ -487,7 +487,7 @@ while ($currentline <= $#mibfile)
 			$_ = $trapsummary;
 			for ($j=0; $j<= $#arguments; $j++)
 			{
-				$variable = (@arguments[$j])+1;
+				$variable = ($arguments[$j])+1;
 				s(%[a-zA-Z])(\$$variable);
 			}
 			
@@ -558,7 +558,7 @@ while ($currentline <= $#mibfile)
 			#print OUTPUTFILE "$descriptionline1\n";
 			for ($i=0; $i <= $#description; $i++)
 			{
-				print OUTPUTFILE "@description[$i]";
+				print OUTPUTFILE "$description[$i]";
 			}
 			print OUTPUTFILE "EDESC\n";
 	
@@ -571,7 +571,6 @@ while ($currentline <= $#mibfile)
 	}
 	
 	$currentline++; # Increment to the next line
-	$line2 = @mibfile[$currentline]; # Get next line
 }	
 
 
@@ -617,14 +616,17 @@ foreach $key (sort keys %SNMP::MIB)
     $currentline=0;
     while ($currentline <= $#mibfile)
     {
-      $line = @mibfile[$currentline];
+      $line = $mibfile[$currentline];
       if ( $line =~ /$SNMP::MIB{$key}{label}\s+TRAP-TYPE.*/  || $line =~ /$SNMP::MIB{$key}{label}\s+NOTIFICATION-TYPE.*/)
       {
 	$currentline++; # Increment to the next line
-	$line3 = @mibfile[$currentline];
-	
-	while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ || $line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) )
-		{
+	$line3 = $mibfile[$currentline];
+
+	$end_of_definition = 0;
+		
+	while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ ) 
+			&& !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) && ($end_of_definition == 0) )
+	{
 			# Keep going through the file until the next TRAP-TYPE or the end of the mib file
 			# is reached
 				
@@ -663,7 +665,7 @@ foreach $key (sort keys %SNMP::MIB)
 				}
 				
 				$currentline++; # Increment to the next line
-				$line4 = @mibfile[$currentline];
+				$line4 = $mibfile[$currentline];
 	
 				# Assume the rest is the description up until a ::= or end of the file
 				while (! ($line4 =~ /::=/))
@@ -687,7 +689,7 @@ foreach $key (sort keys %SNMP::MIB)
 						
 						# Increment to next line and continue with the loop
 						$currentline++; # Increment to the next line
-						$line4 = @mibfile[$currentline];
+						$line4 = $mibfile[$currentline];
 						next;
 					}
 				  	
@@ -710,7 +712,7 @@ foreach $key (sort keys %SNMP::MIB)
 						
 						# Increment to next line and continue with the loop
 						$currentline++; # Increment to the next line
-						$line4 = @mibfile[$currentline];
+						$line4 = $mibfile[$currentline];
 						next;
 					}
 					# If next line is a --#ARGUMENTS, pull out the information and place in $arguments
@@ -720,12 +722,12 @@ foreach $key (sort keys %SNMP::MIB)
 						
 						for($i=0;$i <= $#arguments;$i++)
 						{
-							#print "argument $i: @arguments[$i]\n";
+							#print "argument $i: $arguments[$i]\n";
 						}
 											
 						# Increment to next line and continue with the loop
 						$currentline++; # Increment to the next line
-						$line4 = @mibfile[$currentline];
+						$line4 = $mibfile[$currentline];
 						next;
 					}					
 					# If next line starts with a --#, ignore it and continue with the loop
@@ -733,7 +735,7 @@ foreach $key (sort keys %SNMP::MIB)
 					if ($line4 =~ /--#/)
 					{
 						$currentline++; # Increment to the next line
-						$line4 = @mibfile[$currentline];
+						$line4 = $mibfile[$currentline];
 						next;
 					}
 					# If we did not find text after the word DESCRIPTION, then the NEXT
@@ -770,12 +772,17 @@ foreach $key (sort keys %SNMP::MIB)
 					}
 
 					$currentline++; # Increment to the next line
-					$line4 = @mibfile[$currentline];
+					$line4 = $mibfile[$currentline];
 				}
 				#print "EDESC\n";
+
+				if ($line4 =~ /::=/)
+				{
+					$end_of_definition = 1;		# Move on to the next one
+				}
 			}
 			$currentline++; # Increment to the next line
-			$line3 = @mibfile[$currentline];
+			$line3 = $mibfile[$currentline];
 		}
 		
 		# Combine Trap type and summary together to make new summary
@@ -802,7 +809,7 @@ foreach $key (sort keys %SNMP::MIB)
 			$_ = $trapsummary;
 			for ($j=0; $j<= $#arguments; $j++)
 			{
-				$variable = (@arguments[$j])+1;
+				$variable = ($arguments[$j])+1;
 				s(%[a-zA-Z])(\$$variable);
 			}
 			
@@ -873,7 +880,7 @@ foreach $key (sort keys %SNMP::MIB)
 			#print OUTPUTFILE "$descriptionline1\n";
 			for ($i=0; $i <= $#description; $i++)
 			{
-				print OUTPUTFILE "@description[$i]";
+				print OUTPUTFILE "$description[$i]";
 			}
 			print OUTPUTFILE "EDESC\n";
 	
