@@ -1946,6 +1946,12 @@ sub readtrap
 	while (defined($line = <$input>))
 	{
 	  $line =~ s(`)(')g;	#` Replace any back ticks / quotes with regular quotes
+	  
+	  if ($remove_backslash_from_quotes == 1)  # Remove escape from quotes if enabled
+	  {
+	    $line =~ s/\\\"/"/g;
+	  }
+	  
 	  my $temp1;
 	  my $temp2;
 
@@ -2500,6 +2506,7 @@ sub loadsnmpttini {
 	$wildcard_expansion_separator = $cfg->val('General', 'wildcard_expansion_separator');
 	$mibs_environment = $cfg->val('General', 'mibs_environment');
 	$allow_unsafe_regex = $cfg->val('General', 'allow_unsafe_regex');
+	$remove_backslash_from_quotes = $cfg->val('General', 'remove_backslash_from_quotes');
 	
 	# DaemonMode
 	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -2592,6 +2599,7 @@ sub loadsnmpttini {
 	if (! defined ($translate_integers)) { $translate_integers = 0} ;
 	if (! defined ($wildcard_expansion_separator)) { $wildcard_expansion_separator = " "} ;
 	if (! defined ($allow_unsafe_regex)) { $allow_unsafe_regex = 0} ;
+	if (! defined ($remove_backslash_from_quotes)) { $remove_backslash_from_quotes = 0} ;
 	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($spool_directory)) { $spool_directory = ''} ;
 	if (! defined ($sleep)) { $sleep = 5} ;

@@ -1466,9 +1466,9 @@ enable support in the snmptt.ini file by setting <span
  style="font-weight: bold;">1</span>.&nbsp; Note:&nbsp; <span
  style="font-weight: bold;">This is considered unsafe because the
 contents of the regular expression (left)(and right) is executed by Perl
-which could contain unsafe code</span>.&nbsp; If this option is
-enabled, <span style="font-weight: bold;">BE SURE THAT THE SNMPTT
-CONFIGURATION FILES ARE SECURE!&nbsp; </span><br>
+which could contain unsafe code</span>.&nbsp; If this option is enabled, <span
+ style="font-weight: bold;">BE SURE THAT THE SNMPTT CONFIGURATION FILES
+ARE SECURE!&nbsp; </span><br>
 <p>Example:<br>
 </p>
 <div style="margin-left: 40px;"> FORMAT line before:&nbsp;<span
@@ -2308,12 +2308,11 @@ will be produced at the top of the help screen.</li>
   <li>Try to translate a <span style="font-weight: bold;">TRAP-TYPE</span>
 or <span style="font-weight: bold;">NOTIFICATION-TYPE</span> entry
 contained inside the MIB file.&nbsp; For example, if the MIB file
-contains the Notification definition of '<span
- style="font-weight: bold;">rptrHealth NOTIFICATION-TYPE</span>', then
-type:&nbsp; <span style="font-weight: bold;">snmptranslate rptrHealth
--IR -Td</span>.&nbsp; If you get '<span style="font-weight: bold;">Unknown
-object identifier: xxx'</span> then the MIB file was not found or parsed
-correctly.<br>
+contains the Notification definition of '<span style="font-weight: bold;">rptrHealth
+NOTIFICATION-TYPE</span>', then type:&nbsp; <span
+ style="font-weight: bold;">snmptranslate rptrHealth -IR -Td</span>.&nbsp;
+If you get '<span style="font-weight: bold;">Unknown object identifier:
+xxx'</span> then the MIB file was not found or parsed correctly.<br>
   </li>
 </ol>
 <p><span style="font-weight: bold;">Running snmpttconvertmib</span>:<br>
@@ -2714,9 +2713,16 @@ file:&nbsp;<br>
 </p>
 <div style="margin-left: 40px; font-weight: bold;">mibAllowUnderline 1<br>
 </div>
+<p> </p>
+<p> <b><br>
+Q:&nbsp; Double quotation marks (") are being logged with a \ in front
+of them.&nbsp; How can this be disabled?<br>
+</b><br>
+A:&nbsp; Set <span style="font-weight: bold;">remove_backslash_from_quotes
+= 1</span> in the <span style="font-weight: bold;">snmptt.ini</span> to
+have the \ removed from double quotes (").<br>
+</p>
 <p><br>
-&nbsp; <br>
-&nbsp; <br>
 &nbsp; <br>
 &nbsp; <br>
 &nbsp; <br>
