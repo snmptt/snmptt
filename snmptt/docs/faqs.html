@@ -1,88 +1,90 @@
-<!DOCTYPE doctype PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE doctype PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta name="generator" content=
-"HTML Tidy for Windows (vers 1st March 2004), see www.w3.org" />
-<meta content="text/html; charset=us-ascii" http-equiv=
-"Content-Type" />
-<meta content="Alex Burger" name="Author" />
-<meta content="Mozilla/4.78 [en] (Windows NT 5.0; U) [Netscape]"
-name="GENERATOR" />
-<link rel="StyleSheet" type="text/css" href="layout1.css" />
-<title>SNMP Trap Translator</title>
+  <meta name="generator"
+ content="HTML Tidy for Windows (vers 1st March 2004), see www.w3.org">
+  <meta content="text/html; charset=us-ascii" http-equiv="Content-Type">
+  <meta content="Alex Burger" name="Author">
+  <meta content="Mozilla/4.78 [en] (Windows NT 5.0; U) [Netscape]"
+ name="GENERATOR">
+  <link rel="StyleSheet" type="text/css" href="layout1.css">
+  <title>SNMP Trap Translator</title>
 </head>
 <body>
 <h1>SNMPTT FAQ / Troubleshooting</h1>
-<b>(<a href="http://www.snmptt.org">www.snmptt.org</a>)</b><br />
-This file was last updated on:&nbsp; April 4th, 2003<br />
-<br />
+<b>(<a href="http://www.snmptt.org">www.snmptt.org</a>)</b><br>
+This file was last updated on:&nbsp; Aug 11th, 2004<br>
+<br>
 <b>Q:&nbsp; What version of Net-SNMP should I run?</b>
 <p>A:&nbsp; If you have no plans on using the Net-SNMP Perl module
 (see the next question), then any recent version of Net-SNMP or
 UCD-SNMP should be sufficient with the exception of Net-SNMP
 5.1.&nbsp; Net-SNMP 5.1.1 and higher can be used.&nbsp; If you plan
 on using UCD-SNMP 4.2.3 (provided by Compaq for RedHat 7.2), then
-you must at least use a newer version of <span style=
-"font-weight: bold;">snmptrapd</span>.</p>
-<p>If you plan on enabling the Net-SNMP Perl module, <span style=
-"font-weight: bold;">Net-SNMP v5.1.1 is</span> <span style=
-"font-weight: bold;">recommended</span>.&nbsp; This will allow you
+you must at least use a newer version of <span
+ style="font-weight: bold;">snmptrapd</span>.</p>
+<p>If you plan on enabling the Net-SNMP Perl module, <span
+ style="font-weight: bold;">Net-SNMP v5.1.1 or higher is</span> <span
+ style="font-weight: bold;">recommended</span>.&nbsp; This will allow
+you
 to use all the features of snmptt.&nbsp; Net-SNMP 5.0.8 and
 5.0.9&nbsp; can also be patched with <a style="font-weight: bold;"
-href=
-"http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
-patch 722075</a> to provide similar functionality.&nbsp; The patch
-is also availabe in the contrib folder of the snmptt
-package.&nbsp;</p>
-The standard way to apply the patch is to follow these steps:<br />
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
+patch 722075</a> to provide similar functionality.&nbsp; The patch is
+available
+from the <a
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
+Net-SNMP patch page</a>. <br>
+</p>
+The standard way to apply the patch is to follow these steps:<br>
 <ol>
-<li>Download a fresh copy of Net-SNMP 5.0.9 or 5.0.8</li>
-<li>Uncompress the archive (tar xvf net-snmp-5.0.9.tar.gz)</li>
-<li>cd net-snmp-5.0.x</li>
-<li>patch -p0 &lt; /path/to/patch.net-snmp-722075</li>
-<li>Compile Net-SNMP as per Net-SNMP documentation<br /></li>
+  <li>Download a fresh copy of Net-SNMP 5.0.9 or 5.0.8</li>
+  <li>Uncompress the archive (tar xvf net-snmp-5.0.9.tar.gz)</li>
+  <li>cd net-snmp-5.0.x</li>
+  <li>patch -p0 &lt; /path/to/patch.net-snmp-722075</li>
+  <li>Compile Net-SNMP as per Net-SNMP documentation<br>
+  </li>
 </ol>
 <p>If you run freebsd, you can simply copy the patch file into
 /usr/ports/net/net-snmp/files and rename it to
 patch-snmp-72205.&nbsp; When you rebuild Net-SNMP, the patch will
 be included.</p>
-<p><br />
-<b>Q: Do I need the UCD-SNMP / Net-SNMP Perl module?<br /></b></p>
+<p><br>
+<b>Q: Do I need the UCD-SNMP / Net-SNMP Perl module?<br>
+</b></p>
 A:&nbsp; SNMPTT does not REQUIRE the Perl module, but it is
 recommended.&nbsp; By enabling the Perl module, you will get the
-following benefits:<br />
+following benefits:<br>
 <ul>
-<li>Proper $v, $E, $O, $-n, $+n, $-*, $+* (and others that use
+  <li>Proper $v, $E, $O, $-n, $+n, $-*, $+* (and others that use
 textual names) variable substitution</li>
-<li>Conversion of numerical OIDs to text form</li>
-<li>Conversion of INTEGER values to enumeration tags (for example:
-<span style="font-weight: bold;">Status is now OK</span> instead of
-<span style="font-weight: bold;">Status is now 1</span>)</li>
-<li>Conversion of the enterprise into textual form for logging to
+  <li>Conversion of numerical OIDs to text form</li>
+  <li>Conversion of INTEGER values to enumeration tags (for example:
+    <span style="font-weight: bold;">Status is now OK</span> instead of
+    <span style="font-weight: bold;">Status is now 1</span>)</li>
+  <li>Conversion of the enterprise into textual form for logging to
 SQL databases</li>
-<li>Ability for traps passed from <span style=
-"font-weight: bold;">snmptrapd</span>or loaded from the
-<span style="font-weight: bold;">snmptt.conf</span> files to
-contain symbolic OIDs such as <span style=
-"font-weight: bold;">linkDown</span> and <span style=
-"font-weight: bold;">IF-MIB::linkUp</span></li>
-<li>Variable syntax, description and enums when converting a MIB
+  <li>Ability for traps passed from <span style="font-weight: bold;">snmptrapd</span>or
+loaded from the
+    <span style="font-weight: bold;">snmptt.conf</span> files to
+contain symbolic OIDs such as <span style="font-weight: bold;">linkDown</span>
+and <span style="font-weight: bold;">IF-MIB::linkUp</span></li>
+  <li>Variable syntax, description and enums when converting a MIB
 file using snmpttconvertmib</li>
 </ul>
 Unless Net-SNMP 5.1.1 or 5.0.8 / 5.0.9 with patch 72205 is used,
 some Perl features may not work correctly.&nbsp; The use of
-Net-SNMP 5.1.1 or 5.0.8 / 5.0.9 with patch 72205 is <span style=
-"font-weight: bold;">highly recommended</span>.<br />
-<br />
+Net-SNMP 5.1.1 or 5.0.8 / 5.0.9 with patch 72205 is <span
+ style="font-weight: bold;">highly recommended</span>.<br>
+<br>
 Note:&nbsp; Do not confuse the CPAN module Net::SNMP with the
 Net-SNMP Perl module.&nbsp; They are two completely unrelated
 programs.&nbsp; Net::SNMP is a stand-alone SNMP module for Perl,
-while the Net-SNMP Perl module is a Perl extension of the <a href=
-"http://www.net-snmp.org">Net-SNMP</a> software and is included
-with <a href="http://www.net-snmp.org">Net-SNMP</a>.<br />
-<br />
-<p><br />
+while the Net-SNMP Perl module is a Perl extension of the <a
+ href="http://www.net-snmp.org">Net-SNMP</a> software and is included
+with <a href="http://www.net-snmp.org">Net-SNMP</a>.<br>
+<br>
+<p><br>
 <b>Q:&nbsp; I want to enable the Perl support for UCD-SNMP /
 Net-SNMP under Linux, but I installed UCD-SNMP / Net-SNMP using
 RPMs.&nbsp; What is the easiest way to install the module without
@@ -90,52 +92,60 @@ recompiling everything?</b></p>
 <p>A:&nbsp; You should not have to re-compile the entire
 package.&nbsp; Try the following:</p>
 <ol>
-<li>Download the source RPM that matches the binary RPM you
+  <li>Download the source RPM that matches the binary RPM you
 downloaded.&nbsp; For example: ucd-snmp-4.2.3-1.src.rpm</li>
-<li>Install the RPM</li>
-<li>Locate the installed source code.&nbsp; For Mandrake, it should
+  <li>Install the RPM</li>
+  <li>Locate the installed source code.&nbsp; For Mandrake, it should
 be in /usr/src/RPM/SOURCES</li>
-<li>Go into the sub directory perl/SNMP</li>
-<li>Follow the instructions in the README file</li>
+  <li>Go into the sub directory perl/SNMP</li>
+  <li>Follow the instructions in the README file</li>
 </ol>
 <p>Note:&nbsp; If you have installed Net-SNMP 5.0.9 or 5.0.8 using
 RPM packages, and want to apply patch 722075, you will need to
 re-compile the entire package and re-install.&nbsp; Patch 722075
 makes modifications to both the Perl source files, and the main
 snmp libraries so the above steps will not work.</p>
-<p><br />
+<p><br>
 <b><span style="font-weight: bold;">Q:&nbsp; I want to use Net-SNMP
 under Windows NT.&nbsp;&nbsp; What should I do?</span></b></p>
-<p>A:&nbsp; You have at least two options:</p>
+<p>A:&nbsp; You have at least three options:</p>
 <ol>
-<li>Download the Net-SNMP 5.1.1+ binary from the Net-SNMP home page
-and install.<br /></li>
-<li>Download the Net-SNMP 5.1.1+ source and compile using MSVC++,
+  <li>Download the Net-SNMP 5.1.2+ binary from the Net-SNMP home page
+and install.<br>
+  </li>
+  <li>Download the Net-SNMP 5.1.2+ source and compile using MSVC++,
 MinGW or Cygwin as described in the Net-SNMP README.WIN32
 file.&nbsp; This should create a working snmptrapd.&nbsp; See the
 question: <b><span style="font-weight: bold;">How to I enable the
 Perl support for UCD-SNMP / Net-SNMP under
-Windows</span></b><span style="font-weight: bold;">?</span></li>
+Windows</span></b><span style="font-weight: bold;">?</span> Note:
+Net-SNMP 5.1.2 or higher is recommended if compiling under Windows as
+it contains the latest Windows specific compiling improvements.<br>
+  </li>
 </ol>
-<p><b><span style="font-weight: bold;"><br />
+<p><b><span style="font-weight: bold;"><br>
 Q:&nbsp; How to I enable the Perl support for UCD-SNMP / Net-SNMP
-under Windows</span></b><span style=
-"font-weight: bold;">?</span></p>
+under Windows</span></b><span style="font-weight: bold;">?</span></p>
 <p style="font-weight: bold; text-decoration: underline;">Native
 Windows:</p>
 <p style="margin-left: 40px;">Install ActiveState ActivePerl and
 then the ActivePerl ppm module included in the Net-SNMP binary
 available from the <a href="http://www.net-snmp.org">Net-SNMP web
-site</a>.</p>
-<p><span style=
-"font-weight: bold; text-decoration: underline;">Cygwin:</span></p>
-<p style="margin-left: 40px;">Download the Net-SNMP 5.1.1+ source
+site</a>.<br>
+</p>
+<p style="margin-left: 40px;">If you compiled your own version of
+Net-SNMP, see the perl/README document for instructions on compiling
+the Perl modules.<br>
+</p>
+<p><span style="font-weight: bold; text-decoration: underline;">Cygwin:</span></p>
+<p style="margin-left: 40px;">Download the Net-SNMP 5.1.2+ source
 and compile using Cygwin as described in the Net-SNMP README.WIN32
 file.</p>
 <p style="margin-left: 40px;">Compile the Perl modules as described
-in the perl\SNMP\README file.&nbsp;<br /></p>
-<p style="margin-left: 40px;">The program <span style=
-"font-weight: bold;">snmptt-net-snmp-test</span> can be used to
+in the perl\SNMP\README file.&nbsp;<br>
+</p>
+<p style="margin-left: 40px;">The program <span
+ style="font-weight: bold;">snmptt-net-snmp-test</span> can be used to
 perform various translations to test the functionality of the
 installed UCD-SNMP / Net-SNMP Perl module.&nbsp; The value of
 <span style="font-weight: bold;">best_guess</span> can be specified
@@ -145,7 +155,7 @@ use:&nbsp; <span style="font-weight: bold;">snmptt-net-snmp-test
 --best_guess=2</span>.</p>
 <p><b>Q:&nbsp; I have enabled net_snmp_perl_enable but the variable
 names are not being translated into text using $v<i>n, $-n, $+n,
-$-* or $+*</i>.&nbsp; How do I troubleshoot it?</b><br />
+$-* or $+*</i>.&nbsp; How do I troubleshoot it?</b><br>
 <b>Q:&nbsp; I have enabled translate_integers but the integer
 values are not being translated into text.&nbsp;&nbsp; How do I
 troubleshoot it?</b></p>
@@ -154,7 +164,7 @@ installed and working, and must ensure UCD-SNMP / Net-SNMP is
 configured correctly with all the required MIBS.</p>
 <p>For starters, make sure the SNMP module is working.&nbsp;
 Type:</p>
-<blockquote>perl<br />
+<blockquote>perl<br>
 use SNMP;</blockquote>
 If you get an error after typing 'use SNMP', then the module is not
 installed correctly.&nbsp; Re-install the module and make sure you
@@ -176,30 +186,31 @@ a MIB file
 translate properly because SNMPTRAPD does not pass them correctly
 to SNMPTT.&nbsp; Upgrade to a newer version of snmptrapd.
 &nbsp;</p>
-<br />
+<br>
 <p><b>Q: Are there any sample files to get me
-started?<br /></b></p>
+started?<br>
+</b></p>
 A:&nbsp; Yes, the examples folder contains a sample snmptt.conf
-file, and a sample trap file for testing.<br />
+file, and a sample trap file for testing.<br>
 <ol>
-<li>Install SNMPTT as described in this document</li>
-<li>Copy the <span style=
-"font-weight: bold;">snmptt.conf.generic</span> file to the
-location specified in the snmptt.ini file (probably <span style=
-"font-weight: bold;">/etc/snmp/</span> or <span style=
-"font-weight: bold;">c:\snmp</span>)</li>
-<li>Add <span style="font-weight: bold;">snmptt.conf.generic</span>
+  <li>Install SNMPTT as described in this document</li>
+  <li>Copy the <span style="font-weight: bold;">snmptt.conf.generic</span>
+file to the
+location specified in the snmptt.ini file (probably <span
+ style="font-weight: bold;">/etc/snmp/</span> or <span
+ style="font-weight: bold;">c:\snmp</span>)</li>
+  <li>Add <span style="font-weight: bold;">snmptt.conf.generic</span>
 to the <span style="font-weight: bold;">snmptt_conf_files</span>
 section of <span style="font-weight: bold;">snmptt.ini</span>.</li>
-<li>Test SNMPTT by typing:&nbsp; <span style=
-"font-weight: bold;">snmptt &lt; sample-trap.generic</span></li>
-<li>Check the logs files etc for a sample linkDown trap</li>
+  <li>Test SNMPTT by typing:&nbsp; <span style="font-weight: bold;">snmptt
+&lt; sample-trap.generic</span></li>
+  <li>Check the logs files etc for a sample linkDown trap</li>
 </ol>
-<p><br />
+<p><br>
 <b>Q:&nbsp; SNMPTT is not working!&nbsp; How do I troubleshoot
 it?</b></p>
-<p>A:&nbsp; Start by enabling <span style=
-"font-weight: bold;">enable_unknown_trap_log</span> in the
+<p>A:&nbsp; Start by enabling <span style="font-weight: bold;">enable_unknown_trap_log</span>
+in the
 <span style="font-weight: bold;">snmptt.ini</span> file.&nbsp; Look
 inside this file to see if the traps are being passed correctly to
 SNMPTT but not being handled correctly.&nbsp; Next, enable debug
@@ -211,18 +222,21 @@ you are finished.</p>
 daemon mode, try the following.&nbsp; This will prevent you have
 having to continuously generate the trap on the host.</p>
 <ol>
-<li>Shut down SNMPTT</li>
-<li>Generate the trap</li>
-<li>Copy the resulting # file from the spool directory
+  <li>Shut down SNMPTT</li>
+  <li>Generate the trap</li>
+  <li>Copy the resulting # file from the spool directory
 (/var/spool/snmptt) to the /tmp directory as
-/tmp/test-trap<br /></li>
-<li>Edit the file, removing the first line (which is a large number
+/tmp/test-trap<br>
+  </li>
+  <li>Edit the file, removing the first line (which is a large number
 that contains the date / time)</li>
-<li>Run SNMPTT in standalone method using: <span style=
-"font-weight: bold;">snmptt &lt; test-trap</span><br /></li>
-<li>Troubleshoot by using the log files etc<br /></li>
+  <li>Run SNMPTT in standalone method using: <span
+ style="font-weight: bold;">snmptt &lt; test-trap</span><br>
+  </li>
+  <li>Troubleshoot by using the log files etc<br>
+  </li>
 </ol>
-<p><b><br />
+<p><b><br>
 Q:&nbsp; I have configured SNMPTT correctly with an snmptt.ini
 file, snmptt.conf file(s) etc and it still does not process
 traps.&nbsp; Everything appears in the snmpttunknowntrap.log
@@ -230,8 +244,8 @@ file.&nbsp; What did I do wrong?</b></p>
 <p>A:&nbsp; You probably didn't start snmptrapd correctly.&nbsp;
 Make sure it is started using:</p>
 <blockquote><b>snmptrapd -On</b></blockquote>
-If it is not started with <span style=
-"font-weight: bold;">-On</span>, then it will not pass traps using
+If it is not started with <span style="font-weight: bold;">-On</span>,
+then it will not pass traps using
 numeric OIDs and SNMPTT will not process them.
 <p>As an alternative, you can edit your <b>snmp.conf</b> file to
 include the line: <b>printNumericOids 1.&nbsp;</b> This setting
@@ -246,22 +260,23 @@ in traps not being matched.&nbsp; A patch is available from the
 Net-SNMP web site for 5.0.8+ to allow it to handle other symbolic
 names such as module::symbolic name (eg: SNMPv2-MIB::coldTrap)
 etc.&nbsp; The patch is available from the contrib folder, or it
-can be downloaded from the <a href=
-"http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
+can be downloaded from the <a
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
 Net-SNMP patch page</a>.&nbsp; Net-SNMP 5.1.1 and higher contain
 this patch.</p>
-<p><b><br />
+<p><b><br>
 Q:&nbsp; I have disabled syslog support in SNMPTT, but my syslog
 (or NT Event Log) is still filling up with trap messages.&nbsp; How
-do I disable them?</b><br />
+do I disable them?</b><br>
 <b>Q:&nbsp; I am using syslog (or NT Event Log) to log trap
 messages, but there are two log entries for each trap
 received.&nbsp; How do I prevent it?</b></p>
 <p>A:&nbsp; What you are seeing are <b>snmptrapd</b> trap messages,
 not SNMPTT messages.&nbsp; SNMPTT trap messages start with
 '<b>snmptt[<span style="font-style: italic;">pid</span>]:</b>'
-while snmptrapd messages start with '<b>snmptrapd[<span style=
-"font-style: italic;">pid</span>]:</b>'.&nbsp; If you do not start
+while snmptrapd messages start with '<b>snmptrapd[<span
+ style="font-style: italic;">pid</span>]:</b>'.&nbsp; If you do not
+start
 snmptrapd with either the <b>-P</b> or <b>-o</b> (lowercase o)
 switches, syslog support will be forced on.&nbsp; Snmptrapd should
 be started using '<b>snmptrapd -On</b>' and this results in syslog
@@ -280,16 +295,18 @@ and shutdown will not be logged to syslog.
 <p>A patch for Net-SNMP 5.0.7 is available that adds a new switch
 (-t) to prevent TRAP messages from being logged to syslog, but
 allowing system messages to continue to be logged.&nbsp; The patch
-is available from the <a href=
-"http://sourceforge.net/tracker/?func=detail&amp;atid=312694&amp;aid=695312&amp;group_id=12694">
+is available from the <a
+ href="http://sourceforge.net/tracker/?func=detail&amp;atid=312694&amp;aid=695312&amp;group_id=12694">
 Net-SNMP patch section</a>.&nbsp; This patch is available in
-Net-SNMP 5.1.1.&nbsp; With this patch, snmptrapd should be started
+Net-SNMP 5.1.1 and higher.&nbsp; With this patch, snmptrapd should be
+started
 using:</p>
 <blockquote><b>snmptrapd -On -t</b></blockquote>
-<p><br />
+<p><br>
 <b>Q:&nbsp; I set translate_oids or translate_trap_oid, but the
 trap is being logged in numerical form.&nbsp;
-Why?<br /></b><b>Q:&nbsp; I set</b> <b>translate_oids or</b>
+Why?<br>
+</b><b>Q:&nbsp; I set</b> <b>translate_oids or</b>
 <b>translate_trap_oid to 1 or 3 in snmptt.ini, but the trap is not
 being logged with a long symbolic name.&nbsp; Why?</b></p>
 A:&nbsp; The current version of Net-SNMP (5.0.9 at the time of this
@@ -299,18 +316,18 @@ when translating an OID and most of the 5.0.x versions do not
 properly tranlsate numeric OIDs to long symbolic names.&nbsp; A
 patch is available for 5.0.8+ that will appear in later releases of
 Net-SNMP (5.1.1+).&nbsp; The patch is available from the contrib
-folder, or it can be downloaded from the <a href=
-"http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
-Net-SNMP patch page</a>.<br />
-<br />
-The program <span style=
-"font-weight: bold;">snmptt-net-snmp-test</span> can be used to
+folder, or it can be downloaded from the <a
+ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
+Net-SNMP patch page</a>.<br>
+<br>
+The program <span style="font-weight: bold;">snmptt-net-snmp-test</span>
+can be used to
 perform various translations to test the functionality of the
 installed UCD-SNMP / NE-SNMP Perl module.&nbsp; The value of
 <span style="font-weight: bold;">best_guess</span> can be specified
 on the command line to determine how translations should
-occur.<br />
-<br />
+occur.<br>
+<br>
 <p><b>Q:&nbsp; I converted a MIB using snmpttconvertmib (default
 snmptranslate mode) but the OIDs are appearing as text instead of
 being numerical.&nbsp; Why?</b></p>
@@ -318,12 +335,12 @@ being numerical.&nbsp; Why?</b></p>
 <blockquote><b>EVENT linkUp
 .iso.org.dod.internet.snmpV2.snmpModules.snmpMIB.snmpMIBObjects.snmpTraps.linkUp
 "Status Events" Normal</b>
-<p><b>instead of</b></p>
-<p><b>EVENT linkUp .1.3.6.1.6.3.1.1.5.4 "Status Events"
+  <p><b>instead of</b></p>
+  <p><b>EVENT linkUp .1.3.6.1.6.3.1.1.5.4 "Status Events"
 Normal</b></p>
 </blockquote>
-<p><br />
-A:&nbsp; By default, <b>snmpttconvertmib</b> uses the
+<p><br>
+A:&nbsp; <b>Snmpttconvertmib</b> uses the
 <b>snmptranslate</b> command to convert MIB files.&nbsp; With
 Net-SNMP v5.0.2 and newer, setting the <b>-On</b> switch on the
 <b>snmptranslate</b> command causes the output to be in numerical
@@ -332,9 +349,9 @@ format, which is what is needed for <b>snmpttconvertmib</b>.</p>
 -On switch will TOGGLE the setting of using numerical output.&nbsp;
 With Net-SNMP v5.0.2 and newer, setting the -On switch will FORCE
 the output to be numerical.</p>
-<p><b>Snmpttconvermib</b> will use the<span style=
-"font-weight: bold;">-On</span> switch for <span style=
-"font-weight: bold;">snmptranslate</span> <b>only</b> if it detects
+<p><b>Snmpttconvermib</b> will use the<span style="font-weight: bold;">-On</span>
+switch for <span style="font-weight: bold;">snmptranslate</span> <b>only</b>
+if it detects
 anything but UCD-SNMP or Net-SNMP v5.0.1.</p>
 <p>If you are using UCD-SNMP, or Net-SNMP v5.0.1, the best option
 is to modify your <b>snmp.conf</b> file (for UCD-SNMP / Net-SNMP),
@@ -342,56 +359,57 @@ and add or modify the line:</p>
 <blockquote><b>printNumericOids 1</b></blockquote>
 This will cause all applications to output in numerical format
 including <b>snmptranslate</b>.&nbsp; Note: This will affect other
-UCD-SNMP / Net-SNMP programs you are using, if any.<br />
-&nbsp;<br />
-<b>Q:&nbsp; Does SNMPTT use DNS?</b><br />
-<br />
+UCD-SNMP / Net-SNMP programs you are using, if any.<br>
+&nbsp;<br>
+<b>Q:&nbsp; Does SNMPTT use DNS?</b><br>
+<br>
 Only if it is enabled.&nbsp; See the <a href="#DNS">Name Resolution
-/ DNS</a> section.<br />
-<br />
-<b><br />
+/ DNS</a> section.<br>
+<br>
+<b><br>
 Q:&nbsp; Why doesn't the snmptt-init.d script work with
-Debian?</b><br />
-<br />
+Debian?</b><br>
+<br>
 The snmptt-init.d script provided with SNMPTT was written for
 Mandrake and RedHat.&nbsp; To make the script work with Debian
-without requiring any re-writing of the script, copy <span style=
-"font-weight: bold;">/etc/init.d/skeleton</span> to <span style=
-"font-weight: bold;">/etc/init.d/functions</span>.<br />
-<p><b><br />
+without requiring any re-writing of the script, copy <span
+ style="font-weight: bold;">/etc/init.d/skeleton</span> to <span
+ style="font-weight: bold;">/etc/init.d/functions</span>.<br>
+<p><b><br>
 Q:&nbsp; Is there a front-end alarm browser available for
 SNMPTT?</b></p>
-<p>A:&nbsp; Take a look at <a href=
-"http://sourceforge.net/projects/snmptt-gui">SNMPTT-GUI</a>.&nbsp;
+<p>A:&nbsp; Take a look at <a
+ href="http://sourceforge.net/projects/snmptt-gui">SNMPTT-GUI</a>.&nbsp;
 SNMPTT-GUI aims to provide a web based frontend for SNMPTT.&nbsp;
 The GUI is made up of server side perl cgi scripts with client side
 javascripts which interfaces to a SQL database using DBI::ODBC.</p>
 <p>SNMPTT-GUI questions should be directed to the project admins on
-the <a href=
-"http://sourceforge.net/projects/snmptt-gui/">SNMPTT-GUI
-Sourceforge page</a>.<br />
+the <a href="http://sourceforge.net/projects/snmptt-gui/">SNMPTT-GUI
+Sourceforge page</a>.<br>
 &nbsp;</p>
 <p><b>Q:&nbsp; When I convert a MIB file using snmpttconvertmib I
-get 'Bad operator (_) errors.<br /></b><br />
+get 'Bad operator (_) errors.<br>
+</b><br>
 A:&nbsp; You need to enable support for underlines / underscores in
 MIB files.&nbsp; See the snmp.conf man page.&nbsp; Support can be
-enabled by adding this line to your <span style=
-"font-weight: bold;">~/.snmp/snmp.conf</span> file:&nbsp;</p>
+enabled by adding this line to your <span style="font-weight: bold;">~/.snmp/snmp.conf</span>
+file:&nbsp;</p>
 <div style="margin-left: 40px; font-weight: bold;">
 mibAllowUnderline 1</div>
-<p><b><br />
+<p><b><br>
 Q:&nbsp; Double quotation marks (") are being logged with a \ in
-front of them.&nbsp; How can this be disabled?<br /></b><br />
-A:&nbsp; Set <span style=
-"font-weight: bold;">remove_backslash_from_quotes = 1</span> in the
+front of them.&nbsp; How can this be disabled?<br>
+</b><br>
+A:&nbsp; Set <span style="font-weight: bold;">remove_backslash_from_quotes
+= 1</span> in the
 <span style="font-weight: bold;">snmptt.ini</span> to have the \
 removed from double quotes (").</p>
-<p><br />
-&nbsp;<br />
-&nbsp;<br />
-&nbsp;<br />
-&nbsp;<br />
-&nbsp;<br />
+<p><br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
 &nbsp;</p>
 </body>
 </html>
