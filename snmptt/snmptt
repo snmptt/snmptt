@@ -109,10 +109,14 @@ if ($debug == 1)
 	$debugcmdline = 1;
 }
 
-if ($daemonmode == 1)
+if ($daemon == 1)
 {
-	$daemon = 1;	
+  	# $daemon = 1;	
 	$daemoncmdline = 1;
+}
+else
+{
+ 	$daemoncmdline = 0;
 }
 
 if ($debug == 2)
@@ -1282,7 +1286,6 @@ sub loadsnmpttini {
 	# 
 	# Defaults Start
 	# 
-        $daemonmode = 0;
 	$multiple_event = 0;
 	$fqdn_enable = 0;
 	$daemon_fork = 1;
@@ -1319,19 +1322,19 @@ sub loadsnmpttini {
 	# 
 	
 	# General
-	if ($cfg->val('General', 'mode') eq "standalone") {
-	  $daemonmode = 0;
+	if ( ($cfg->val('General', 'mode') eq "daemon") || ($daemoncmdline == 1) )
+	{
+	  $daemon = 1;
 	}
 	else {
-	  $daemonmode = 1;
+	  $daemon = 0;
 	}
+	
 	$multiple_event = $cfg->val('General', 'multiple_event');
 	$fqdn_enable = $cfg->val('General', 'fqdn_enable');
 	
 	# DaemonMode
-	if ($daemoncmdline == 0) {
-	  $daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
-	}
+	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
 	$spool_directory = $cfg->val('DaemonMode', 'spool_directory');
 	$sleep = $cfg->val('DaemonMode', 'sleep');
 	

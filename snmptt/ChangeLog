@@ -1,4 +1,6 @@
 January 20th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Cleaned up code for determining whether to run as a daemon or
+  standalone mode.
 - Fix bug with Nodes list not being flushed out when processing 
   multiple traps at once.  Thanks to Christophe Belmont.
 
