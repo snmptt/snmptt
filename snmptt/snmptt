@@ -1842,6 +1842,7 @@ sub readtrap
 		if ($DEBUGGING >= 2) {
 		  print "  Could not translate - Net-SNMP Perl module not enabled - will add to hash table anyways\n";
 		}
+	      }
 	    }
 	    # If the value is blank, set it to (null)
 	    if ($temp2 eq "")
