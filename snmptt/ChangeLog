@@ -1,3 +1,7 @@
+January 23rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Spool file list sorted before processing to ensure traps are 
+  processed in the order they are received when in daemon mode.
+
 January 22nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Changed SNMPTTHANDLER to output the current date and time on the
   first line of the spool file.

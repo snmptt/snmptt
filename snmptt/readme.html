@@ -10,7 +10,7 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.4.1</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; January 22nd, 2003
+<br>This file was last updated on:&nbsp; January 23rd, 2003
 <p>&nbsp;<a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote>&nbsp;<a href="#What is it">What is it?</a>
@@ -152,6 +152,10 @@ included in the NET-SNMP package.
 <p><b><font size=+1>0.5 - ??, 2003</font></b>
 <ul>
 <li>
+Spool file list sorted before processing to ensure traps are processed
+in the order they are received when in daemon mode</li>
+
+<li>
 Added <b>use_trap_time </b>variable to config file for daemon mode to have
 SNMPTT use either the time from the spool file, or the current time.</li>
 
@@ -260,11 +264,15 @@ Initial release</li>
 <ol>
 <li>
 Set <b>fqdn_enable</b> to <b>1 </b>to have SNMPTT operate the same as v0.4,
-or leave as 0 and test</li>
+or leave as 0 (recommended default) and test</li>
 
 <li>
 Set <b>use_trap_time</b> to<b> 0</b> to have SNMPTT operate the same as
 v0.4, or leave as 1 (recommended default) and test</li>
+
+<li>
+Replace <b><u>both</u></b> <b>SNMPTTHANDLER</b> and <b>SNMPTT</b> with
+the new versions</li>
 </ol>
 <b><font size=+1>v0.1, v0.2 or v0.3 to v0.4</font></b>
 <p>To upgrade from v0.1, v0.2 to v0.3 to v0.4, you should:
