@@ -289,7 +289,7 @@ Following is a sample of two defined traps in snmptt.conf:
 
 #
 EVENT COMPAQ_11003 .1.3.6.1.4.1.232.0.11003 "LOGONLY" Normal
-FORMMAT Compaq Generic Trap: $*
+FORMAT Compaq Generic Trap: $*
 EXEC qpage -f TRAP notifygroup1 "Compaq Generic Trap: $*"
 NODES /etc/snmp/cpqnodes
 SDESC
