@@ -1,5 +1,11 @@
 April 4th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Add db_unknown_trap_format variable, update docs, faq
+- Statistics dumped at shutdown: 
+  Total traps received
+  Total traps translated
+  Total unknown traps
+- Statistics can be dumped every x seconds via statistics_interval 
+  variable or by creating a !statistics file in the spool directory.
 
 April 3rd, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Add support for logging unknown traps to SQL table.

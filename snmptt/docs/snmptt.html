@@ -262,8 +262,16 @@ translate_trap_oid</span> or <span style=
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
 <h3><b>0.9.1</b> <b>- ??, 2004</b></h3>
 <ul>
-<li>Added support for logging unknown traps to a SQL
-table<br /></li>
+<li>Added support for logging unknown traps to a SQL table</li>
+<li>Added logging of statistical information for <span style=
+"font-weight: bold;">total traps received</span>, <span style=
+"font-weight: bold;">total traps translated</span> and <span style=
+"font-weight: bold;">total unknown traps</span>.&nbsp; Statistics
+logged at shut down, and optionally at a defined interval defined
+by new <span style="font-weight: bold;">snmptt.ini</span> variable
+<span style="font-weight: bold;">statistics_interval</span>.&nbsp;
+Logging can also be forced by sending the SIGUSR1 signal, or
+creating a file called !statistics in the spool folder.<br /></li>
 <li>Fixed bug with with handling traps in symbolic format
 (snmptrapd without -On)</li>
 </ul>
@@ -1126,7 +1134,8 @@ Unable to open spool dir <i>x</i> <b>(*)</b><br />
 Unable to read spool dir <i>x</i> <b>(*)</b><br />
 Could not open trap file <i>x</i> <b>(*)</b><br />
 Unable to delete trap file <i>x</i> from spool dir <b>(*)</b><br />
-Unable to delete !reload file spool dir <b>(*)</b><br />
+Unable to delete !reload file spool dir <b>(*)<br /></b> Unable to
+delete !statistics file spool dir <b>(*)</b><br />
 Reloading configuration file(s) <b>(*)</b><br />
 SNMPTT (version) shutdown <b>(*)</b><br />
 Loading <i>snmpttconfigfile</i> <b>(*)</b><br />
@@ -1170,7 +1179,8 @@ EventID 6: Could not open trap file <i>x</i> <b>(*)</b><br />
 EventID 7: Unable to delete trap file <i>x</i> from spool dir
 <b>(*)</b><br />
 EventID 20: Unable to delete !reload file spool dir
-<b>(*)</b><br />
+<b>(*)<br /></b> EventID 21: Unable to delete !statistics file
+spool dir <b>(*)</b><br />
 EventID 8: Reloading configuration file(s) <b>(*)</b><br />
 EventID 1: SNMPTT (version) shutdown <b>(*)</b><br />
 EventID 9: Loading <i>snmpttconfigfile</i> <b>(*)</b><br />
@@ -1522,31 +1532,55 @@ traps per minute should be handled easily.
 "font-weight: bold;">--daemon</span> command line option or setting
 the <b>mode</b> variable in the <b>snmptt.ini</b> file to
 <b>daemon</b> will cause SNMPTT to run in daemon mode.</p>
-<p>By setting the .ini variable <b>use_trap_time</b> to <b>1</b>
-(default), the date and time used for logging etc will be the date
-and time passed inside the trap spool file.&nbsp; If
-<b>use_trap_time</b> is set to <b>0</b>, the date and time that the
-trap was <i>processed</i> by SNMPTT is used.&nbsp; Setting
-<b>use_trap_time</b> to <b>0</b> can result in inaccurate time
-stamps in log files due to the length of time SNMPTT sleeps between
-spool directory polling.</p>
+<p>By setting the <span style=
+"font-weight: bold;">snmptt.ini</span> variable
+<b>use_trap_time</b> to <b>1</b> (default), the date and time used
+for logging will be the date and time passed inside the trap spool
+file.&nbsp; If <b>use_trap_time</b> is set to <b>0</b>, the date
+and time that the trap was <i>processed</i> by SNMPTT is
+used.&nbsp; Setting <b>use_trap_time</b> to <b>0</b> can result in
+inaccurate time stamps in log files due to the length of time
+SNMPTT sleeps between spool directory polling.</p>
 <p>Note:&nbsp; When running on a <b>non</b> Windows platform,
 SNMPTT will fork to the background and create a pid file in
 <span style="font-weight: bold;">/var/run/snmptt.pid</span> if
 <b>daemon_fork</b> is set to 1.&nbsp; If the user is not able to
 create the <span style=
 "font-weight: bold;">/var/run/snmptt.pid</span> file, it will
-attempt to create one in the current working directory.</p>
+attempt to create one in the current working directory.<br /></p>
 <p>Sending the HUP signal to SNMPTT when running as a daemon will
 cause it to reload the configuration file including the .ini file,
-any snmptt.conf files listed in the .ini file and any NODES files
-if dynamic_nodes is disabled.&nbsp; A reload can also be forced by
-adding a file to the spool directory called <span style=
+snmptt.conf files listed in the .ini file and any NODES files if
+<span style="font-weight: bold;">dynamic_nodes</span> is
+disabled.&nbsp; A reload can also be forced by adding a file to the
+spool directory called <span style=
 "font-weight: bold;">!reload</span>.&nbsp; The filename is
 <span style="font-weight: bold;">not</span> case sensitive.&nbsp;
 If this file is detected, it will flag a reload to occur and will
 delete the file.&nbsp; This would be the only way to cause a reload
-when using Windows.</p>
+when using Windows as Windows does not support signals.<br /></p>
+<p>Statistical logging of <span style="font-weight: bold;">total
+traps received</span>, <span style="font-weight: bold;">total traps
+translated</span> and <span style="font-weight: bold;">total
+unknown traps</span> can be enabled by setting the <span style=
+"font-weight: bold;">statistics_interval</span> <span style=
+"font-weight: bold;">snmptt.ini</span> variable to a value greater
+than 0.&nbsp; At each interval (defined in seconds), the statistics
+will be logged to syslog or the event log.<br /></p>
+Sending the USR1 signal will also cause the statistical information
+for <span style="font-weight: bold;">total traps received</span>,
+<span style="font-weight: bold;">total traps translated</span> and
+<span style="font-weight: bold;">total unknown traps</span> to be
+logged.&nbsp; This could be used for example if you want to log
+statistics at a set time each day using a task scheduler instead of
+using the interval time defined in the <span style=
+"font-weight: bold;">snmptt.ini</span> variable <span style=
+"font-weight: bold;">statistics_interval</span>.&nbsp; A statistics
+dump can also be forced by adding a file to the spool directory
+called <span style="font-weight: bold;">!statistics</span> which is
+processed similar to the <span style=
+"font-weight: bold;">!reload</span> file.<br />
+<br />
 <h2><a id="Command-line-arguments" name=
 "Command-line-arguments"></a>Command line arguments</h2>
 <p>The following command line arguments are supported:</p>

@@ -219,6 +219,13 @@ unknown_trap_log_enable = 0
 # for unknown traps
 unknown_trap_log_file = c:\\snmp\\snmpttunknown.log
 
+# How often in seconds statistics should be logged to syslog or the event log.
+# Set to 0 to disable
+# 1 hour = 216000
+# 12 hours = 2592000
+# 24 hours = 5184000
+statistics_interval = 0
+
 # Set to 1 to enable logging of *TRAPS* to the event log.
 # All traps will be recorded to the Application log
 eventlog_enable = 0

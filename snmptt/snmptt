@@ -185,6 +185,9 @@ if ($eventlog_system_enable == 1 || $eventlog_enable == 1)
 }
 
 $debug_file_used = 0;
+
+my $g_start_time = time();
+
 if ($DEBUGGING >= 1)
 {
 	if ($DEBUGGING_FILE ne '') 
@@ -201,7 +204,7 @@ if ($DEBUGGING >= 1)
 	}
 	
 	# print out time
-	print "********** SNMPTT $snmptt_version started: ",scalar(localtime)," **********\n\n"
+	print "********** SNMPTT $snmptt_version started: ",localtime($g_start_time)," **********\n\n"
 }
 
 if ($syslog_system_enable == 1 && $daemon == 1)
@@ -351,14 +354,23 @@ if ($sql_win32_odbc_enable == 1)
 
 # Pull in passed SNMP info from snmptrapd via STDIN and place in the array @tempvar
 
+# Global variables for statistics
+my $g_total_traps_received = 0;
+my $g_total_traps_translated = 0;
+my $g_total_traps_unknown = 0;
+my $g_last_statistics_logged = $g_start_time;
+
 if ($daemon == 1)
 {
 	$SIG{HUP} = \&signal_handler_reload;
 
 	$SIG{TERM} = \&signal_handler_die;
-	
+
+	$SIG{USR1} = \&signal_log_statistics;
+        
 	$timetoreload = 0;
 	$timetodie = 0;
+        $timetologstatistics = 0;
 
 	&loadsnmpttconf;	# Load SNMPTT.CONF file
 
@@ -556,6 +568,30 @@ if ($daemon == 1)
 		      next;
 		    }
 
+                    if (lc($file) eq "!statistics")
+		    {
+		      $timetologstatistics = 1;
+		      unless (unlink($file))		      
+		      {
+			if ($DEBUGGING >= 1)
+			{
+			  print "Unable to delete !statistics file from spool dir:$!\n";
+			}
+			warn "Unable to delete !statistics file from spool dir:$!\n";
+			
+			if ($syslog_system_enable == 1)
+			{
+			  syslog_system("Unable to delete !statistics file from spool dir");
+			}
+			if ($eventlog_system_enable == 1)
+			{
+			  eventlog_system("Unable to delete !statistics file from spool dir",21,$eventlog_error);
+			}
+		      }
+		      next;
+		    }
+
+
 		    if ($DEBUGGING >= 1)
 		    {
 		      print "Processing file: $file\n";
@@ -615,7 +651,20 @@ if ($daemon == 1)
 		    }
 		  }
 		}
-		if ($DEBUGGING >= 1)
+
+                if ($statistics_interval > 0) {
+                  if (time() >= ($g_last_statistics_logged + $statistics_interval)) {
+                    &log_statistics();
+                  }
+                }
+
+		if ($timetologstatistics == 1)
+		{
+                  &log_statistics();
+                  $timetologstatistics = 0;
+                }
+                
+                if ($DEBUGGING >= 1)
 		{
 			print "Sleeping for $sleep seconds\n\n";
 		}
@@ -644,16 +693,28 @@ if ($daemon == 1)
 	}
 	if ($DEBUGGING >= 1)
 	{
-		print "SNMPTT $snmptt_version shutdown: ",scalar(localtime),"\n\n"
+		print "SNMPTT $snmptt_version shutdown: ",scalar(localtime),"\n\n";
+                print "Total traps received:    $g_total_traps_received\n";
+                print "Total traps translated:  $g_total_traps_translated\n";                
+                print "Total unknown traps:     $g_total_traps_unknown\n\n";
 	}
 	
 	if ($syslog_system_enable == 1 &&  $daemon == 1)
 	{
 	  syslog_system("SNMPTT $snmptt_version shutdown");
+          syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total unknown traps=$g_total_traps_unknown");                
+          #syslog_system("Total traps received:    $g_total_traps_received");
+          #syslog_system("Total traps translated:  $g_total_traps_translated");
+          #syslog_system("Total unknown traps:     $g_total_traps_unknown");                
 	}
 	if ($eventlog_system_enable == 1 &&  $daemon == 1)
 	{
-	  eventlog_system("SNMPTT $snmptt_version shutdown",1,$eventlog_information);
+	  my $message = "SNMPTT $snmptt_version shutdown\n\n" . \
+          "Total traps received:    $g_total_traps_received\n" . \
+          "Total traps translated:  $g_total_traps_translated\n" . \
+          "Total unknown traps:     $g_total_traps_unknown\n";
+          
+          eventlog_system($message,1,$eventlog_information);
 	}
 }
 else
@@ -967,7 +1028,11 @@ sub processtrap
 		{
 
 			# Trap received exists in our list of trap definitions
-			if ($DEBUGGING >= 1)
+			
+                        # Statistics
+                        $g_total_traps_translated++;
+                        
+                        if ($DEBUGGING >= 1)
 			{
 				print "\nTrap defined, processing...\n\n";
 				print "\n\nFORMAT line:\n";				
@@ -2121,6 +2186,9 @@ sub readtrap
 	@entvar = ();
 	@entvarname = ();
 
+        # Statistics
+        $g_total_traps_received++;
+
 	if ($DEBUGGING >= 2) 
 	{	  
 	  print "Reading trap.  Current time: " . scalar(localtime()). "\n";
@@ -2591,6 +2659,9 @@ sub searchfortrap
 		{
 			print "\n\nTrap not defined.  Nothing to do...\n\n";
 		}
+
+                # Statistics
+                $g_total_traps_unknown++;
 		
 		if ($unknown_trap_log_enable == 1)
 		{
@@ -2928,6 +2999,7 @@ sub loadsnmpttini {
 	$log_file = $cfg->val('Logging', 'log_file');
 	$unknown_trap_log_enable = $cfg->val('Logging', 'unknown_trap_log_enable');
 	$unknown_trap_log_file = $cfg->val('Logging', 'unknown_trap_log_file');
+	$statistics_interval = $cfg->val('Logging', 'statistics_interval');
 	$syslog_enable = $cfg->val('Logging', 'syslog_enable');
 	$syslog_facility = $cfg->val('Logging', 'syslog_facility');
 	@syslog_level_alert = $cfg->val('Logging', 'syslog_level_alert');
@@ -3035,6 +3107,7 @@ sub loadsnmpttini {
 	if (! defined ($unknown_trap_log_file)) { $unknown_trap_log_file = ''} ;
 	if (! defined ($syslog_enable)) { $syslog_enable = 0} ;
 	if (! defined ($syslog_facility)) { $syslog_facility = 'local0'} ;
+	if (! defined ($statistics_interval)) { $statistics_interval = 0} ;
 	if (! defined ($syslog_level)) { $syslog_level = 'warning'} ;
 	if (! defined ($syslog_system_enable)) { $syslog_system_enable = 0} ;
 	if (! defined ($syslog_system_facility)) { $syslog_system_facility = 'local0'} ;
@@ -3975,4 +4048,37 @@ sub translate_enterprise_oid_format_sub
 
 }
 
+# Log statistics to syslog, event log etc
+sub log_statistics {
 
+  if ($DEBUGGING >= 1)
+  {
+    print "Total traps received:    $g_total_traps_received\n";
+    print "Total traps translated:  $g_total_traps_translated\n";                
+    print "Total unknown traps:     $g_total_traps_unknown\n\n";
+  }
+  
+  if ($syslog_system_enable == 1)  
+  { 
+    syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total unknown traps=$g_total_traps_unknown");                
+  }
+  if ($eventlog_system_enable == 1)
+  {
+    my $message = "" . \
+    "Total traps received:    $g_total_traps_received\n" . \
+    "Total traps translated:  $g_total_traps_translated\n" . \
+    "Total unknown traps:     $g_total_traps_unknown\n";
+    
+    eventlog_system($message,1,$eventlog_information);
+  }
+
+  $g_last_statistics_logged = time();
+}
+
+sub signal_log_statistics {
+	#
+	# Statistics log
+	#
+	$timetologstatistics = 1;
+}
+  
