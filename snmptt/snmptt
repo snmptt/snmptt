@@ -1639,6 +1639,7 @@ sub loadsnmpttconf
 	  while (<SNMPTTCONF>)
 	  {
 	    chomp;				#remove <cr> at end of line	
+	    s/\015//;                       	# Remove any DOS carriage returns
 	    push(@snmpttconf, $_);		#add to each line to @trapconf array
 	    $tempcount++;
 	  }

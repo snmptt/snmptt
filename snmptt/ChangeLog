@@ -1,3 +1,6 @@
+May  7th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- SNMPTT will strip DOS carriage return from snmptt.conf files if detected.
+
 April 29th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Snmpttconvertmib:  Printing of INTEGER enums was wrong.  Fixed.
 
