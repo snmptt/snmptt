@@ -1,6 +1,12 @@
+August 29th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Lines starting with # in NODES file treated as comment.
+  Thanks to Ingo Flaschberger.
+- Changed @var[3] references to $receivedtrap
+
 August 21th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Passed IP address sometimes in the format of
-  udp:ipaddress:port.  udp: and :port now removed
+  udp:ipaddress:port.  udp: and :port now removed.  Thanks to
+  Ingo Flaschberger.
 
 August 20th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_0.2.2

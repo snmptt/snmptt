@@ -292,21 +292,26 @@ sub processtrap
 {
 	# if no nodes list, then $hostmatch = 1 so trap is logged etc, otherwise it is not
 	$hostmatch = 0;
-	if ($event{"@var[3]"}[5] eq '')
+	if ($event{"$receivedtrap"}[5] eq '')
 	{
 		$hostmatch = 1;		# No nodes defined, so default to all nodes
 	}
 	else
 	{
-		if ($event{"@var[3]"}[5] =~ /\\|\// )	# Contain a \ or /?  Must be a filename
+		if ($event{"$receivedtrap"}[5] =~ /\\|\// )	# Contain a \ or /?  Must be a filename
 		{
-			if (open NODESFILE, $event{@var[3]}[5])
+			if (open NODESFILE, $event{$receivedtrap}[5])
 			{
 				while (defined($line = <NODESFILE>))
 				{
 					chomp($line);
 					$line = $line;
-					push (@nodes, $line);
+					
+					# Allow comment lines starting with a #
+					if (!($temp =~ /((^#)|(\s+#)).*/))
+					{
+						push (@nodes, $line);
+					}
 				}
 				close LOGFILE;
 			}
@@ -321,7 +326,7 @@ sub processtrap
 		}
 		else 	# Must be a list of nodes
 		{
-			@nodes = split /\s/, $event{"@var[3]"}[5];
+			@nodes = split /\s/, $event{"$receivedtrap"}[5];
 		}
 
 		foreach $a (@nodes)
@@ -333,7 +338,7 @@ sub processtrap
 		}
 	}
 
-	if ($hostmatch == 1 && $event{@var[3]}[1] ne "IGNORE")
+	if ($hostmatch == 1 && $event{$receivedtrap}[1] ne "IGNORE")
 	{
 	
 		# Trap received exists in our list of trap definitions
@@ -343,11 +348,11 @@ sub processtrap
 		}
 		# Variable substitution for FORMAT string
 		
-		$_ = $event{"@var[3]"}[3];	# FORMAT string
+		$_ = $event{"$receivedtrap"}[3];	# FORMAT string
 	
 		&substitute;
 	
-		$message = "@var[3] $event{@var[3]}[2] \"$event{@var[3]}[1]\" @var[0] - $_\n";
+		$message = "$receivedtrap $event{$receivedtrap}[2] \"$event{$receivedtrap}[1]\" @var[0] - $_\n";
 	
 		if ($enablestdout == 1)
 		{
@@ -384,10 +389,10 @@ sub processtrap
 		# Variable substitution for EXEC string
 		#
 	
-		if ($event{"@var[3]"}[4] ne '' && $event{@var[3]}[1] ne "LOGONLY")
+		if ($event{"$receivedtrap"}[4] ne '' && $event{$receivedtrap}[1] ne "LOGONLY")
 		{
 			
-			$_ = $event{"@var[3]"}[4];	# EXEC string
+			$_ = $event{"$receivedtrap"}[4];	# EXEC string
 		
 			&substitute;
 	
@@ -405,7 +410,7 @@ sub processtrap
 		}
 		elsif ($DEBUGGING >= 1)
 		{
-			if ($event{@var[3]}[1] eq "LOGONLY")
+			if ($event{$receivedtrap}[1] eq "LOGONLY")
 			{
 				print "\n\nTrap set to LOGONLY...\n\n";
 			}
@@ -415,7 +420,7 @@ sub processtrap
 	{
 		if ($DEBUGGING >= 1)
 		{
-			if ($event{@var[3]}[1] eq "IGNORE")
+			if ($event{$receivedtrap}[1] eq "IGNORE")
 			{
 				print "\n\nTrap set to IGNORE...\n\n";
 			}
@@ -450,7 +455,7 @@ sub substitute
 	s(\$A)(@var[4])g;
 
 	# $S - Event name
-	s(\$S)($event{"@var[3]"}[0])g;
+	s(\$S)($event{"$receivedtrap"}[0])g;
 	
 	# $# - Number of variable-bindings in the trap
 	s(\$#)($#entvar)g;
@@ -459,7 +464,7 @@ sub substitute
 	s(\$\$)(\$)g;
 
 	# $s - Severity
-	s(\$s)($event{"@var[3]"}[2])g;
+	s(\$s)($event{"$receivedtrap"}[2])g;
 
 	# $r - Hostname
 	s(\$r)(@var[0])g;
@@ -823,7 +828,7 @@ sub readtrap
 }
 	
 sub searchfortrap
-	{
+{
 		
 	# Variables of trap received by SNMPTRAPD:
 	# 
@@ -852,7 +857,10 @@ sub searchfortrap
 	#
 	# Example: 	To access FORMAT string for received trap:
 	# 		$event{"@var[3]"}[3]
-	
+	#
+	#		or
+	# 		
+	# 		$event{"$receivedtrap"}[3]	
 	###############################################################################
 	# Check to see if received trap is defined in the snmptt.conf, and perform variable
 	# substitution, logging etc if found
@@ -860,9 +868,10 @@ sub searchfortrap
 	# Look for matching OID
 	
 	$processed = 0;
+	$receivedtrap = @var[3];
 	
 	# Check for exact match
-	if (exists $event{"@var[3]"})
+	if (exists $event{"$receivedtrap"})
 	{
 		if ($DEBUGGING >= 1)
 		{
@@ -883,25 +892,25 @@ sub searchfortrap
 	# Check for wildcard match in hash table if not already processed
 	if ($processed == 0)
 	{
-		$receivedtrap = @var[3];
+		$receivedtraptemp = $receivedtrap;
 		
 		$counter = 0;	# Drill down only 40 times.  Should never need this, but
 				# it's here to prevent an infinite loop in this while statement
 				# just in case
-		while ($counter <= 40 && $receivedtrap ne '')
+		while ($counter <= 40 && $receivedtraptemp ne '')
 		{
 			# Remove last digit of recevied trap, add a * and look for match
-			$receivedtrap =~ s/(.*)\.\d+$/\1/;
+			$receivedtraptemp =~ s/(.*)\.\d+$/\1/;
 	
 			if ($DEBUGGING >= 2)
 			{
 				print "Drilling down looking for wildcards in the EVENT hash table\n";
-				print $receivedtrap.".\*\n\n";
+				print $receivedtraptemp.".\*\n\n";
 			}
 			
-			if (exists $event{$receivedtrap.'.*'})
+			if (exists $event{$receivedtraptemp.'.*'})
 			{
-				@var[3] = $receivedtrap.'.*';	# Set @var[3] to matching trap with wildcard
+				$receivedtrap = $receivedtraptemp.'.*';	# Set $receivedtrap to matching trap with wildcard
 				&processtrap;
 				$processed = 1;
 				last;	# found, so stop this while loop
@@ -922,7 +931,7 @@ sub searchfortrap
 		{
 			if (open LOGFILE, ">>$unknowntraplogfile")
 			{	
-				print LOGFILE scalar(localtime),": Unknown trap (@var[3]) received from @var[0] at: \n";
+				print LOGFILE scalar(localtime),": Unknown trap ($receivedtrap) received from @var[0] at: \n";
 				#print out all standard variables
 				for ($i=0;$i <= $#var;$i++)
 				{
