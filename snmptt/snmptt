@@ -111,6 +111,10 @@ if ($debug == 1)
 	$DEBUGGING = 1;	
 	$debugcmdline = 1;
 }
+else
+{
+  $debugcmdline = 0;
+}
 
 if ($daemon == 1)
 {
@@ -151,6 +155,10 @@ if ($debugfile ne '')
 {
 	$DEBUGGING_FILE = $debugfile;	# commandline overpowers snmptt script
 	$debugfilecmdline = 1;
+}
+else
+{
+  $debugfilecmdline = 0;
 }
 
 ##############################################################################
@@ -1025,7 +1033,7 @@ sub substitute
 	{
 	  print "\nVariable $entvarname[$i-1] with value $entvar[$i-1] may be numerical\n";
 	}
-	if ($vartype = &SNMP::getType($entvarname[$i-1]) eq "INTEGER") # Make sure it's a SNMP INTEGER type
+	if (&SNMP::getType($entvarname[$i-1]) eq "INTEGER") # Make sure it's a SNMP INTEGER type
 	{
 	  if ($DEBUGGING >= 2)
 	  {
@@ -1888,7 +1896,6 @@ sub loadsnmpttini {
 	$unknown_trap_log_file = $cfg->val('Logging', 'unknown_trap_log_file');
 	$syslog_enable = $cfg->val('Logging', 'syslog_enable');
 	$syslog_facility = $cfg->val('Logging', 'syslog_facility');
-	@syslog_level_emerg = $cfg->val('Logging', 'syslog_level_emerg');
 	@syslog_level_alert = $cfg->val('Logging', 'syslog_level_alert');
 	@syslog_level_crit = $cfg->val('Logging', 'syslog_level_crit');
 	@syslog_level_err = $cfg->val('Logging', 'syslog_level_err');	
