@@ -351,7 +351,7 @@ This means that if the program called never quits, SNMPTRAPD will wait
 forever.&nbsp; If a trap is received while the traphandler is running,
 it is buffered and will be processed when the traphandler finishes.&nbsp;
 I do not know how large this buffer is.
-<p>With a 600 Mhz PIII and a 9000 line snmptt.conf containing 566 unique
+<p>With a 450 Mhz PIII and a 9000 line snmptt.conf containing 566 unique
 traps (EVENTs), it takes under a second to process the trap including logging
 and executing the qpage program in my examples.
 <p>A future improvement may be to separate the program into two separate
