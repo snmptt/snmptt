@@ -16,7 +16,7 @@
 <body>
 <h1>SNMP Trap Translator v0.9.1</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on:&nbsp; May 13th, 2004
+This file was last updated on:&nbsp; June 11th, 2004
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -265,10 +265,21 @@ module is recommended.<br /></span></blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
 <h3><b>0.9.1</b> <b>- ??, 2004</b></h3>
 <ul>
-<li>Added support for logging unknown traps to a SQL table</li>
+  <li></li>
+  <li></li>
+  <li>Added <b>escape_sequences_enable</b> option to <b>snmptt.ini</b> to enable the use of common escape sequences in FORMAT and EXEC lines 
+  such as <b>\n</b> <b>\t</b> etc</li>
+  <li>Added variable substitution <b>$D</b> to dump the description text from the MIB file for FORMAT and EXEC lines.  Can be enabled or disabled using the <b>mib_descriptions_enable</b> <b>snmptt.ini</b> option.</li>
+  <li>Fixed bug with MySQL 'gone away' errors when running SNMPTT as non-root due to connection being terminated when 
+  the uid changed</li>
+  <li>Added the error number reported by MySQL to MySQL errors (system syslog, eventlog etc)</li>
+  <li>Added some friendly error messages when required Perl modules are not available</li>
+  <li>Added <b>/usr/local/etc/snmp</b> and <b>/usr/local/etc</b> paths to the list of default directories searched for <b>snmptt.ini</b> under Unix</li>
+  <li>Added support for logging unknown traps to a SQL table</li>
 <li>Added logging of statistical information for <span style=
 "font-weight: bold;">total traps received</span>, <span style=
-"font-weight: bold;">total traps translated</span> and <span style=
+"font-weight: bold;">total traps translated</span>, <span style=
+"font-weight: bold;">total traps ignored</span> and <span style=
 "font-weight: bold;">total unknown traps</span>.&nbsp; Statistics
 logged at shut down, and optionally at a defined interval defined
 by new <span style="font-weight: bold;">snmptt.ini</span> variable
