@@ -1,3 +1,8 @@
+February 21st, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added ability to translate integer values to enumeration tags defined
+  in MIB files.  Configure using snmptt.ini variables translate_integers
+  and mibs_environment.  Requires UCD / NET-SNMP Perl module (SNMP.pm)
+
 February 18th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug in snmpttconvertmib that would cause the last trap
   (notification) converted from a v2 MIB file to contain an

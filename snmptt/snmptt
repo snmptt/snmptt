@@ -163,6 +163,16 @@ if ($debugfile ne '')
 use Text::ParseWords;
 use POSIX qw(strftime);
 
+if ($translate_integers == 1)
+{
+	require SNMP;
+	if (defined ($mibs_environment))
+	{
+	  $ENV{'MIBS'} = $mibs_environment;
+	}
+	&SNMP::initMib();
+}
+
 if ($syslog_enable == 1)
 {
 	require Sys::Syslog;
@@ -368,8 +378,11 @@ sub processtrap
 	# @var[5] 		trap community string
 	# @var[6] 		enterprise
 	#
+	# @entvarname[0]	passed variable name 1
+	# @entvarname[1]	passed variable name 2
+	#
 	# @entvar[0]		passed variable 1
-	# @entvar[0]		passed variable 2
+	# @entvar[1]		passed variable 2
 	# .
 	# .
 	# etc..
@@ -658,9 +671,46 @@ sub substitute
 	# Perform substitution on $_ variable
 
 	# $n - Variable-bindings
-	for($i=0;$i <= $#entvar+1; $i++)
+	for($i=1;$i <= $#entvar+1; $i++)
 	{
+	  if ($translate_integers == 1)
+	  {
+	    if ($entvar[$i-1] =~ /\d+/)				# Check to see if value is numerical
+	    {
+	      if ($DEBUGGING >= 2)
+	      {
+		print "\nVariable $entvarname[$i-1] with value $entvar[$i-1] is numerical\n";
+	      }
+	      if ($vartype = &SNMP::getType($entvarname[$i-1]) eq "INTEGER") # Make sure it's a SNMP INTEGER type
+	      {
+		if ($DEBUGGING >= 2)
+		{
+		  print "Variable $entvarname[$i-1] is also defined as an INTEGER in the mib - will attempt to translate\n\n";
+		}
+		my $val = SNMP::mapEnum($entvarname[$i-1], $entvar[$i-1]);
+		if ($val ne '')					# Make sure we got something
+		{
+		  s(\$$i)($val)g;
+		}
+		else						# Didn't get something
+		{
+		  s(\$$i)($entvar[$i-1])g;
+		}
+	      }
+	      else						# It's not an INTEGER after all
+	      {
 		s(\$$i)($entvar[$i-1])g;
+	      }
+	    }
+	    else						# It's not numerical
+	    {
+	      s(\$$i)($entvar[$i-1])g;
+	    }
+	  }
+	  else	# translate_integers is disabled
+	  {
+	    s(\$$i)($entvar[$i-1])g;
+	  }
 	}
 
 	# $c - Category
@@ -934,6 +984,7 @@ sub readtrap
 	@tempvar = ();
 	@var = ();
 	@entvar = ();
+	@entvarname = ();
 
 	if ( $daemon == 1)
 	{
@@ -1005,20 +1056,22 @@ sub readtrap
 	      push(@tempvar, $temp2);
 	    }
 	  }
-	  else			# Should have been variable value, but only value found.  Workaround
-	  			#
-				# Normally it is expected that a line contains a variable name
-				# followed by a space followed by the value (except for the 
-				# first line which is the hostname and the second which is the
-				# IP address).  If there is no variable name on the line (only
-				# one string), then add a variable string called 'variable' so 
-				# it is handled correctly in the next section.
-				# This happens with ucd-snmp v4.2.3 but not v4.2.1 or v4.2.5.
-				# This appears to be a bug in ucd-snmp v4.2.3.  This works around
-				# the problem by using 'variable' for the variable name, although 
-				# v4.2.3 should NOT be used with SNMPTT as it prevents SNMP V2 traps 
-				# from being handled correctly.
+	  else
 	  {
+	    # Should have been variable value, but only value found.  Workaround
+	    # 
+	    # Normally it is expected that a line contains a variable name
+	    # followed by a space followed by the value (except for the 
+	    # first line which is the hostname and the second which is the
+	    # IP address).  If there is no variable name on the line (only
+	    # one string), then add a variable string called 'variable' so 
+	    # it is handled correctly in the next section.
+	    # This happens with ucd-snmp v4.2.3 but not v4.2.1 or v4.2.5.
+	    # This appears to be a bug in ucd-snmp v4.2.3.  This works around
+	    # the problem by using 'variable' for the variable name, although 
+	    # v4.2.3 should NOT be used with SNMPTT as it prevents SNMP V2 traps 
+	    # from being handled correctly.
+
 	    if ($DEBUGGING >= 2)
 	    {
 	      print "Data passed from snmptrapd is incorrect.  UCD-SNMP v4.2.3 is known to cause this\n";
@@ -1083,6 +1136,7 @@ sub readtrap
 		}
 		else	# application specific variables
 		{
+			@entvarname[$j] = @tempvar[$i];
 			@entvar[$j] = @tempvar[$i+1];
 			$j++;
 		}
@@ -1143,7 +1197,7 @@ sub readtrap
 		#print out all enterprise specific variables
 		for ($i=0;$i <= $#entvar;$i++)
 		{
-			print "Value $i: @entvar[$i]\n\n";
+			print "Value $i: @entvarname[$i]=@entvar[$i]\n\n";
 		}
 	}
 		
@@ -1157,8 +1211,11 @@ sub readtrap
 	# @var[5] 		trap community string
 	# @var[6] 		enterprise
 	#
+	# @entvarname[0]	passed variable name 1
+	# @entvarname[1]	passed variable name 2
+	#
 	# @entvar[0]		passed variable 1
-	# @entvar[0]		passed variable 2
+	# @entvar[1]		passed variable 2
 	# .
 	# .
 	# etc..
@@ -1180,8 +1237,11 @@ sub searchfortrap
 	# @var[5] 		trap community string
 	# @var[6] 		enterprise
 	#
+	# @entvarname[0]	passed variable name 1
+	# @entvarname[1]	passed variable name 2
+	#
 	# @entvar[0]		passed variable 1
-	# @entvar[0]		passed variable 2
+	# @entvar[1]		passed variable 2
 	# .
 	# .
 	# etc..
@@ -1280,7 +1340,7 @@ sub searchfortrap
 				#print out all enterprise specific variables
 				for ($i=0;$i <= $#entvar;$i++)
 				{
-					print LOGFILE "Value $i: @entvar[$i]\n";
+					print LOGFILE "Value $i: @entvarname[$i]=@entvar[$i]\n";
 				}
 				print LOGFILE "\n\n";
 				close LOGFILE;
@@ -1375,6 +1435,8 @@ sub loadsnmpttini {
 	$multiple_event = $cfg->val('General', 'multiple_event');
 	$strip_domain = $cfg->val('General', 'strip_domain');
 	@strip_domain_list = $cfg->val('General', 'strip_domain_list');
+	$translate_integers = $cfg->val('General', 'translate_integers');
+	$mibs_environment = $cfg->val('General', 'mibs_environment');
 	
 	# DaemonMode
 	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -1426,6 +1488,7 @@ sub loadsnmpttini {
 	# 
 	if (! defined ($multiple_event)) { $multiple_event = 0} ;
 	if (! defined ($strip_domain)) { $strip_domain = 0} ;
+	if (! defined ($translate_integers)) { $translate_integers = 0} ;
 	if (! defined ($use_trap_time)) { $use_trap_time = 1} ;
 	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($spool_directory)) { $spool_directory = ''} ;
