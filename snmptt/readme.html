@@ -35,6 +35,7 @@ This file was last updated on:&nbsp; April 22nd, 2003
 Configuration file format</a> <br>
   <a href="#SNMPTT.CONF-Configuration-file-Notes">SNMPTT.CONF
 Configuration file Notes</a> <br>
+  <a href="#DNS">Name resolution / DNS</a><br>
   <a href="#Sample1-SNMPTT.CONF-file">Sample1 SNMPTT.CONF file</a> <br>
   <a href="#Sample2-SNMPTT.CONF-file">Sample2 SNMPTT.CONF file</a> <br>
   <a href="#Notes">Notes</a> <br>
@@ -179,7 +180,20 @@ traps using symbolic form, or you enable the options <span
 <p><b><font size="+1">0.8</font></b><b><font size="+1"> - ???</font></b><b><font
  size="+1">, 2003</font></b></p>
 <ul>
-  <li><br>
+  <li>Agent IP address is now used instead of 'host' IP address for
+NODES matches, the 'hostname' column in database logs and the $A
+variable</li>
+  <li>Variable $A now prints the agent host name.&nbsp; $aA prints the
+agent IP address.</li>
+  <li>Variable $E now prints the enterprise in symbolic form.&nbsp; $e
+prints the numeric OID</li>
+  <li>Variable $O now prints the trap in symbolic form.&nbsp; $o prints
+the numeric OID</li>
+  <li>Added the configuration option <span style="font-weight: bold;">dns_enable</span>
+to enable DNS lookups on host and agent IP addresses</li>
+  <li>If DNS is enabled, NODES entries are resolved to IP addresses and
+the IP address is used to perform the match.&nbsp; This will allow for
+aliases to be used.<br>
   </li>
   <li>Changed snmptt.ini setting <span style="font-weight: bold;">translate_trap_oid</span>
 to <span style="font-weight: bold;">translate_log_trap_oid</span></li>
@@ -419,14 +433,18 @@ files to load</li>
 contained in the v0.78package</li>
   <li> Backup your <b>snmptt.ini </b>file, replace it with the new
 version, and make any necessary configuration changes to it</li>
-  <li> In your snmptt.conf file, configure <span
+  <li> In your snmptt.ini file, configure <span
  style="font-weight: bold;">translate_log_trap_oid</span> with <span
  style="font-weight: bold;">translate_trap_oid</span> value from old <span
  style="font-weight: bold;">snmptt.ini</span></li>
-  <li>In your snmptt.conf file, configure <span
+  <li>In your snmptt.ini file, configure <span
  style="font-weight: bold;">translate_value_oids</span> with <span
  style="font-weight: bold;">translate_oids</span> value from old <span
  style="font-weight: bold;">snmptt.ini</span></li>
+  <li>In your snmptt.conf files, replace any $A with $aA unless you
+want agent host names to be used instead of IP addresses<span
+ style="font-weight: bold;"><br>
+    </span></li>
   <li>Review other translate settings in <span
  style="font-weight: bold;">snmptt.ini</span><br>
   </li>
@@ -996,14 +1014,17 @@ the syslog level or NT Event Log type to the severity level.</blockquote>
 logged to any of the supported logging methods. </p>
     <p>Variable substitution is performed on this string using the
 following variables: </p>
-    <blockquote>$A, $aA - Trap agent IP address <br>
+    <blockquote>$A - Trap agent host name <b>(see Note 1)</b><br>
+$aA - Trap agent IP address<br>
 $c - Category <br>
 $C - Trap community string <br>
-$E, $e&nbsp; - Enterprise trap OID in number format <br>
+$E - Enterprise trap OID in symbolic format <br>
+$e&nbsp; - Enterprise trap OID in number format <br>
 $G&nbsp; - Generic trap number (0 if enterprise trap) <br>
 $S&nbsp; - Specific trap number (0 if generic trap) <br>
 $N&nbsp; - Event name defined <br>
-$O, $o - Trap OID in numerical format <b>(see Note 4)</b><br>
+$O - Trap OID in symbolic format <b>(see Note 4)</b><br>
+$o - Trap OID in numerical format <b>(see Note 4)</b><br>
 $R, $r&nbsp; - Hostname <b>(see Note 1)</b> <br>
 $aR, $ar - IP address <br>
 $s&nbsp; - Severity <br>
@@ -1038,15 +1059,8 @@ output will be formatted as:
 For MySQL, DBD::ODBC and Win32::ODBC, the <b>formatline</b> column will
 contain only the <b>format</b> text.</blockquote>
 Note (1):
-    <blockquote>If you are using DNS, the host name may resolve to the
-Fully Qualified Domain Name (FQDN) by snmptrapd.&nbsp; For example:
-barney.bedrock.com.
-      <p>Adding an entry for the host in your /etc/hosts file or
-c:\%systemroot%\system32\drivers\etc\hosts may result in snmptrapd
-sending the short name instead (barney).&nbsp; You can also enable the <b>strip_domain</b>
-/ <b>strip_domain_list</b> options to have SNMPTT strip the domain of
-any FQDN host.&nbsp; See the <span style="font-weight: bold;">snmptt.ini</span>
-file for details.</p>
+    <blockquote>See the section '<a href="#DNS">Name Resolution / DNS</a>'
+for important DNS information.<br>
     </blockquote>
 Note (2):
     <blockquote>If&nbsp; <b>translate_integers</b> is enabled in the <b>snmptt.ini</b>
@@ -1188,27 +1202,10 @@ Do not use any spaces between network ranges as they will be
 interpreted as two different values.&nbsp; For example,
 192.168.1.1&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp; 192.168.1.20 will not
 work.&nbsp; Use 192.168.1.1-192.168.1.20 instead.
-      <p>If you are using DNS, the names passed to SNMPTT may resolve
-to the Fully Qualified Domain Name (FQDN) by <span
- style="font-weight: bold;">snmptrapd </span>which could prevent
-matches from occuring.&nbsp; For example: <span
- style="font-weight: bold;">barney.bedrock.com.</span> </p>
-      <p>Adding an entry for the host in your <span
- style="font-weight: bold;">/etc/hosts</span> file or <span
- style="font-weight: bold;">c:\%systemroot%\system32\drivers\etc\hosts</span>
-may result in snmptrapd sending the short name instead (barney).&nbsp;
-You can also enable the <b>strip_domain</b> / <b>strip_domain_list</b>
-options to have SNMPTT strip the domain of any FQDN host.&nbsp; See the <span
- style="font-weight: bold;">snmptt.ini</span> file for details.<br>
-      </p>
-      <p>SNMPTT is passed both the host name and the IP address from <span
- style="font-weight: bold;">snmptrapd</span>.&nbsp; Because of this, <span
- style="font-weight: bold;">SNMPTT </span>does not need to perform any
-DNS queries to resolve host names to IP addresses.&nbsp; When a host is
-compared to a network range or IP address, the IP address passed from <span
- style="font-weight: bold;">snmptrapd </span>is used, as opposed to
-doing a DNS query of the host name.<br>
-      </p>
+      <p>See the section '<a
+ href="file:///I:/cvs/snmptt/readme.html#DNS">Name Resolution / DNS</a>'
+for important DNS information.</p>
+      <p></p>
     </blockquote>
   </blockquote>
   <b>MATCH:</b> <br>
@@ -1466,6 +1463,50 @@ file</li>
 performedifthe hostname matches a defined hostname in the NODES entry <b>OR</b>
 the NODES entry is blank</li>
 </ul>
+<br>
+<a name="DNS"></a><b><font size="+2">Name resolution / DNS</font></b>
+<p>Snmptrapd passes the IP address of the device sending the trap
+(host), the host name of the device sending the trap (host) (if
+configured to resolve host names) and the IP address of the actual SNMP
+agent (agent).<br>
+<br>
+If the configuration setting <span style="font-weight: bold;">dns_enabled</span>
+is set to 0 (dns disabled), then the host name of the AGENT will not be
+available for the $A variable, NODES matches, and the hostname column
+in SQL databases.&nbsp; The only exception to this is if the (host) IP
+address matches the (agent) IP address and snmptrapd is configured to
+resolve host names.&nbsp; In that case, the host name of the (host)
+will be used for the (agent) host name as they are obviously the same
+host.<br>
+<br>
+If the configuration setting <span style="font-weight: bold;">dns_enabled</span>
+is set to 1 (dns enabled), then the host name of both the host and the
+AGENT will be resolved via DNS.&nbsp; NODES entries will also be
+resolved to IP addresses before performing matches.<br>
+<br>
+The host name may resolve to the Fully Qualified Domain Name
+(FQDN).&nbsp; For example: barney.bedrock.com.&nbsp; Adding an entry
+for the host in your /etc/hosts file or
+%systemroot%\system32\drivers\etc\hosts may result in the short name
+being used instead (barney).&nbsp; You can also enable the <b>strip_domain</b>
+/ <b>strip_domain_list</b> options to have SNMPTT strip the domain of
+any FQDN host.&nbsp; See the <span style="font-weight: bold;">snmptt.ini</span>
+file for details.</p>
+To allow IP addresses to be resolved to host names, PTR records must
+exist in DNS or the local hosts file must contain all hosts.<br>
+<br>
+<span style="font-weight: bold; text-decoration: underline;">It is
+recommended that either DNS be installed on the machine running SNMPTT
+/ snmptrapd or a local hosts file be configured will all devices</span>.&nbsp;
+DNS should be configured as a secondary (authoritive) for the domains
+that it will receive traps from.&nbsp; This will reduce network
+resolution traffic, speed up resolution, and remove the dependency of
+the network for DNS.&nbsp; <span style="font-weight: bold;">If a local
+DNS or hosts file is not used, then the entire network management
+station could become useless during a DNS / remote network outage and
+could cause false alarms for network management software.</span><br
+ style="font-weight: bold;">
+<br>
 <br>
 <a name="Sample1-SNMPTT.CONF-file"></a><b><font size="+2">Sample1
 SNMPTT.CONF file</font></b>
