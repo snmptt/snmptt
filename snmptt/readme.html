@@ -10,7 +10,7 @@
 <a href="http://sourceforge.net"><img SRC="file:////bink/alex/cvs/snmptt/sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.5.1</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; March 13th, 2003
+<br>This file was last updated on:&nbsp; March 21st, 2003
 <p><a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote><a href="#What is it">What is it?</a>
@@ -1570,6 +1570,7 @@ file
 <p>If you are using UCD-SNMP v4.2.3, then the variables will not translate
 properly because SNMPTRAPD does not pass them correctly to SNMPTT.&nbsp;
 Upgrade to a newer version of snmptrapd.
+<br>&nbsp;
 <p><b>Q:&nbsp; I converted a MIB using snmpttconvertmib but the OIDs are
 appearing as text instead of being numberical.&nbsp; Why?</b>
 <blockquote><b>For example:</b></blockquote>
@@ -1598,8 +1599,14 @@ This will cause all applications to output in numerical format including
 Note: This will affect other UCD-SNMP / Net-SNMP programs you are using,
 if any.
 <br>&nbsp;
-<br>&nbsp;
-<br>&nbsp;
+<p><b>Q:&nbsp; Is there a front-end alarm browser available for SNMPTT?</b>
+<p>A:&nbsp; Take a look at <a href="http://sourceforge.net/projects/snmptt-gui">SNMPTT-GUI</a>.&nbsp;
+SNMPTT-GUI aims to provide a web based frontend for SNMPTT.&nbsp; The gui
+is made up of server side perl cgi scripts with client side javascripts
+which interfaces to a SQL database using DBI::ODBC.
+<p>SNMPTT-GUI questions should be directed to the project admins on the
+<a href="http://sourceforge.net/projects/snmptt-gui/">SNMPTT-GUI Sourceforge
+page</a>.
 <br>&nbsp;
 <br>&nbsp;
 <br>&nbsp;
