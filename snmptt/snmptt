@@ -1183,14 +1183,12 @@ sub processtrap
 			{
 				$trap_attempted_to_log++;
 
-				# Backslash any quotes
+				# Double any single quotes
 				my $message_short2 = $message_short;
-				$message_short2 =~ s(\')(\\\')g;   #'
-				$message_short2 =~ s(\")(\\\")g;   #"
+				$message_short2 =~ s(\')('')g;     #'
 
 				my $community = $var[5];
-				$community =~ s(\')(\\\')g;   #'
-				$community =~ s(\")(\\\")g;   #"
+				$community =~ s(\')('')g;   #'
 				
 				unless (defined ($dbh_odbc->do(
 					"INSERT INTO $dbd_odbc_table (eventname, eventid, trapoid, enterprise, 
@@ -1225,14 +1223,12 @@ sub processtrap
 			{
 				$trap_attempted_to_log++;	
 
-				# Backslash any quotes
+				# Double any single quotes
 				my $message_short2 = $message_short;
-				$message_short2 =~ s(\')(\\\')g;   #'
-				$message_short2 =~ s(\")(\\\")g;   #"
+				$message_short2 =~ s(\')('')g;     #'
 
 				my $community = $var[5];
-				$community =~ s(\')(\\\')g;   #'
-				$community =~ s(\")(\\\")g;   #"
+				$community =~ s(\')('')g;   #'
 				
 				# if defined, there's an error
 				if (defined ($dbh_win32_odbc->Sql

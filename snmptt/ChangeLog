@@ -1,3 +1,7 @@
+June  11th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Changed ODBC & WinODBC code to not escape quotes.  Instead, double up
+  single quotes, and do not touch double quotes.
+
 May  27th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added trapoid database column to contain the actual trap OID received from
   Net-SNMP.  eventid will contain what was matched in the .conf file.
