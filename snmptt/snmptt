@@ -215,6 +215,11 @@ if ($DEBUGGING >= 1)
 chomp($tempvar[0]=<>);	#hostname
 chomp($tempvar[1]=<>);	#ip address
 
+# Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
+# out just the IP address
+@tempvar[1] =~ /(\d+\.\d+\.\d+\.\d+)/;
+@tempvar[1] = $1;
+
 #Process varbinds
 #Separate everything out, keeping both the variable name and the value
 while (defined($line = <>))
