@@ -1,4 +1,5 @@
 April 2nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added translate_oids option
 - Snmpttconvertmib: Replace any spaces with -'s in severity
 
 April 1st, 2003: Alex Burger <alex_b@users.sourceforge.net>

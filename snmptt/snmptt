@@ -1106,13 +1106,23 @@ sub substitute
   {
     my $val = $entvar[$i-1];
     
+    print "\nVariable $entvarname[$i-1] with value $entvar[$i-1]\n";
+    
+    # This will translate (if enabled) any OIDs found in the VALUE (not the variable name) to the textual  
+    # name if possible.  For example, if the value was 'A UPS Alarm (.1.3.6.1.4.1.534.1.7.12) has cleared.', 
+    # it could be translated to: 'A UPS Alarm (xupsBuildingAlarm) has cleared.'
+    if ($translate_oids == 1 && $net_snmp_perl_enable == 1)
+    {
+      $val = &translate_oids_sub($val);
+    }
+
     if ($translate_integers == 1 && $net_snmp_perl_enable == 1)
     {
-      if ($entvar[$i-1] =~ /\d+/)				# Check to see if value is numerical
+      if (! ($entvar[$i-1] =~ /\D+/))				# Check to see if value is numerical
       {
 	if ($DEBUGGING >= 2)
 	{
-	  print "\nVariable $entvarname[$i-1] with value $entvar[$i-1] appears to be numerical\n";
+	  print "  Value is numerical\n";
 	}
 	
 	# Problem #1: UCD-SNMP 4.2.3 allows getType and mapEnum to be passed a numerical OID.  
@@ -1140,7 +1150,7 @@ sub substitute
 	{
 	  if ($DEBUGGING >= 2)
 	  {
-	    print "  Variable $entvarname[$i-1] is defined as an INTEGER in the mib - will attempt to translate\n";
+	    print "  Value is defined as an INTEGER in the mib - will attempt to translate\n";
 	  }
 	  my $val2 = SNMP::mapEnum($temp_textOID, $entvar[$i-1]);
 	  if ($val2 ne '')					# Make sure we got something
@@ -1149,7 +1159,7 @@ sub substitute
 	    
 	    if ($DEBUGGING >= 2)
 	    {
-		    print "    Translated to: $val2\n\n";
+		    print "    Translated to: $val2\n";
 	    }    
           }
 	  else
@@ -1157,7 +1167,7 @@ sub substitute
 	    $val = $entvar[$i-1];
 	    if ($DEBUGGING >= 2)
 	    {
-		    print "    Could not translate\n\n";
+		    print "    Could not translate\n";
 	    } 
 	  }
 	}
@@ -1165,7 +1175,7 @@ sub substitute
 	{
 	  if ($DEBUGGING >= 2)
 	  {
-	    print "  Variable $entvarname[$i-1] is NOT defined as an INTEGER or Integer32 in the mib\n\n";
+	    print "  Value is NOT defined as an INTEGER or Integer32 in the mib\n";
 	  }
 	}
       }
@@ -2027,6 +2037,7 @@ sub loadsnmpttini {
 	$strip_domain = $cfg->val('General', 'strip_domain');
 	@strip_domain_list = $cfg->val('General', 'strip_domain_list');
 	$net_snmp_perl_enable = $cfg->val('General', 'net_snmp_perl_enable');
+	$translate_oids = $cfg->val('General', 'translate_oids');
 	$translate_integers = $cfg->val('General', 'translate_integers');
 	$wildcard_expansion_separator = $cfg->val('General', 'wildcard_expansion_separator');
 	$mibs_environment = $cfg->val('General', 'mibs_environment');
@@ -2111,6 +2122,7 @@ sub loadsnmpttini {
 	if (! defined ($multiple_event)) { $multiple_event = 0} ;
 	if (! defined ($strip_domain)) { $strip_domain = 0} ;
 	if (! defined ($net_snmp_perl_enable)) { $net_snmp_perl_enable = 0} ;
+	if (! defined ($translate_oids)) { $translate_oids = 0} ;
 	if (! defined ($translate_integers)) { $translate_integers = 0} ;
 	if (! defined ($wildcard_expansion_separator)) { $wildcard_expansion_separator = " "} ;
 	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
@@ -2310,7 +2322,95 @@ sub dec2bin {
     #$str =~ s/^0+(?=\d)//;   # otherwise you'll get leading zeros
     return $str;
 }
+
 sub bin2dec {
     return unpack("N", pack("B32", substr("0" x 32 . shift, -32)));
 }
+
+sub translate_oids_sub
+{
+  my $string = $_[0];
+
+  if ($string =~ /\.\d+/)	# If it appears to contain an OID
+  {
+    if ($DEBUGGING >= 2)
+    {
+      print "  Value appears to contain an OID or IP address.\n";
+    }
+    my $string_temp = $string;
+    my @oids = ();
+    my $done = 1;
+
+    # Find any IP addresses and remove from $string_temp
+    while ($done)
+    {
+      if ($string_temp =~ /(?<!\.|\d)(\d+\.\d+\.\d+\.\d+)(?!\.)/ ) { $found = 1; }
+      else { $found = 0; }
+
+      if ($found)
+      {
+	$string_temp =~ s/$1//g;	# Remove IP from string_temp
+	#print "ip:$temp\n";
+      }
+      else
+      {
+	$done = 0;
+      }
+    }
+    
+    # Find all the OIDs and put them in a @oids array, and remove from $string_temp
+    $done = 1;
+    my $oid_found = 0;
+    while ($done)
+    {   
+      if ($string_temp =~ /(\.\d+)+/) {	$found = 1; }
+      else { $found = 0; }
+
+      if ($found)
+      {
+	my $oid = $&;
+	push (@oids, $oid);
+	$string_temp =~ s/$oid//g;	# Remove OID from string_temp
+	$oid_found = 1;
+      }
+      else
+      {
+	$done = 0;
+      }
+    }
+
+    if ($oid_found == 1 && $DEBUGGING >= 2)
+    {
+      print "  Value contains an OID.\n";
+    }
+    
+    # Replace all OIDs in $string with textual names if possible
+    foreach my $oid (@oids)
+    {
+      my $temp = &SNMP::translateObj($oid);
+      if (defined ($temp))
+      {
+	if ($temp =~ /\.$/)
+	{
+	  chop $temp;
+	}
+	$string =~ s/$oid/$temp/g;
+	if ($oid_found == 1 && $DEBUGGING >= 2)
+	{
+	  print "    OID: $oid=$temp\n";
+	}
+      }
+    }
+  }
+  else
+  {
+    if ($DEBUGGING >= 2)
+    {
+      print "  Value does not appear to contain an OID\n";
+    }
+  }
+  # Return the new string
+  return $string;    
+}
+
 

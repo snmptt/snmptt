@@ -44,6 +44,13 @@ END
 #       the loading of the MIBS at startup.
 net_snmp_perl_enable = 0
 
+# Set to 0 to disable converting OID values to text as defined in the MIB files
+# Set to 1 to enable converting OID values to text as defined in the MIB files
+# For example, if the value contained: 'A UPS Alarm (.1.3.6.1.4.1.534.1.7.12) has cleared.',
+# it could be translated to: 'A UPS Alarm (xupsBuildingAlarm) has cleared.'
+# Note: net_snmp_perl_enable *must* be enabled
+translate_oids = 1
+
 # Set to 0 to disable converting INTEGER values to enumeration tags as defined in the 
 # MIB files
 # Set to 1 to enable converting INTEGER values to enumeration tags as defined in the 
