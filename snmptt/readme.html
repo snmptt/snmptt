@@ -21,6 +21,13 @@ This file was last updated on:&nbsp; September 9th, 2003
   <a href="#Requirements">Requirements</a> <br>
   <a href="#Whats-New">What's New</a> <br>
   <a href="#Upgrading">Upgrading</a> <br>
+  <a href="#Installation-Overview">Installation Overview</a><br>
+  <a href="file:///I:/cvs/snmptt/readme.html#Installation-Unix">Installation</a>
+  <br>
+  <b>&nbsp;&nbsp; </b><a
+ href="file:///I:/cvs/snmptt/readme.html#Installation-Unix">Unix</a> <br>
+  <b>&nbsp;&nbsp; </b><a
+ href="file:///I:/cvs/snmptt/readme.html#Installation-Windows">Windows</a><br>
   <a href="#Configuration-Options">Configuration Options - snmptt.ini</a>
   <br>
   <a href="#LoggingStandard">Logging</a> <br>
@@ -55,9 +62,6 @@ Configuration file Notes</a> <br>
   <a href="#Sample1-SNMPTT.CONF-file">Sample1 SNMPTT.CONF file</a> <br>
   <a href="#Sample2-SNMPTT.CONF-file">Sample2 SNMPTT.CONF file</a> <br>
   <a href="#Notes">Notes</a> <br>
-  <a href="#Installation-Unix">Installation</a> <br>
-  <b>&nbsp;&nbsp; </b><a href="#Installation-Unix">Unix</a> <br>
-  <b>&nbsp;&nbsp; </b><a href="#Installation-Windows">Windows</a> <br>
   <a href="#Limitations">Limitations</a> <br>
   <a href="#Feedback">Feedback &amp; Bugs</a><br>
   <a href="#Integration-with-other-software">Integration with other
@@ -71,7 +75,7 @@ Convert MIB</a> </p>
 &nbsp; <br>
 &nbsp; </p>
 <p><a name="License"></a><b><font size="+2">License</font></b> </p>
-<p>Copyright 2002 Alex Burger <br>
+<p>Copyright 2002, 2003 Alex Burger <br>
 alex_b@users.sourceforge.net <br>
 4/3/2002 </p>
 <p>This program is free software; you can redistribute it and/or modify
@@ -137,17 +141,19 @@ DBD::ODBC or Win32::ODBC modules</li>
   </li>
   <li> Required: <a
  href="http://search.cpan.org/search?module=Text::ParseWords">Text::ParseWords</a>
-(included with most distributions including ActivePerl)</li>
+module (included with most distributions including ActivePerl)</li>
   <li> Required: <a
  href="http://search.cpan.org/search?module=Getopt::Long">Getopt::Long</a>
-(included with most distributions including ActivePerl)</li>
-  <li> Required: Posix (included with most if not all distributions
+module (included with most distributions including ActivePerl)</li>
+  <li> Required: Posix module (included with most if not all
+distributions
 including ActivePerl)</li>
   <li> Required: <a
- href="http://search.cpan.org/search?module=Config::IniFiles">Config::IniFiles</a></li>
-  <li> Required: <a
+ href="http://search.cpan.org/search?module=Config::IniFiles">Config::IniFiles</a>
+module</li>
+  <li>Required: <a
  href="http://search.cpan.org/search?module=Time::HiRes">Time::HiRes</a>
-(only required when using SNMPTT in daemon mode - required by <b>snmptthandler</b>)</li>
+module (only required when using SNMPTT in daemon mode - required by <b>snmptthandler</b>)</li>
   <li> Optional: <a
  href="http://search.cpan.org/search?module=Sys::Syslog">Sys::Syslog</a>
 module (included with most Unix distributions)</li>
@@ -194,7 +200,7 @@ Net-SNMP
 does not have this problem.<br>
 </p>
 <p>Note: </p>
-<blockquote>SNMPTT only requies the the Net-SNMP Perl module if you
+<blockquote>SNMPTT only requires the Net-SNMP Perl module if you
 want to have variable names translated into symbolic form, want to be
 able to have <span style="font-weight: bold;">snmptrapd </span>pass
 traps using symbolic form, or you enable the options <span
@@ -227,9 +233,6 @@ MySQL and PostgreSQL databases</li>
 to allow NODES files to be either loaded at startup or loaded each time
 an EVENT is processed<br>
   </li>
-  <li>Added the option <span style="font-weight: bold;">resolve_value_ip_addresses</span>
-to resolve ip addresses contained inside enterprise variable values<br>
-  </li>
   <li>Added <span style="font-weight: bold;">trapoid </span>column
 for database logging to contain the actual trap received.&nbsp; The <span
  style="font-weight: bold;">eventid</span> column will contain the
@@ -240,10 +243,11 @@ correct values because the received trap OID was replaced with the
 actual EVENT entry<br>
   </li>
   <li>Fixed bug that caused OIDs not to be translated correctly with
-transl<br>
+    <span style="font-weight: bold;">translate_value_oids</span> enabled<br>
   </li>
   <li>Agent IP address is now used instead of 'host' IP address for
-NODES matches, the 'hostname' column in database logs and the $A
+NODES matches, the 'hostname' column in database logs and the <span
+ style="font-weight: bold;">$A</span>
 variable</li>
   <li>Variable <span style="font-weight: bold;">$A </span>now prints
 the agent host name.&nbsp; <span style="font-weight: bold;">$aA </span>prints
@@ -290,10 +294,10 @@ report the correct number of enterprise variables (was 1 lower than it
 should have been)</li>
   <li>Added <a href="http://www.nagios.org">Nagios</a> / <a
  href="http:/www.netsaint.org">Netsaint</a> integration documentation</li>
-  <li>PID file created (/var/run/snmptt.pid or ./snmptt.pid) when
+  <li>PID file now created (/var/run/snmptt.pid or ./snmptt.pid) when
 running in daemon
 mode on Linux / Unix.&nbsp; snmptt-init.d script updated to remove the
-pid file when stopping.</li>
+pid file when shutting down snmptt.</li>
   <li>Added contrib folder<br>
   </li>
   <li>Snmpttconvertmib</li>
@@ -529,13 +533,16 @@ files to load</li>
 <p>To upgrade from v0.7 to v0.8, you should:<br>
 </p>
 <ol>
-  <li> Replace <b>SNMPTT</b> and <b>SNMPTTCONVERTMIB</b> with the new
+  <li> Replace <span style="font-weight: bold;">snmptt</span> and <span
+ style="font-weight: bold;">snmpttconvertmib </span>with the new
 versions contained in
-the v0.8 package</li>
+the v0.8 package.&nbsp; Make sure the files areexecutable (<span
+ style="font-weight: bold;">chmod +x <span style="font-style: italic;">filename</span></span>)</li>
   <li>Replace your <span style="font-weight: bold;">/etc/rc.d/init.d/snmptt</span>
 file (<span style="font-weight: bold;">cp snmptt-init.d
-/etc/rc.d/init.d/snmptt</span>).&nbsp; Make sure file is executable (<span
- style="font-weight: bold;">chmod +x /etc/rc.d/init.d/snmptt</span>)</li>
+/etc/rc.d/init.d/snmptt</span>).&nbsp; Make sure the file is executable
+(<span style="font-weight: bold;">chmod +x <span
+ style="font-style: italic;">filename</span></span>)</li>
   <li>Backup your <b>snmptt.ini </b>file, replace it with the new
 version, and make any necessary configuration changes to it</li>
   <li> In your snmptt.ini file, configure <span
@@ -548,7 +555,7 @@ version, and make any necessary configuration changes to it</li>
  style="font-weight: bold;">snmptt.ini</span></li>
   <li>In your snmptt.ini file, set <span style="font-weight: bold;">dynamic_nodes</span>
 to 1 if you want the NODES files to be loaded each time an event is
-processed which is how previous versions worked<br>
+processed which is how previous versions of snmptt worked<br>
   </li>
   <li>In your snmptt.conf files, replace any <span
  style="font-weight: bold;">$A</span> with <span
@@ -634,7 +641,210 @@ snmptthandler scripts</li>
 files instead of trap definitions, move that list to the snmptt.ini file</li>
 </ol>
 <p><br>
-<a name="Configuration-Options"></a><b><font size="+2">Configuration
+<a name="Installation-Overview"></a><b><font size="+2">Installation
+Overview</font></b> </p>
+<p>The following outlines the general steps required to install and
+configure SNMPTT:<br>
+</p>
+<ol>
+  <li>Install Net-SNMP and SNMPTT as described in the <a
+ href="#Installation-Unix">Installation</a> section</li>
+  <li>Create a snmptt.conf file <a
+ href="#SNMPTT.CONF-Configuration-file-format">by hand</a>, or using <a
+ href="#SNMP-Trap-Translator-Convert-MIB">snmpttconvertmib<br>
+    </a></li>
+  <li><a href="#Configuration-Options">Modify snmptt.ini</a> to include
+the snmptt.conf file and set any desired options</li>
+  <li><a href="#Installation-Unix">Start snmptt</a></li>
+  <li>Configure your network devices to send traps to the Net-SNMP /
+snmptt machine</li>
+  <li>Initiate a trap on your network device and check the snmptt log
+files for the result</li>
+</ol>
+<p><br>
+<a name="Installation-Unix"></a><b><font size="+2">Installation -
+Unix</font></b> </p>
+<p>1.&nbsp; <b><u>Read this entire file to understand how snmptt works</u></b>
+</p>
+<p>2.&nbsp; Copy <b>snmptt</b> to <span style="font-weight: bold;">/usr/sbin/</span>
+and ensure it is executable (<b>chmod +x snmptt</b>) </p>
+<p>3.&nbsp; Copy <b>snmptthandler</b> to <span
+ style="font-weight: bold;">/usr/sbin/</span> and ensure it is
+executable (<b>chmod +x snmptthandler</b>) </p>
+<p>4.&nbsp; Copy <b>snmptt.ini</b> to <b>/etc/snmp/ </b>or <span
+ style="font-weight: bold;">/etc/</span> and edit the options inside
+the
+file. </p>
+<p>5a.&nbsp;&nbsp; For <b>standlone mode:&nbsp; </b>Modify the
+Net-SNMP <span style="font-weight: bold;">snmptrapd.conf</span> file
+by
+adding the following line: </p>
+<blockquote><b>traphandle default /usr/sbin/snmptt</b>
+  <p>Note:&nbsp;&nbsp; It is possible to configure snmptrapd to execute
+  <span style="font-weight: bold;">snmptt </span>based on the specific
+trap
+received, but using the <span style="font-weight: bold;">default </span>option
+is preferred</p>
+</blockquote>
+5b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
+snmptrapd.conf file by adding the following line:
+<blockquote><b>traphandle default /usr/sbin/snmptthandler</b>
+  <p>Launch snmptt using: </p>
+  <p><b>snmptt --daemon</b></p>
+</blockquote>
+<blockquote>A startup script is included which can be used to start and
+stop <b>snmptt</b> on Mandrake, RedHat and other systems.&nbsp; Copy
+the
+script to the init.d directory (renaming the file during the copy):
+  <p><b>cp snmptt.init.d to /etc/rc.d/init.d/snmptt</b> </p>
+  <p>Add the service using <span style="font-weight: bold;">chkconfig</span>:</p>
+  <p><b>chkconfig --add snmptt</b> </p>
+  <p>Configure the service to start at runlevel 2345: </p>
+  <p><b>chkconfig --level 2345 snmptt on</b> </p>
+  <p>Snmptt will be started at the next reboot, or can be started
+immediately with: </p>
+  <p><b>service snmptt start</b> </p>
+  <p>or </p>
+  <p><b>/etc/rc.d/init.d/snmptt start</b></p>
+</blockquote>
+6.&nbsp; Start <span style="font-weight: bold;">snmptrapd </span>using
+the command line:&nbsp; <span style="font-weight: bold;">snmptrapd -On</span>.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; You should be able to edit the <b>/etc/rc.d/init.d/snmptrapd</b>
+script if you have one and change <br>
+&nbsp;&nbsp;&nbsp;&nbsp; the <b>OPTIONS</b> to <b>"-On"</b>. <b><br>
+<span style="font-weight: bold;"><br>
+</span></b>
+<div style="margin-left: 40px;"><b><span style="font-weight: bold;">Note:&nbsp;
+The -On is recommended.&nbsp; This will make snmptrapd pass OIDs in
+numeric form </span><span style="font-weight: bold;">and prevent
+SNMPTT from having to translate the symbolic name to numerical
+form.&nbsp; If </span><span style="font-weight: bold;">the </span></b><span
+ style="font-weight: bold;">UCD-SNMP / Net-SNMP Perl module is not
+installed, then you MUST use the -On switch.&nbsp; Depending on the
+version of
+UCD-SNMP / Net-SNMP, some symbolic names may not translate
+correctly.&nbsp; See the FAQ
+section for more info.</span><br>
+</div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
+file to include the line: <b>printNumericOids 1.&nbsp; </b>This
+setting will take effect no matter what is used on the command line. </p>
+<p><a name="Installation-Windows"></a><b><font size="+2">Installation -
+Windows</font></b> </p>
+<p>1.&nbsp; <b><u>Read this entire file to understand how snmptt works</u></b>
+</p>
+<p>2.&nbsp; Create the directory <span style="font-weight: bold;">c:\snmp</span>
+and copy <b>snmptt</b> and <b>snmptthandler</b> to it.&nbsp; </p>
+<p>3.&nbsp; Copy <b>snmptt.ini-nt</b> to <b>%SystemRoot%\snmptt.ini</b>
+(c:\winnt\snmptt.ini)<b> </b>and edit the options inside the file. </p>
+<p>4a.&nbsp;&nbsp; For <b>standlone mode:&nbsp; </b>Modify the
+Net-SNMP snmptrapd.conf file by adding the following line: </p>
+<blockquote><b>traphandle default perl c:\snmp\snmptt</b></blockquote>
+<blockquote>Note:&nbsp;&nbsp; It is possible to configure snmptrapd to
+execute snmptt based on the specific trap received, but using the <span
+ style="font-weight: bold;">default </span>option is preferred</blockquote>
+4b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
+snmptrapd.conf file by adding the following line:
+<blockquote><b>traphandle default perl c:\snmp\snmptthandler</b>
+  <p>Launch snmptt using: </p>
+  <p><b>snmptt --daemon</b></p>
+</blockquote>
+5.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD -On. <b><br>
+</b><b><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;
+Note:&nbsp; The -On is recommended.&nbsp; This will make snmptrapd pass
+OIDs in numeric form</span><br style="font-weight: bold;">
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; and prevent
+SNMPTT from having to translate the symbolic name to numerical
+form.&nbsp; If</span><br style="font-weight: bold;">
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; the </span></b><span
+ style="font-weight: bold;">UCD-SNMP / Net-SNMP Perl module is not
+installed, then you MUST use the <br>
+&nbsp;&nbsp;&nbsp;&nbsp; -On switch.&nbsp; Depending on the version of
+UCD-SNMP / Net-SNMP, some symbolic names<br>
+&nbsp;&nbsp;&nbsp;&nbsp; may not translate correctly.&nbsp; See the FAQ
+section for more info.<br>
+</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
+file to include the line: <b>printNumericOids 1.&nbsp; </b>This
+setting will take effect no matter what is used on the command line.
+<p><b><u><font size="+1">Windows NT EventLog:</font></u></b> </p>
+<p>If you have enabled Windows Event Log support, then you must install
+an Event Message File to prevent "Event Message Not Found" messages
+from
+appearing in the Event Log.&nbsp; Microsoft Knowledge Base article
+KB166902 contains information on this error. </p>
+<p>The Event Message File is a binary DLL file.&nbsp; Included with
+SNMPTT is a pre-compiled binary.&nbsp; To compile the DLL yourself, see
+'Compiling' below. </p>
+<p>To install the DLL: </p>
+<ol>
+  <li> Backup your system</li>
+  <li> Make sure Event Viewer is not open</li>
+  <li> Copy <b>bin\snmptt-eventlog.dll</b> to <b>%windir%\system32</b></li>
+  <li> Launch the Registry Editor</li>
+  <li> Go to '<b>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Eventlog\Application</b>'</li>
+  <li> Create a new subkey (under Application) called <b>SNMPTT</b></li>
+  <li> Inside of the <b>SNMPTT</b> key, create a new <span
+ style="font-weight: bold;">String </span>Value called <b>EventMessageFile</b>.&nbsp;
+Give it a value of <b>%windir%\system32\snmptt-eventlog.dll</b></li>
+  <li> Inside of the <b>SNMPTT</b> key, create a new <span
+ style="font-weight: bold;">DWORD </span>Value called <b>TypesSupported</b>.&nbsp;
+Give it a vlue of <b>7</b></li>
+</ol>
+To un-install the DLL:
+<ol>
+  <li> Backup your system</li>
+  <li> Make sure Event Viewer is not open</li>
+  <li> Launch the Registry Editor</li>
+  <li> Go to '<b>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Eventlog\Application</b>'</li>
+  <li> Delete the key <b>SNMPTT</b></li>
+  <li> Delete the file <b>%windir%\system32</b></li>
+</ol>
+Compiling snmptt-eventlog.dll (MS Visual C++ required)
+<ol>
+  <li> If your environment is not already set up for command line
+compilation, locate <b>vcvars32.bat</b>, start a command prompt, and
+execute it (<span style="font-weight: bold;">vcvars32.bat</span>).<br>
+  </li>
+  <li> cd into the directory where <span style="font-weight: bold;">snmptt-eventlog.mc</span>
+is located (included with SNMPTT) and execute the following commands:</li>
+  <li> <b>mc snmptt-eventlog.mc</b></li>
+  <li> <b>rc /r snmptt-eventlog.rc</b></li>
+  <li> <b>link /nodefaultlib /INCREMENTAL:NO /release /nologo
+-base:0x60000000 -machine:i386 -dll -noentry -out:snmptt-eventlog.dll
+snmptt-eventlog.res</b></li>
+  <li> Install the DLL as described above</li>
+</ol>
+<p><br>
+<b><u><font size="+1">Windows NT Service:</font></u></b> </p>
+<p>To configure SNMPTT as a service under Windows NT, follow these
+steps.&nbsp; More information can be obtained from the Windows NT
+Resource Kit. </p>
+<p>1.&nbsp;&nbsp;&nbsp; Install the Windows NT resource kit </p>
+<p>2.&nbsp;&nbsp;&nbsp; Copy the <b>srvany.exe</b> program to <b>c:\winnt\system32</b>
+from <b>c:\Program Files\Resource Kit *</b> </p>
+<p>3.&nbsp;&nbsp;&nbsp; Install the SNMPTT service using: </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b> instsrv SNMPTT
+c:\winnt\system32\srvany.exe</b> </p>
+<p>4.&nbsp;&nbsp;&nbsp; Configure the service: </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Launch <b>REGEDIT</b> </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Go to <b>HKLM\SYSTEM\CurrentControlSet\SNMPTT</b>
+</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Create a key called: <b>Parameters</b>
+</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Inside of Parameters,
+create a Sting Value (REG_SZ) called <b>Application</b> with the value
+of: <b>c:\perl\bin\perl.exe</b> </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Inside of Parameters,
+create a Sting Value (REG_SZ) called <b>AppParameters</b> with the
+value
+of: <b>c:\snmp\snmptt --daemon</b> </p>
+<p>5.&nbsp;&nbsp;&nbsp; Start the service from the control panel, or
+from a command prompt, type:&nbsp; <b>net start snmptt</b> </p>
+To remove the service, type:&nbsp; <b>instsrv SNMPTT remove</b> <br>
+<p><br>
+</p>
+<p><a name="Configuration-Options"></a><b><font size="+2">Configuration
 Options - snmptt.ini</font></b> </p>
 <p>As mentioned throughout this document, configuration options are set
 by editing the <b>snmptt.ini</b> file. </p>
@@ -1896,187 +2106,6 @@ format. </p>
 definitions.&nbsp; <span style="font-weight: bold;">Snmpttconvertmib </span>can
 be used to convert the file to <span style="font-weight: bold;">snmptt.conf</span>
 format. <br>
-&nbsp; </p>
-<p><a name="Installation-Unix"></a><b><font size="+2">Installation -
-Unix</font></b> </p>
-<p>1.&nbsp; <b><u>Read this entire file to understand how snmptt works</u></b>
-</p>
-<p>2.&nbsp; Copy <b>snmptt</b> to <span style="font-weight: bold;">/usr/sbin/</span>
-and ensure it is executable (<b>chmod +x snmptt</b>) </p>
-<p>3.&nbsp; Copy <b>snmptthandler</b> to <span
- style="font-weight: bold;">/usr/sbin/</span> and ensure it is
-executable (<b>chmod +x snmptthandler</b>) </p>
-<p>4.&nbsp; Copy <b>snmptt.ini</b> to <b>/etc/snmp/ </b>or <span
- style="font-weight: bold;">/etc/</span> and edit the options inside
-the
-file. </p>
-<p>5a.&nbsp;&nbsp; For <b>standlone mode:&nbsp; </b>Modify the
-Net-SNMP <span style="font-weight: bold;">snmptrapd.conf</span> file
-by
-adding the following line: </p>
-<blockquote><b>traphandle default /usr/sbin/snmptt</b>
-  <p>Note:&nbsp;&nbsp; It is possible to configure snmptrapd to execute
-  <span style="font-weight: bold;">snmptt </span>based on the specific
-trap
-received, but using the <span style="font-weight: bold;">default </span>option
-is preferred</p>
-</blockquote>
-5b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
-snmptrapd.conf file by adding the following line:
-<blockquote><b>traphandle default /usr/sbin/snmptthandler</b>
-  <p>Launch snmptt using: </p>
-  <p><b>snmptt --daemon</b></p>
-</blockquote>
-<blockquote>A startup script is included which can be used to start and
-stop <b>snmptt</b> on Mandrake, RedHat and other systems.&nbsp; Copy
-the
-script to the init.d directory (renaming the file during the copy):
-  <p><b>cp snmptt.init.d to /etc/rc.d/init.d/snmptt</b> </p>
-  <p>Add the service using <span style="font-weight: bold;">chkconfig</span>:</p>
-  <p><b>chkconfig --add snmptt</b> </p>
-  <p>Configure the service to start at runlevel 2345: </p>
-  <p><b>chkconfig --level 2345 snmptt on</b> </p>
-  <p>Snmptt will be started at the next reboot, or can be started
-immediately with: </p>
-  <p><b>service snmptt start</b> </p>
-  <p>or </p>
-  <p><b>/etc/rc.d/init.d/snmptt start</b></p>
-</blockquote>
-6.&nbsp; Start <span style="font-weight: bold;">snmptrapd </span>using
-the command line:&nbsp; <span style="font-weight: bold;">snmptrapd -On</span>.<br>
-&nbsp;&nbsp;&nbsp;&nbsp; You should be able to edit the <b>/etc/rc.d/init.d/snmptrapd</b>
-script if you have one and change <br>
-&nbsp;&nbsp;&nbsp;&nbsp; the <b>OPTIONS</b> to <b>"-On"</b>. <b><br>
-<span style="font-weight: bold;"><br>
-</span></b>
-<div style="margin-left: 40px;"><b><span style="font-weight: bold;">Note:&nbsp;
-The -On is recommended.&nbsp; This will make snmptrapd pass OIDs in
-numeric form </span><span style="font-weight: bold;">and prevent
-SNMPTT from having to translate the symbolic name to numerical
-form.&nbsp; If </span><span style="font-weight: bold;">the </span></b><span
- style="font-weight: bold;">UCD-SNMP / Net-SNMP Perl module is not
-installed, then you MUST use the -On switch.&nbsp; Depending on the
-version of
-UCD-SNMP / Net-SNMP, some symbolic names may not translate
-correctly.&nbsp; See the FAQ
-section for more info.</span><br>
-<span style="font-weight: bold;"></span></div>
-<p>&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
-file to include the line: <b>printNumericOids 1.&nbsp; </b>This
-setting will take effect no matter what is used on the command line. </p>
-<p><a name="Installation-Windows"></a><b><font size="+2">Installation -
-Windows</font></b> </p>
-<p>1.&nbsp; <b><u>Read this entire file to understand how snmptt works</u></b>
-</p>
-<p>2.&nbsp; Create the directory <span style="font-weight: bold;">c:\snmp</span>
-and copy <b>snmptt</b> and <b>snmptthandler</b> to it.&nbsp; </p>
-<p>3.&nbsp; Copy <b>snmptt.ini-nt</b> to <b>%SystemRoot%\snmptt.ini</b>
-(c:\winnt\snmptt.ini)<b> </b>and edit the options inside the file. </p>
-<p>4a.&nbsp;&nbsp; For <b>standlone mode:&nbsp; </b>Modify the
-Net-SNMP snmptrapd.conf file by adding the following line: </p>
-<blockquote><b>traphandle default perl c:\snmp\snmptt</b></blockquote>
-<blockquote>Note:&nbsp;&nbsp; It is possible to configure snmptrapd to
-execute snmptt based on the specific trap received, but using the <span
- style="font-weight: bold;">default </span>option is preferred</blockquote>
-4b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
-snmptrapd.conf file by adding the following line:
-<blockquote><b>traphandle default perl c:\snmp\snmptthandler</b>
-  <p>Launch snmptt using: </p>
-  <p><b>snmptt --daemon</b></p>
-</blockquote>
-5.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD -On. <b><br>
-</b><b><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;
-Note:&nbsp; The -On is recommended.&nbsp; This will make snmptrapd pass
-OIDs in numeric form</span><br style="font-weight: bold;">
-<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; and prevent
-SNMPTT from having to translate the symbolic name to numerical
-form.&nbsp; If</span><br style="font-weight: bold;">
-<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; the </span></b><span
- style="font-weight: bold;">UCD-SNMP / Net-SNMP Perl module is not
-installed, then you MUST use the <br>
-&nbsp;&nbsp;&nbsp;&nbsp; -On switch.&nbsp; Depending on the version of
-UCD-SNMP / Net-SNMP, some symbolic names<br>
-&nbsp;&nbsp;&nbsp;&nbsp; may not translate correctly.&nbsp; See the FAQ
-section for more info.<br>
-</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
-file to include the line: <b>printNumericOids 1.&nbsp; </b>This
-setting will take effect no matter what is used on the command line.
-<p><b><u><font size="+1">Windows NT EventLog:</font></u></b> </p>
-<p>If you have enabled Windows Event Log support, then you must install
-an Event Message File to prevent "Event Message Not Found" messages
-from
-appearing in the Event Log.&nbsp; Microsoft Knowledge Base article
-KB166902 contains information on this error. </p>
-<p>The Event Message File is a binary DLL file.&nbsp; Included with
-SNMPTT is a pre-compiled binary.&nbsp; To compile the DLL yourself, see
-'Compiling' below. </p>
-<p>To install the DLL: </p>
-<ol>
-  <li> Backup your system</li>
-  <li> Make sure Event Viewer is not open</li>
-  <li> Copy <b>bin\snmptt-eventlog.dll</b> to <b>%windir%\system32</b></li>
-  <li> Launch the Registry Editor</li>
-  <li> Go to '<b>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Eventlog\Application</b>'</li>
-  <li> Create a new subkey (under Application) called <b>SNMPTT</b></li>
-  <li> Inside of the <b>SNMPTT</b> key, create a new <span
- style="font-weight: bold;">String </span>Value called <b>EventMessageFile</b>.&nbsp;
-Give it a value of <b>%windir%\system32\snmptt-eventlog.dll</b></li>
-  <li> Inside of the <b>SNMPTT</b> key, create a new <span
- style="font-weight: bold;">DWORD </span>Value called <b>TypesSupported</b>.&nbsp;
-Give it a vlue of <b>7</b></li>
-</ol>
-To un-install the DLL:
-<ol>
-  <li> Backup your system</li>
-  <li> Make sure Event Viewer is not open</li>
-  <li> Launch the Registry Editor</li>
-  <li> Go to '<b>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Eventlog\Application</b>'</li>
-  <li> Delete the key <b>SNMPTT</b></li>
-  <li> Delete the file <b>%windir%\system32</b></li>
-</ol>
-Compiling snmptt-eventlog.dll (MS Visual C++ required)
-<ol>
-  <li> If your environment is not already set up for command line
-compilation, locate <b>vcvars32.bat</b>, start a command prompt, and
-execute it (<span style="font-weight: bold;">vcvars32.bat</span>).<br>
-  </li>
-  <li> cd into the directory where <span style="font-weight: bold;">snmptt-eventlog.mc</span>
-is located (included with SNMPTT) and execute the following commands:</li>
-  <li> <b>mc snmptt-eventlog.mc</b></li>
-  <li> <b>rc /r snmptt-eventlog.rc</b></li>
-  <li> <b>link /nodefaultlib /INCREMENTAL:NO /release /nologo
--base:0x60000000 -machine:i386 -dll -noentry -out:snmptt-eventlog.dll
-snmptt-eventlog.res</b></li>
-  <li> Install the DLL as described above</li>
-</ol>
-<p><br>
-<b><u><font size="+1">Windows NT Service:</font></u></b> </p>
-<p>To configure SNMPTT as a service under Windows NT, follow these
-steps.&nbsp; More information can be obtained from the Windows NT
-Resource Kit. </p>
-<p>1.&nbsp;&nbsp;&nbsp; Install the Windows NT resource kit </p>
-<p>2.&nbsp;&nbsp;&nbsp; Copy the <b>srvany.exe</b> program to <b>c:\winnt\system32</b>
-from <b>c:\Program Files\Resource Kit *</b> </p>
-<p>3.&nbsp;&nbsp;&nbsp; Install the SNMPTT service using: </p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b> instsrv SNMPTT
-c:\winnt\system32\srvany.exe</b> </p>
-<p>4.&nbsp;&nbsp;&nbsp; Configure the service: </p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Launch <b>REGEDIT</b> </p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Go to <b>HKLM\SYSTEM\CurrentControlSet\SNMPTT</b>
-</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Create a key called: <b>Parameters</b>
-</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Inside of Parameters,
-create a Sting Value (REG_SZ) called <b>Application</b> with the value
-of: <b>c:\perl\bin\perl.exe</b> </p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Inside of Parameters,
-create a Sting Value (REG_SZ) called <b>AppParameters</b> with the
-value
-of: <b>c:\snmp\snmptt --daemon</b> </p>
-<p>5.&nbsp;&nbsp;&nbsp; Start the service from the control panel, or
-from a command prompt, type:&nbsp; <b>net start snmptt</b> </p>
-<p>To remove the service, type:&nbsp; <b>instsrv SNMPTT remove</b> <br>
 &nbsp; </p>
 <p><a name="Limitations"></a><b><font size="+2">Limitations</font></b> </p>
 <p><b><font size="+1">Standalone mode only:</font></b> </p>
