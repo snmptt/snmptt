@@ -1,3 +1,6 @@
+March 26th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_0.6.1
+
 March 25th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_0.6
 - Fixed bug in snmptt - domain name strip not working correctly

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v0.6
+# SNMPTT v0.6.1
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -46,7 +46,7 @@
 ##############################################################################
 #
 
-$snmptt_version = "v0.6";
+$snmptt_version = "v0.6.1";
 
 sub showversion
 {
