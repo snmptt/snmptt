@@ -132,7 +132,7 @@ while ($currentline <= $#mibfile)
 			{
 				$temp1 = 0;
 				$trapsummary = "";
-				@description = "";
+				@description = ();
 				
 				# Start of DESCRIPTION
 				
@@ -149,7 +149,7 @@ while ($currentline <= $#mibfile)
 						$descriptionline1 = $1;
 						$temp1 = 1;
 						push (@description, "$1\n");
-						#print "Line 1: $1 \n";
+						#print "Line 1a: $1 \n";
 					}
 				}
 				
@@ -213,7 +213,7 @@ while ($currentline <= $#mibfile)
 						$line4 =~ (/\s*(.*)\s*/);
 						$descriptionline1 = $1;
 						push (@description, "$1\n");
-						#print "Line 1: $1 \n";
+						#print "Line 1b: $1 \n";
 						$temp1 = 1;
 					}
 					else
@@ -223,7 +223,7 @@ while ($currentline <= $#mibfile)
 						if ($1 ne "")
 						{
 							push (@description, "$1\n");
-							#print "$1\n";
+							#print "c:$1\n";
 						}
 					}
 
@@ -292,7 +292,10 @@ while ($currentline <= $#mibfile)
 	
 			print OUTPUTFILE "SDESC\n";
 			#print OUTPUTFILE "$descriptionline1\n";
-			print OUTPUTFILE "@description";		
+			for ($i=0; $i <= $#description; $i++)
+			{
+				print OUTPUTFILE "@description[$i]";
+			}
 			print OUTPUTFILE "EDESC\n";
 	
 			$currentline--;
