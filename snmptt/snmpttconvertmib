@@ -1090,5 +1090,3 @@ foreach $key (sort keys %SNMP::MIB)
 	#End of process the trap files using NET-SNMP Perl
 }
 
-
-	i
