@@ -89,16 +89,6 @@ unknown_trap_log_enable = 0
 # Ex: 'c:\\snmp\\snmpttunknown.log'
 unknown_trap_log_file = c:\\snmp\\snmpttunknown.log
 
-# Set to 1 to enable logging to syslog.  If you do not have the Sys::Syslog module
-# then disable this.  Windows users should disable this.
-syslog_enable = 0
-
-# Syslog facility to use.  For example: 'local0'
-syslog_facility = local0
-
-# Syslog level to use.  For example: 'warning'
-syslog_level = warning
-
 [Exec]
 
 # Set to 1 to allow EXEC statements to execute.  Should normally be left on unless you

@@ -45,9 +45,12 @@
 #
 ##############################################################################
 #
+
+$snmptt_version = "v0.5.1";
+
 sub showversion
 {
-	print "\nSNMPTT v0.5.1\n";
+	print "\nSNMPTT $snmptt_version\n";
 	print "(c) 2002 Alex Burger\n";
 	print "http://snmptt.sourceforge.net\n\n";
 }
@@ -163,6 +166,30 @@ if ($debugfile ne '')
 use Text::ParseWords;
 use POSIX qw(strftime);
 
+if ($syslog_enable == 1 || $syslog_system_enable == 1)
+{
+	require Sys::Syslog;
+}
+
+if ($DEBUGGING >= 1)
+{
+	if ($DEBUGGING_FILE ne '') 
+	{
+	  	open DEBUGFILE, ">>$DEBUGGING_FILE"
+			or warn "Could not open debug output file ($!)";
+	
+		select DEBUGFILE;	# Change default output to debug file
+	}
+	
+	# Print out time
+	print "SNMPTT $snmptt_version started: ",scalar(localtime),"\n\n"
+}
+
+if ($syslog_system_enable == 1)
+{
+  syslog_system("SNMPTT $snmptt_version started");
+}
+
 if ($translate_integers == 1)
 {
 	require SNMP;
@@ -171,11 +198,6 @@ if ($translate_integers == 1)
 	  $ENV{'MIBS'} = $mibs_environment;
 	}
 	&SNMP::initMib();
-}
-
-if ($syslog_enable == 1)
-{
-	require Sys::Syslog;
 }
 
 if ($mysql_dbi_enable == 1)
@@ -193,20 +215,6 @@ if ($sql_win32_odbc_enable == 1)
 	warn "Unable to connect to DSN $sql_win32_odbc_dsn:" . Win32::ODBC::Error() . "\n" unless (defined $dbhodbc);
 
 }
-
-if ($DEBUGGING >= 1)
-{
-	if ($DEBUGGING_FILE ne '') 
-	{
-	  	open DEBUGFILE, ">>$DEBUGGING_FILE"
-			or warn "Could not open debug output file ($!)";
-	
-		select DEBUGFILE;	# Change default output to debug file
-	}
-	
-	# Print out time
-	print "SNMPTT started: ",scalar(localtime),"\n\n"
-}		
 
 ##############################################################################
 ####  MAIN SECTION START
@@ -251,28 +259,43 @@ if ($daemon == 1)
 		
 		if (! (chdir($spool_directory)))
 		{
-			if ($DEBUGGING >= 1)
-			{
-				print "Unable to enter dir $spool_directory:$!\n";
-			}
-			warn "Unable to enter dir $spool_directory:$!\n";
+		  if ($DEBUGGING >= 1)
+		  {
+		    print "Unable to enter dir $spool_directory:$!\n";
+		  }
+		  warn "Unable to enter dir $spool_directory:$!\n";
+		  
+		  if ($syslog_system_enable == 1)
+		  {
+		    syslog_system("Unable to enter dir $spool_directory");
+		  }
 		}
+		
 		elsif (! (opendir(DIR, ".")))
 		{
-			if ($DEBUGGING >= 1)
-			{
-				print "Unable to open $spool_directory:$!\n";
-			}
-			warn "Unable to open $spool_directory:$!\n";
+		  if ($DEBUGGING >= 1)
+		  {
+		    print "Unable to open $spool_directory:$!\n";
+		  }
+		  warn "Unable to open $spool_directory:$!\n";
+
+		  if ($syslog_system_enable == 1)
+		  {
+		    syslog_system("Unable to open $spool_directory");
+		  }
 		}
 		elsif (! (@filenames = readdir(DIR)))
 		{
-		
-			if ($DEBUGGING >= 1)
-			{
-				print "Unable to read $spool_directory:$!\n";
-			}
-			warn "Unable to read $spool_directory:$!\n";
+		  if ($DEBUGGING >= 1)
+		  {
+		    print "Unable to read $spool_directory:$!\n";
+		  }
+		  warn "Unable to read $spool_directory:$!\n";
+
+		  if ($syslog_system_enable == 1)
+		  {
+		    syslog_system("Unable to read $spool_directory");
+		  }
 		}
 		else
 		{
@@ -300,6 +323,12 @@ if ($daemon == 1)
 						print "Could not open trap file $spool_directory$file: ($!)\n";
 					}
 					warn "Could not open trap file $spool_directory$file: ($!)\n";
+
+					if ($syslog_system_enable == 1)
+					{
+					  syslog_system("Could not open trap file $spool_directory$file");
+					}
+
 					$filesuccess = 0;
 				}
 						
@@ -320,6 +349,11 @@ if ($daemon == 1)
 							print "Unable to delete $file:$!\n";
 						}
 						warn "Unable to delete $file:$!\n";
+						
+						if ($syslog_system_enable == 1)
+						{
+						  syslog_system("Unable to delete $file");
+						}
 					}
 				}
 			}
@@ -336,10 +370,25 @@ if ($daemon == 1)
 			{
 				print "Reloading configuration file\n\n";
 			}
+			
+			if ($syslog_system_enable == 1)
+			{
+			  syslog_system("Reloading configuration file");
+			}
+
 			&loadsnmpttini;		# Load ini file
 			&loadsnmpttconf;	# Load SNMPTT.CONF file
 			$timetoreload = 0;
 		}
+	}
+	if ($DEBUGGING >= 1)
+	{
+		print "SNMPTT $snmptt_version shutdown: ",scalar(localtime),"\n\n"
+	}
+	
+	if ($syslog_system_enable == 1)
+	{
+	  syslog_system("SNMPTT $snmptt_version shutdown");
 	}
 }
 else
@@ -812,29 +861,52 @@ sub loadsnmpttconf
 	
 	foreach $snmpttconffile (@snmptt_conf_files)
 	{
-		open SNMPTTCONF, $snmpttconffile
-			or die "Could not open snmptt.conf file: $snmpttconffile ($!)";
-			if ($DEBUGGING >= 1)
-		{
-			print "\n\tLoading $snmpttconffile\n";
-		}
-		
-		$tempcount = 0;
-		while (<SNMPTTCONF>)
-		{
-			chomp;				#remove <cr> at end of line	
-			push(@snmpttconf, $_);		#add to each line to @trapconf array
-			$tempcount++;
-		}
-	
-		if ($DEBUGGING >= 1)
-		{
-			print "\tFinished loading $tempcount lines from $snmpttconffile\n";
-		}
+	  if ($DEBUGGING >= 1)
+	  {
+	    print "\n\tLoading $snmpttconffile\n";
+	  }
+	  
+	  if ($syslog_system_enable == 1 && $daemon == 1)
+	  {
+	    syslog_system("Loading $snmpttconffile");
+	  }
+	  
+	  unless (open SNMPTTCONF, $snmpttconffile)
+	  {
+	    warn "Could not open configuration file: $snmpttconffile ($!)";
+	    if ($DEBUGGING >= 1)
+	    {
+	      print "\n\tCould not open configuration file: $snmpttconffile\n";
+	    }
+	    
+	    if ($syslog_system_enable == 1 && $daemon == 1)
+	    {
+	      syslog_system("Could not open configuration file: $snmpttconffile");
+	    }
+	    
+	    next;
+	  }
+	  $tempcount = 0;
+	  while (<SNMPTTCONF>)
+	  {
+	    chomp;				#remove <cr> at end of line	
+	    push(@snmpttconf, $_);		#add to each line to @trapconf array
+	    $tempcount++;
+	  }
+	  
+	  if ($DEBUGGING >= 1)
+	  {
+	    print "\tFinished loading $tempcount lines from $snmpttconffile\n";
+	  }
+	  if ($syslog_system_enable == 1 && $daemon == 1)
+	  {
+	    syslog_system("Finished loading $tempcount lines from $snmpttconffile");
+	  }
 	}
-		if ($DEBUGGING >= 1)
+	
+	if ($DEBUGGING >= 1)
 	{
-		print "\nFinished loading list of files to load from $snmpttconffile\n";
+		print "\nFinished loading configuration files\n";
 	}
 	
 	# Process each line of snmptt.conf loaded into @snmpttconf array.
@@ -1453,6 +1525,9 @@ sub loadsnmpttini {
 	$syslog_enable = $cfg->val('Logging', 'syslog_enable');
 	$syslog_facility = $cfg->val('Logging', 'syslog_facility');
 	$syslog_level = $cfg->val('Logging', 'syslog_level');
+	$syslog_system_enable = $cfg->val('Logging', 'syslog_system_enable');
+	$syslog_system_facility = $cfg->val('Logging', 'syslog_system_facility');
+	$syslog_system_level = $cfg->val('Logging', 'syslog_system_level');
 	
 	# Exec
 	$exec_enable = $cfg->val('Exec', 'exec_enable');
@@ -1501,6 +1576,9 @@ sub loadsnmpttini {
 	if (! defined ($syslog_enable)) { $syslog_enable = 0} ;
 	if (! defined ($syslog_facility)) { $syslog_facility = 'local0'} ;
 	if (! defined ($syslog_level)) { $syslog_level = 'warning'} ;
+	if (! defined ($syslog_system_enable)) { $syslog_system_enable = 0} ;
+	if (! defined ($syslog_system_facility)) { $syslog_system_facility = 'local0'} ;
+	if (! defined ($syslog_system_level)) { $syslog_system_level = 'warning'} ;
 	if (! defined ($exec_enable)) { $exec_enable = 1} ;
 	if (! defined ($mysql_dbi_enable)) { $mysql_dbi_enable = 0} ;
 	if (! defined ($mysql_dbi_database)) { $mysql_dbi_database = ''} ;
@@ -1541,3 +1619,15 @@ sub signal_handler_die {
 	$timetodie = 1;
 }
 
+sub syslog_system {
+  my $message = @_[0];
+  if (Sys::Syslog::openlog('SNMPTT', '',$syslog_system_facility) )
+  {
+    Sys::Syslog::syslog ($syslog_system_level, $message,1);
+    Sys::Syslog::closelog();
+  }
+  else
+  {
+    warn "Cannot open log_file: $!";
+  }
+}
