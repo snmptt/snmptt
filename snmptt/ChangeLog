@@ -2,7 +2,7 @@ March 7th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Improved syslog and event log support by allowing different syslog and
   NT Event Log levels based on the severity level defined in the snmptt.conf
   file
-- Added variable expansion for variable names using $vn and $+n
+- Added variable expansion for variable names using $vn, $+n, $-n, $+* and $-*
 - Fixed bug that would prevent variables numbered 10 or higher from being
   translated correctly
 

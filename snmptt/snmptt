@@ -976,6 +976,20 @@ sub substitute
 {
 	# Perform substitution on $_ variable
 
+	# Wildcards - $*, $+*, $-*
+	my $temp_wildcard1;
+	my $temp_wildcard2;
+	my $temp_wildcard3;
+	for($i=1;$i <= $#entvar+1; $i++)
+	{
+	  $temp_wildcard1 = $temp_wildcard1 . "\$$i ";
+	  $temp_wildcard2 = $temp_wildcard2 . "\$\+$i ";
+	  $temp_wildcard3 = $temp_wildcard3 . "\$-$i ";
+	}
+	s(\$\*)($temp_wildcard1)g;
+	s(\$\+\*)($temp_wildcard2)g;
+	s(\$-\*)($temp_wildcard3)g;
+	
 	# $v - Names of variable-bindings 
 	# Count down backwards to make sure 10 is not mistaken for $1
 	for($i=$#entvarname+1;$i > 0; $i--)
@@ -1043,13 +1057,17 @@ sub substitute
 	      
 	      my $temp = &SNMP::translateObj($entvarname[$i-1],0);
 	      s(\$\+$i)($temp:$entvar[$i-1])g;		# $+n
+
+	      my $temp2 = &SNMP::getType($entvarname[$i-1]);
+	      s(\$-$i)($temp ($temp2):$entvar[$i-1])g;	# $-n
 	    }
 	    else
 	    {
 	      s(\$$i)($entvar[$i-1])g;			# $n
 	      s(\$\+$i)(variable$i:$entvar[$i-1])g;	# $+n
+	      
+	      s(\$-$i)(variable$i (unknown):$entvar[$i-1])g;	# $-n
 	    }
-	    
 	  }
 	}
 
@@ -1133,9 +1151,6 @@ sub substitute
 		# $G - Generic trap number - 0
 		s(\$G)(0)g;	  
 	}	
-
-	# $* - Expand all variable-bindings
-	s(\$\*)(@entvar)g;
 }
 
 sub loadsnmpttconf
