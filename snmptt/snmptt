@@ -30,7 +30,7 @@
 # The script is called by defining a 'traphandle' in snmptrapd.conf.  
 # For example:
 #
-# traphandle default /sbin/snmptrapexex
+# traphandle default /sbin/snmptt
 # 
 # SNMPTRAPD feeds details about the trap to the launched program's standard
 # input in the following format (see snmptrapd.conf man page for a complete
