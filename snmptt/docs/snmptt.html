@@ -1683,9 +1683,9 @@ NOTIFICATION-TYPE line in the MIB file when converted using
 <b>event_OID:</b>
 <blockquote>Object identifier string in dotted format or symbolic
 notation <b><u>containing no spaces</u></b>.
-<p>For example, a Compaq (enterprise 1.3.6.1.4.1.232)
+<p>For example, a Compaq (enterprise .1.3.6.1.4.1.232)
 cpqHoGenericTrap trap (trap 11001) would be written as:</p>
-<p style="margin-left: 40px;">1.3.6.1.4.1.232.0.11001.</p>
+<p style="margin-left: 40px;">.1.3.6.1.4.1.232.0.11001</p>
 <p>Symbolic names can also be used if the UCD-SNMP / Net-SNMP Perl
 module is installed and enabled by setting
 <b>net_snmp_perl_enable</b> in the snmptt.ini file.&nbsp; For
@@ -1708,7 +1708,7 @@ with the module name, the event definition will be <span style=
 Also note that UCD-SNMP may not properly convert symbolic names to
 numeric OIDs which could result in traps not being matched.</div>
 <blockquote>SNMP V1 traps are in the format of enterprise ID
-(1.3.6.1.4.1.232) followed by a 0, and then followed by the trap
+(.1.3.6.1.4.1.232) followed by a 0, and then followed by the trap
 number (11001).
 <p>There can be multiple entries for the same trap OID in the
 configuration file.&nbsp; If <b>multiple_event</b> is enabled in
@@ -1718,11 +1718,11 @@ disabled, only the first matching entry will be used.</p>
 </blockquote>
 Wildcards in dotted format notation can&nbsp; also be used.&nbsp;
 For example:
-<p style="margin-left: 40px;">1.3.6.1.4.1.232.1.2.*</p>
+<p style="margin-left: 40px;">.1.3.6.1.4.1.232.1.2.*</p>
 <p><b>Note:</b></p>
 <blockquote>Specific trap matches are performed before wildcards so
-if you have an entry for 1.3.6.1.4.1.232.1.2.5 AND
-1.3.6.1.4.1.232.1.2.*, it will process the .5 trap when received
+if you have an entry for .1.3.6.1.4.1.232.1.2.5 AND
+.1.3.6.1.4.1.232.1.2.*, it will process the .5 trap when received
 even if the wildcard is defined first.
 <p>Wildcard matches are only matched if there are NO exact
 matches.&nbsp; This takes into consideration the NODES list.&nbsp;
@@ -3005,17 +3005,17 @@ incoming traps from SEC.<br />
 Following is an example snmptt.conf.sec file to accept incoming
 traps from SEC.&nbsp; Use an enterprise OID that will not
 interferre with any other OIDs already configured on your
-system.&nbsp; For example, 1.3.6.1.4.1.9999.<br />
+system.&nbsp; For example, .1.3.6.1.4.1.9999.<br />
 <br />
 <div style="margin-left: 40px;"><span style=
-"font-weight: bold;">EVENT Cisco_Link_DownUp 1.3.6.1.4.1.9999.1
+"font-weight: bold;">EVENT Cisco_Link_DownUp .1.3.6.1.4.1.9999.1
 "Cisco Events" Normal</span><br />
 FORMAT $1<br />
 #<br />
 #<br />
 #<br />
 <span style="font-weight: bold;">EVENT Cisco_Link_DownUp
-1.3.6.1.4.1.9999.2 "Cisco Events" Major</span><br />
+.1.3.6.1.4.1.9999.2 "Cisco Events" Major</span><br />
 FORMAT $1<br />
 #<br />
 #<br />
@@ -3170,15 +3170,15 @@ print "$node\n";<br />
 print "$ipaddr\n";<br />
 print ".1.3.6.1.2.1.1.3.0 00:00:00:00.00\n";<br />
 if ($severity=~/normal/i) {<br />
-&nbsp; print ".1.3.6.1.6.3.1.1.4.1.0 1.3.6.1.4.1.9999.1\n";<br />
+&nbsp; print ".1.3.6.1.6.3.1.1.4.1.0 .1.3.6.1.4.1.9999.1\n";<br />
 }<br />
 else {<br />
-&nbsp; print ".1.3.6.1.6.3.1.1.4.1.0 1.3.6.1.4.1.9999.2\n";<br />
+&nbsp; print ".1.3.6.1.6.3.1.1.4.1.0 .1.3.6.1.4.1.9999.2\n";<br />
 }<br />
-print "1.3.6.1.4.1.9999.1.1 $message\n";<br />
+print ".1.3.6.1.4.1.9999.1.1 $message\n";<br />
 print ".1.3.6.1.6.3.18.1.3.0 $ipaddr\n";<br />
 print ".1.3.6.1.6.3.18.1.4.0 public\n";<br />
-print ".1.3.6.1.6.3.1.1.4.3.0 1.3.6.1.4.1.9999\n";<br />
+print ".1.3.6.1.6.3.1.1.4.3.0 .1.3.6.1.4.1.9999\n";<br />
 <br />
 close TRAP;<br /></div>
 <br />
