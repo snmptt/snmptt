@@ -1,4 +1,6 @@
 Aug 16th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Change version to 0.9.5
+- Add daemon sample traps
 - Fixed missing _unknown in unknown logging for PostgreSQL, ODBC
   and Win32::ODBC.  Thanks to mike at mccartney.net 
 

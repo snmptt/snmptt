@@ -14,9 +14,9 @@
 <title>SNMP Trap Translator</title>
 </head>
 <body>
-  <h1>SNMP Trap Translator v0.9.4</h1>
+  <h1>SNMP Trap Translator v0.9.5</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on:&nbsp; July 14th, 2004
+This file was last updated on:&nbsp; July 16th, 2004
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -262,7 +262,7 @@ or you enable the options <b>translate_integers</b>,
 <b>translate_trap_oid</b> or <b>translate_oids</b>.  Although not required, using the Perl 
 module is recommended.<br /></span></blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
-<h3><b>0.9.4</b> <b>- ??, 2004</b></h3>
+<h3><b>0.9.5</b> <b>- ??, 2004</b></h3>
 <ul>
   <li>SQL database connections are now opened after forking to the background when running in daemon mode, and after changing users when running SNMPTT as a non-root user.  This should prevent 'gone away' and other connection problems with SQL databases due to lost handles.</li>
   <li>Added <b>mysql_ping_on_insert</b>, <b>postgresql_ping_on_insert</b> and <b>dbd_odbc_ping_on_insert</b> options to 'ping' the database before doing an INSERT.  Also added the options <b>mysql_ping_interval</b>, <b>postgresql_ping_interval</b> and <b>dbd_odbc_ping_interval</b> to periodically ping the database.  These options will help ensure the connection to the database remains available.  If an error is returned, it will attempt to reconnect to the database.  This should prevent SNMPTT from having to be restarted if the SQL server is not available due to an outage or a connection timeout due to no activity.</li>
@@ -634,8 +634,8 @@ configuration files to load</li>
 <li>Initial release</li>
 </ul>
 <h2><a id="Upgrading" name="Upgrading"></a>Upgrading</h2>
-<h3><b>v0.9 to v0.9.4</b></h3>
-<p>To upgrade from v0.8 to v0.9.4, you should:</p>
+<h3><b>v0.9 to v0.9.5</b></h3>
+<p>To upgrade from v0.8 to v0.9.5, you should:</p>
 <ol>
   <li>Replace <b>snmptt</b> and <b>snmpttconvertmib</b> with the
   new versions contained in the v1.0 package.&nbsp; Make sure the files
