@@ -32,7 +32,7 @@
 # Allows you to set the MIBS environment variable used by SNMPTT
 # Leave blank or comment out to have the systems enviroment settings used
 # To have all MIBS processed, set to ALL
-$mibs_environment = ALL;
+$mibs_environment = "RFC1213-MIB";
 
 # This sets the best_guess parameter used by the UCD-SNMP / NET-SNMP Perl module for 
 # translating symbolic nams to OIDs and vice versa.

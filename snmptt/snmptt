@@ -228,6 +228,10 @@ if ($net_snmp_perl_enable == 1)
 	if ($DEBUGGING >= 1)
 	{
 	  print "********** Net-SNMP version $SNMP::VERSION Perl module enabled **********\n\n";
+	  if (defined ($mibs_environment))
+	  {
+	    print "********** MIBS: $mibs_environment **********\n\n";
+	  }
 	}
 }
 
