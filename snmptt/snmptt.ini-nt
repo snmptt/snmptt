@@ -91,7 +91,7 @@ unknown_trap_log_file = c:\\snmp\\snmpttunknown.log
 
 # Set to 1 to enable logging of *TRAPS* to the event log.
 # All traps will be recorded to the Application log
-eventlog_enable = 1
+eventlog_enable = 0
 
 # Set the event log type for *TRAPS*.  Options are:
 # INFORMATION, WARNING or ERROR
@@ -100,8 +100,9 @@ eventlog_type = 'WARNING'
 #eventlog_type = 'ERROR'
 
 # Set to 1 to enable logging of *SNMPTT system errors* to the event log.
-# All errors will be recorded to the Application log
-eventlog_system_enable = 1
+# All errors will be recorded to the Application log.  The event type used
+# will depend on the severity of the problem and is hard coded into SNMPTT.
+eventlog_system_enable = 0
 
 [Exec]
 
