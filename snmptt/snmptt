@@ -658,7 +658,6 @@ sub processtrap
 			{
 				$message = $_;
 				
-				print "hello\n";
 				if (defined $dbhodbc->Sql
 				        ("INSERT INTO $sqlodbctable (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
