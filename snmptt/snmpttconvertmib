@@ -129,7 +129,7 @@ if ($debug == 2)
   $DEBUGGING = 2;
 }
 
-if (($input eq "") || ($output eq ""))
+if (($in eq "") || ($out eq ""))
 {
   print "\nMissing arguments!\n";
   &show_help();
@@ -858,7 +858,7 @@ if (1)
 sub show_help
 {
   $USAGE = qq/Usage:
-  snmpttconvertmib [<options>]
+  snmpttconvertmib --in= --out= [<options>]
 Options:
   --debug=n              Set debug level (1 or 2)
   --help                 Display this message
