@@ -122,6 +122,7 @@ translate_varname_oid_format = 1
 # MIB files
 # Set to 1 to enable converting INTEGER values to enumeration tags as defined in the 
 # MIB files
+# Example: moverDoorState:open instead of moverDoorState:2
 # Note: net_snmp_perl_enable *must* be enabled
 translate_integers = 1
 
@@ -243,6 +244,13 @@ eventlog_type = WARNING
 eventlog_system_enable = 0
 
 [SQL]
+# Determines if the enterprise column contains the numeric OID or symbolic OID
+# Set to 0 for numeric OID
+# Set to 1 for symbolic OID
+# Uses translate_enterprise_oid_format to determine format
+# Note: net_snmp_perl_enable *must* be enabled
+db_translate_enterprise = 0
+
 # MySQL: Set to 1 to enable logging to a MySQL database via DBI (Linux / Windows)
 # This requires DBI:: and DBD::mysql
 mysql_dbi_enable = 0
