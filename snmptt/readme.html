@@ -10,9 +10,9 @@
 </head>
 <body>
 <br>
-<b><font size="+3">SNMP Trap Translator v0.8</font></b><br>
+<b><font size="+3">SNMP Trap Translator v0.8.1</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; September 16th, 2003
+This file was last updated on:&nbsp; September 17th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -1411,8 +1411,10 @@ $R, $r&nbsp; - Hostname <b>(see Note 1)</b> <br>
 $aR, $ar - IP address <br>
 $s&nbsp; - Severity <br>
 $T&nbsp; - Uptime:&nbsp; Time since network entity was initialized <br>
-$X&nbsp; - Current time <br>
-$x&nbsp; - Current date <br>
+$X&nbsp; - Time trap was spooled (daemon mode) or current time
+(standalone mode)<br>
+$x&nbsp; - Date trap was spooled (daemon mode) or current date
+(standalone mode) <br>
 $# - Number of (how many) variable-bindings in the trap <br>
 $$&nbsp; - Print a $ <br>
 $@ - Number of seconds since the epoch <br>
