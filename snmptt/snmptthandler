@@ -53,7 +53,7 @@
 # or 'c:\snmp\snmptt\spool\'
 # Don't forget the trailing slash!
 $spooldirectory = '/var/spool/snmptt/';
-#$spooldirectory = 'c:\snmp\snmptt\spool/';
+#$spooldirectory = 'd:\\snmp\\snmpttspool\\';
 
 #Debugging:  	0 = no output messages
 #		1 = output some basic messages
@@ -65,7 +65,7 @@ $DEBUGGING = 0;
 #
 $DEBUGGINGFILE = '';				# STDOUT
 #$DEBUGGINGFILE = '/var/log/snmptthandler.debug';	
-
+#$DEBUGGINGFILE = 'd:\\snmp\\snmptthandler.debug';
 #OPTIONS END
 #
 ##############################################################################

@@ -56,16 +56,16 @@ $enablestdout = 1;
 $enablelog = 1;
 
 # Log file location.  The COMPLETE path and filename.  Ex: '/var/log/snmptt.log'
-# or 'c:\snmp\snmptt.log'
+# or 'd:\\snmp\\snmptt.log'
 $logfile = '/var/log/snmptt.log';
-#$logfile = 'd:\snmp\snmptt.log';
+#$logfile = 'd:\\snmp\\snmptt.log';
 
 # Directory to read received traps from.  Ex: /var/spool/snmptt/
-# or 'c:\snmp\snmptt\spool\'
+# or 'd:\\snmp\\snmptt\\spool\\'
 # ** Only used in daemon mode **
 # Don't forget the trailing slash!
 $spooldirectory = '/var/spool/snmptt/';
-#$spooldirectory = 'c:\snmp\snmptt\spool/';
+#$spooldirectory = 'd:\\snmp\\snmpttspool\\';
 
 # Amount of time in seconds to sleep between processing spool files
 # ** Only used in daemon mode **
@@ -79,9 +79,9 @@ $sleep = 5;
 $enableunknowntraplog = 0;
 
 # Log file location.  The COMPLETE path and filename.  Ex: '/var/log/snmpttunknown.log'
-# or 'c:\snmp\snmpttunknown.log'
+# or 'd:\\snmp\\snmpttunknown.log'
 $unknowntraplogfile = '/var/log/snmpttunknown.log';
-#$unknowntraplogfile = 'd:\snmp\snmpttunknown.log';
+#$unknowntraplogfile = 'd:\\snmp\\snmpttunknown.log';
 
 # Set to 1 to enable logging to syslog.  If you do not have the Sys::Syslog module
 # then disable this.  Windows users should disable this.
@@ -105,9 +105,9 @@ $enableexec = 1;
 $multiple_event = 1;
 
 # Location of the snmptt.conf (this is NOT the snmptrapd.conf file).  The COMPLETE path 
-# and filename.  Ex: '/etc/snmp/snmptt.conf'
+# and filename.  Ex: '/etc/snmp/snmptt.conf or d:\\snmp\\snmptt.conf'
 $snmpttconffile = '/etc/snmp/snmptt.conf';
-#$snmpttconffile = 'd:\snmp\snmptt.conf';
+#$snmpttconffile = 'd:\\snmp\\snmptt.conf';
 
 # Format of snmptt.conf file.
 $snmpttconfiletype = 0;		# Contains trap definitions
@@ -123,6 +123,7 @@ $DEBUGGING = 0;
 #
 $DEBUGGINGFILE = '';				# STDOUT
 #$DEBUGGINGFILE = '/var/log/snmptt.debug';	
+#$DEBUGGINGFILE = 'd:\\snmp\\snmptt.debug';
 
 #OPTIONS END
 #
@@ -250,11 +251,35 @@ if ($daemon == 1)
 {
 	$SIG{HUP} = \&signal_handler_reload;
 
-	$timetoreload = 0;
-		
-	&loadsnmpttconf;	# Load SNMPTT.CONF file
+	$SIG{TERM} = \&signal_handler_die;
 	
-	while (1)
+	$timetoreload = 0;
+	$timetodie = 0;
+
+	&loadsnmpttconf;	# Load SNMPTT.CONF file
+
+	# Only fork to the background if not Win32
+	if ($^O ne "MSWin32")
+	{
+		use POSIX qw(setsid);
+	
+		chdir '/'
+		   or die "Can't chdir to /: $!";
+		open STDIN, '/dev/null'
+		   or die "Can't read /dev/null: $!";
+		open STDOUT, '>>/dev/null'
+		   or die "Can't write to /dev/null: $!";
+		open STDERR, '>>/dev/null'
+		   or die "Can't write to /dev/null: $!";
+		defined(my $pid = fork)
+		   or die "Can't fork: $!";
+		exit if $pid;
+		POSIX:setsid
+		   or die "Can't start a new session: $!";
+		umask 0;
+	}
+	
+	while (!$timetodie)
 	{
 	
 		
@@ -298,7 +323,7 @@ if ($daemon == 1)
 				print "Processing file: $file\n";
 			}
 		
-
+			$filesuccess = 1;
 			unless (open FILE, $spooldirectory.$file)
 			{
 				if ($DEBUGGING >= 1)
@@ -306,7 +331,9 @@ if ($daemon == 1)
 					print "Could not open trap file $spooldirectory$file: ($!)\n";
 				}
 				warn "Could not open trap file $spooldirectory$file: ($!)\n";
+				$filesuccess = 0;
 			}
+		
 		
 			$input = 'FILE';
 	
@@ -314,17 +341,20 @@ if ($daemon == 1)
 	
 			&searchfortrap;		# Search for trap snmptt.conf (array)
 
-			unless (unlink($file))
-			{
-				if ($DEBUGGING >= 1)
-				{
-					print "Unable to delete $file:$!\n";
-				}
-				warn "Unable to delete $file:$!\n";
-			}
-	
 			close FILE;
-			
+
+			if ($filesuccess == 1)
+			{
+				unless (unlink($file))
+				{
+					if ($DEBUGGING >= 1)
+					{
+						print "Unable to delete $file:$!\n";
+					}
+					warn "Unable to delete $file:$!\n";
+				}
+			}
+				
 			#exit();
 		}
 		if ($DEBUGGING >= 1)
@@ -1151,5 +1181,12 @@ sub signal_handler_reload {
 	# Daemon reload
 	#
 	$timetoreload = 1;
+}
+
+sub signal_handler_die {
+	#
+	# Daemon die
+	#
+	$timetodie = 1;
 }
 

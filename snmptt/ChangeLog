@@ -1,3 +1,8 @@
+September 3rd, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Added fork for daemon mode for non Win32 systems
+- Fixed minor Win32 file problems and tested deamon mode under 
+  Windows NT.  Snmptthandler not tested
+
 August 29th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed reload of configuration file to purge memory first
 - Cleaned up spool file error handling for daemon mode
