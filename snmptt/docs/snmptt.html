@@ -259,14 +259,14 @@ and <b>description_clean</b> <b>snmptt.ini</b> options.</li>
 <li>Added support for logging unknown traps to a SQL table</li>
 <li>Added logging of statistical information for <b>total traps received</b>,
 <b>total traps translated</b>, <b>total traps ignored</b> and <b>total unknown
-traps</b>. Statistics logged at shut down, and optionally at a defined
+traps</b>. Statistics are logged at shut down, and optionally at a defined
 interval defined by the new <b>snmptt.ini</b> variable
 <b>statistics_interval</b>. Logging can also be forced by sending the SIGUSR1
-signal, or creating a file called !statistics in the spool folder.<br /></li>
+signal, or by creating a file called !statistics in the spool folder.<br /></li>
 <li>Added the error number reported by MySQL to MySQL errors (system syslog,
 eventlog etc)</li>
 <li>Added <b>/usr/local/etc/snmp</b> and <b>/usr/local/etc</b> paths to the
-list of default directories searched for <b>snmptt.ini</b> under Unix</li>
+list of default directories searched for <b>snmptt.ini</b>.</li>
 <li>Added some friendly error messages when required Perl modules are not
 available</li>
 <li>Fixed bug with with handling traps in symbolic format (snmptrapd without
