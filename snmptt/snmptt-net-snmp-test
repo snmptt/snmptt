@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT Net-SNMP-Test v0.2
+# SNMPTT Net-SNMP-Test v1.0
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -50,7 +50,7 @@ $net_snmp_perl_best_guess = 1;
 #############################################################################
 #
 
-$snmpttnet_snmp_test_version = "v0.2";
+$snmpttnet_snmp_test_version = "v1.0";
 
 sub showversion
 {
