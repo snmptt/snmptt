@@ -1263,8 +1263,8 @@ addresss<br>
 <div style="margin-left: 40px;">Notes:<br>
 <br>
 <div style="margin-left: 40px;">To limit which devices can be mapped to
-this EVENT definition based on the IP address / hostname of the device
-/ agent that sent the trap, the <span style="font-weight: bold;">NODES </span>keyword
+this EVENT definition based on the IP address / hostname of the device /
+agent that sent the trap, the <span style="font-weight: bold;">NODES </span>keyword
 should be used.&nbsp; The MATCH keyword only operates on Enterprise
 variables ($<span style="font-style: italic;">n</span>),<br>
 <br>
@@ -2273,8 +2273,16 @@ compared to a network range or IP address for <span
  style="font-weight: bold;">NODES </span>list comparisons, the IP
 address passed from <span style="font-weight: bold;">snmptrapd </span>is
 used, as opposed to doing a DNS query of the host name.<br>
+&nbsp; <br>
+<b><br>
+Q:&nbsp; Why doesn't the snmptt-init.d script work with Debian?</b><br>
 <br>
-<p><b>Q:&nbsp; Is there a front-end alarm browser available for SNMPTT?</b> </p>
+The snmptt-init.d script provided with SNMPTT was written for Mandrake
+and RedHat.&nbsp; To make the script work with Debian without requiring
+any re-writing of the script, copy /etc/init.d/skeleton to
+/etc/init.d/functions.<br>
+<p><b><br>
+Q:&nbsp; Is there a front-end alarm browser available for SNMPTT?</b> </p>
 <p>A:&nbsp; Take a look at <a
  href="http://sourceforge.net/projects/snmptt-gui">SNMPTT-GUI</a>.&nbsp;
 SNMPTT-GUI aims to provide a web based frontend for SNMPTT.&nbsp; The

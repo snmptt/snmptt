@@ -616,12 +616,23 @@ sub processtrap
 	
 	while (defined($event{$receivedtrap}[$l+1]))
 	{
-		if ($DEBUGGING >= 1)
+	  if (($multiple_event == 0) && ($multiple_event_passes > 0))
+	  {
+	    if ($DEBUGGING >= 1)
+	    {
+	      print "  multiple_event = $multiple_event, multiple_event_passes = " .
+	            "$multiple_event_passes so don't process any more entries\n";
+            }
+	    last;	# Don't look any further - stop
+	  }
+	  if ($DEBUGGING >= 1)
 		{
-			print  "Working with event entry: $receivedtrap => $event{$receivedtrap}[0+$l],$event{$receivedtrap}[1+$l],$event{$receivedtrap}[2+$l],$event{$receivedtrap}[5+$l]\n";
+			print  "Working with EVENT entry: $receivedtrap => $event{$receivedtrap}[0+$l],$event{$receivedtrap}[1+$l],$event{$receivedtrap}[2+$l],$event{$receivedtrap}[5+$l]\n";
 		}
 		
 		$hostmatch = 0;
+		$nodesmatch = 0;	# Match from NODES
+		my $match_found = 0;	# Match from MATCH
 	
 		# $event is the hash of events defined in the config file
 		# $event2 is a copy of the matching event
@@ -653,13 +664,14 @@ sub processtrap
 			
 		if ($event2[5] eq '')
 		{
-			$hostmatch = 1;		# No nodes defined, so default to all nodes
-			$multiple_event_passes++;
-			$processed = 1;
-			if ($DEBUGGING >= 1)
-			{
-			  print "  No nodes defined for this entry so all nodes will match\n";
-			}
+		  $nodesmatch = 1;
+		  #$hostmatch = 1;		# No nodes defined, so default to all nodes
+		  #$multiple_event_passes++;
+		  #$processed = 1;
+		  if ($DEBUGGING >= 1)
+		  {
+		    print "  No nodes defined for this entry so all nodes will match\n";
+		  }
 		}
 		else
 		{
@@ -718,34 +730,38 @@ sub processtrap
 				  #if ( $a eq $var[1])     # compare against ip
 				  if ( checkip($var[1], $a) == 1)
 				  {				  
-				    $hostmatch = 1;
-				    $processed = 1;
+				    $nodesmatch = 1;
+				    #$hostmatch = 1;
+				    #$processed = 1;
 				  }
 				}
 	                        elsif (lc $a eq lc $var[0])	# NODES entry is a host name.  Do lowercase compare	
 				{
-					$hostmatch = 1;
-					$processed = 1;
+				  $nodesmatch = 1;
+				  #$hostmatch = 1;
+				  #$processed = 1;
 				}
 			}
-			if ($hostmatch == 1)
-			{
-			  $multiple_event_passes++;
-			  
-			  if ($DEBUGGING >= 1)
+			#if ($hostmatch == 1)
+			if ($DEBUGGING >= 1)
+			{			  
+			  if ($nodesmatch == 1)
  			  {
-			  	print "  Node found in list\n";
+			    print "  Node found in list\n";
+			  }
+			  else
+			  {
+			    print "  Node NOT found in list\n";
 			  }
 			}
 		}
 
 		# Check for MATCH entries
-		if ($hostmatch == 1 && defined($event2[7][0]))
-		{
+		if ($nodesmatch == 1 && defined($event2[7][0]))	# Only if NODES has matched and 
+		{						# we have some MATCH statements
 		  my @match = ();
 		  my $match_type;
-		  my $match_found = 0;
-		  
+		  		  
 		  for (my $i=0; defined($event2[7][$i]); $i++)
 		  {
 		    my $match_temp = $event2[7][$i];
@@ -762,6 +778,7 @@ sub processtrap
 		  }
 		  if ($DEBUGGING >= 2)
 		  {
+		    print "  MATCH statements found\n";
 		    print "    MATCH type: " . uc($match_type) . "\n";
 		  }
 		  
@@ -793,27 +810,37 @@ sub processtrap
 		      }
 		    }
 		  }
-		  if ($match_found == 0)
+		  if ($DEBUGGING >= 1)
 		  {
-		    $hostmatch = 2;
+		    if ($match_found == 1)
+		    {
+		      print "  MATCH statement(s) final result = true...\n\n";
+		    }
+		    else 
+		    {
+		      print "  MATCH statement(s) final result = false...\n\n";
+		    }
 		  }
 		}
+		else
+		{
+		  if ($DEBUGGING >= 1)
+		  {
+		    print "  No MATCH entries defined for this entry\n";
+		  }
+		  $match_found = 1;	# Default to match_found if no MATCH entries
+		}
+
+		if ($nodesmatch == 1 && $match_found == 1)
+		{
+		  $multiple_event_passes++;
+		  $hostmatch = 1;
+		  $processed = 1;
+		}
+		
 		if ($hostmatch == 1 && $event2[1] ne "IGNORE")
 		{
-			#print "multiple_event_passes is $multiple_event_passes\n";
-			#print "multiple_event is $multiple_event\n";
-			if (($multiple_event == 0) && ($multiple_event_passes > 1))
-			{
-				if ($DEBUGGING >= 1)
- 				{
-			  		print "  multiple_event = $multiple_event, multiple_event_passes = " .
-					"$multiple_event_passes so don't process any more entries\n";
-				}
-				last;	# Don't look any further - stop
 
-			}
-
-			# print "  multiple_event = $multiple_event, multiple_event_passes = " . "$multiple_event_passes\n";			
 			# Trap received exists in our list of trap definitions
 			if ($DEBUGGING >= 1)
 			{
@@ -1218,24 +1245,17 @@ sub processtrap
 				}
 			}
 		}
-		elsif ($hostmatch == 2)
-		{
-		  if ($DEBUGGING >= 1)
-		  {
-		    print "\n\nTrap defined, but MATCH statement resulted in non-match...\n\n";
-		  }
-		}
 		else
 		{
 			if ($DEBUGGING >= 1)
 			{
 				if ($event2[1] eq "IGNORE")
 				{
-					print "\n\nTrap set to IGNORE...\n\n";
+				  print "\nTrap set to IGNORE...\n\n";
 				}
 				else
 				{
-					print "\n\nTrap defined, but host $var[0] does not match...\n\n";
+				  print "\nTrap defined, but NODES or MATCH check failed - skipping this EVENT entry..\n\n";
 				}
 			}
 		}
@@ -1771,7 +1791,6 @@ sub loadsnmpttconf
 					$linematch = substr($line2,6);
 
 					push (@match,$linematch);
-					print "!!-$linematch\n";
 				}
 				$currentline++; # Increment to the next line
 				$line2 = $snmpttconf[$currentline]; # Get next line
@@ -2217,6 +2236,12 @@ sub searchfortrap
 		$counter = 0;	# Drill down only 40 times.  Should never need this, but
 				# it's here to prevent an infinite loop in this while statement
 				# just in case
+		
+		if ($DEBUGGING >= 1)
+		{
+		  print "Looking for wildcards in the EVENT hash table\n";
+		}			
+				
 		while ($counter <= 40 && $receivedtraptemp ne '')
 		{
 			# Remove last digit of recevied trap, add a * and look for match
@@ -2820,7 +2845,7 @@ sub match(match)
     #print "Regex detected\n";
     $result = match_regex($value, $match);
     $result = match_result($result, $not);
-    if ($DEBUGGING >= 2)
+    if ($DEBUGGING >= 1)
     {
       print "    REGEX: value=$value, match=$match.  Result=" . ($result == 1 ? "true" : "false") . "\n";
     }
@@ -2831,7 +2856,7 @@ sub match(match)
     #print "IP address of some sort\n";
     $result = checkip($value, $match);
     $result = match_result($result, $not);
-    if ($DEBUGGING >= 2)
+    if ($DEBUGGING >= 1)
     {
       print "    IP ADDRESS: value=$value, match=$match.  Result=" . ($result == 1 ? "true" : "false") . "\n";
     }
@@ -2842,7 +2867,7 @@ sub match(match)
     #print "Number detected\n";
     $result = match_number($value, $match);
     $result = match_result($result, $not);
-    if ($DEBUGGING >= 2)
+    if ($DEBUGGING >= 1)
     {
       print "    NUMBER: value=$value, match=$match.  Result=" . ($result == 1 ? "true" : "false") . "\n";
     }
@@ -2850,7 +2875,7 @@ sub match(match)
   # Unknown entry - ignore it
   else
   {
-    if ($DEBUGGING >= 2)
+    if ($DEBUGGING >= 1)
     {
       print "  IGNORED: value=$value, match=$match\n";
       $result = 0;
@@ -2948,7 +2973,7 @@ sub match_regex
        			  
   if ($regex_temp ne '')
   {
-    if ($DEBUGGING >= 2)
+    if ($DEBUGGING >= 1)
     {
       print "  Doing REGEX MATCH: ($regex_temp)\n";
     }

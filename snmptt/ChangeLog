@@ -1,4 +1,5 @@
 April 18th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Cleaned up NODES / MATCH code
 - Changed version to snmptt_0.7.1
 
 April 17th, 2003: Alex Burger <alex_b@users.sourceforge.net>
