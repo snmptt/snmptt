@@ -124,6 +124,7 @@ if ($debug == 2)
 if ($dump ==1)
 {
 	$DEBUGGING = 2;	
+	&findsnmpttini;
 	&loadsnmpttini;
 	&loadsnmpttconf;		# Load SNMPTT.CONF file
 	print ("\n\n");
@@ -132,6 +133,7 @@ if ($dump ==1)
 
 if ($time ==1)
 {
+	&findsnmpttini;
 	&loadsnmpttini;
 	&loadsnmpttconf;		# Load SNMPTT.CONF file
 	exit(0);
@@ -143,41 +145,6 @@ if ($debugfile ne '')
 	$debugfilecmdline = 1;
 }
 
-##############################################################################
-# Load config file start
-# 
-# For Linux / Unix, try /etc/snmp/snmptt.ini first, /etc/snmptt.ini second.
-#
-# For Windows, try %SystemRoot%\snmptt.ini only.
-# 
-if ($ini ne '')
-{
-  $configfile = $ini;
-}
-else
-{	
- 	if ($^O ne "MSWin32")
-	{
-	  $configfile = '/etc/snmp/snmptt.ini';
-	  if( open( CONFIG, '/etc/snmp/snmptt.ini' ) )
-	  {
-	    $configfile = '/etc/snmp/snmptt.ini';
-	    close CONFIG;
-	  }
-	  elsif ( open( CONFIG, '/etc/snmptt.ini' ) )
-	  {
-	    $configfile = '/etc/snmptt.ini';
-	    close CONFIG;
-	  }
-	}
-	else {
-	  $configfile = $ENV{'SystemRoot'}."\\snmptt.ini";
-	}
-}
-
-&loadsnmpttini;
-
-##############################################################################
 		
 use Text::ParseWords;
 
@@ -217,6 +184,9 @@ if ($DEBUGGING >= 1)
 }		
 
 ##############################################################################
+
+&findsnmpttini;
+&loadsnmpttini;
 
 ####  MAIN SECTION START
 
@@ -1172,7 +1142,43 @@ sub searchfortrap
 		}
 	}
 }
-	
+
+sub findsnmpttini
+{
+	##############################################################################
+	# Load config file start
+	# 
+	# For Linux / Unix, try /etc/snmp/snmptt.ini first, /etc/snmptt.ini second.
+	#
+	# For Windows, try %SystemRoot%\snmptt.ini only.
+	# 
+	if ($ini ne '')
+	{
+	  $configfile = $ini;
+	}
+	else
+	{	
+	 	if ($^O ne "MSWin32")
+		{
+		  $configfile = '/etc/snmp/snmptt.ini';
+		  if( open( CONFIG, '/etc/snmp/snmptt.ini' ) )
+		  {
+		    $configfile = '/etc/snmp/snmptt.ini';
+		    close CONFIG;
+		  }
+		  elsif ( open( CONFIG, '/etc/snmptt.ini' ) )
+		  {
+		    $configfile = '/etc/snmptt.ini';
+		    close CONFIG;
+		  }
+		}
+		else {
+		  $configfile = $ENV{'SystemRoot'}."\\snmptt.ini";
+		}
+	}
+	##############################################################################
+}
+      
 sub loadsnmpttini {
 
 	##############################################################################
