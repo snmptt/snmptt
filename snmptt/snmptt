@@ -1019,6 +1019,11 @@ sub readtrap
 				# v4.2.3 should NOT be used with SNMPTT as it prevents SNMP V2 traps 
 				# from being handled correctly.
 	  {
+	    if ($DEBUGGING >= 2)
+	    {
+	      print "Data passed from snmptrapd is incorrect.  UCD-SNMP v4.2.3 is known to cause this\n";
+	    }
+	    
 	    if ($temp2 =~ /^\"/ && $temp2 =~ /$\"/)			# Have quotes around it?
 	    {
 	      $line = substr($line,1,(length($line)-2));		# Remove quotes
