@@ -1,5 +1,7 @@
 SNMPTT Contribution files
 =========================
+September 16th, 2003
+
 These files are NOT supported and are meant to be used on a 'WYSIWYG' basis.
 
 
@@ -10,9 +12,3 @@ patch.net-snmp-722075	Patch file for net-snmp 5.0.8 / 5.0.9 to fix OID tag
 patch.net-snmp-734774	Patch file for net-snmp 5.0.8 / 5.0.9 to fix Perl test
                         scripts for 'make test'
 sendemail.sh		A script to send emails for the EXEC line
-snmptt.conf.generic	Configuration file that wsa built from generic net-snmp
-                        MIBs
-snmptt.conf.apc		Configuration file that was built from powernet360.mib
-                        (APC)
-snmptt.conf.cisco	Configuration file that was built from Cisco MIBs
-snmptt.conf.juniper	Configuration file that was built from Juniper MIBs
