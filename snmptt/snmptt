@@ -152,7 +152,7 @@ if ($debugfile ne '')
 #
 
 &findsnmpttini;
-&loadsnmpttini
+&loadsnmpttini;
 		
 ##############################################################################
 
