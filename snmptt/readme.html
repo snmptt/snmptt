@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; May 28th, 2003
+This file was last updated on:&nbsp; June 12th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -44,7 +44,11 @@ Configuration file Notes</a> <br>
   <b>&nbsp;&nbsp; </b><a href="#Installation-Unix">Unix</a> <br>
   <b>&nbsp;&nbsp; </b><a href="#Installation-Windows">Windows</a> <br>
   <a href="#Limitations">Limitations</a> <br>
-  <a href="#Feedback">Feedback &amp; Bugs</a></blockquote>
+  <a href="#Feedback">Feedback &amp; Bugs</a><br>
+  <a href="#Integration-with-other-software">Integration with other
+software</a><br>
+  <b>&nbsp;&nbsp; </b><a href="#Nagios-Netsaint">Nagios / Netsaint</a><br>
+</blockquote>
 <a href="#SNMP-Trap-Translator-Convert">SNMP Trap Translator Convert</a>
 <p><a href="#SNMP-Trap-Translator-Convert-MIB">SNMP Trap Translator
 Convert MIB</a> </p>
@@ -1813,7 +1817,290 @@ Sourceforge for <a
 and <a
  href="http://sourceforge.net/tracker/?atid=463396&amp;group_id=51473&amp;func=browse">feature
 requests</a>. <br>
-&nbsp; </p>
+&nbsp; <br>
+</p>
+<p><a name="Integration-with-other-software"></a><b><font size="+2">Integration
+with other software<br>
+</font></b></p>
+<p><a name="Nagios-Netsaint"></a><b><font size="+2">Nagios / </font></b><b><font
+ size="+2">Netsaint<br>
+</font></b></p>
+<p style="font-weight: bold;"><big>Overview</big></p>
+<p>Nagios / Netsaint is a system monitoring application. It monitors
+hosts and services and alerts you when things go wrong.&nbsp; The name
+changed from Netsaint to Nagios in July of 2002.<br>
+</p>
+<p></p>
+<p style="font-weight: bold;">This section will outline the basic steps
+to integrate SNMPTT with Nagios.&nbsp; It will not attempt to explain
+how Nagios works.&nbsp; There is very good documentation available on
+the <a href="http://www.nagios.org">Nagios web page</a>.&nbsp; You
+should be able to install and configuration Nagios before attempting to
+integrate it with SNMPTT.&nbsp; You should also have a functioning
+SNMPTT system that can at least log translated traps to a log file.<br>
+<br>
+<big>Passive Service Checks</big></p>
+<p>Passive service checks allow Nagios to process service check results
+that are submitted by external applications.&nbsp; Using SNMPTT's EXEC
+statement, the received trap can be passed to Nagios using the <span
+ style="font-weight: bold;">submit_check_result</span> script included
+with Nagios.&nbsp; Once received by Nagios, the trap can be logged, a
+page sent, email sent etc.&nbsp; <span
+ style="font-weight: bold; text-decoration: underline;"><br>
+</span></p>
+<p><span style="font-weight: bold; text-decoration: underline;">One</span>
+service is defined for each Nagios host that is to receive traps from
+SNMPTT.&nbsp; The benefits of using only one service entry is that it
+is makes it easier to set up Nagios. Trying to define every possible
+trap for every host you have is not recommended.&nbsp; For example,
+after converting the MIBS from Compaq, there are over 340 traps
+defined.&nbsp; Trying to define this for every Compaq server would not
+be a good idea as 40 servers * 340 traps = 13,600 service definitions.<br>
+</p>
+<p>The downside of using only one service entry is that you will only
+see the last trap that was recieved on the Nagios console.&nbsp; Each
+received trap will be logged, emailed, paged etc but the console will
+only show the last one as being in the warning or critical state.&nbsp; <span
+ style="text-decoration: underline;">The service will remain in this
+state until you manually force a service check.</span>&nbsp; See <big><small><span
+ style="font-weight: bold;">Clearing received traps</span> below.<br>
+</small><span style="font-weight: bold;"></span></big></p>
+<p></p>
+<p><big><span style="font-weight: bold;">Volatile Services</span></big><br>
+</p>
+<p>When defining the service for receiving the SNMPTT translated trap,
+the service must be defined as <span style="font-weight: bold;">volatile</span>.&nbsp;
+When a service is changed from an <span style="font-weight: bold;">OK </span>state
+to a <span style="font-weight: bold;">non-OK</span> state, contacts are
+notified etc.&nbsp; Normally, a service is Nagios is NOT defined
+volatile which means if another service check is performed and the
+state is <span style="text-decoration: underline;">STILL</span> <span
+ style="font-weight: bold;">non-OK</span> then NO contacts are
+notified.&nbsp; Because there is only one service entry for the SNMP
+traps, we need to make sure we are contacted every time a trap comes in.<br>
+<br>
+<big><span style="font-weight: bold;">Creating the service entry</span></big><br>
+</p>
+<p>Following is a sample service entry for Nagios.&nbsp; The <span
+ style="font-weight: bold;">Description </span>column should not be
+included in the definition.<br>
+</p>
+<table border="1">
+  <tbody>
+    <tr>
+      <td class="Definition" colspan="3">define service{</td>
+      <td style="vertical-align: top; font-style: italic;">Description<br>
+      </td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Required">host_name</td>
+      <td class="Required">server01</td>
+      <td style="vertical-align: top; font-style: italic;"><br>
+      </td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Required">service_description</td>
+      <td class="Required">TRAP</td>
+      <td style="vertical-align: top; font-style: italic;">Name of
+service.&nbsp; What you use here must match the same value for the <span
+ style="font-weight: bold;">submit_check_result</span> script</td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Optional">is_volatile</td>
+      <td class="Optional">1</td>
+      <td style="vertical-align: top; font-style: italic;">Enables
+volatile services</td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Required">check_command</td>
+      <td class="Required">check-host-alive</td>
+      <td style="vertical-align: top; font-style: italic;">Used to
+reset the status to OK when <span style="font-weight: bold;">'Schedule
+an immediate check of this service'</span> is selected.<br>
+      </td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Required">max_check_attempts</td>
+      <td class="Required">1<br>
+      </td>
+      <td style="vertical-align: top; font-style: italic;">Leave as 1.</td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Required">normal_check_interval</td>
+      <td class="Required">1<br>
+      </td>
+      <td style="vertical-align: top; font-style: italic;">Leave as 1.</td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Required">retry_check_interval</td>
+      <td class="Required">1<br>
+      </td>
+      <td style="vertical-align: top; font-style: italic;">Leave as 1.</td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Optional">passive_checks_enabled</td>
+      <td class="Optional">1</td>
+      <td style="vertical-align: top; font-style: italic;">Enables
+passive checks<br>
+      </td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Required">check_period</td>
+      <td class="Required">none</td>
+      <td style="vertical-align: top; font-style: italic;">When this
+servcie can be checked.&nbsp; Because it is a passive service, it never
+needs to be checked</td>
+    </tr>
+<!--<tr><td></td><td class="Optional">failure_prediction_enabled</td><td class="Optional">[0/1]</td></tr>//--> <tr>
+      <td><br>
+      </td>
+      <td class="Required">notification_interval</td>
+      <td class="Required">31536000</td>
+      <td style="vertical-align: top; font-style: italic;">Notification
+interval.&nbsp; Set to a very high number to prevent you from getting
+pages of previously received traps.</td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Required">notification_period</td>
+      <td class="Required">24x7</td>
+      <td style="vertical-align: top; font-style: italic;">When you can
+be notified.&nbsp; Can be changed</td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Required">notification_options</td>
+      <td class="Required">w,u,c,r</td>
+      <td style="vertical-align: top; font-style: italic;">Notify on
+warning, unknown, critical and recovery<br>
+      </td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Optional">notifications_enabled</td>
+      <td class="Optional">1<br>
+      </td>
+      <td style="vertical-align: top; font-style: italic;">Enable
+notifications<br>
+      </td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+      <td class="Required">contact_groups</td>
+      <td class="Required">cg_core</td>
+      <td style="vertical-align: top; font-style: italic;">Name of
+contact group to notify</td>
+    </tr>
+    <tr>
+      <td>&nbsp;&nbsp;&nbsp;</td>
+      <td class="Definition" colspan="2">}</td>
+      <td style="vertical-align: top; font-style: italic;"><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p></p>
+<p>Following is a sample service entry for Netsaint.<br>
+</p>
+<p style="margin-left: 40px;"><span style="font-weight: bold;">service[server01]=TRAP;1;none;1;1;1;cg_core;31536000;24x7;0;1;1;;check-host-alive</span><br>
+</p>
+<p></p>
+See the Nagios table above for an explanation of the various fields.<br>
+<br>
+<br>
+<big><span style="font-weight: bold;">Creating the SNMPTT EXEC statement</span></big><br>
+<br>
+The Nagios distribution should contain the script <span
+ style="font-weight: bold;">submit_check_result</span> in the <span
+ style="font-weight: bold;">contrib/eventhandlers</span>
+directory.&nbsp; Create a directory called <span
+ style="font-weight: bold;">eventhandlers </span>under <span
+ style="font-weight: bold;">libexec </span>(<span
+ style="font-weight: bold;">/usr/local/netsaint/libexec</span>) and
+copy the <span style="font-weight: bold;">submit_check_result</span>
+script to that directory.&nbsp; Make sure the script is executable (<span
+ style="font-weight: bold;">chmod +x submit_check_result)</span>.<br>
+<br>
+The <span style="font-weight: bold;">submit_check_result</span> script
+expects the following arguments: <br>
+<br>
+<div style="margin-left: 40px;"><span style="font-weight: bold;">host_name</span><br
+ style="font-weight: bold;">
+<span style="font-weight: bold;">svc_description</span><br
+ style="font-weight: bold;">
+<span style="font-weight: bold;">return_code</span><br
+ style="font-weight: bold;">
+<span style="font-weight: bold;">plugin_output</span><br>
+</div>
+<br>
+The possible return codes are: 0=OK, 1=WARNING, 2=CRITICAL,
+-1=UNKNOWN.&nbsp; The <span style="font-weight: bold;">submit_check_result</span>
+contains this information.<br>
+<br>
+Create an EXEC statement such as the following for each EVENT entry in
+your SNMPTT.CONF file:<br>
+<br>
+<div style="margin-left: 40px;"><span style="font-weight: bold;">EXEC
+/usr/local/netsaint/libexec/eventhandlers/submit_check_result $r TRAP 1
+"xxxxxx"</span><br>
+</div>
+<br>
+where "xxxxxx" is the text for the trap using the same format as the
+FORMAT statement.&nbsp; For example:<br>
+<br>
+<div style="margin-left: 40px;"><span style="font-weight: bold;">EXEC
+/usr/local/netsaint/libexec/eventhandlers/submit_check_result $r TRAP 1
+"Drive $1 in bay $2 has failed"</span><br>
+</div>
+<br>
+The variable substitution <span style="font-weight: bold;">$r</span> is
+used to pass the host name, <span style="font-weight: bold;">TRAP </span>matches
+the service definition defined above, <span style="font-weight: bold;">1</span>
+represents a WARNING, and <span style="font-weight: bold;">"xxxxxx"</span>
+is the translated message from SNMPTT.<br>
+<br>
+You must make sure that the host definition in Nagios matches the
+hostname that will be passed from SNMPTT using the $r variable.&nbsp;
+See the section '<a href="file:///I:/cvs/snmptt/readme.html#DNS">Name
+Resolution / DNS</a>' for important DNS information.<br>
+<br>
+<br>
+<big><span style="font-weight: bold;">Clearing received traps</span></big><br>
+<br>
+Once a trap is received for a host, it will remain in the <span
+ style="font-weight: bold;">WARNING</span> <span
+ style="font-weight: bold;"></span>state.&nbsp; To clear the trap from
+the Nagios console, open the <span style="font-weight: bold;">TRAP </span>service
+and click '<span style="font-weight: bold;">Schedule an immediate check
+of this service</span>'.&nbsp; This will cause the defined service
+check to be run (<span style="font-weight: bold;">check-host-alive</span>
+in the example above) which will then change the status code to <span
+ style="font-weight: bold;">OK</span> and clear the warning after a
+minute or so, assuming of course the system responds OK to the <span
+ style="font-weight: bold;">check-host-alive</span> check.<br>
+<br>
 <p><a name="SNMP-Trap-Translator-Convert"></a><b><font size="+3">SNMP
 Trap Translator Convert v0.3</font></b> <br>
 <b><font size="+1">(SNMPTTCONVERT)</font></b> </p>
