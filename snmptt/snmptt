@@ -3053,7 +3053,8 @@ sub translate_value_oids_sub
     $noinf = 0;
     while ($done)
     {
-      if ($string_temp =~ /(?<!\.)(\d+\.\d+\.\d+\.\d+)(?!\.)/ ) { $found = 1; }
+      if ($string_temp =~ /(?<!\.)(?<!\d)(\d+\.\d+\.\d+\.\d+)(?!\.\d)(?!\d)/ ) { $found = 1; }
+      #if ($string_temp =~ /(?<!\.)(\d+\.\d+\.\d+\.\d+)(?!\.)/ ) { $found = 1; }
       else { $found = 0; }
 
       if ($found)
@@ -3170,7 +3171,8 @@ sub resolve_value_ip_addresses_sub
     $noinf = 0;
     while ($done)
     {
-      if ($string_temp =~ /(?<!\.)(\d+\.\d+\.\d+\.\d+)(?!\.)/ ) { $found = 1; }
+      if ($string_temp =~ /(?<!\.)(?<!\d)(\d+\.\d+\.\d+\.\d+)(?!\.\d)(?!\d)/ ) { $found = 1; }
+      #if ($string_temp =~ /(?<!\.)(\d+\.\d+\.\d+\.\d+)(?!\.)/ ) { $found = 1; }
       else { $found = 0; }
 
       if ($found)

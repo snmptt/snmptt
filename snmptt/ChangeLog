@@ -1,3 +1,8 @@
+October 1st, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed bug with translate_value_oids_sub.  Was not detecting
+  IP addresses correctly (backtracing problem).  Function
+  resolve_value_ip_addresses_sub also changed.
+
 September 16th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_0.8.1
 
