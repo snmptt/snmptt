@@ -1,0 +1,307 @@
+#!/usr/bin/perl
+#
+# SNMPTTCONVERTMIB v0.1
+#
+# Copyright 2002 Alex Burger
+# alex_b@users.sourceforge.net
+# 
+# 8/14/2002
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+##############################################################################
+#
+# http://www.sourceforge.net/projects/snmptt
+#
+###############################################################################
+#
+# OPTIONS START
+# 
+# Set this to '' to have no default EXEC line added, or modify as needed.
+#$defaultexec = '';
+$defaultexec = '#EXEC qpage -f TRAP notifygroup1';
+
+# Choose what type of quotes (if any) you want around the SUMMARY text pulled from the MIB.
+#$defaultexecquote = '';		# no quotes
+#$defaultexecquote = "\'";		# single (') quotes
+$defaultexecquote = "\"";		# double (") quotes
+#
+# OPTIONS END
+#
+#############################################################################
+#
+# Debugging:  	0 = no output messages
+#		1 = output some basic messages
+#		2 = out all messages
+use constant DEBUGGING => 2;
+
+if ((@ARGV[0] eq "") || (@ARGV[1] eq ""))
+{
+	print "Missing arguments!\n\n";
+	print "Syntax is: snmpttconvertmib inputmibfile outputfile\n\n";
+	die;
+}
+
+print "\nFile to load is:	@ARGV[0]\n";
+print "File to APPEND TO:	@ARGV[1]\n";
+
+$input = @ARGV[0];
+$output = @ARGV[1];
+
+if (DEBUGGING >= 1)
+{
+	print "\nLoading @ARGV[0]\n";
+}
+
+unless (open INPUTFILE, "<$input")
+{
+	die "Cannot open input file: $!";
+}
+
+while (<INPUTFILE>)
+{
+	chomp;				#remove <cr> at end of line	
+	push(@mibfile, $_);		#add to each line to @trapconf array
+}
+
+if (DEBUGGING >= 1)
+{
+	print "Finished loading @ARGV[0]\n\n";
+}
+
+$currentline=0;
+
+unless (open OUTPUTFILE, ">$output")
+{
+	die "Cannot open output file: $!";
+}
+
+while ($currentline <= $#mibfile)
+{
+	$line = @mibfile[$currentline];
+	
+	# eg: 'mngmtAgentTrap-23003 TRAP-TYPE';
+	if ( $line =~ /(.*)\s+TRAP-TYPE.*/ )
+	{
+
+		if ( $line =~ /TRAP-TYPE.*FROM/ )
+		{
+			$currentline++; # Increment to the next line
+			$line = @mibfile[$currentline]; # Get next line
+			next;
+		}
+		
+		$trapname = $1;
+
+		# Remove beginning and trailing white space
+		$trapname =~ (/\s*(.*)\s*/);
+		$trapname = $1;
+		
+		#if ($3 == 6)
+		#{
+		#	$temp = "EVENT $1 $2.0.$4 $6 Normal";
+		#}
+		
+		print "#\n";
+		print "Line: $currentline\n";
+		print "TRAP-TYPE: $1\n";		# If trapsummary blank, use trapsummary line for FORMAT and EXEC
+
+		$currentline++; # Increment to the next line
+		$line3 = @mibfile[$currentline];
+		
+		while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ ) )
+		{
+			# Keep going through the file until the next TRAP-TYPE or the end of the mib file
+			# is reached
+				
+			# Look for DESCRIPTION and anything after (including newline with /s)
+			# and capture that anything in $1
+			if ($line3 =~ /DESCRIPTION(.*)/s)
+			{
+				$temp1 = 0;
+				$trapsummary = "";
+				@description = "";
+				
+				# Start of DESCRIPTION
+				
+				#print "SDESC\n";
+				
+				# If there is more text after the word DESCRIPTION, assume it's the start of 
+				# the description.  If it is, pull it out and place in $descriptionline1.
+				if ($1 ne "")
+				{
+					# Pull out text and remove beginning and trailing white space
+					if ($1 =~ /\s*(.*)\s*/)
+					{
+						#print ("2\n");
+						$descriptionline1 = $1;
+						$temp1 = 1;
+						push (@description, "$1\n");
+						#print "Line 1: $1 \n";
+					}
+				}
+				
+				$currentline++; # Increment to the next line
+				$line4 = @mibfile[$currentline];
+	
+				# Assume the rest is the description up until a ::= or end of the file
+				while (! ($line4 =~ /::=/))
+				{
+					# If next line is a --#SUMMARY, pull out the information and place in $summary
+					if ($line4 =~ /--#SUMMARY(.*)/)
+					{
+							
+						# Pull out text and remove beginning and trailing white space and quotes
+						if ($line4 =~ /\s*--#SUMMARY\s*(.*)\s*/)
+						{
+							# Remove any quotes
+							$_ = $1;
+							s(\")()g;
+							# "
+							
+							#print ("2\n");
+							$trapsummary = $_;
+							#print "Summary: $trapsummary \n";
+						}
+						
+						# Increment to next line and continue with the loop
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}
+					# If next line is a --#ARGUMENTS, pull out the information and place in $arguments
+					if ($line4 =~ /--#ARGUMENTS {(.*)}/)
+					{
+						@arguments = split /,/, $1;
+						
+						for($i=0;$i <= $#arguments;$i++)
+						{
+							#print "argument $i: @arguments[$i]\n";
+						}
+											
+						# Increment to next line and continue with the loop
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}					
+					# If next line starts with a --#, ignore it and continue with the loop
+					# (we already got the SUMMARY line above)
+					if ($line4 =~ /--#/)
+					{
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}
+					# If we did not find text after the word DESCRIPTION, then the NEXT
+					# line must be the first line of description.  Pull that out and place
+					# in $descriptionline1.
+					if ($temp1 == 0)
+					{
+						# Remove beginning and trailing white space
+						$line4 =~ (/\s*(.*)\s*/);
+						$descriptionline1 = $1;
+						push (@description, "$1\n");
+						#print "Line 1: $1 \n";
+						$temp1 = 1;
+					}
+					else
+					{
+						# Remove beginning and trailing white space
+						$line4 =~ (/\s*(.*)\s*/);
+						if ($1 ne "")
+						{
+							push (@description, "$1\n");
+							#print "$1\n";
+						}
+					}
+
+					$currentline++; # Increment to the next line
+					$line4 = @mibfile[$currentline];
+				}
+				#print "EDESC\n";
+			}
+			$currentline++; # Increment to the next line
+			$line3 = @mibfile[$currentline];
+		}
+
+
+		$trapoid = `snmptranslate -IR -Ts $trapname`;
+		chomp $trapoid;
+		if ($trapoid ne "")
+		{
+			print OUTPUTFILE "#\n#\n#\n";
+			print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" Normal\n";
+	
+			# Loop through trapsummary and replace the %s and %d etc with %1 to %n
+	
+			$j = $#arguments; # j is last element number
+			
+			#print "j is $j\n";
+			
+			$_ = $trapsummary;
+			for ($j=0; $j<= $#arguments; $j++)
+			{
+				s(%[a-zA-Z])(\$@arguments[$j]);
+			}
+			
+			#print "new summary: $_\n";
+			
+			$trapsummary = $_;
+			
+			# Use trapsummary line for FORMAT and EXEC
+			if ($trapsummary ne "")
+			{
+				print OUTPUTFILE "FORMAT $trapsummary\n";
+				if ($defaultexec ne '')
+				{
+					print OUTPUTFILE "$defaultexec $defaultexecquote$trapsummary$defaultexecquote\n"
+				}		
+			}
+			# If trapsummary blank, use trapsummary line for FORMAT and EXEC
+			elsif ($descriptionline1 ne "")
+			{
+				print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
+				if ($defaultexec ne '')
+				{
+					print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1 \$*$defaultexecquote\n"
+				}
+				#print OUTPUTFILE "EXEC $descriptionline1 \$*\n";
+			}
+			# If descriptionline1 is also blank, just use $* for FORMAT and EXEC
+			else
+			{
+				print OUTPUTFILE "FORMAT \$*\n";
+				if ($defaultexec ne '')
+				{
+					print OUTPUTFILE "$defaultexec $defaultexecquote\$*$defaultexecquote\n"
+				}
+				#print OUTPUTFILE "EXEC \$*\n";
+			}
+	
+			print OUTPUTFILE "SDESC\n";
+			#print OUTPUTFILE "$descriptionline1\n";
+			print OUTPUTFILE "@description";		
+			print OUTPUTFILE "EDESC\n";
+	
+			$currentline--;
+		}
+		
+		print "OID: $trapoid\n";
+		#print "\@description is ", $#description,"\n";
+		#print "going to next trap\n\n";
+	}
+	$currentline++; # Increment to the next line
+	$line2 = @mibfile[$currentline]; # Get next line
+}	
