@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v0.7
+# SNMPTT v0.7.1
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
@@ -750,7 +750,7 @@ sub processtrap
 		  {
 		    my $match_temp = $event2[7][$i];
 		    $match_temp =~ s/\s//g;	# Remove any white space from $match
-		    if ($match_temp =~ /^default=(.*)/i)
+		    if ($match_temp =~ /^mode=(.*)/i)
 		    {
 		      $match_type = lc($1);
 		      last;
@@ -771,7 +771,7 @@ sub processtrap
 		    $match_temp =~ s/\s//g;	# Remove any white space from $match
 		    
 		    # DEFAULT= line
-		    if ($match_temp =~ /^default=(.*)/i)
+		    if ($match_temp =~ /^mode=(.*)/i)
 		    {
 		      next;
 		    }
@@ -792,13 +792,12 @@ sub processtrap
 			last;
 		      }
 		    }
-		    if ($match_found == 0)
-		    {
-		      $hostmatch = 2;
-		    }
+		  }
+		  if ($match_found == 0)
+		  {
+		    $hostmatch = 2;
 		  }
 		}
-
 		if ($hostmatch == 1 && $event2[1] ne "IGNORE")
 		{
 			#print "multiple_event_passes is $multiple_event_passes\n";
@@ -2854,7 +2853,7 @@ sub match(match)
     if ($DEBUGGING >= 2)
     {
       print "  IGNORED: value=$value, match=$match\n";
-      next;
+      $result = 0;
     }
   }
   
@@ -2931,7 +2930,6 @@ sub match_number(value, match)
   }
   return 0;
 }
-
 
 sub match_regex
 {
