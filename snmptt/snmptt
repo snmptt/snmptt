@@ -595,6 +595,7 @@ sub processtrap
 	# 4: EXEC string
 	# 5: NODES string
 	# 6: REGEX array
+	# 7: MATCH array
 	#
 	# Example: 	To access FORMAT string for received trap:
 	# 		$event{"$var[3]"}[3]
@@ -646,8 +647,9 @@ sub processtrap
 		$event2[4]=$event{"$receivedtrap"}[4+$l];	# 4: EXEC string
 		$event2[5]=$event{"$receivedtrap"}[5+$l];	# 5: NODES string
 		$event2[6]=$event{"$receivedtrap"}[6+$l];	# 6: REGEX string		
-	
-		$l+=8;
+		$event2[7]=$event{"$receivedtrap"}[7+$l];	# 7: MATCH string		
+		
+		$l+=9;
 			
 		if ($event2[5] eq '')
 		{
@@ -736,7 +738,67 @@ sub processtrap
 			  }
 			}
 		}
-	
+
+		# Check for MATCH entries
+		if ($hostmatch == 1 && defined($event2[7][0]))
+		{
+		  my @match = ();
+		  my $match_type;
+		  my $match_found = 0;
+		  
+		  for (my $i=0; defined($event2[7][$i]); $i++)
+		  {
+		    my $match_temp = $event2[7][$i];
+		    $match_temp =~ s/\s//g;	# Remove any white space from $match
+		    if ($match_temp =~ /^default=(.*)/i)
+		    {
+		      $match_type = lc($1);
+		      last;
+		    }
+		  }
+		  if ($match_type ne 'and' && $match_type ne 'or')
+		  {
+		    $match_type = 'or';
+		  }
+		  if ($DEBUGGING >= 2)
+		  {
+		    print "    MATCH type: " . uc($match_type) . "\n";
+		  }
+		  
+		  for (my $i=0; defined($event2[7][$i]); $i++)
+		  {
+		    my $match_temp = $event2[7][$i];
+		    $match_temp =~ s/\s//g;	# Remove any white space from $match
+		    
+		    # DEFAULT= line
+		    if ($match_temp =~ /^default=(.*)/i)
+		    {
+		      next;
+		    }
+
+		    if (match($match_temp) == 1)
+		    {
+		      $match_found = 1;
+		      if ($match_type eq "or")
+		      {
+			last;
+		      }
+		    }
+		    else
+		    {
+		      $match_found = 0;
+		      if (lc($match_type) eq "and")
+		      {
+			last;
+		      }
+		    }
+		    if ($match_found == 0)
+		    {
+		      $hostmatch = 2;
+		    }
+		  }
+		}
+
 		if ($hostmatch == 1 && $event2[1] ne "IGNORE")
 		{
 			#print "multiple_event_passes is $multiple_event_passes\n";
@@ -1156,6 +1218,13 @@ sub processtrap
 					print "\n\nTrap set to LOGONLY...\n\n";
 				}
 			}
+		}
+		elsif ($hostmatch == 2)
+		{
+		  if ($DEBUGGING >= 1)
+		  {
+		    print "\n\nTrap defined, but MATCH statement resulted in non-match...\n\n";
+		  }
 		}
 		else
 		{
@@ -1651,6 +1720,7 @@ sub loadsnmpttconf
 			$linenodes = '';
 			$lineregex = '';
 			@regex = ();
+			@match = ();
 	
 			$currentline++; # Increment to the next line which should be a FORMAT, EXEC or NODES
 			$line2 = $snmpttconf[$currentline];
@@ -1695,6 +1765,15 @@ sub loadsnmpttconf
 					  push (@regex,$lineregex);
 					}
 				}
+				elsif ($line2 =~ /^MATCH/)
+				{
+					# It's a MATCH line
+					
+					$linematch = substr($line2,6);
+
+					push (@match,$linematch);
+					print "!!-$linematch\n";
+				}
 				$currentline++; # Increment to the next line
 				$line2 = $snmpttconf[$currentline]; # Get next line
 			}
@@ -1720,7 +1799,8 @@ sub loadsnmpttconf
 				@{ $event{$temp[2]} }[5+$countx]= $lineexec;
 				@{ $event{$temp[2]} }[6+$countx]= $linenodes;
 				@{ $event{$temp[2]} }[7+$countx]= [@regex];
-				@{ $event{$temp[2]} }[0]= 8+ @{ $event{$temp[2]} }[0];
+				@{ $event{$temp[2]} }[8+$countx]= [@match];
+				@{ $event{$temp[2]} }[0]= 9+ @{ $event{$temp[2]} }[0];
 				
 				$tempcount2++;		# Temporary counter of the number of EVENTS found with at
 							# least a FORMAT line specified
@@ -1753,7 +1833,7 @@ sub loadsnmpttconf
 			while (defined($event{$key}[$l+1]))
 			{	
 				print  "hash: $key => $event{$key}[1+$l],$event{$key}[2+$l],$event{$key}[3+$l],$event{$key}[4+$l],$event{$key}[7+$l][0]\n";
-			$l+=8;
+			$l+=9;
 			}
 
 		}
@@ -2710,4 +2790,176 @@ sub translate_oids_sub
   return $string;    
 }
 
+sub match(match)
+{
+  my $match = shift;
+  my $value;
+  my $not = 0;
+  my $result = 0;
+
+  $match =~ /^\$(\d+):(.*)/;
+  $value = $entvar[$1];
+  $match = $2;
+
+  if ($value eq '' || $match eq '')
+  {
+    return 0;
+  }
+  if ($match =~ /^\!(.*)/) 
+  {
+    $not = 1;
+    $match = $1;
+  }
+  else 
+  {  
+    $not = 0; 
+  }
+  
+  # Match is a REGEX
+  if ($match =~ /\(.*\)/)
+  {
+    #print "Regex detected\n";
+    $result = match_regex($value, $match);
+    $result = match_result($result, $not);
+    if ($DEBUGGING >= 2)
+    {
+      print "    REGEX: value=$value, match=$match.  Result=" . ($result == 1 ? "true" : "false") . "\n";
+    }
+  }
+  # Match is an IP address
+  elsif ($match =~ /\d+\.\d+\.\d+\.\d+/)
+  {
+    #print "IP address of some sort\n";
+    $result = checkip($value, $match);
+    $result = match_result($result, $not);
+    if ($DEBUGGING >= 2)
+    {
+      print "    IP ADDRESS: value=$value, match=$match.  Result=" . ($result == 1 ? "true" : "false") . "\n";
+    }
+  }
+  # Match is a number
+  elsif ($match =~ /\d+/)
+  {
+    #print "Number detected\n";
+    $result = match_number($value, $match);
+    $result = match_result($result, $not);
+    if ($DEBUGGING >= 2)
+    {
+      print "    NUMBER: value=$value, match=$match.  Result=" . ($result == 1 ? "true" : "false") . "\n";
+    }
+  }
+  # Unknown entry - ignore it
+  else
+  {
+    if ($DEBUGGING >= 2)
+    {
+      print "  IGNORED: value=$value, match=$match\n";
+      next;
+    }
+  }
+  
+  if ($result == 1)
+  {
+    #print "true\n";
+    return 1;
+  }
+  else
+  {
+    #print "false\n";
+    return 0;
+  }
+}
+
+sub match_result(result, not)
+{
+  my $result = shift;
+  my $not = shift;
+
+  if ($not == 0)
+  {
+    return $result;
+  }
+  else
+  {
+    return !$result;
+  }
+  return 0;
+}
+
+sub match_number(value, match)
+{
+  my $value = shift;
+  my $match = shift;
+
+  my $result;
+
+  if ($match == $value)
+  {
+    return 1;
+  }
+  elsif ($match =~ /,/)
+  {
+    my @temp = split (",",$match);
+    foreach my $a (@temp)
+    {
+      if ($a == $value)
+      {
+	return 1;
+      }
+    }
+  }
+  elsif ($match =~ /^\>(.*)/)
+  {
+    if ($value > $1)
+    {
+      return 1;
+    }
+  }
+  elsif ($match =~ /^\<(.*)/)
+  {
+    if ($value < $1)
+    {
+      return 1;
+    }
+  }
+  elsif ($match =~/(\d+)-(\d+)/)
+  {
+    if ($value > $1 && $value < $2)
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+
+sub match_regex
+{
+  my $value = shift;
+  my $regex_temp = shift;
+
+  my $result;
+
+  #print "value: $value\n";
+  #print "regex: $regex_temp\n";
+  
+  $regex_temp =~ /\((.*)\)/;
+  $regex_temp = $1;
+
+  #print ":$regex_temp:\n";
+       			  
+  if ($regex_temp ne '')
+  {
+    if ($DEBUGGING >= 2)
+    {
+      print "  Doing REGEX MATCH: ($regex_temp)\n";
+    }
+    if ($value =~ /$regex_temp/i)
+    {
+      #print "Match!\n";
+      return 1;
+    }
+  }
+  return 0;
+}
 
