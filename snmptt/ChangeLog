@@ -1,0 +1,10 @@
+June 13th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Bug fix with $s - Severity.  Thanks to Hugues Mertens
+- Started this ChangeLog
+
+April 30th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Improved debugging output
+
+April 18th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Initial release of snmptt_0.1
+

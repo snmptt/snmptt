@@ -642,7 +642,7 @@ sub substitute
 	s(\$\$)(\$)g;
 
 	# $s - Severity
-	s(\$s)(@temp[4])g;
+	s(\$s)($event{"@var[3]"}[2])g;
 
 	# $r - Hostname
 	s(\$r)(@var[0])g;
