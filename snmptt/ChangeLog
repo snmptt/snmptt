@@ -1,4 +1,5 @@
 February 12th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_0.5
 - Changed fqdn_enable ini parameter to strip_domain.  Strip_domain
   can now be 0, 1 or 2.  0 = do not strip domain name.  1 = strip
   domain name.  2 = strip domain name based on list of domains contained
