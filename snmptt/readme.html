@@ -178,8 +178,8 @@ traps using symbolic form, or you enable the options <span
 <p><b><font size="+1">0.7 - ??</font></b><b><font size="+1">, 2003</font></b></p>
 <ul>
   <li>Fixes a vulnerability by replacing back ticks (`) in recived
-traps with with forward ticks (').&nbsp; This prevents data contained
-in traps from being executed when using the EXEC feature<br>
+traps with with forward ticks (').&nbsp; This prevents data contained in
+traps from being executed when using the EXEC feature<br>
   </li>
   <li>Added the ability for traps passed from <span
  style="font-weight: bold;">snmptrapd </span>or loaded from the <span
@@ -876,7 +876,9 @@ from the <a
 patch page</a>.&nbsp; If the version of Net-SNMP you are using does not
 support this feature and the event OID is specified with the module
 name, the event definition will be <span
- style="font-weight: bold; text-decoration: underline;">ignored</span>.<br>
+ style="font-weight: bold; text-decoration: underline;">ignored</span>.&nbsp;
+Also note that UCD-SNMP may not properly convert symbolic names to
+numeric OIDs which could result in traps not being matched.<br>
       </div>
       <p></p>
       <blockquote>SNMP V1 traps are in the format of enterprise ID
@@ -1882,10 +1884,11 @@ take effect no matter what is used on the command line. </p>
 enabled, then SNMPTT should be able to handle traps passed using
 symbolic form.&nbsp; The Perl module (used by SNMPTT) in Net-SNMP 5.0.8
 and previous versions should be able to handle single symbolic names
-(eg: coldTrap).&nbsp; A patch is available from the Net-SNMP web site
-for 5.0.8 to allow it to handle other symbolic names such as
-module::symbolic name (eg: SNMPv2-MIB::coldTrap) etc.&nbsp; The patch
-can be downloaded from the <a
+(eg: coldTrap).&nbsp; UCD-SNMP may not properly convert symbolic names
+to numeric OIDs which could result in traps not being matched.&nbsp; A
+patch is available from the Net-SNMP web site for 5.0.8 to allow it to
+handle other symbolic names such as module::symbolic name (eg:
+SNMPv2-MIB::coldTrap) etc.&nbsp; The patch can be downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.</p>
 <p><b>Q:&nbsp; When I try to convert a MIB, it will not convert
@@ -1900,7 +1903,7 @@ of each line.&nbsp; To strip them out and craete a new file, type: </p>
 Note: This should no longer be required as <span
  style="font-weight: bold;">snmpttconvert </span>and <span
  style="font-weight: bold;">snmpttconvertmib </span>now automatically
-remove <span style="font-weight: bold;">\015</span> characters while
+removes <span style="font-weight: bold;">\015</span> characters while
 reading the input file.<br>
 </p>
 <p><b><br>
