@@ -10,7 +10,7 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.5.1</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; March 10th, 2003
+<br>This file was last updated on:&nbsp; March 11th, 2003
 <p><a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote><a href="#What is it">What is it?</a>
@@ -98,8 +98,9 @@ Translates received traps into a readable format by performing variable
 substitution</li>
 
 <li>
-Outputs translated traps to standard output, text log file, a SQL database
-and / or syslog</li>
+Outputs translated traps to standard output, text log file, syslog, NT
+Event Log, MySQL, or any database support by the DBD::ODBC or Win32::ODBC
+modules</li>
 
 <li>
 Executes a user defined program when a trap is received</li>
@@ -176,11 +177,12 @@ the MIB files.</blockquote>
 <p><b><font size=+1>0.6 - ???, 2003</font></b>
 <ul>
 <li>
-Added new variable substitutions: <b>$v<i>n</i></b> (variable name), <b>$+<i>n</i>
-</b>(variable name:value),
+Added new variable substitutions: <b>$v<i>n</i></b> (variable name), <b>$+<i>n</i></b>(variable
+name:value),
 <b>$-<i>n</i></b> (variable name (type):value),
-<b>$+*</b> (same as $+<i>n</i> but wildcard), and <b>$-*</b> (same as $-<i>n</i>
-but wildcard).&nbsp; Translation of the variable name using the MIB requires
+<b>$+*</b>
+(same as $+<i>n</i> but wildcard), and <b>$-*</b> (same as $-<i>n</i> but
+wildcard).&nbsp; Translation of the variable name using the MIB requires
 he UCD-SNMP / NET-SNMP Perl module.</li>
 
 <li>
@@ -358,7 +360,7 @@ Backup your <b>snmptt.ini </b>file, replace it with the new version, and
 make any necessary configuration changes to it</li>
 
 <li>
-Enable any new features as required</li>
+Enable any new features in snmptt.ini as required</li>
 
 <li>
 Test and report any issues to alex_b@users.sourceforge.net</li>
