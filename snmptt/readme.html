@@ -103,7 +103,7 @@ Executes a user defined program when a trap is received</li>
 (Tested with) Perl 5.6.1</li>
 
 <li>
-NET-SNMP (formerly known as UCD-SNMP)</li>
+Required: NET-SNMP (formerly known as UCD-SNMP).&nbsp; Specifically <b>snmptrapd</b></li>
 
 <li>
 Required: Text::ParseWords (included with most distributions including
@@ -117,7 +117,7 @@ Optional: Sys::Syslog module</li>
 
 <li>
 Required: Time::HiRes (only required when using SNMPTT in daemon mode -
-required by snmptthandler)</li>
+required by <b>snmptthandler</b>)</li>
 </ul>
 All development and testing was done on Mandrake Linux 8.1 using UCD-SNMP
 v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).&nbsp; I have also tested
@@ -139,14 +139,14 @@ Daemon mode support for SNMPTT.&nbsp; When running as a daemon, SNMPTTHANDLER
 script is used to spool traps from SNMPTRAPD.</li>
 
 <li>
-Added SNMPTTCONVERTMIB utility to convert trap / notify definitions from
-MIB files</li>
+SNMPTTCONVERTMIB utility to convert trap / notify definitions from MIB
+files</li>
 
 <li>
-Added sample trap file (sample-trap) for testing</li>
+Sample trap file (sample-trap) for testing</li>
 
 <li>
-Added command line options to SNMPTT</li>
+Command line options to SNMPTT</li>
 
 <li>
 SNMPTT now strips UDP: and :<i>port</i> from IP addresses when using NET-SNMP
@@ -225,9 +225,9 @@ script and modify the following variable:
 
 <p><br><a NAME="Configuration Options"></a><b><font size=+2>Configuration
 Options</font></b>
-<p>As mentioned in the INSTALLATION section below, configuration options
-are set by editing the options between OPTIONS START and OPTIONS END in
-the snmptt script.
+<p>As mentioned throughout this document, configuration options are set
+by editing the options between OPTIONS START and OPTIONS END in the snmptt
+script.
 <br>&nbsp;
 <p><a NAME="Modes of Operation"></a><b><font size=+2>Modes of Operation</font></b>
 <p>SNMPTT can be run in two modes:&nbsp; standalone mode and daemon mode.
@@ -262,7 +262,8 @@ of traps being received, daemon mode should be used.&nbsp; If it takes
 more than one trap per second.
 <p>Running SNMPTT without the --daemon command line option will result
 standalone mode unless the <b>$daemon</b> variable in SNMPTT is set to
-1.
+1.&nbsp; For standalone mode, he <b>$daemon</b> variable in SNMPTT should
+be set 0.
 <p><b><font size=+1>Daemon mode</font></b>
 <p>To use SNMPTT in daemon mode, SNMPTT would be run in daemon mode and
 the snmptrapd.conf file would contain a traphandle statement such as:
@@ -304,8 +305,8 @@ per minute should be handled easily.
 <p>Running SNMPTT with the --daemon command line option or setting the
 <b>$daemon</b>
 variable in SNMPTT is set to 1 will cause SNMPTT to run in daemon mode.
-<p>Note:&nbsp; When running on a non Windows platform, SNMPTT will fork
-to the background unless <b>$daemonfork</b> is set to 0.
+<p>Note:&nbsp; When running on a <b>non</b> Windows platform, SNMPTT will
+fork to the background unless <b>$daemonfork</b> is set to 0.
 <br>&nbsp;
 <p><a NAME="Command line arguments"></a><b><font size=+2>Command line arguments</font></b>
 <p>The following command line arguments are supported:
@@ -491,7 +492,7 @@ A trap is handled as many times as it matches in the configuration file</li>
 If any number of exact matches exist, the wildcard match is NOT performed</li>
 
 <li>
-If an exact match does NOT exists, the wildcard match IS performed</li>
+If an exact match does NOT exist, the wildcard match IS performed</li>
 </ul>
 <b>If $multiple_event is set to 0 in snmptt:</b>
 <ul>
@@ -501,7 +502,9 @@ A trap is handled once using the first match in the configuration file</li>
 <li>
 If an exact match exists, the wildcard match is NOT performed</li>
 
-<br>If an exact match does NOT exists, the wildcard match IS performed</ul>
+<li>
+If an exact match does NOT exist, the wildcard match IS performed</li>
+</ul>
 <a NAME="Sample1 SNMPTT.CONF file"></a><b><font size=+2>Sample1 SNMPTT.CONF
 file</font></b>
 <p>Following is a sample of two defined traps in <b>snmptt.conf:</b>
@@ -594,8 +597,9 @@ with:
 6.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD -On.
 <br>&nbsp;&nbsp;&nbsp;&nbsp; You should be able to edit the <b>/etc/rc.d/init.d/snmptrapd</b>
 script if you have one and change
-<br>&nbsp;&nbsp;&nbsp;&nbsp; the <b>OPTIONS</b> to <b>"-On"</b>.&nbsp;
-<b>The -On is required otherwise snmptt will NOT recognize the traps.</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp; the <b>OPTIONS</b> to <b>"-On"</b>. 
+<b>The
+-On is required otherwise snmptt will NOT recognize the traps.</b>
 <br>&nbsp;
 <p><a NAME="Installation - Windows"></a><b><font size=+2>Installation -
 Windows</font></b>
@@ -649,9 +653,10 @@ the CVS tree.
 <p><a NAME="SNMP Trap Translator Convert"></a><b><font size=+3>SNMP Trap
 Translator Convert v0.1</font></b>
 <br><b><font size=+1>(SNMPTTCONVERT)</font></b>
-<p>SNMPTTCONVERT is a simple Perl script which will read a file created
-for HP Openview which is provided by most vendors including Compaq and
-Cisco.&nbsp; The file can contain multiple traps.
+<p>Some vendors provide a file that can be imported into HP Openview using
+a HP Openview utiltity.&nbsp; SNMPTTCONVERT is a simple Perl script which
+will convert one of these files into the format used by SNMPTT.&nbsp; The
+file can contain multiple traps.
 <p>For example, if the file ciscotrap.txt contained:
 <blockquote>rpsFailed {.1.3.6.1.4.1.437.1.1.3} 6 5 - "Status Events" 1
 <br>Trap received from enterprise $E with $# arguments: sysName=$1
@@ -719,7 +724,7 @@ becomes the active NIC."
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ::= 11010
 <br>&nbsp;</blockquote>
 Executing <b>snmpttconvertmib CPQHOST.mib snmptt.conf </b>would APPEND
-to the end of the <b>snmptt.conf</b> file:
+to the end of the <b>snmptt.conf</b> file (specified on the command line):
 <blockquote>#
 <br>#
 <br>#
