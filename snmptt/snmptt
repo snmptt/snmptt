@@ -2145,8 +2145,6 @@ sub readtrap
 	    }
 	  }
 
-	  
-
 	  if ($variable_fix == 0 )
 	  {
 	    # If line begins with a double quote (") but does not END in a double quote then we need to merge
