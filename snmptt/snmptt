@@ -884,7 +884,7 @@ sub processtrap
 			{
 				$trap_attempted_to_log++;	
 				
-				# Escape any quotes
+				# Backslash any quotes
 				my $message_short2 = $message_short;
 				$message_short2 =~ s(\')(\\\')g;   #'
 				$message_short2 =~ s(\")(\\\")g;   #"
@@ -923,7 +923,7 @@ sub processtrap
 			{
 				$trap_attempted_to_log++;	
 
-				# Escape any quotes
+				# Backslash any quotes
 				my $message_short2 = $message_short;
 				$message_short2 =~ s(\')(\\\')g;   #'
 				$message_short2 =~ s(\")(\\\")g;   #"
@@ -962,7 +962,7 @@ sub processtrap
 			{
 				$trap_attempted_to_log++;
 
-				# Escape any quotes
+				# Backslash any quotes
 				my $message_short2 = $message_short;
 				$message_short2 =~ s(\')(\\\')g;   #'
 				$message_short2 =~ s(\")(\\\")g;   #"
@@ -1002,7 +1002,7 @@ sub processtrap
 			{
 				$trap_attempted_to_log++;	
 
-				# Escape any quotes
+				# Backslash any quotes
 				my $message_short2 = $message_short;
 				$message_short2 =~ s(\')(\\\')g;   #'
 				$message_short2 =~ s(\")(\\\")g;   #"
