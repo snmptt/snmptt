@@ -3387,7 +3387,7 @@ sub match_number
   }
   elsif ($match =~/(\d+)-(\d+)/)
   {
-    if ($value > $1 && $value < $2)
+    if ($value => $1 && $value <= $2)
     {
       return 1;
     }

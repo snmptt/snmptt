@@ -1,3 +1,7 @@
+October 9th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed bug with MATCH statement integer range.  1-5 would match
+  only 2-4 instead of 1-5.
+
 October 1st, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with translate_value_oids_sub.  Was not detecting
   IP addresses correctly (backtracing problem).  Function
