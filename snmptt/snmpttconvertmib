@@ -111,66 +111,7 @@ if ($version == 1)
 
 if ($help == 1)
 {
-  $USAGE = qq/Usage:
-  snmpttconvertmib [<options>]
-Options:
-  --debug=n              Set debug level (1 or 2)
-  --help                 Display this message
-  --version              Display author and version information
-  --net_snmp_perl        Use NET-SNMP Perl integration instead of
-			 NET-SNMP snmptranslate utility
-  --in=filename          Input file
-  --out=filename         Output file
-  --nodes=name or file   If specified, will insert a NODES line after FORMAT or 
-  			 EXEC.  The host name(s) separated by spaces, or the 
-			 name of the nodes file.  Use quotes for multiple
-			 entries.  See NODES section in readme.html for examples
-  --no_description	 Do not save the description
-  --no_variables	 Do not save the variable list in the description
-  --no_format_summary	 Do not use the --#SUMMARY lines for FORMAT \/ EXEC
-  --no_format_desc	 Do not use the description line for FORMAT \/ EXEC
-  --no_severity 	 Do not use the --#SEVERITY line for EVENT line.  Default
-                         severity of "Normal" will be used, unless --severity= is 
-			 set
-  --severity=s  	 Severity level for EVENT line.  Only used if there is no
-                         --#SEVERITY line, or --no_severity is set.  Must NOT 
-			 contain any spaces.
-			 Example: 
-			   Critical
-  --format=n		 FORMAT \/ EXEC order preference
-			   0 = --#SUMMARY or description
-			   1 = description or --#SUMMARY
-			   2 = --#SUMMARY and description
-			   3 = description and --#SUMMARY
-  --format_desc=n	 How to convert the description line for FORMAT \/ EXEC
-			   0 = First line of description
-			   n = n sentence(s) of description
-  --no_desc_wildcard	 To prevent \$* from being appended to the end of 
-  			 description text when used on the FORMAT \/ EXEC 
-			 lines.  A wildcard is only used if the description 
-			 line contained no variable definitions (\%n).
-  --exec=command         Command line to use for EXEC line.  Use SINGLE quotes
-                         with Unix.  Example:
-    			   'qpage -f TRAP notifygroup1'
-
-  Note:  The only benefit in using the --net_snmp_perl switch (which requires the
-         Net-SNMP Perl module to be installed) is that the Variables: description section 
-         will include:
-           -variable syntax
-           -variable description
-           -variable enums
-
-	   For example:
-           2: globalStatus
-              Syntax="INTEGER"
-                2: ok
-                4: failure
-              Descr="Current status of the entire library system"
-/;
-  
-  &showversion;
-  print $USAGE . "\n";
-  
+  &show_help();
   exit(0);
 }
 
@@ -198,8 +139,8 @@ if ($exec ne '')
 
 if (($input eq "") || ($output eq ""))
 {
-  print "Missing arguments!\n\n";
-  print "Syntax is: snmpttconvertmib --in=inputmibfile --out=outputfile\n\n";
+  print "\nMissing arguments!\n";
+  &show_help();
   die;
 }
 
@@ -399,6 +340,7 @@ if ($net_snmp_perl == 0)
 	      }
 	    }
 	  }
+	  $templine =~ s/(--.*)//; # Remove any trailing comments
 	  $templine =~ s/\s//g;	# Remove any white space
 	  $templine =~ /\{(.*)\}/;
 	  @variables = split /\,/, $1;
@@ -1323,3 +1265,65 @@ else
   #End of process the trap files using NET-SNMP Perl
 }
 
+sub show_help
+{
+  $USAGE = qq/Usage:
+  snmpttconvertmib [<options>]
+Options:
+  --debug=n              Set debug level (1 or 2)
+  --help                 Display this message
+  --version              Display author and version information
+  --net_snmp_perl        Use NET-SNMP Perl integration instead of
+			 NET-SNMP snmptranslate utility
+  --in=filename          Input file
+  --out=filename         Output file
+  --nodes=name or file   If specified, will insert a NODES line after FORMAT or 
+  			 EXEC.  The host name(s) separated by spaces, or the 
+			 name of the nodes file.  Use quotes for multiple
+			 entries.  See NODES section in readme.html for examples
+  --no_description	 Do not save the description
+  --no_variables	 Do not save the variable list in the description
+  --no_format_summary	 Do not use the --#SUMMARY lines for FORMAT \/ EXEC
+  --no_format_desc	 Do not use the description line for FORMAT \/ EXEC
+  --no_severity 	 Do not use the --#SEVERITY line for EVENT line.  Default
+                         severity of "Normal" will be used, unless --severity= is 
+			 set
+  --severity=s  	 Severity level for EVENT line.  Only used if there is no
+                         --#SEVERITY line, or --no_severity is set.  Must NOT 
+			 contain any spaces.
+			 Example: 
+			   Critical
+  --format=n		 FORMAT \/ EXEC order preference
+			   0 = --#SUMMARY or description
+			   1 = description or --#SUMMARY
+			   2 = --#SUMMARY and description
+			   3 = description and --#SUMMARY
+  --format_desc=n	 How to convert the description line for FORMAT \/ EXEC
+			   0 = First line of description
+			   n = n sentence(s) of description
+  --no_desc_wildcard	 To prevent \$* from being appended to the end of 
+  			 description text when used on the FORMAT \/ EXEC 
+			 lines.  A wildcard is only used if the description 
+			 line contained no variable definitions (\%n).
+  --exec=command         Command line to use for EXEC line.  Use SINGLE quotes
+                         with Unix.  Example:
+    			   'qpage -f TRAP notifygroup1'
+
+  Note:  The only benefit in using the --net_snmp_perl switch (which requires the
+         Net-SNMP Perl module to be installed) is that the Variables: description section 
+         will include:
+           -variable syntax
+           -variable description
+           -variable enums
+
+	   For example:
+           2: globalStatus
+              Syntax="INTEGER"
+                2: ok
+                4: failure
+              Descr="Current status of the entire library system"
+/;
+  
+  &showversion;
+  print $USAGE . "\n";
+}

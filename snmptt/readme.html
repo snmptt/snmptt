@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; June 19th, 2003
+This file was last updated on:&nbsp; June 24th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -230,14 +230,16 @@ and $e is always the numerical enterprise OID</li>
  style="font-weight: bold;">db_translate_enterprise</span> setting</li>
   <li>Fixed bug with <span style="font-weight: bold;">$#</span> to
 report the correct number of enterprise variables (was 1 lower than it
-should have been)<br>
+should have been)</li>
+  <li>Added Nagios / Netsaint integration documentation<br>
   </li>
   <li>Snmpttconvertmib</li>
   <ul>
     <li>Now prints the variables contained in each trap unless
 --no_variables is set.&nbsp; When using --net_snmp_perl it will also
 resolve the Syntax (INTEGER, OCTETSTR etc) and Description.&nbsp; If
-it's an INTEGER, will also print out the enumeration tags if any exist.<br>
+it's an INTEGER, will also print out the enumeration tags if any exist.</li>
+    <li>Improved compatability with MIB files<br>
     </li>
   </ul>
 </ul>
@@ -1842,7 +1844,7 @@ should be able to install and configuration Nagios before attempting to
 integrate it with SNMPTT.&nbsp; You should also have a functioning
 SNMPTT system that can at least log translated traps to a log file.<br>
 <br>
-<big>Passive Service Checks</big></p>
+<big>Nagios Passive Service Checks</big></p>
 <p>Passive service checks allow Nagios to process service check results
 that are submitted by external applications.&nbsp; Using SNMPTT's EXEC
 statement, the received trap can be passed to Nagios using the <span
@@ -1866,10 +1868,11 @@ received trap will be logged, emailed, paged etc but the console will
 only show the last one as being in the warning or critical state.&nbsp; <span
  style="text-decoration: underline;">The service will remain in this
 state until you manually force a service check.</span>&nbsp; See <big><small><span
- style="font-weight: bold;">Clearing received traps</span> below.<br>
+ style="font-weight: bold;">Clearing received traps in Nagios</span>
+below.<br>
 </small><span style="font-weight: bold;"></span></big></p>
 <p></p>
-<p><big><span style="font-weight: bold;">Volatile Services</span></big><br>
+<p><big><span style="font-weight: bold;">Nagios Volatile Services</span></big><br>
 </p>
 <p>When defining the service for receiving the SNMPTT translated trap,
 the service must be defined as <span style="font-weight: bold;">volatile</span>.&nbsp;
@@ -1882,7 +1885,7 @@ is <span style="text-decoration: underline;">STILL</span> <span
 notified.&nbsp; Because there is only one service entry for the SNMP
 traps, we need to make sure we are contacted every time a trap comes in.<br>
 <br>
-<big><span style="font-weight: bold;">Creating the service entry</span></big><br>
+<big><span style="font-weight: bold;">Creating the Nagios service entry</span></big><br>
 </p>
 <p>Following is a sample service entry for Nagios.&nbsp; The <span
  style="font-weight: bold;">Description </span>column should not be
@@ -1900,7 +1903,7 @@ included in the definition.<br>
       </td>
       <td class="Required">host_name</td>
       <td class="Required">server01</td>
-      <td style="vertical-align: top; font-style: italic;"><br>
+      <td style="vertical-align: top; font-style: italic;">Name of host<br>
       </td>
     </tr>
     <tr>
@@ -1970,7 +1973,7 @@ passive checks<br>
       <td class="Required">none</td>
       <td style="vertical-align: top; font-style: italic;">When this
 servcie can be checked.&nbsp; Because it is a passive service, it never
-needs to be checked</td>
+needs to be automatically checked</td>
     </tr>
 <!--<tr><td></td><td class="Optional">failure_prediction_enabled</td><td class="Optional">[0/1]</td></tr>//--> <tr>
       <td><br>
@@ -1979,7 +1982,9 @@ needs to be checked</td>
       <td class="Required">31536000</td>
       <td style="vertical-align: top; font-style: italic;">Notification
 interval.&nbsp; Set to a very high number to prevent you from getting
-pages of previously received traps.</td>
+pages of previously received traps (1 year - restart Nagios at least
+once a year! - do not set to 0!).<br>
+      </td>
     </tr>
     <tr>
       <td><br>
@@ -2030,7 +2035,8 @@ contact group to notify</td>
 <p style="margin-left: 40px;"><span style="font-weight: bold;">service[server01]=TRAP;1;none;1;1;1;cg_core;31536000;24x7;0;1;1;;check-host-alive</span><br>
 </p>
 <p></p>
-See the Nagios table above for an explanation of the various fields.<br>
+See the Netsaint documentation and the Nagios table above for an
+explanation of the various fields.<br>
 <br>
 <br>
 <big><span style="font-weight: bold;">Creating the SNMPTT EXEC statement</span></big><br>
@@ -2059,19 +2065,21 @@ expects the following arguments: <br>
 </div>
 <br>
 The possible return codes are: 0=OK, 1=WARNING, 2=CRITICAL,
--1=UNKNOWN.&nbsp; The <span style="font-weight: bold;">submit_check_result</span>
-contains this information.<br>
+-1=UNKNOWN.&nbsp; See the top of the <span style="font-weight: bold;">submit_check_result</span>
+script for a detailed description of each argument.<br>
 <br>
-Create an EXEC statement such as the following for each EVENT entry in
-your SNMPTT.CONF file:<br>
+Create an EXEC statement such as the following for each <span
+ style="font-weight: bold;">EVENT </span>entry in your <span
+ style="font-weight: bold;">snmptt.conf</span>&nbsp;<span
+ style="font-weight: bold;"></span>file:<br>
 <br>
 <div style="margin-left: 40px;"><span style="font-weight: bold;">EXEC
 /usr/local/netsaint/libexec/eventhandlers/submit_check_result $r TRAP 1
 "xxxxxx"</span><br>
 </div>
 <br>
-where "xxxxxx" is the text for the trap using the same format as the
-FORMAT statement.&nbsp; For example:<br>
+where "xxxxxx" is the text for the trap using the same format as the <span
+ style="font-weight: bold;">FORMAT </span>statement.&nbsp; For example:<br>
 <br>
 <div style="margin-left: 40px;"><span style="font-weight: bold;">EXEC
 /usr/local/netsaint/libexec/eventhandlers/submit_check_result $r TRAP 1
@@ -2090,7 +2098,7 @@ See the section '<a href="file:///I:/cvs/snmptt/readme.html#DNS">Name
 Resolution / DNS</a>' for important DNS information.<br>
 <br>
 <br>
-<big><span style="font-weight: bold;">Clearing received traps</span></big><br>
+<big><span style="font-weight: bold;">Clearing received traps in Nagios</span></big><br>
 <br>
 Once a trap is received for a host, it will remain in the <span
  style="font-weight: bold;">WARNING</span> <span
@@ -2108,8 +2116,8 @@ minute or so, assuming of course the system responds OK to the <span
 Trap Translator Convert v0.3</font></b> <br>
 <b><font size="+1">(SNMPTTCONVERT)</font></b> </p>
 <p>Some vendors provide a file that can be imported into HP Openview
-using a HP Openview utiltity.&nbsp; <span style="font-weight: bold;">SNMPTTCONVERT</span>is
-a simple Perl script which will convert one of these files into the
+using a HP Openview utiltity.&nbsp; <span style="font-weight: bold;">SNMPTTCONVERT</span>
+is a simple Perl script which will convert one of these files into the
 format used by SNMPTT.&nbsp; The file can contain multiple traps. </p>
 <p>For example, if the file ciscotrap.txt contained: </p>
 <blockquote>rpsFailed {.1.3.6.1.4.1.437.1.1.3} 6 5 - "Status Events" 1 <br>
@@ -2211,32 +2219,85 @@ script.</p>
  href="http://www.net-snmp.org/man/snmptranslate.html"><b>snmptranslate</b></a>
 utility</li>
 </ul>
-<div style="margin-left: 40px;">or</div>
+<div
+ style="margin-left: 40px; font-weight: bold; text-decoration: underline;">or</div>
 <ul>
   <li> UCD-SNMP / Net-SNMP <b style="font-weight: bold;"><a
  href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">Perl
 module</a></b><br>
   </li>
 </ul>
+<p>Snmpttconvertmib can convert a MIB file using either the
+snmptranslate utility, or by using the Net-SNMP Perl module.&nbsp; The
+only difference between the two is that the Net-SNMP Perl module method
+will provide more detailed Variable: information such as:<br>
+</p>
+<ul>
+  <li>variable syntax</li>
+  <li>variable description</li>
+  <li>variable enums</li>
+</ul>
+<p>For example:<br>
+</p>
+<div style="margin-left: 40px;">2: globalStatus<br>
+&nbsp;&nbsp; Syntax="INTEGER"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2: ok<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4: failure<br>
+&nbsp;&nbsp; Descr="Current status of the entire library system"<br>
+</div>
+<p></p>
+<p>Note:&nbsp; There appears to be a bug in both UCD-SNMP and Net-SNMP
+that prevents TRAPS / NOTIFICATIONS from being parsed correctly if the
+MIB file contains definitions that contain three values in the ::=
+line.&nbsp; For example:<br>
+</p>
+<div style="margin-left: 40px;">::= { snmpDot3RptrMgt 0 1 }<br>
+</div>
+<p>For these types of MIB files, the snmptranslate method should be
+used.<br>
+</p>
+<p>The default method is to use snmptranslate.&nbsp; To use the Perl
+module, use --net_snmp_perl on the snmpttconvertmib command line.<br>
+</p>
 <p><br>
-<b><font size="+2">Converting a MIB file</font></b> </p>
+</p>
+<p><b><font size="+2">Converting a MIB file</font></b> </p>
 <p>See the <span style="font-weight: bold;">snmpttconvertmib </span>help
 screen for all possible command line options (<span
- style="font-weight: bold;">snmpttconvertmib --h</span>).<br>
+ style="font-weight: bold;">snmpttconvertmib --h</span>) before
+converting a MIB file.&nbsp; Depending on what type of information is
+available in the MIB file, you may want to change how the FORMAT / EXEC
+lines are generated.<br>
 </p>
-<p>Follow these steps to successfully convert a MIB file: <br>
-&nbsp; </p>
+<p>Before trying to convert&nbsp; MIB file, you should ensure that the
+MIB file can be parsed by Net-SNMP<br>
+</p>
 <ol>
-  <li> Edit the options between OPTIONS START and OPTIONS END in
-snmpttconvertmib</li>
-  <li> Copy the MIB file to UCD-SNMP / Net-SNMP mibs folder</li>
+  <li>Copy the MIB file to the UCD-SNMP / Net-SNMP mibs folder</li>
   <li> Type: <b>export MIBS=ALL</b> to ensure all the mibs will be read
 in by <b>snmptranslate</b></li>
   <li> Make sure the MIB file can be interpreted by <b>snmptranslate</b>
 correctly.&nbsp; Simply typing <b>snmptranslate</b> should tell you if
 it was able to read the mib file correctly.&nbsp; If it can't, an error
 will be produced at the top of the help screen.</li>
-  <li> If you are using <b>UCD-SNMP</b>, or <b>Net-SNMP v5.0.<span
+  <li>Try to translate a TRAP-TYPE or NOTIFICATION-TYPE entry contained
+inside the MIB file.&nbsp; For example, if the MIB file contains the
+Notification definition of '<span style="font-weight: bold;">rptrHealth
+NOTIFICATION-TYPE</span>', then type:&nbsp; <span
+ style="font-weight: bold;">snmptranslate rptrHealth -IR -Td</span>.&nbsp;
+If you get '<span style="font-weight: bold;">Unknown object identifier:
+xxx'</span> then the MIB file was not found or parsed correctly.<br>
+  </li>
+</ol>
+<p><span style="font-weight: bold;">Snmptranslate method</span>:<br>
+&nbsp; </p>
+<ol>
+  <li>Make sure the MIB file has been successfully installed (see above)<br>
+  </li>
+  <li> Edit the options between OPTIONS START and OPTIONS END in
+snmpttconvertmib if needed<br>
+  </li>
+  <li>If you are using <b>UCD-SNMP</b>, or <b>Net-SNMP v5.0.<span
  style="text-decoration: underline;">1</span></b>, then add the
 folllowing to your snmp.conf file: <b>printNumericOids 1</b>
 (note:&nbsp; this will affect all snmp commands).&nbsp; This ensures the
@@ -2245,35 +2306,45 @@ do not require this change, as <b>snmpttconvertmib</b> will use a
 command line switch to force it on when calling <b>snmptranslate</b>.</li>
   <li> Convert the mib file with: <b>snmpttconvertmib --in=<i>path-to-mib</i>
 --out=<i>output-file-name</i></b>.&nbsp; Note:&nbsp; the <b>output-file-name</b>
-is appended to, so remember to delete it first if needed.&nbsp; To use
-the Perl module instead of snmptranslate, use: <b>snmpttconvertmib --in=<i>path-to-mib</i>
---out=<i>output-file-name</i> --net_snmp_perl --mibdir=</b><b><i>path-to-mib-directory</i></b></li>
+is appended to, so remember to delete it first if needed. <br>
+  </li>
 </ol>
-Example:
-<blockquote><b>snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib
+<div style="margin-left: 40px;">Example: </div>
+<blockquote style="margin-left: 80px;"><b>snmpttconvertmib
+--in=/usr/share/snmp/mibs/CPQHOST.mib
 --out=/etc/snmp/snmptt-compaqhost.conf<br>
   <br>
-  </b><b>snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib
+  </b></blockquote>
+<p><span style="font-weight: bold;">Perl module method</span>:<br>
+&nbsp; </p>
+<ol>
+  <li>Make sure the MIB file has been successfully installed (see above)</li>
+  <li> Edit the options between OPTIONS START and OPTIONS END in
+snmpttconvertmib if needed<br>
+  </li>
+  <li>Convert the mib file with: <b>snmpttconvertmib --net_snmp_perl
+--in=<i>path-to-mib</i> --out=<i>output-file-name</i></b>.&nbsp;
+Note:&nbsp; the <b>output-file-name</b> is appended to, so remember to
+delete it first if needed.&nbsp; </li>
+</ol>
+<div style="margin-left: 40px;">Example: </div>
+<blockquote style="margin-left: 80px;"><b>snmpttconvertmib
+--in=/usr/share/snmp/mibs/CPQHOST.mib
 --out=/etc/snmp/snmptt-compaqhost.conf --net_snmp_perl
 --mibdir=/usr/share/snmp/mibs</b><br>
 </blockquote>
 <p>Note:&nbsp; <br>
 </p>
-<div style="margin-left: 40px;">Use <span style="font-weight: bold;">snmpttconvertmib
--h</span> for more options.<br>
-<br>
-Using either the <span style="font-weight: bold;">snmptranslate</span>
-or the <span style="font-weight: bold;">Perl module</span> should
-produce the exact same output, but the Perl module should be
-faster.&nbsp; The order of the output may be different as the Perl
-module will output based on a sorted list of OIDs contained in the MIB
-file, while the snmptranslate method will process the MIB from top to
-bottom.<br>
+<div style="margin-left: 40px;">The order of the output may be
+different between the snmptranslate and the Perl module methods.&nbsp;
+This is because the Perl module output is based on a <span
+ style="font-weight: bold;">sorted </span>list of OIDs contained in
+the MIB file, while the snmptranslate method will process the MIB from
+top to bottom which may not be pre-sorted.<br>
 </div>
 <p><b><font size="+2">How it works</font></b> <br>
-&nbsp; </p>
-<p><b><font size="+1">SNMP V1 files (TRAP-TYPE) - snmptranslate
-(default) method:</font></b> </p>
+&nbsp;<br>
+<b><font size="+1">Snmptranslate (default) method:</font></b> </p>
 <p>Some MIB files contain <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b>
 lines which are used by Novell's Network Management system.&nbsp; These
 MIB files convert very well to <b>SNMPTT</b> as they contain detailed
@@ -2282,19 +2353,27 @@ lines.&nbsp; Compaq's MIBs usually have these lines. </p>
 <p>Other MIBS contain only a <b>DESCRIPTION</b> section where the first
 line contains the <b>FORMAT</b> string.&nbsp; In some MIBS, this line
 also contains variables similar to the <b>--#SUMMARY</b> lines. </p>
-<p>The mib file is searched for lines containing <b>TRAP-TYPE</b>.&nbsp;
-If it finds one that appears to be a valid trap definition, it reads in
-the following lines until a ::= is found while looking for the <b>ENTERPRISE</b>
-and <b>DESCRIPTION</b> section.&nbsp; It then looks for the <b>--#SUMMARY</b>
-and <b>--#ARGUMENTS</b> line. </p>
-<p>The value for the <b>ENTERPRISE</b> is used when looking up the <b>TRAP-TYPE</b>.<b>SNMPTRANSLATE</b>
-is used with the following syntax to find the <b>OID</b> of the trap: </p>
-<p><b>snmptranslate -IR -Ts <i>enterprise</i>#.<i>trapname</i></b> </p>
+<p>The mib file is searched for the name of the MIB file.&nbsp; This
+should be at the top of the file and contain <span
+ style="font-style: italic;">'</span><span style="font-weight: bold;"><span
+ style="font-style: italic;">name </span>DEFINITIONS ::=BEGIN</span>'.&nbsp;
+This name will be used when looking up the TRAP / NOTIFICATION to
+ensure the correct MIB file is accessed.<br>
+</p>
+<p>The mib file is also searched for lines containing <b>TRAP-TYPE </b>or<font
+ size="+1">NOTIFICATION-TYPE</font>.&nbsp; If it finds one that appears
+to be a valid trap definition, it reads in the following lines until a
+::= is found while looking for the <b></b><b>DESCRIPTION</b>
+section.&nbsp; It then looks for the <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b>
+line if enabled.<br>
+</p>
+<p><b></b><b>SNMPTRANSLATE</b> is used with the following syntax to find
+the <b>OID</b> of the trap: </p>
+<p><b>snmptranslate -IR -Ts <i>mib-name::</i><i>trapname</i></b> </p>
 <p>Note: If&nbsp; Net-SNMP 5.0.2 or newer is detected, the command line
 also includes the -On switch.&nbsp; See the <a
  href="file:///h:/cvs/snmptt/readme.html#FAQ-Troubleshooting">FAQ</a>.</p>
-<p>MIB files can become quite complex to read due to the use of IMPORT
-statements etc.&nbsp; This is why snmptranslate is used. </p>
+<p></p>
 <p><span style="font-weight: bold;">* </span>If <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b>
 are found, the <b>%<i>letter</i></b> variables are replaced with <b>$<i>number</i></b>
 variables based on the values lists in the <b>--#ARGUMENTS</b> section
@@ -2309,97 +2388,38 @@ variables are replaced with <b>$<i>number</i></b> variables starting at
 <p><span style="font-weight: bold;">* </span>If there is no <b>--#SUMMARY</b>
 and <b>--#ARGUMENTS</b> lines, and the first line of the <b>DESCRIPTION</b>
 does not contain <b>%<i>letter</i></b> variables, then that line will be
-used to define the <b>FORMAT</b> and <b>EXEC</b> lines followed by a <b>$*</b>
+sed to define the <b>FORMAT</b> and <b>EXEC</b> lines followed by a <b>$*</b>
 which will dump all received variables. <br>
+</p>
+<p><span style="font-weight: bold;">* </span>If the entry contains
+variables, the variables are listed in the DESC section. <br>
 </p>
 <p style="font-weight: bold;">* Note:&nbsp; This can be changed by
 specifying a --format=n command line option.&nbsp; See the
 snmpttconvertmib help screen for all possible command line options
 (snmpttconvertmib --h).</p>
-<p><b><font size="+1">SNMP V1 files (TRAP-TYPE) - Perl module method:</font></b> <br>
+<p><b><font size="+1">Perl module method:</font></b> <br>
 </p>
 <p>When the Perl module is used, the only differences are:<br>
 </p>
 <ol>
-  <li>The MIB file is also loaded into memory using the Perl module</li>
-  <li>A loop goes through all the TRAP / NOTIFICATIONS</li>
+  <li>A loop goes through all the TRAP / NOTIFICATIONS contained inside
+the Perl hash of entries from the MIB<br>
+  </li>
   <li>For each one, the MIB file is parsed using the same method above
-for the DESCRIPTION and SUMMARY text</li>
+for the DESCRIPTION, SUMMARY, variables etc</li>
+  <li>The variable description, syntax and enums are added to the
+Variables section of the DESC section.<br>
+  </li>
   <li>Snmptranslate is not used as the Perl module already contains the
 OID of the trap / notification</li>
-  <li>The conversion should be considerably quicker than using <span
- style="font-weight: bold;">snmptranslate</span><br>
-  </li>
 </ol>
 Note:<br>
 <div style="margin-left: 40px;">The Perl module has the ability to
 extract the desription from the MIB file, but it does not include the
 --#SUMMARY lines as they appear as comments.&nbsp; Because of this, the
-description and summary lines are extracted handled manually.<br>
+description and summary lines are extracted manually.<br>
 </div>
-<p><b><font size="+1">SNMP V2 files (NOTIFICATION-TYPE) </font></b><b><font
- size="+1">- snmptranslate (default) method:</font></b><b><font
- size="+1">:</font></b> </p>
-<p>The mib file is searched for lines containing <b>NOTIFICATION-TYPE</b>.&nbsp;
-If it finds one that appears to be a valid trap definition, it reads in
-the following lines until a ::= is found while looking for the <b>DESCRIPTION</b>
-section. It then looks for the <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b>
-line.&nbsp; I have never seen a V2 file with the&nbsp; <b>--#SUMMARY</b>
-and <b>--#ARGUMENTS</b> lines in them, but I have left the code in place
-in case they exist. </p>
-<p>The value for the <b>ENTERPRISE</b> is used when looking up the <b>NOTIFICATION-TYPE</b>.<b>SNMPTRANSLATE</b>
-is used with the following syntax to find the <b>OID</b> of the trap: </p>
-<p><b>snmptranslate -IR -Ts <i>enterprise</i>.<i>trapname</i></b> </p>
-<p>Note: If&nbsp; Net-SNMP 5.0.2 or newer is detected, the command line
-also includes the -On switch.&nbsp; See the <a
- href="#FAQ-Troubleshooting">FAQ</a>.<br>
-</p>
-<p>MIB files can become quite complex to read due to the use of IMPORT
-statements etc.&nbsp; This is why snmptranslate is used. </p>
-<p><span style="font-weight: bold;">* </span>If <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b>
-are found, the <b>%<i>letter</i></b> variables are replaced with <b>$<i>number</i></b>
-variables based on the values lists in the <b>--#ARGUMENTS</b> section
-incrememented by 1 (ARGUMENTS starts with 0, SNMPTT starts with
-1).&nbsp; This will be used to define the <b>FORMAT</b> and <b>EXEC</b>
-lines. </p>
-<p><span style="font-weight: bold;">* </span>If there is no <b>--#SUMMARY</b>
-and <b>--#ARGUMENTS</b> lines, but the first line of the <b>DESCRIPTION</b>
-contains <b>%<i>letter</i></b> variables, then that line will be used to
-define the <b>FORMAT</b> and <b>EXEC</b> lines.&nbsp; The <b>%<i>letter</i></b>
-variables are replaced with <b>$<i>number</i></b> variables starting at
-1 and going up. </p>
-<p><span style="font-weight: bold;">* </span>If there is no <b>--#SUMMARY</b>
-and <b>--#ARGUMENTS</b> lines, and the first line of the <b>DESCRIPTION</b>
-does not contain <b>%<i>letter</i></b> variables, then that line will be
-used to define the <b>FORMAT</b> and <b>EXEC</b> lines followed by a <b>$*</b>
-which will dump all received variables. <br>
-</p>
-<p><span style="font-weight: bold;">* Note:&nbsp; This can be changed
-by specifying a --format=n command line option.&nbsp; See the
-snmpttconvertmib help screen for all possible command line options
-(snmpttconvertmib --h).</span><br>
-&nbsp; <br>
-<b><font size="+1">SNMP V2 files (</font></b><b><font size="+1">NOTIFICATION</font></b><b><font
- size="+1">-TYPE) - Perl module method:</font></b> <br>
-</p>
-<p>When the Perl module is used, the only differences are:<br>
-</p>
-<ol>
-  <li>The MIB file is also loaded into memory using the Perl module</li>
-  <li>A loop goes through all the TRAP / NOTIFICATIONS</li>
-  <li>For each one, the MIB file is parsed using the same method above
-for the DESCRIPTION and SUMMARY text</li>
-  <li>Snmptranslate is not used as the Perl module already contains the
-OID of the trap / notification</li>
-  <li>The conversion should be considerably quicker than using <span
- style="font-weight: bold;">snmptranslate</span><br>
-  </li>
-</ol>
-Note:<br>
-<div style="margin-left: 40px;"> The Perl module has the ability to
-extract the desription from the MIB file, but it does not include the
---#SUMMARY lines as they appear as comments.&nbsp; Because of this, the
-description and summary lines are extracted handled manually.</div>
 <p><br>
 </p>
 <p><a name="FAQ-Troubleshooting"></a><b><font size="+3">Faq /
@@ -2422,6 +2442,28 @@ of <span style="font-weight: bold;">snmptt.ini</span>.</li>
   <li>Check the logs files etc for a sample linkDown trap<br>
   </li>
 </ol>
+<p><b><br>
+Q: Do I need the UCD-SNMP / Net-SNMP Perl module?<br>
+</b></p>
+A:&nbsp; SNMPTT does not REQUIRE the Perl module, but it is
+recommended.&nbsp; By enabling the Perl module, you will get the
+following benefits:<br>
+<ul>
+  <li>Proper $v, $E, $O, $-n, $+n, $-*, $+* variable substitution</li>
+  <li>Conversion of numerical OIDs to text form</li>
+  <li>Conversion of INTEGER values to enumeration tags (for example: <span
+ style="font-weight: bold;">Status is now OK</span> instead of <span
+ style="font-weight: bold;">Status is now 1</span>)</li>
+  <li>Conversion of the enterprise into textual form for logging to SQL
+databases</li>
+  <li>Ability for traps passed from <span style="font-weight: bold;">snmptrapd</span>or
+loaded from the <span style="font-weight: bold;">snmptt.conf</span>
+files to contain symbolic OIDs such as <span style="font-weight: bold;">linkDown</span>
+and <span style="font-weight: bold;">IF-MIB::linkUp</span></li>
+  <li>Variable syntax, description and enums when converting a MIB file
+using snmpttconvertmib<br>
+  </li>
+</ul>
 <p><b><br>
 Q:&nbsp; SNMPTT is not working!&nbsp; How do I troubleshoot it?</b> </p>
 <p>A:&nbsp; Start by enabling <span style="font-weight: bold;">enable_unknown_trap_log</span>
@@ -2679,8 +2721,21 @@ javascripts which interfaces to a SQL database using DBI::ODBC. </p>
 Sourceforge page</a>. <br>
 &nbsp; <br>
 </p>
-<p><br>
-&nbsp; <br>
+<p><b> Q:&nbsp; When I convert a MIB file using --net_snmp_perl, no
+traps / notifications appear in the output file.&nbsp; When I use the
+snmptranslate method it works fine.&nbsp; Why?</b><br>
+<br>
+A:&nbsp; There appears to be a bug in both UCD-SNMP and Net-SNMP that
+prevents TRAPS / NOTIFICATIONS from being parsed correctly if the MIB
+file contains definitions that contain three values in the ::=
+line.&nbsp; For example:<br>
+</p>
+<div style="margin-left: 40px;">::= { snmpDot3RptrMgt 0 1 }<br>
+<br>
+</div>
+For these types of MIB files, the <span style="font-weight: bold;">snmptranslate</span>method
+should be used until the bug has been fixed.<br>
+<p> <br>
 &nbsp; <br>
 &nbsp; <br>
 &nbsp; <br>
