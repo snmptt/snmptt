@@ -9,6 +9,15 @@ August 29th, 2002: Alex Burger <alex_b@users.sourceforge.net>
   Thanks to Ingo Flaschberger.
 - Changed @var[3] references to $receivedtrap
 
+August 26th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Added snmptthandler script which when run from snmptrapd.conf
+  instead of snmptt, will dump received traps (quickly) into
+  the directory defined by $spooldirectory to be later processed
+  by snmptt running as a daemon.
+- Added daemon mode support to snmptt.  snmptt --daemon or 
+  setting daemonmode=1 in script to enable.  Looks in 
+  $spooldirectory for files to process every $sleeptime seconds.
+
 August 21th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Passed IP address sometimes in the format of
   udp:ipaddress:port.  udp: and :port now removed.  Thanks to

@@ -44,6 +44,10 @@
 #
 # OPTIONS START
 #
+# Set to 1 to run as a daemon (snmptrapd.conf calls snmptthandler)
+# Set to 0 to run standalone (snmptt called from snmptrapd.conf)
+$daemonmode = 0;
+
 # Set to 1 to enable messages to be sent to standard output, or 0 to disable.
 # Would normally be left off unless you are piping this program to another
 $enablestdout = 1;
@@ -163,6 +167,7 @@ if ($help == 1)
 $USAGE = qq/Usage:
     snmptt [<options>] 
 Options:
+    --daemon                             Run as a daemon
     --debug=n                            Set debug level (1 or 2)
     --debugfile=filename                 Set debug output file
     --dump                               Dump (display) defined traps
@@ -181,6 +186,11 @@ Options:
 if ($debug == 1)
 {
 	$DEBUGGING = 1;	
+}
+
+if ($daemonmode == 1)
+{
+	$daemon = 1;	
 }
 
 if ($debug ==2)
