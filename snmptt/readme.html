@@ -204,7 +204,7 @@ agent IP address.</li>
 prints the numeric OID</li>
   <li>Variable $O now prints the trap in symbolic form.&nbsp; $o prints
 the numeric OID</li>
-  <li> Added new variable substitution <b>$n</b> to print the actual
+  <li> Added new variable substitution <b>$i</b> to print the actual
 matched entry from the .conf file (which could be a wildcard OID)<br>
   </li>
   <li>Added the configuration option <span style="font-weight: bold;">dns_enable</span>
@@ -1055,8 +1055,8 @@ $e&nbsp; - Enterprise trap OID in number format <br>
 $G&nbsp; - Generic trap number (0 if enterprise trap) <br>
 $S&nbsp; - Specific trap number (0 if generic trap) <br>
 $N&nbsp; - Event name defined in .conf file of matched entry<br>
-$n&nbsp; - Event OID defined in .conf file of matched entry (could be a
-wildcard OID) (not the same as $<span style="font-style: italic;">n</span>)<br>
+$i&nbsp; - Event OID defined in .conf file of matched entry (could be a
+wildcard OID)<br>
 $O - Trap OID in symbolic format <b>(see Note 4)</b><br>
 $o - Trap OID in numerical format <b>(see Note 4)</b><br>
 $R, $r&nbsp; - Hostname <b>(see Note 1)</b> <br>
@@ -1856,9 +1856,9 @@ service is defined for each Nagios host that is to receive traps from
 SNMPTT.&nbsp; The benefits of using only one service entry is that it is
 makes it easier to set up Nagios. Trying to define every possible trap
 for every host you have is not recommended.&nbsp; For example, after
-converting the MIBS from Compaq, there are over 340 traps
-defined.&nbsp; Trying to define this for every Compaq server would not
-be a good idea as 40 servers * 340 traps = 13,600 service definitions.<br>
+converting the MIBS from Compaq, there are over 340 traps defined.&nbsp;
+Trying to define this for every Compaq server would not be a good idea
+as 40 servers * 340 traps = 13,600 service definitions.<br>
 </p>
 <p>The downside of using only one service entry is that you will only
 see the last trap that was recieved on the Nagios console.&nbsp; Each

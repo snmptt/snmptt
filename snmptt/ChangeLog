@@ -2,6 +2,7 @@ June 19th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed $# - was giving one less than the actual number of enterprise
   variables
 - Fixed MATCH statement to start at $1 instead of $0
+- Changed $n to $i to prevent confusion
 
 June 18th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Change help for snmpttconvertmib --exec= line

@@ -1464,8 +1464,8 @@ sub substitute
   # $N - Event name
   s(\$N)($event2[0])g;
 
-  # $N - Event name
-  s(\$n)($receivedtrap_entry)g;
+  # $i - Event OID
+  s(\$i)($receivedtrap_entry)g;
   
   # $# - Number of variable-bindings in the trap
   my $entvar_temp = $#entvar+1;
