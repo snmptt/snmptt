@@ -883,14 +883,11 @@ sub loadsnmpttconf
 	{
 		print "Printing out all the events in hash table:\n\n";
 		foreach $key (sort keys %event)
-		{
-			#print "hash: $key => $event{$key}[0],$event{$key}[1],$event{$key}[2],$event{$key}[3]\n";
-			#			
-			
+		{		
 			$l=0;
 			while (defined($event{$key}[$l+1]))
 			{	
-				print  "ahash: $key => $event{$key}[1+$l],$event{$key}[2+$l],$event{$key}[3+$l],$event{$key}[4+$l]\n";
+				print  "hash: $key => $event{$key}[1+$l],$event{$key}[2+$l],$event{$key}[3+$l],$event{$key}[4+$l]\n";
 			$l+=7;
 			}
 
