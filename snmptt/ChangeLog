@@ -1,3 +1,11 @@
+October 18th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Minor bug fix for MySQL / ODBC support - eventid wrong, use
+  INSERT INTO instead of just INSERT for ODBC to allow it to
+  work with MS Access
+
+October 17th, 2002: Alex Burger <alex_b@users.sourceforge.net>
+- Added support for MySQL (Linux / Windows) and ODBC (Windows)
+
 September 27th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_0.3.1
 - Fixed bug with $x variable - code was searching for $r, not $x

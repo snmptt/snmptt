@@ -96,8 +96,8 @@ $syslogfacility = 'local0';
 # Syslog level to use.  For example: 'warning'
 $sysloglevel = 'warning';
 
-# MySQL: Set to 1 to enable logging to a MySQL database via DBI.  
-# Windows users should disable this.
+# MySQL: Set to 1 to enable logging to a MySQL database via DBI 
+# (Linux / Windows)
 $enablemysqldbi = 0;
 
 # MySQL: Database to use
@@ -112,8 +112,8 @@ $mysqldbiusername = 'root';
 # MySQL: Password to use
 $mysqldbipassword = 'password';
 
-# WinODBC: Set to 1 to enable logging to a SQL database via ODBC on Windows.  
-# Non-Windows users should disable this.
+# ODBC: Set to 1 to enable logging to a SQL / Access database via ODBC on Windows.  
+# (Tested with Windows only)
 $enablesqlodbc = 0;
 
 # WinODBC: Database to use
@@ -646,7 +646,7 @@ sub processtrap
 				 warn "Unable to prepare our query: ".$dbh->errstr."\n";
 
 				 if (defined $sth) {
-					 $sth->execute($event2[0],$trapreceived,@var[6],@var[5],@var[0],@var[4],$event2[1],
+					 $sth->execute($event2[0],$receivedtrap,@var[6],@var[5],@var[0],@var[4],$event2[1],
 					 $event2[2],@var[2],scalar(localtime),$message)
 					 or warn "Unable to execute our query: ".$dbhmysql->errstr."\n";
 
@@ -660,13 +660,13 @@ sub processtrap
 				
 				print "hello\n";
 				if (defined $dbhodbc->Sql
-				        ("INSERT $mysqldbitable (eventname, eventid, enterprise, community, 
+				        ("INSERT INTO $sqlodbctable (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
-					\'$event2[0]\',\'$trapreceived'\,\'@var[6]\',\'@var[5]\',\'@var[0]\',\'@var[4]\',
+					\'$event2[0]\',\'$receivedtrap'\,\'@var[6]\',\'@var[5]\',\'@var[0]\',\'@var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'@var[2]\',\'".scalar(localtime)."\',
 					\'$message\')" ) )
 				{					
-					warn "Unable to perform INSERT: ".Win32::ODBC::Error()."\n";
+					warn "Unable to perform INSERT INTO: ".Win32::ODBC::Error()."\n";
 		 	 	}
 			}				 
 
