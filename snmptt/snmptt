@@ -2746,7 +2746,7 @@ sub readtrap
 		#print out all enterprise specific variables
 		for ($i=0;$i <= $#entvar;$i++)
 		{
-			print "Ent Value $i: $entvarname[$i]=$entvar[$i]\n\n";
+			print "Ent Value $i (\$" . ($i+1) . "): $entvarname[$i]=$entvar[$i]\n\n";
 		}
 	}
 		

@@ -1,3 +1,7 @@
+Aug 9th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- Debug output now prints out $n variable number beside 'Ent Value x' such as 
+  'Ent Value 2 ($3):' to reduce confusion when troubleshooting.
+
 July 14th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - snmpttconvertmib:  Fix bug with infinite loop when processing VARIABLES
   section if MIB file had spaces after }.  Thanks to mike at mccartney.net
