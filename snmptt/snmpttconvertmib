@@ -83,7 +83,7 @@ if (DEBUGGING >= 1)
 
 $currentline=0;
 
-unless (open OUTPUTFILE, ">$output")
+unless (open OUTPUTFILE, ">>$output")
 {
 	die "Cannot open output file: $!";
 }
