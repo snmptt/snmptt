@@ -405,9 +405,9 @@ changed by editing the SNMPTTCONVERT script.
 <p><b><font size=+3>SNMP Trap Translator MIB Convert v0.1</font></b>
 <br><b><font size=+1>(SNMPTTCONVERTMIB)</font></b>
 <p><b>SNMPTTCONVERTMIB</b> is a Perl script which will read a MIB file
-and convert the <b>TRAP-TYPE</b> definitions into a configuration file
-readable by <b>SNMPTT</b>.
-<p>For example, if the file <b>CPQHOST.mib</b> contained:
+and convert the <b>TRAP-TYPE</b> (v1) or <b>NOTIFICATION-TYPE</b> (v2)
+definitions into a configuration file readable by <b>SNMPTT</b>.
+<p>For example, if the file <b>CPQHOST.mib</b> (v1) contained:
 <blockquote>CPQHOST-MIB DEFINITIONS ::= BEGIN
 <p>&nbsp;&nbsp;&nbsp; IMPORTS
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enterprises&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -494,6 +494,8 @@ Example:
 <blockquote><b>snmpttconvertmib /usr/share/snmp/mibs/CPQHOST.mib /etc/snmp/snmptt-compaqhost.conf</b></blockquote>
 
 <p><br><b><font size=+2>How it works</font></b>
+<br>&nbsp;
+<p><b><font size=+1>SNMP V1 files (TRAP-TYPE):</font></b>
 <p>Some MIB files contain <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines
 which are used by Novell's Network Management system.&nbsp; These MIB files
 convert very well to <b>SNMPTT</b> as they contain detailed information
@@ -504,10 +506,10 @@ line contains the <b>FORMAT</b> string.&nbsp; In some MIBS, this line also
 contains variables similar to the <b>--#SUMMARY</b> lines.
 <p>The mib file is searched for lines containing <b>TRAP-TYPE</b>.&nbsp;
 If it finds one that appears to be a valid trap definition, it reads in
-the following lines until a ::= is found looking for the <b>ENTERPRISE</b>
+the following lines until a ::= is found while looking for the <b>ENTERPRISE</b>
 and <b>DESCRIPTION</b> section.&nbsp; It then looks for the <b>--#SUMMARY</b>
 and <b>--#ARGUMENTS</b> line.
-<p>The value for the <b>ENTERPRISE</b> is used when looking up the <b>TRAP-TYPE</b>.&nbsp;
+<p>The value for the <b>ENTERPRISE</b> is used when looking up the <b>TRAP-TYPE</b>.
 <b>SNMPTRANSLATE</b> is used with the following syntax to find the <b>OID</b>
 of the trap:
 <p><b>snmptranslate -IR -Ts <i>enterprise</i>#.<i>trapname</i></b>
@@ -521,13 +523,45 @@ the <b>FORMAT</b> and <b>EXEC</b> lines.
 <p>If there is no <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, but
 the first line of the <b>DESCRIPTION</b> contains <b>%<i>letter</i></b>
 variables, then that line will be used to define the <b>FORMAT</b> and
-<b>EXEC</b> lines.&nbsp; The <b>%<i>letter</i></b> variables are replaced
-with <b>$<i>number</i></b> variables starting at 1 and going up.
+<b>EXEC</b>
+lines.&nbsp; The <b>%<i>letter</i></b> variables are replaced with <b>$<i>number</i></b>
+variables starting at 1 and going up.
 <p>If there is no <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, and
 the first line of the <b>DESCRIPTION</b> does not contain <b>%<i>letter</i></b>
 variables, then that line will be used to define the <b>FORMAT</b> and
-<b>EXEC</b> lines followed by a <b>$*</b> which will dump all received
-variables.
+<b>EXEC</b>
+lines followed by a <b>$*</b> which will dump all received variables.
+<br>&nbsp;
+<p><b><font size=+1>SNMP V2 files (NOTIFICATION-TYPE):</font></b>
+<p>The mib file is searched for lines containing <b>NOTIFICATION-TYPE</b>.&nbsp;
+If it finds one that appears to be a valid trap definition, it reads in
+the following lines until a ::= is found while looking for the <b>DESCRIPTION</b>
+section. It then looks for the <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b>
+line.&nbsp; I have never seen a V2 file with the&nbsp; <b>--#SUMMARY</b>
+and <b>--#ARGUMENTS</b> lines in them, but I have left the code in place
+in case they exist.
+<p>The value for the <b>ENTERPRISE</b> is used when looking up the <b>NOTIFICATION-YPE</b>.
+<b>SNMPTRANSLATE</b> is used with the following syntax to find the <b>OID</b>
+of the trap:
+<p><b>snmptranslate -IR -Ts <i>enterprise</i>.<i>trapname</i></b>
+<p>MIB files can become quite complex to read due to the use of IMPORT
+statements etc.&nbsp; This is why snmptranslate is used.
+<p>If <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> are found, the <b>%<i>letter</i></b>
+variables are replaced with <b>$<i>number</i></b> variables based on the
+values lists in the <b>--#ARGUMENTS</b> section incrememented by 1 (ARGUMENTS
+starts with 0, SNMPTT starts with 1).&nbsp; This will be used to define
+the <b>FORMAT</b> and <b>EXEC</b> lines.
+<p>If there is no <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, but
+the first line of the <b>DESCRIPTION</b> contains <b>%<i>letter</i></b>
+variables, then that line will be used to define the <b>FORMAT</b> and
+<b>EXEC</b>
+lines.&nbsp; The <b>%<i>letter</i></b> variables are replaced with <b>$<i>number</i></b>
+variables starting at 1 and going up.
+<p>If there is no <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, and
+the first line of the <b>DESCRIPTION</b> does not contain <b>%<i>letter</i></b>
+variables, then that line will be used to define the <b>FORMAT</b> and
+<b>EXEC</b>
+lines followed by a <b>$*</b> which will dump all received variables.
 <br>&nbsp;
 <p><b><font size=+2>Troubleshooting</font></b>
 <p>If you find that the MIB file is not converting properly, make sure

@@ -1,5 +1,14 @@
 August 15th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_0.2.1
+- Added command line options to snmptt: 
+    debug, debugfile, dump, help, version, time
+- Updated snmpttconvertmib to use also use enterprise when
+  running snmptranslate
+- Added updated readme.html (readme is text version of
+  readme.html which is updated when new versions are released)
+- Added sample-trap to CVS.  snmptt < sample-trap to use
+- Added support for NOTIFICATION-TYPE v2 MIB files to
+  snmpttconvertmib
 
 August 14th, 2002:  Alex Burger <alex_b@users.sourceforge.net> 
 - Add first version of SNMPTTCONVERTMIB

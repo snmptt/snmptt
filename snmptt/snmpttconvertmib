@@ -92,6 +92,8 @@ while ($currentline <= $#mibfile)
 {
 	$line = @mibfile[$currentline];
 	
+	# TRAP-TYPE - SNMP V1
+	# 
 	# eg: 'mngmtAgentTrap-23003 TRAP-TYPE';
 	if ( $line =~ /(.*)\s+TRAP-TYPE.*/ )
 	{	
@@ -109,11 +111,7 @@ while ($currentline <= $#mibfile)
 		# Remove beginning and trailing white space
 		$trapname =~ (/\s*(.*)\s*/);
 		$trapname = $1;
-		
-		#if ($3 == 6)
-		#{
-		#	$temp = "EVENT $1 $2.0.$4 $6 Normal";
-		#}
+
 		
 		print "#\n";
 		print "Line: $currentline\n";
@@ -352,6 +350,280 @@ while ($currentline <= $#mibfile)
 		#print "\@description is ", $#description,"\n";
 		#print "going to next trap\n\n";
 	}
+
+	# NOTIFICATION-TYPE - SNMP V2
+	# 
+	# eg: 'ciscoSystemClockChanged NOTIFICATION-TYPE';
+	if ( $line =~ /(.*)\s+NOTIFICATION-TYPE.*/ )
+	{	
+		$enterprisefound =0;
+
+		# If the NOTIFICATION-TYPE line starts with white space or a comma, it's probably a import line, so ignore
+		if (( $line =~ /^\s+NOTIFICATION-TYPE.*/ ) | ( $line =~ /^.*,.*NOTIFICATION-TYPE.*/ ))
+		{
+			print "skipping a NOTIFICATION-TYPE line - probably an import line.\n";
+			$currentline++; # Increment to the next line
+			$line = @mibfile[$currentline]; # Get next line
+			next;
+		}
+		
+		$notificationname = $1;
+
+		# Remove beginning and trailing white space
+		$notificationname =~ (/\s*(.*)\s*/);
+		$notificationname = $1;
+			
+		print "#\n";
+		print "Line: $currentline\n";
+		print "NOTIFICATION-TYPE: $1\n";	# If trapsummary blank, use trapsummary line for FORMAT and EXEC
+
+		$currentline++; # Increment to the next line
+		$line3 = @mibfile[$currentline];
+		
+		while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/ ) )
+		{
+			# Keep going through the file until the next NOTIFICATION-TYPE or the end of the mib file
+			# is reached
+				
+			# Look for DESCRIPTION and anything after (including newline with /s)
+			# and capture that anything in $1		
+			if ($line3 =~ /DESCRIPTION(.*)/s)
+			{
+				$temp1 = 0;
+				$notificationsummary = "";
+				@description = ();
+				
+				# Start of DESCRIPTION
+				
+				#print "SDESC\n";
+				
+				# If there is more text after the word DESCRIPTION, assume it's the start of 
+				# the description.  If it is, pull it out and place in $descriptionline1.
+				if ($1 ne "")
+				{
+					# Pull out text and remove beginning and trailing white space
+					if ($1 =~ /\s*(.*)\s*/)
+					{
+						#print ("2\n");
+						# Remove any quotes
+						$_ = $1;
+						s(\")()g;
+						# "								
+						$descriptionline1 = $_;
+						$temp1 = 1;
+
+						push (@description, "$_\n");
+						#print "Line 1a: $_ \n";
+					}
+				}
+				
+				$currentline++; # Increment to the next line
+				$line4 = @mibfile[$currentline];
+	
+				# Assume the rest is the description up until a ::= or end of the file
+				while (! ($line4 =~ /^\s+.*::=/))
+				{
+					# If next line is a --#SUMMARY, pull out the information and place in $summary
+					if ($line4 =~ /--#SUMMARY(.*)/)
+					{
+							
+						# Pull out text and remove beginning and trailing white space and quotes
+						if ($line4 =~ /\s*--#SUMMARY\s*(.*)\s*/)
+						{
+							# Remove any quotes
+							$_ = $1;
+							s(\")()g;
+							# "
+							
+							#print ("2\n");
+							$notificationsummary = $_;
+							#print "Summary: $notificationsummary \n";
+						}
+						
+						# Increment to next line and continue with the loop
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}
+					# If next line is a --#ARGUMENTS, pull out the information and place in $arguments
+					if ($line4 =~ /--#ARGUMENTS {(.*)}/)
+					{
+						@arguments = split /,/, $1;
+						
+						for($i=0;$i <= $#arguments;$i++)
+						{
+							#print "argument $i: @arguments[$i]\n";
+						}
+											
+						# Increment to next line and continue with the loop
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}					
+					# If next line starts with a --#, ignore it and continue with the loop
+					# (we already got the SUMMARY line above)
+					if ($line4 =~ /--#/)
+					{
+						$currentline++; # Increment to the next line
+						$line4 = @mibfile[$currentline];
+						next;
+					}
+					# If we did not find text after the word DESCRIPTION, then the NEXT
+					# line must be the first line of description.  Pull that out and place
+					# in $descriptionline1.
+					if ($temp1 == 0)
+					{
+						# Remove beginning and trailing white space
+						$line4 =~ (/\s*(.*)\s*/);
+						# Remove any quotes
+						$_ = $1;
+						s(\")()g;
+						# "								
+						$descriptionline1 = $_;
+						
+						push (@description, "$_\n");
+						#print "Line 1b: $_ \n";
+						$temp1 = 1;
+					}
+					else
+					{
+						# Remove beginning and trailing white space
+						$line4 =~ (/\s*(.*)\s*/);
+						if ($1 ne "")
+						{
+							# Remove any quotes
+							$_ = $1;
+							s(\")()g;
+							# "
+														
+							push (@description, "$_\n");
+							#print "c:$_\n";
+						}
+					}
+
+					$currentline++; # Increment to the next line
+					$line4 = @mibfile[$currentline];
+				}
+				
+				if ($enterprisefound == 0)
+				{
+					# $line4 should now contain ::= line
+					# Pull out enterprise from { }
+					#print "Line4: $line4\n";
+					$line4 =~ /{(.*)\s\d.*/;
+
+					#print "\$1=$1\n";
+					$enterprisefound =1;
+					
+					# Remove any spaces
+					$_ = $1;
+					s( )()g;
+					$enterprise = $_;
+					print "Enterprise: $enterprise\n";
+				}
+				
+				
+				
+			}
+			$currentline++; # Increment to the next line
+			$line3 = @mibfile[$currentline];
+		}
+		
+		$notificationoid = `snmptranslate -IR -Ts $enterprise.$notificationname`;
+		chomp $notificationoid;
+		if ($notificationoid ne "")
+		{
+			print OUTPUTFILE "#\n#\n#\n";
+			print OUTPUTFILE "EVENT $notificationname $notificationoid \"Status Events\" Normal\n";
+	
+			# Loop through notificationsummary and replace the %s and %d etc with %1 to %n
+	
+			$j = $#arguments; # j is last element number
+			
+			#print "j is $j\n";
+			
+			# Change the %s or %d etc into $1 etc (starts at $1)
+			$_ = $notificationsummary;
+			for ($j=0; $j<= $#arguments; $j++)
+			{
+				$variable = (@arguments[$j])+1;
+				s(%[a-zA-Z])(\$$variable);
+			}
+			
+			#print "new summary: $_\n";
+			
+			$notificationsummary = $_;
+			
+			# Use notificationsummary line
+			if ($notificationsummary ne "")
+			{
+				print OUTPUTFILE "FORMAT $notificationsummary\n";
+				if ($defaultexec ne '')
+				{
+					print OUTPUTFILE "$defaultexec $defaultexecquote$notificationsummary$defaultexecquote\n"
+				}		
+			}
+			# If notificationsummary blank, use descriptionline1 line
+			elsif ($descriptionline1 ne "")
+			{
+
+
+				if ($descriptionline1 =~ /%[a-zA-Z]/)
+				{
+					# Sometimes the variables are in the first line of the description
+					# Change the %s or %d etc into $1 etc (starts at $1)
+					# There is no list of variables, so just put them in order starting at 1 and
+					# going up to 20
+					$_ = $descriptionline1;
+					for ($j=1; $j<= 20; $j++)
+					{
+						s(%[a-zA-Z])(\$$j);
+					}
+					$descriptionline1 = $_;
+					$descriptionlinehadvariables = 1;
+
+					print OUTPUTFILE "FORMAT $descriptionline1\n";
+					if ($defaultexec ne '')
+					{
+						print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1$defaultexecquote\n"
+					}
+				}
+				else
+				{
+					print OUTPUTFILE "FORMAT $descriptionline1 \$*\n";
+					if ($defaultexec ne '')
+					{
+						print OUTPUTFILE "$defaultexec $defaultexecquote$descriptionline1 \$*$defaultexecquote\n"
+					}
+				}
+			}
+			# If descriptionline1 is also blank, just use $*
+			else
+			{
+				print OUTPUTFILE "FORMAT \$*\n";
+				if ($defaultexec ne '')
+				{
+					print OUTPUTFILE "$defaultexec $defaultexecquote\$*$defaultexecquote\n"
+				}
+				#print OUTPUTFILE "EXEC \$*\n";
+			}
+	
+			print OUTPUTFILE "SDESC\n";
+			#print OUTPUTFILE "$descriptionline1\n";
+			for ($i=0; $i <= $#description; $i++)
+			{
+				print OUTPUTFILE "@description[$i]";
+			}
+			print OUTPUTFILE "EDESC\n";
+	
+			$currentline--;
+		}
+		
+		print "OID: $notificationoid\n";
+		#print "\@description is ", $#description,"\n";
+		#print "going to next notification\n\n";
+	}
+	
 	$currentline++; # Increment to the next line
 	$line2 = @mibfile[$currentline]; # Get next line
 }	
