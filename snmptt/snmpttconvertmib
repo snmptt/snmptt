@@ -73,6 +73,7 @@ $net_snmp_perl = 0;
 $in = '';
 $out = '';
 $mibdir = '/usr/share/snmp/mibs/';
+$nodes = '';
 
 GetOptions 	('version' => \$version, 
 		'debug:i' => \$debug,
@@ -80,8 +81,9 @@ GetOptions 	('version' => \$version,
 		'in=s' => \$in,  
 		'out=s' => \$out,
 		'net_snmp_perl' => \$net_snmp_perl,
-		'mibdir=s' => \$mibdir);
-
+		'mibdir=s' => \$mibdir,
+		'nodes=s' => \$nodes);
+	
 if ($version == 1)
 {
 	&showversion;
@@ -101,7 +103,10 @@ Options:
     --in=filename                        Input file
     --out=filename                       Output file
     --mibdir=dir                         Directory for mib files when net_snmp_perl is enabled*
-
+    --nodes=name or file                 If specified, will insert a NODES line after FORMAT or EXEC. 
+                                         The host name(s) separated by spaces, or the name of the
+					 nodes file.  Use quotes for multiple host names.
+					    
 * Note:  If net_snmp_perl is enabled, then the directory path for the MIB file directory is 
          required.  Not specifying a --mibdir will use the default of \/usr\/share\/snmp\/mibs\/.
 
@@ -124,6 +129,8 @@ if ($debug == 2)
 
 $input = $in;
 $output = $out;
+
+print "nodes: $nodes\n";
 
 if (($input eq "") || ($output eq ""))
 {
@@ -185,7 +192,8 @@ unless (open OUTPUTFILE, ">>$output")
 	die "Cannot open output file: $!";
 }
 
-
+print OUTPUTFILE "#\n#\n#\n#\n";
+print OUTPUTFILE "MIB: $input converted on " . scalar(localtime) . " using snmpttconvertmib $snmpttconvertmib_version\n";
 
 if ($net_snmp_perl == 0)
 {
@@ -541,6 +549,11 @@ while ($currentline <= $#mibfile)
 				#print OUTPUTFILE "EXEC \$*\n";
 			}
 	
+			if ($nodes ne '')
+			{
+				print OUTPUTFILE "NODES $nodes\n";
+			}	
+			
 			print OUTPUTFILE "SDESC\n";
 			#print OUTPUTFILE "$descriptionline1\n";
 			for ($i=0; $i <= $#description; $i++)
@@ -851,6 +864,11 @@ foreach $key (sort keys %SNMP::MIB)
 				#print OUTPUTFILE "EXEC \$*\n";
 			}
 	
+			if ($nodes ne '')
+			{
+				print OUTPUTFILE "NODES $nodes\n";
+			}
+						
 			print OUTPUTFILE "SDESC\n";
 			#print OUTPUTFILE "$descriptionline1\n";
 			for ($i=0; $i <= $#description; $i++)

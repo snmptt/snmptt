@@ -1046,7 +1046,7 @@ sub substitute
 	    
 	    if ($DEBUGGING >= 2)
 	    {
-		    print "translated to: $val2\n\n";
+		    print "  Translated to: $val2\n\n";
 	    }    
           }
 	  else
@@ -1054,7 +1054,7 @@ sub substitute
 	    $val = $entvar[$i-1];
 	    if ($DEBUGGING >= 2)
 	    {
-		    print "Could not translate\n\n";
+		    print "  Could not translate\n\n";
 	    } 
 	  }
 	}
