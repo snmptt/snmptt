@@ -10,7 +10,7 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.5.1</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; March 7th, 2003
+<br>This file was last updated on:&nbsp; March 10th, 2003
 <p><a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote><a href="#What is it">What is it?</a>
@@ -175,11 +175,6 @@ tags in MIB files.</blockquote>
 <p><b><font size=+1>0.6 - ???, 2003</font></b>
 <ul>
 <li>
-Improved syslog and NT Event Log support by allowing different syslog and
-eventlog levels based on the severity level defined in the snmptt.conf
-file</li>
-
-<li>
 Added variable expansion for variable names using $v<i>n</i>, $+<i>n</i>,
 $-<i>n</i>, $+* and $-*.&nbsp; This feature requires the UCD-SNMP / NET-SNMP
 Perl module</li>
@@ -203,7 +198,13 @@ Fixed bug with Win32::ODBC connection not being closed on exit of SNMPTT</li>
 MySQL code cleanup</li>
 
 <li>
-Added support for logging traps to the NT Event Log</li>
+Added support for logging traps to the NT Event Log including the ability
+to select the eventlog level based on the severity level defined in the
+snmptt.conf file</li>
+
+<li>
+Improved syslog support by adding the ability to select the syslog level
+based on the severity level defined in the snmptt.conf file</li>
 
 <li>
 Added syslog and NT Event Log support for SNMPTT 'system' events such as
@@ -351,6 +352,12 @@ new versions contained in the v0.6 package</li>
 <li>
 Backup your <b>snmptt.ini </b>file, replace it with the new version, and
 make any necessary configuration changes to it</li>
+
+<li>
+Enable any new features as required</li>
+
+<li>
+Test and report any issues to alex_b@users.sourceforge.net</li>
 </ol>
 <b><font size=+1>v0.4 to v0.5</font></b>
 <p>To upgrade from v0.1, v0.2 to v0.3 to v0.4, you should:
@@ -402,6 +409,9 @@ in that order.
 parameter.&nbsp; See <a href="#Command line arguments">Command Line Arguments</a>.
 <p>A sample <b>snmptt.ini</b> is provided in this package.&nbsp; For Windows
 NT, be sure to copy the <b>snmptt.ini-nt</b> file to <b>%SystemRoot%\snmptt.ini</b>.
+<p>This readme file does not document all configuration options available
+in the <b>snmptt.ini</b> as the <b>snmptt.ini</b> file contains detailed
+descriptions for each option.
 <br>&nbsp;
 <p><a NAME="LoggingStandard"></a><b><font size=+2>Logging - Standard</font></b>
 <p>Translated traps can be sent to standard output and to a log file.&nbsp;
@@ -790,8 +800,8 @@ of <i>variablename (variabletype):value</i> <b>(**) (***)</b>
 <br>$v<i>n</i>&nbsp; - Expand variable name of the variable-binding n (1-<i>n</i>)
 <b>(***)</b>
 <br>$*&nbsp; - Expand all variable-bindings
-<br>$+*&nbsp; - Expand all variable-bindings in the format of <i>variablename:value</i>
-<b>(**) (***)</b>
+<br>$+*&nbsp; - Expand all variable-bindings in the format of <i>variablename:value</i><b>(**)
+(***)</b>
 <br>$-*&nbsp; - Expand all variable-bindings in the format of <i>variablename
 (variabletype):value</i> <b>(**) (***)</b></blockquote>
 Example:
