@@ -1,6 +1,6 @@
    SNMP Trap Translator v0.1
    (SNMPTT)
-   This file was last updated on:  June 15th, 2002
+   This file was last updated on:  June 17th, 2002
 
    License
    =======
@@ -65,17 +65,17 @@
    -Required: Text::ParseWords (included with most distributions including ActivePerl)
    -Optional: Sys::Syslog module
 
-   All development and testing was done on Mandrake Linux 8.1 using UCD-SNMP v4.2.1 on
-   Mandrake Linux 8.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).  I have also tested the program
+   All development and testing was done on Mandrake Linux 8.1 using UCD-SNMP v4.2.1 
+   (package ucd-snmp-4.2.1-5mdk.i586.rpm).  I have also tested the program
    with Windows 2000 using a test file without actually using UCD-SNMP.  Windows users must
    disable the syslog feature as described below.  Both SNMP V1 and V2 traps have been
    tested.
 
    UCD-SNMP v4.2.3 appears to have a bug that prevents it from working correctly with
-   SNMPTT.  UCD-SNMP v4.2.5 appears to work fine.
+   SNMPTT.  UCD-SNMP v4.2.1, v4.2.4 and v4.2.5 appear to work fine.
 
    Note:   This script does NOT require the NET-SNMP Perl module included in the NET-SNMP
-   package
+   package.
 
    Logging
    =======
