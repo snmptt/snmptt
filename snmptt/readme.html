@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; September 8th, 2003
+This file was last updated on:&nbsp; September 9th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -293,7 +293,8 @@ should have been)</li>
   <li>PID file created (/var/run/snmptt.pid or ./snmptt.pid) when
 running in daemon
 mode on Linux / Unix.&nbsp; snmptt-init.d script updated to remove the
-pid file when stopping.<br>
+pid file when stopping.</li>
+  <li>Added contrib folder<br>
   </li>
   <li>Snmpttconvertmib</li>
   <ul>
@@ -1116,11 +1117,12 @@ in the snmptt.ini file.&nbsp; For example:<br>
       <p>Note:<br>
       </p>
       <div style="margin-left: 40px;">The current version of Net-SNMP
-(5.0.8 at the time of this writing) and everything before it does not
+(5.0.9 at the time of this writing) and everything before it does not
 support including the module name (eg: <span style="font-weight: bold;">IF-MIB::</span>)
 when translating an OID.&nbsp; A patch is available for 5.0.8+ that
 will
-appear in later releases of Net-SNMP (5.1+).&nbsp; The patch can be
+appear in later releases of Net-SNMP (5.1).&nbsp; The patch is
+available from the contrib folder, or it can be
 downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.&nbsp; If the version of Net-SNMP you are using does not
@@ -1293,7 +1295,8 @@ everything before it does not support including the module name (eg: <span
 and most of the 5.0.x versions do not properly tranlsate numeric OIDs
 to
 long symbolic names.&nbsp; A patch is available for 5.0.8+ that will
-appear in later releases of Net-SNMP (5.1+).&nbsp; The patch can be
+appear in later releases of Net-SNMP (5.1).&nbsp; The patch is
+available from the contrib folder, or it can be
 downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.<br>
@@ -1309,13 +1312,14 @@ must enable support for it by enabling <b>net_snmp_perl_enable</b> in
 the snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b> is not
 enabled, it will default to using the numeric OID.&nbsp; <br>
       <br>
-The current version of Net-SNMP (5.0.8 at the time of this writing) and
+The current version of Net-SNMP (5.0.9 at the time of this writing) and
 everything before it does not support including the module name (eg: <span
  style="font-weight: bold;">IF-MIB::</span>) when translating an OID
 and most of the 5.0.x versions do not properly tranlsate numeric OIDs
 to
 long symbolic names.&nbsp; A patch is available for 5.0.8+ that will
-appear in later releases of Net-SNMP (5.1+).&nbsp; The patch can be
+appear in later releases of Net-SNMP (5.1).&nbsp; The patch is
+available from the contrib folder, or it can be
 downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.</blockquote>
@@ -2774,7 +2778,9 @@ and previous versions should be able to handle single symbolic names
 to numeric OIDs which could result in traps not being matched.&nbsp; A
 patch is available from the Net-SNMP web site for 5.0.8+ to allow it to
 handle other symbolic names such as module::symbolic name (eg:
-SNMPv2-MIB::coldTrap) etc.&nbsp; The patch can be downloaded from the <a
+SNMPv2-MIB::coldTrap) etc.&nbsp; The patch is available from the
+contrib folder, or it can be
+downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.&nbsp; Net-SNMP 5.1 and higher will contain this patch.<br>
 </p>
@@ -2915,13 +2921,15 @@ is being logged in numerical form.&nbsp; Why?<br>
 to 1 or 3 in snmptt.ini, but the trap is not being logged with a long
 symbolic name.&nbsp; Why?</b><br>
 </p>
-A:&nbsp; The current version of Net-SNMP (5.0.8 at the time of this
+A:&nbsp; The current version of Net-SNMP (5.0.9 at the time of this
 writing) and everything before it does not support including the module
 name (eg: <span style="font-weight: bold;">IF-MIB::</span>) when
 translating an OID and most of the 5.0.x versions do not properly
 tranlsate numeric OIDs to long symbolic names.&nbsp; A patch is
 available for 5.0.8+ that will appear in later releases of Net-SNMP
-(5.1+).&nbsp; The patch can be downloaded from the <a
+(5.1+).&nbsp; The patch is available from the contrib folder, or it can
+be
+downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.<br>
 <br>
