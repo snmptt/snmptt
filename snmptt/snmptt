@@ -723,10 +723,47 @@ sub processtrap
 			if ($syslog_enable == 1)
 			{
 				$trap_attempted_to_log++;
+
+				my $syslog_level_temp = 99;
+				my $temp;
 				
+				foreach $temp (@syslog_level_debug)
+				{
+				  if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'debug' }
+				}
+				foreach $temp (@syslog_level_info)
+				{
+				  if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'info' }
+				}
+				foreach $temp (@syslog_level_notice)
+				{
+				  if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'notice' }
+				}
+				foreach $temp (@syslog_level_warning)
+				{
+				  if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'warning' }
+				}
+				foreach $temp (@syslog_level_err)
+				{
+				  if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'err' }
+				}
+				foreach $temp (@syslog_level_crit)
+				{
+				  if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'crit' }
+				}
+				foreach $temp (@syslog_level_alert)
+				{
+				  if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'alert' }
+				}
+				
+				if ($syslog_level_temp == 99)
+				{
+				  $syslog_level_temp = $syslog_level;
+				}
+
 				if (Sys::Syslog::openlog('TRAPD', '',$syslog_facility) )
 				{
-					Sys::Syslog::syslog ($syslog_level, $message,1);
+					Sys::Syslog::syslog ($syslog_level_temp, $message,1);
 					Sys::Syslog::closelog();
 					$trap_successfully_logged++;
 				}
@@ -740,23 +777,52 @@ sub processtrap
 			{
 			  $trap_attempted_to_log++;
 			  
-			  if ($eventlog_type =~ /INFORMATION/s)
+			  my $eventlog_type_temp = 99;
+			  my $temp;
+
+			  foreach $temp (@eventlog_type_information)
 			  {
-			    if (eventlog_system($message,2,$eventlog_information) == 0)
-			    {
-			      $trap_successfully_logged++;
-			    }
+			    if (lc($event2[2]) eq lc($temp)) { $eventlog_type_temp = $eventlog_information }
 			  }
-			  elsif ($eventlog_type =~ /ERROR/s)
+
+			  foreach $temp (@eventlog_type_warning)
 			  {
-			    if (eventlog_system($message,2,$eventlog_error) == 0)
+			    if (lc($event2[2]) eq lc($temp)) { $eventlog_type_temp = $eventlog_warning }
+			  }
+			  
+			  foreach $temp (@eventlog_type_error)
+			  {
+			    if (lc($event2[2]) eq lc($temp)) { $eventlog_type_temp = $eventlog_error }
+			  }
+			  
+			  if ($eventlog_type_temp == 99)
+			  # Use the default eventlog type
+			  {
+			    if ($eventlog_type =~ /INFORMATION/s)
 			    {
-			      $trap_successfully_logged++;
+			      if (eventlog_system($message,2,$eventlog_information) == 0)
+			      {
+				$trap_successfully_logged++;
+			      }
+			    }
+			    elsif ($eventlog_type =~ /ERROR/s)
+			    {
+			      if (eventlog_system($message,2,$eventlog_error) == 0)
+			      {
+				$trap_successfully_logged++;
+			      }
+			    }
+			    else
+			    {
+			      if (eventlog_system($message,2,$eventlog_warning) == 0)
+			      {
+				$trap_successfully_logged++;
+			      }
 			    }
 			  }
 			  else
 			  {
-			    if (eventlog_system($message,2,$eventlog_warning) == 0)
+			    if (eventlog_system($message,2,$eventlog_type_temp) == 0)
 			    {
 			      $trap_successfully_logged++;
 			    }
@@ -1778,11 +1844,22 @@ sub loadsnmpttini {
 	$unknown_trap_log_file = $cfg->val('Logging', 'unknown_trap_log_file');
 	$syslog_enable = $cfg->val('Logging', 'syslog_enable');
 	$syslog_facility = $cfg->val('Logging', 'syslog_facility');
+	@syslog_level_emerg = $cfg->val('Logging', 'syslog_level_emerg');
+	@syslog_level_alert = $cfg->val('Logging', 'syslog_level_alert');
+	@syslog_level_crit = $cfg->val('Logging', 'syslog_level_crit');
+	@syslog_level_err = $cfg->val('Logging', 'syslog_level_err');	
+	@syslog_level_warning = $cfg->val('Logging', 'syslog_level_warning');
+	@syslog_level_notice = $cfg->val('Logging', 'syslog_level_notice');
+	@syslog_level_info = $cfg->val('Logging', 'syslog_level_info');	
+	@syslog_level_debug = $cfg->val('Logging', 'syslog_level_debug');
 	$syslog_level = $cfg->val('Logging', 'syslog_level');
 	$syslog_system_enable = $cfg->val('Logging', 'syslog_system_enable');
 	$syslog_system_facility = $cfg->val('Logging', 'syslog_system_facility');
 	$syslog_system_level = $cfg->val('Logging', 'syslog_system_level');
 	$eventlog_enable = $cfg->val('Logging', 'eventlog_enable');
+	@eventlog_type_information = $cfg->val('Logging', 'eventlog_type_information');
+	@eventlog_type_warning = $cfg->val('Logging', 'eventlog_type_warning');
+	@eventlog_type_error = $cfg->val('Logging', 'eventlog_type_error');	
 	$eventlog_type = $cfg->val('Logging', 'eventlog_type');
 	$eventlog_system_enable = $cfg->val('Logging', 'eventlog_system_enable');
 	
@@ -1826,7 +1903,7 @@ sub loadsnmpttini {
 	# 
 	if (! defined ($multiple_event)) { $multiple_event = 0} ;
 	if (! defined ($strip_domain)) { $strip_domain = 0} ;
-	if (! defined ($net_snmp_perl_enable)) { $net_snmp_perl_enable = 1} ;
+	if (! defined ($net_snmp_perl_enable)) { $net_snmp_perl_enable = 0} ;
 	if (! defined ($translate_integers)) { $translate_integers = 0} ;
 	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($spool_directory)) { $spool_directory = ''} ;

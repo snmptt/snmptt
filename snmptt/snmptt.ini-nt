@@ -110,11 +110,24 @@ unknown_trap_log_file = c:\\snmp\\snmpttunknown.log
 # All traps will be recorded to the Application log
 eventlog_enable = 0
 
-# Set the event log type for *TRAPS*.  Options are:
-# INFORMATION, WARNING or ERROR
-#eventlog_type = 'INFORMATION'
-eventlog_type = 'WARNING'
-#eventlog_type = 'ERROR'
+# Set the event log type for *TRAPS* based on the severity level of the trap
+# as defined in the snmptt.conf file.  Values must be one per line between
+# the eventlog_type_* and END lines, and are not case sensitive.  For example:
+#   Warning
+#   Critical
+# Duplicate definitions will use the definition with the higher severity.
+eventlog_type_information = <<END
+END
+eventlog_type_warning = <<END
+END
+eventlog_type_error = <<END
+END
+
+# Set the default event log type for *TRAPS*.  Valid values:
+# INFORMATION, WARNING or ERROR.  
+#eventlog_type = INFORMATION
+eventlog_type = WARNING
+#eventlog_type = ERROR
 
 # Set to 1 to enable logging of *SNMPTT system errors* to the event log.
 # All errors will be recorded to the Application log.  The event type used

@@ -20,11 +20,12 @@
 <br><a href="#Whats New">What's New</a>
 <br><a href="#Upgrading">Upgrading</a>
 <br><a href="#Configuration Options">Configuration Options - snmptt.ini</a>
-<br><a href="#LoggingStandard">Logging - Standard</a>
-<br><a href="#LoggingSyslog">Logging - Syslog</a>
-<br><a href="#LoggingEventLog">Logging - EventLog</a>
-<br><a href="#LoggingDatabase">Logging - Database</a>
-<br><a href="#LoggingUnknown">Logging - Unknown Traps</a>
+<br><a href="#LoggingStandard">Logging</a>
+<br><b>&nbsp;&nbsp; </b><a href="#LoggingStandard">Standard</a>
+<br><b>&nbsp;&nbsp; </b><a href="#LoggingSyslog">Syslog</a>
+<br><b>&nbsp;&nbsp; </b><a href="#LoggingEventLog">EventLog</a>
+<br><b>&nbsp;&nbsp; </b><a href="#LoggingDatabase">Database</a>
+<br><b>&nbsp;&nbsp; </b><a href="#LoggingUnknown">Unknown Traps</a>
 <br><a href="#Executing an external program">Executing an external program</a>
 <br><a href="#Modes of Operation">Modes of Operation</a>
 <br><a href="#Command line arguments">Command line arguments</a>
@@ -35,8 +36,9 @@ file Notes</a>
 <br><a href="#Sample1 SNMPTT.CONF file">Sample1 SNMPTT.CONF file</a>
 <br><a href="#Sample2 SNMPTT.CONF file">Sample2 SNMPTT.CONF file</a>
 <br><a href="#Notes">Notes</a>
-<br><a href="#Installation - Unix">Installation - Unix</a>
-<br><a href="#Installation - Windows">Installation - Windows</a>
+<br><a href="#Installation - Unix">Installation</a>
+<br><b>&nbsp;&nbsp; </b><a href="#Installation - Unix">Unix</a>
+<br><b>&nbsp;&nbsp; </b><a href="#Installation - Windows">Windows</a>
 <br><a href="#Limitations">Limitations</a>
 <br><a href="#Feedback">Feedback &amp; Bugs</a></blockquote>
 <a href="#SNMP Trap Translator Convert">SNMP Trap Translator Convert</a>
@@ -106,46 +108,53 @@ Executes a user defined program when a trap is received</li>
 <p><br><a NAME="Requirements"></a><b><font size=+2>Requirements</font></b>
 <ul>
 <li>
-(Tested with) Perl 5.6.1</li>
+(Developed using) Perl 5.6.1</li>
 
 <li>
-Required: NET-SNMP (formerly known as UCD-SNMP).&nbsp; Specifically <b>snmptrapd</b></li>
+Required: <a href="http://www.net-snmp.org">NET-SNMP</a> (formerly known
+as UCD-SNMP).&nbsp; Specifically <b>snmptrapd</b></li>
 
 <li>
-Required: Text::ParseWords (included with most distributions including
-ActivePerl)</li>
+Required: <a href="http://search.cpan.org/search?module=Text::ParseWords">Text::ParseWords</a>
+(included with most distributions including ActivePerl)</li>
 
 <li>
-Required: Getopt::Long (included with most distributions including ActivePerl)</li>
+Required: <a href="http://search.cpan.org/search?module=Getopt::Long">Getopt::Long</a>
+(included with most distributions including ActivePerl)</li>
 
 <li>
 Required: Posix (included with most if not all distributions including
 ActivePerl)</li>
 
 <li>
-Required: Config::IniFiles</li>
+Required: <a href="http://search.cpan.org/search?module=Config::IniFiles">Config::IniFiles</a></li>
 
 <li>
-Required: Time::HiRes (only required when using SNMPTT in daemon mode -
-required by <b>snmptthandler</b>)</li>
+Required: <a href="http://search.cpan.org/search?module=Time::HiRes">Time::HiRes</a>
+(only required when using SNMPTT in daemon mode - required by <b>snmptthandler</b>)</li>
 
 <li>
-Optional: Sys::Syslog module</li>
+Optional: <a href="http://search.cpan.org/search?module=Sys::Syslog">Sys::Syslog</a>
+module (included with most Unix distributions)</li>
 
 <li>
-Optional: DBI module.&nbsp; Required for MySQL support in Linux etc</li>
+Optional: <a href="http://search.cpan.org/search?module=DBI">DBI</a> module.&nbsp;
+Required for MySQL support in Linux etc</li>
 
 <li>
-Optional: DBD::ODBC module.&nbsp; Required for ODBC (SQL etc) access on
-Linux / Windows (Win32::ODBC not required if using DBD::ODBC)</li>
+Optional: <a href="http://search.cpan.org/search?module=DBD::ODBC">DBD::ODBC</a>
+module.&nbsp; Required for ODBC (SQL etc) access on Linux / Windows (Win32::ODBC
+not required if using DBD::ODBC)</li>
 
 <li>
-Optional: Win32::ODBC module.&nbsp; Required for ODBC (SQL etc) access
-on Windows (DBD::ODBC not required if using Win32::ODBC)</li>
+Optional: <a href="http://search.cpan.org/search?module=Win32::ODBC">Win32::ODBC</a>
+module.&nbsp; Required for ODBC (SQL etc) access on Windows (DBD::ODBC
+not required if using Win32::ODBC)</li>
 
 <li>
-Optional: NET-SNMP Perl module.&nbsp; Only required to translate variable
-names ($vn) or if translation of integers is enabled</li>
+Optional: <a href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">NET-SNMP
+Perl module</a>.&nbsp; Only required to translate variable names ($vn)
+or if translation of integers is enabled</li>
 </ul>
 All development and testing was done on Mandrake Linux 8.1 using UCD-SNMP
 v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).&nbsp; I have also tested
@@ -165,6 +174,11 @@ tags in MIB files.</blockquote>
 <p><br><a NAME="Whats New"></a><b><font size=+2>What's New</font></b>
 <p><b><font size=+1>0.6 - ???, 2003</font></b>
 <ul>
+<li>
+Improved syslog and NT Event Log support by allowing different syslog and
+eventlog levels based on the severity level defined in the snmptt.conf
+file</li>
+
 <li>
 Added variable expansion for variable names using $v<i>n.&nbsp; </i>This
 feature requires the UCD-SNMP / NET-SNMP Perl module</li>
@@ -1446,7 +1460,7 @@ Go into the sub directory perl/SNMP</li>
 <li>
 Follow the instructions in the README file</li>
 </ol>
-<b></b>
+
 <p><br><b>Q:&nbsp; I have enable net_snmp_perl_enable but the variable
 names are not being translated into text using $v<i>n</i>.&nbsp; How do
 I troubleshoot it?</b>
@@ -1465,7 +1479,8 @@ while building.
 UCD-SNMP / NET-SNMP is correctly configured to process all the required
 mibs.&nbsp; This is configured in the snmp.conf file.&nbsp; Alternatively,
 you can try setting the <b>mibs_enviroment</b> variable in snmptt.ini to
-<b>ALL</b> (no quotes) to force all MIBS to be initialized at SNMPTT startup.
+<b>ALL</b>
+(no quotes) to force all MIBS to be initialized at SNMPTT startup.
 <p>If everything appears to be fine, try translating the variable name
 by hand by using snmptranslate.&nbsp; Get the variable name OID from the
 snmptt.debug file from the second Value 0+ section, and type:
