@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; July 7th, 2003
+This file was last updated on:&nbsp; August 12th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -197,8 +197,8 @@ does not have this problem.<br>
 want to have variable names translated into symbolic form, want to be
 able to have <span style="font-weight: bold;">snmptrapd </span>pass
 traps using symbolic form, or you enable the options <span
- style="font-weight: bold;">translate_integers, translate_trap_oid </span>or<span
- style="font-weight: bold;">translate_oids.<br>
+ style="font-weight: bold;">translate_integers, translate_trap_oid </span>or
+  <span style="font-weight: bold;">translate_oids.<br>
   </span></blockquote>
 <p><br>
 <a name="Whats-New"></a><b><font size="+2">What's New</font></b> </p>
@@ -230,11 +230,15 @@ actual EVENT entry<br>
   <li>Agent IP address is now used instead of 'host' IP address for
 NODES matches, the 'hostname' column in database logs and the $A
 variable</li>
-  <li>Variable $A now prints the agent host name.&nbsp; $aA prints the
+  <li>Variable <span style="font-weight: bold;">$A </span>now prints
+the agent host name.&nbsp; <span style="font-weight: bold;">$aA </span>prints
+the
 agent IP address.</li>
-  <li>Variable $E now prints the enterprise in symbolic form.&nbsp; $e
-prints the numeric OID</li>
-  <li>Variable $O now prints the trap in symbolic form.&nbsp; $o prints
+  <li>Variable <span style="font-weight: bold;">$E </span>now prints
+the enterprise in symbolic form.&nbsp; <span style="font-weight: bold;">$e
+    </span>prints the numeric OID</li>
+  <li>Variable <span style="font-weight: bold;">$O </span>now prints
+the trap in symbolic form.&nbsp; <span style="font-weight: bold;">$o </span>prints
 the numeric OID</li>
   <li> Added new variable substitution <b>$i</b> to print the actual
 matched entry from the .conf file (which could be a wildcard OID)<br>
@@ -254,21 +258,29 @@ to <span style="font-weight: bold;">translate_value_oids</span><br>
 translate_trap_oid_format, </span><span style="font-weight: bold;">translate_varname_oid_format</span>
 and <span style="font-weight: bold;">db_translate_enterprise</span><br>
   </li>
-  <li>$O follows <span style="font-weight: bold;">translate_trap_oid_format</span>,
-and $o is always the numerical trap OID</li>
-  <li>$E follows <span style="font-weight: bold;">translate_enterprise_oid_format</span>,
-and $e is always the numerical enterprise OID</li>
+  <li><span style="font-weight: bold;">$O </span>follows <span
+ style="font-weight: bold;">translate_trap_oid_format</span>,
+and <span style="font-weight: bold;">$o </span>is always the
+numerical trap OID</li>
+  <li><span style="font-weight: bold;">$E </span>follows <span
+ style="font-weight: bold;">translate_enterprise_oid_format</span>,
+and <span style="font-weight: bold;">$e </span>is always the
+numerical enterprise OID</li>
   <li>The enterprise column when logging to a database now follows the <span
  style="font-weight: bold;">db_translate_enterprise</span> setting</li>
-  <li>Fixed bug with <span style="font-weight: bold;">$#</span> to
+  <li>Fixed bug with <span style="font-weight: bold;">$# </span>to
 report the correct number of enterprise variables (was 1 lower than it
 should have been)</li>
-  <li>Added Nagios / Netsaint integration documentation<br>
+  <li>Added <a href="http://www.nagios.org">Nagios</a> / <a
+ href="http:/www.netsaint.org">Netsaint</a> integration documentation<br>
   </li>
   <li>Snmpttconvertmib</li>
   <ul>
-    <li>Now prints the variables contained in each trap unless
---no_variables is set.&nbsp; When using --net_snmp_perl it will also
+    <li>Now prints the variables contained in each trap definition
+unless
+      <span style="font-weight: bold;">--no_variables</span> is
+set.&nbsp; When using <span style="font-weight: bold;">--net_snmp_perl</span>
+it will also
 resolve the Syntax (INTEGER, OCTETSTR etc) and Description.&nbsp; If
 it's an INTEGER, will also print out the enumeration tags if any exist.</li>
     <li>Improved compatability with MIB files<br>
@@ -509,10 +521,16 @@ version, and make any necessary configuration changes to it</li>
  style="font-weight: bold;">translate_value_oids</span> with <span
  style="font-weight: bold;">translate_oids</span> value from old <span
  style="font-weight: bold;">snmptt.ini</span></li>
+  <li>In your snmptt.ini file, set <span style="font-weight: bold;">dynamic_nodes</span>
+to 1 if you want the NODES files to be loaded each time an event is
+processed which is how previous versions worked<br>
+  </li>
   <li>In your snmptt.conf files, replace any $A with $aA unless you
-want agent host names to be used instead of IP addresses<span
- style="font-weight: bold;"><br>
-    </span></li>
+want agent host names to be used instead of IP addresses</li>
+  <li>In your snmptt.conf files, replace any $E with $e unless you
+want Enterprise trap OID in symbolic format</li>
+  <li>In your snmptt.conf files, replace any $O with $o unless you
+want Trap OID in symbolic format</li>
   <li>Review other translate settings in <span
  style="font-weight: bold;">snmptt.ini</span><br>
   </li>
@@ -520,6 +538,10 @@ want agent host names to be used instead of IP addresses<span
 as required</li>
   <li>If you are using database logging, add a new column called <span
  style="font-weight: bold;">trapoid</span><br>
+  </li>
+  <li>If you are using database logging and you enable conversions of
+OIDs to long names, make sure the table columns are wide enough to hold
+them<br>
   </li>
   <li> Test and report any issues to alex_b@users.sourceforge.net, or
 open a bug report at <a
