@@ -1,0 +1,69 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta content="text/html; charset=iso-8859-1"
+ http-equiv="Content-Type">
+  <meta content="Alex  Burger" name="Author">
+  <meta content="Mozilla/4.78 [en] (Windows NT 5.0; U) [Netscape]"
+ name="GENERATOR">
+  <title>SNMP Trap Translator</title>
+</head>
+<body>
+<h1><b><font size="+3">SNMP Trap
+Translator Convert v0.3</font></b>
+</h1>
+<b>(</b><a href="http://www.snmptt.org"><b><font size="+1">SNMPTTCONVERT</font></b></a><b>)</b>
+<br>
+This file was last updated on:&nbsp; November 1st, 2003
+<h2><b><font size="+2">License</font></b></h2>
+<p> </p>
+<p>Copyright 2002, 2003 Alex Burger <br>
+alex_b@users.sourceforge.net <br>
+4/3/2002 </p>
+<p>This program is free software; you can redistribute it and/or modify
+<br>
+it under the terms of the GNU General Public License as published by <br>
+the Free Software Foundation; either version 2 of the License, or <br>
+(at your option) any later version. </p>
+<p>This program is distributed in the hope that it will be useful, <br>
+but WITHOUT ANY WARRANTY; without even the implied warranty of <br>
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.&nbsp; See the <br>
+GNU General Public License for more details. </p>
+<p>You should have received a copy of the GNU General Public License <br>
+along with this program; if not, write to the Free Software <br>
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA&nbsp;
+02111-1307&nbsp; USA <br>
+&nbsp; </p>
+<h2><b><font size="+1">SNMPTTCONVERT</font></b></h2>
+<p></p>
+<p>Some vendors provide a file that can be imported into HP Openview
+using a HP Openview utiltity.&nbsp; <span style="font-weight: bold;">SNMPTTCONVERT</span>
+is a simple Perl script which will convert one of these files into the
+format used by SNMPTT.&nbsp; The file can contain multiple traps. </p>
+<p>For example, if the file ciscotrap.txt contained: </p>
+<blockquote>rpsFailed {.1.3.6.1.4.1.437.1.1.3} 6 5 - "Status Events" 1 <br>
+Trap received from enterprise $E with $# arguments: sysName=$1 <br>
+SDESC <br>
+"A redundant power source is connected to the switch but a failure
+exists in <br>
+the power system." <br>
+EDESC</blockquote>
+Executing snmpttconvert ciscotrap.txt would output:
+<blockquote># <br>
+# <br>
+# <br>
+EVENT rpsFailed .1.3.6.1.4.1.437.1.1.3.0.5 "Status Events" Normal <br>
+FORMAT Trap received from enterprise $E with $# arguments: sysName=$1 <br>
+#EXEC qpage -f TRAP notifygroup1 "Trap received from enterprise $E with
+$# arguments: sysName=$1" <br>
+SDESC <br>
+"A redundant power source is connected to the switch but a failure
+exists in <br>
+the power system." <br>
+EDESC</blockquote>
+<p><br>
+Note:&nbsp; The #EXEC line is added by default.&nbsp; This can be
+changed by editing the SNMPTTCONVERT script. <br>
+&nbsp; </p>
+</body>
+</html>
