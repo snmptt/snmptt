@@ -1112,7 +1112,7 @@ sub substitute
       {
 	if ($DEBUGGING >= 2)
 	{
-	  print "\nVariable $entvarname[$i-1] with value $entvar[$i-1] may be numerical\n";
+	  print "\nVariable $entvarname[$i-1] with value $entvar[$i-1] appears to be numerical\n";
 	}
 	
 	# Problem #1: UCD-SNMP 4.2.3 allows getType and mapEnum to be passed a numerical OID.  
@@ -1135,11 +1135,12 @@ sub substitute
 	  $temp_textOID = $1;
 	}
 	
-	if (&SNMP::getType($temp_textOID) eq "INTEGER") # Make sure it's a SNMP INTEGER type
+	my $temp_OID_type = uc (&SNMP::getType($temp_textOID));
+	if ($temp_OID_type eq "INTEGER32" || $temp_OID_type eq "INTEGER")  # Make sure it's a SNMP INTEGER type
 	{
 	  if ($DEBUGGING >= 2)
 	  {
-	    print "Variable $entvarname[$i-1] is also defined as an INTEGER in the mib - will attempt to translate\n";
+	    print "  Variable $entvarname[$i-1] is defined as an INTEGER in the mib - will attempt to translate\n";
 	  }
 	  my $val2 = SNMP::mapEnum($temp_textOID, $entvar[$i-1]);
 	  if ($val2 ne '')					# Make sure we got something
@@ -1148,7 +1149,7 @@ sub substitute
 	    
 	    if ($DEBUGGING >= 2)
 	    {
-		    print "  Translated to: $val2\n\n";
+		    print "    Translated to: $val2\n\n";
 	    }    
           }
 	  else
@@ -1156,8 +1157,15 @@ sub substitute
 	    $val = $entvar[$i-1];
 	    if ($DEBUGGING >= 2)
 	    {
-		    print "  Could not translate\n\n";
+		    print "    Could not translate\n\n";
 	    } 
+	  }
+	}
+	else
+	{
+	  if ($DEBUGGING >= 2)
+	  {
+	    print "  Variable $entvarname[$i-1] is NOT defined as an INTEGER or Integer32 in the mib\n\n";
 	  }
 	}
       }
