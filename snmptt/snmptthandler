@@ -1,0 +1,176 @@
+#!/usr/bin/perl
+#
+# SNMPTTHANDLER v0.1
+#
+# Copyright 2002 Alex Burger
+# alex_b@users.sourceforge.net
+# 8/26/2002
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+##############################################################################
+#
+# http://www.sourceforge.net/projects/snmptt
+#
+# This script is a snmp trap handler for use with the NET-SNMP / UCD-SNMP 
+# snmptrapd program and SNMPTT.
+#
+# The script is called by defining a 'traphandle' in snmptrapd.conf.  
+# For example:
+#
+# traphandle default /sbin/snmptthandler
+# 
+# SNMPTRAPD feeds details about the trap to the launched program's standard
+# input in the following format (see snmptrapd.conf man page for a complete
+# descriptipon)
+#
+# HOSTNAME: 	The name of the host in question  that  sent the  trap
+# IPADDRESS: 	The IP address of the  host  that  sent  the trap
+# VARBINDS: 	A  list  of  variable bindings that describe the trap and 
+# 		the variables enclosed  in  it.  
+#
+# SNMPTTHANDLER dumps the received traps into a directory to be processed
+# by the SNMPTT daemon.
+# f
+##############################################################################
+#
+# OPTIONS START
+#
+
+# Directory to store received traps.  Ex: /var/spool/snmptt/
+# or 'c:\snmp\snmptt\spool\'
+# Don't forget the trailing slash!
+$spooldirectory = '/var/spool/snmptt/';
+#$spooldirectory = 'c:\snmp\snmptt\spool/';
+
+#Debugging:  	0 = no output messages
+#		1 = output some basic messages
+#		2 = out all messages
+$DEBUGGING = 0;
+
+# Debugging file
+# Location of debugging output file.  Leave blank to default to STDOUT
+#
+$DEBUGGINGFILE = '';				# STDOUT
+#$DEBUGGINGFILE = '/var/log/snmptthandler.debug';	
+
+#OPTIONS END
+#
+##############################################################################
+
+sub showversion
+{
+	printf "\nSNMPTTHANDLER v0.1\n";
+	printf "(c) 2002 Alex Burger\n\n";
+}
+
+##############################################################################
+
+
+##############################################################################
+# Process command line arguments
+
+use Getopt::Long;
+use Time::HiRes qw(gettimeofday);
+
+$version = '';
+$debug = '';
+$help = '';
+
+GetOptions 	('version' => \$version, 
+		'debug' => \$debug,
+		'help' => \$help);
+if ($version == 1)
+{
+	&showversion;
+	exit(0);
+}
+
+if ($help == 1)
+{
+$USAGE = qq/Usage:
+    snmptthandler [<options>] 
+Options:
+    --debug                              Enable debug mode
+    --help                               Display this message
+    --version                            Display author and version information
+/;
+		
+	&showversion;
+	print $USAGE;
+
+	exit(0);
+}
+
+if ($debug == 1)
+{
+	$DEBUGGING = 1;	
+}
+
+
+if ($debugfile ne '') 
+{
+	$DEBUGGINGFILE = $debugfile;	# commandline overpowers snmptt script
+}
+
+##############################################################################
+		
+		
+
+##############################################################################
+# Pull in passed SNMP info from snmptrapd via STDIN and place in the array @tempvar
+
+# Create file in spool directory based on current time
+($s, $usec) = gettimeofday;
+
+# Pad the numbers with 0's to make sure they are all the same length.  Sometimes the
+# usec is shorter than 6.
+$s_pad = sprintf("%09d",$s);
+$usec_pad = sprintf("%06d",$usec);
+
+if ($DEBUGGING >= 1)
+{
+	if ($DEBUGGINGFILE ne '') 
+	{
+		open DEBUGFILE, ">>$DEBUGGINGFILE"
+			or warn "Could not open debug output file ($!)";
+	
+		select DEBUGFILE;	# Change default output to debug file
+	}
+	
+	# Print out time
+	print "SNMPTTHANDLER started: ",scalar(localtime),"\n\n";
+	print "s = $s, usec = $usec\n";
+	print "s_pad = $s_pad, usec_pad = $usec_pad\n\n";
+	print "Data received:\n\n";
+}
+
+$spoolfile = $spooldirectory.'#snmptt-trap-'.$s_pad.$usec_pad;
+
+open SPOOL, ">$spoolfile"
+	or die "Could not open debug output file ($!)";
+
+while (defined($line = <>))
+{
+	print SPOOL $line;
+	
+	if ($DEBUGGING >= 1)
+	{
+		# Print out item passed from snmptrapd
+		print $line."\n";
+	}
+
+}
+
