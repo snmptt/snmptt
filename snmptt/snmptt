@@ -39,7 +39,7 @@
 # HOSTNAME: 	The name of the host in question  that  sent the  trap
 # IPADDRESS: 	The IP address of the  host  that  sent  the trap
 # VARBINDS: 	A  list  of  variable bindings that describe the trap and 
-# 		the variables enclosed  in  it.  These
+# 		the variables enclosed  in  it.  
 ##############################################################################
 #
 # OPTIONS START
