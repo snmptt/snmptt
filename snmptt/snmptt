@@ -171,23 +171,39 @@ if ($syslog_enable == 1 || $syslog_system_enable == 1)
 	require Sys::Syslog;
 }
 
+if ($eventlog_system_enable == 1)
+{
+	require Win32::EventLog;
+	
+	# Constants not available when using 'require' (!)
+	$eventlog_error = 1;		# EVENTLOG_ERROR_TYPE
+	$eventlog_warning = 2;		# EVENTLOG_WARNING_TYPE
+	$eventlog_information = 4;	# EVENTLOG_INFORMATION_TYPE
+}
+
+
 if ($DEBUGGING >= 1)
 {
 	if ($DEBUGGING_FILE ne '') 
 	{
 	  	open DEBUGFILE, ">>$DEBUGGING_FILE"
-			or warn "Could not open debug output file ($!)";
+			or warn "could not open debug output file ($!)";
 	
-		select DEBUGFILE;	# Change default output to debug file
+		select DEBUGFILE;	# change default output to debug file
 	}
 	
-	# Print out time
+	# print out time
 	print "SNMPTT $snmptt_version started: ",scalar(localtime),"\n\n"
 }
 
-if ($syslog_system_enable == 1)
+if ($syslog_system_enable == 1 && $daemon == 1)
 {
   syslog_system("SNMPTT $snmptt_version started");
+}
+
+if ($eventlog_system_enable == 1 && $daemon == 1)
+{
+  eventlog_system("SNMPTT $snmptt_version started",0,$eventlog_information);
 }
 
 if ($translate_integers == 1)
@@ -261,41 +277,52 @@ if ($daemon == 1)
 		{
 		  if ($DEBUGGING >= 1)
 		  {
-		    print "Unable to enter dir $spool_directory:$!\n";
+		    print "Unable to enter spool dir $spool_directory:$!\n";
 		  }
-		  warn "Unable to enter dir $spool_directory:$!\n";
+		  warn "Unable to enter spool dir $spool_directory:$!\n";
 		  
 		  if ($syslog_system_enable == 1)
 		  {
-		    syslog_system("Unable to enter dir $spool_directory");
+		    syslog_system("Unable to enter spool dir $spool_directory");
+		  }
+		  if ($eventlog_system_enable == 1)
+		  {
+		    eventlog_system("Unable to enter spool dir $spool_directory",3,$eventlog_error);
 		  }
 		}
-		
 		elsif (! (opendir(DIR, ".")))
 		{
 		  if ($DEBUGGING >= 1)
 		  {
 		    print "Unable to open $spool_directory:$!\n";
 		  }
-		  warn "Unable to open $spool_directory:$!\n";
+		  warn "Unable to open spool dir $spool_directory:$!\n";
 
 		  if ($syslog_system_enable == 1)
 		  {
-		    syslog_system("Unable to open $spool_directory");
+		    syslog_system("Unable to open spool dir $spool_directory");
+		  }
+		  if ($eventlog_system_enable == 1)
+		  {
+		    eventlog_system("Unable to open spool dir $spool_directory",4,$eventlog_error);
 		  }
 		}
 		elsif (! (@filenames = readdir(DIR)))
 		{
 		  if ($DEBUGGING >= 1)
 		  {
-		    print "Unable to read $spool_directory:$!\n";
+		    print "Unable to read spool dir $spool_directory:$!\n";
 		  }
-		  warn "Unable to read $spool_directory:$!\n";
+		  warn "Unable to read spool dir $spool_directory:$!\n";
 
 		  if ($syslog_system_enable == 1)
 		  {
-		    syslog_system("Unable to read $spool_directory");
+		    syslog_system("Unable to read spool dir $spool_directory");
 		  }
+		  if ($eventlog_system_enable == 1)
+		  {
+		    eventlog_system("Unable to read spool dir $spool_directory",5,$eventlog_error);
+		  }		  
 		}
 		else
 		{
@@ -328,6 +355,10 @@ if ($daemon == 1)
 					{
 					  syslog_system("Could not open trap file $spool_directory$file");
 					}
+					if ($eventlog_system_enable == 1)
+					{
+					  eventlog_system("Could not open trap file $spool_directory$file",6,$eventlog_error);
+					}
 
 					$filesuccess = 0;
 				}
@@ -346,13 +377,17 @@ if ($daemon == 1)
 					{
 						if ($DEBUGGING >= 1)
 						{
-							print "Unable to delete $file:$!\n";
+							print "Unable to delete trap file $file from spool dir:$!\n";
 						}
-						warn "Unable to delete $file:$!\n";
+						warn "Unable to delete trap file $file from spool dir:$!\n";
 						
 						if ($syslog_system_enable == 1)
 						{
-						  syslog_system("Unable to delete $file");
+						  syslog_system("Unable to delete trap file $file from spool dir");
+						}
+						if ($eventlog_system_enable == 1)
+						{
+						  eventlog_system("Unable to delete trap file $file from spool dir",7,$eventlog_error);
 						}
 					}
 				}
@@ -368,12 +403,16 @@ if ($daemon == 1)
 		{
 			if ($DEBUGGING >= 1)
 			{
-				print "Reloading configuration file\n\n";
+				print "Reloading configuration file\(s\)\n\n";
 			}
 			
 			if ($syslog_system_enable == 1)
 			{
-			  syslog_system("Reloading configuration file");
+			  syslog_system("Reloading configuration file\(s\)");
+			}
+			if ($eventlog_system_enable == 1)
+			{
+			  eventlog_system("Reloading configuration file\(s\)",8,$eventlog_information);
 			}
 
 			&loadsnmpttini;		# Load ini file
@@ -386,9 +425,13 @@ if ($daemon == 1)
 		print "SNMPTT $snmptt_version shutdown: ",scalar(localtime),"\n\n"
 	}
 	
-	if ($syslog_system_enable == 1)
+	if ($syslog_system_enable == 1 &&  $daemon == 1)
 	{
 	  syslog_system("SNMPTT $snmptt_version shutdown");
+	}
+	if ($eventlog_system_enable == 1 &&  $daemon == 1)
+	{
+	  eventlog_system("SNMPTT $snmptt_version shutdown",1,$eventlog_information);
 	}
 }
 else
@@ -532,7 +575,7 @@ sub processtrap
 				}
 				else
 				{
-					warn "Cannot open NODES file: $event2[5] $!";
+					warn "Can not open NODES file: $event2[5] $!";
 				}
 				
 				#load file
@@ -614,7 +657,7 @@ sub processtrap
 				}
 				else
 				{
-					warn "Cannot open log_file: $!";
+					warn "Can not open log_file: $!";
 				}
 			}
 	
@@ -627,8 +670,24 @@ sub processtrap
 				}
 				else
 				{
-					warn "Cannot open log_file: $!";
+					warn "Can not open log_file: $!";
 				}
+			}
+			
+			if ($eventlog_enable == 1)
+			{
+			  if ($eventlog_type =~ /INFORMATION/s)
+			  {
+			    eventlog_system($message,2,$eventlog_information);
+			  }
+			  elsif ($eventlog_type =~ /ERROR/s)
+			  {
+			    eventlog_system($message,2,$eventlog_error);
+			  }
+			  else
+			  {
+			    eventlog_system($message,2,$eventlog_warning);
+			  }
 			}
 			
 			if ($mysql_dbi_enable == 1)
@@ -870,6 +929,10 @@ sub loadsnmpttconf
 	  {
 	    syslog_system("Loading $snmpttconffile");
 	  }
+	  if ($eventlog_system_enable == 1)
+	  {
+	    eventlog_system("Loading $snmpttconffile",9,$eventlog_information);
+	  }
 	  
 	  unless (open SNMPTTCONF, $snmpttconffile)
 	  {
@@ -882,6 +945,10 @@ sub loadsnmpttconf
 	    if ($syslog_system_enable == 1 && $daemon == 1)
 	    {
 	      syslog_system("Could not open configuration file: $snmpttconffile");
+	    }
+	    if ($eventlog_system_enable == 1)
+	    {
+	      eventlog_system("Could not open configuration file: $snmpttconffile",10,$eventlog_error);
 	    }
 	    
 	    next;
@@ -901,6 +968,10 @@ sub loadsnmpttconf
 	  if ($syslog_system_enable == 1 && $daemon == 1)
 	  {
 	    syslog_system("Finished loading $tempcount lines from $snmpttconffile");
+	  }
+	  if ($eventlog_system_enable == 1)
+	  {
+	    eventlog_system("Finished loading $tempcount lines from $snmpttconffile",11,$eventlog_information);
 	  }
 	}
 	
@@ -1419,7 +1490,7 @@ sub searchfortrap
 			}
 			else
 			{
-				warn "Cannot open log_file: $!";
+				warn "Can not open log_file: $!";
 			}
 		}
 	}
@@ -1528,6 +1599,9 @@ sub loadsnmpttini {
 	$syslog_system_enable = $cfg->val('Logging', 'syslog_system_enable');
 	$syslog_system_facility = $cfg->val('Logging', 'syslog_system_facility');
 	$syslog_system_level = $cfg->val('Logging', 'syslog_system_level');
+	$eventlog_enable = $cfg->val('Logging', 'eventlog_enable');
+	$eventlog_type = $cfg->val('Logging', 'eventlog_type');
+	$eventlog_system_enable = $cfg->val('Logging', 'eventlog_system_enable');
 	
 	# Exec
 	$exec_enable = $cfg->val('Exec', 'exec_enable');
@@ -1579,6 +1653,9 @@ sub loadsnmpttini {
 	if (! defined ($syslog_system_enable)) { $syslog_system_enable = 0} ;
 	if (! defined ($syslog_system_facility)) { $syslog_system_facility = 'local0'} ;
 	if (! defined ($syslog_system_level)) { $syslog_system_level = 'warning'} ;
+	if (! defined ($eventlog_enable)) { $eventlog_enable = 0} ;
+	if (! defined ($eventlog_enable)) { $eventlog_enable = 'WARNING'} ;
+	if (! defined ($eventlog_system_enable)) { $eventlog_system_enable = 0} ;	
 	if (! defined ($exec_enable)) { $exec_enable = 1} ;
 	if (! defined ($mysql_dbi_enable)) { $mysql_dbi_enable = 0} ;
 	if (! defined ($mysql_dbi_database)) { $mysql_dbi_database = ''} ;
@@ -1628,6 +1705,31 @@ sub syslog_system {
   }
   else
   {
-    warn "Cannot open log_file: $!";
+    warn "Can not open log_file: $!";
   }
 }
+
+sub eventlog_system {
+  my $message = @_[0];
+  my $eventid = @_[1];
+  my $type = @_[2];
+
+  my %event_entry = ('Source' => "SNMPTT",
+  		     'EventType' => $type,
+		     'Category' => NULL,
+		     'EventID' => $eventid,
+		     'Strings' => $message);
+  
+  if (my $eventlog=Win32::EventLog->new('Application') )
+  {
+    $eventlog->Report(\%event_entry)
+      or warn "Can not create event log entry: $!";
+    $eventlog->Close();
+  }
+  else
+  {
+    warn "Can not open log_file: $!";
+  }
+}  
+  
+

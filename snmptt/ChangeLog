@@ -1,4 +1,8 @@
 February 22nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added support for logging traps to the NT Event Log
+- Added syslog and NT Event Log support for SNMPTT 'system' events 
+  such as startup, shutdown, errors handling trap spool directory 
+  and files.  See readme for info on NT Event Log.
 - Added separate debug file for snmptthandler
 - Cleaned up defaults code for snmptthandler
 

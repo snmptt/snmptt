@@ -10,7 +10,7 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.5.1</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; February 21st, 2003
+<br>This file was last updated on:&nbsp; February 22nd, 2003
 <p>&nbsp;<a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote>&nbsp;<a href="#What is it">What is it?</a>
@@ -20,8 +20,11 @@
 <br>&nbsp;<a href="#Whats New">What's New</a>
 <br>&nbsp;<a href="#Upgrading">Upgrading</a>
 <br>&nbsp;<a href="#Configuration Options">Configuration Options - snmptt.ini</a>
-<br>&nbsp;<a href="#Logging - Standard">Logging - Standard</a>
-<br>&nbsp;<a href="#Logging - Database">Logging - Database</a>
+<br>&nbsp;<a href="#LoggingStandard">Logging - Standard</a>
+<br>&nbsp;<a href="#LoggingSyslog">Logging - Syslog</a>
+<br>&nbsp;<a href="#LoggingEventLog">Logging - EventLog</a>
+<br>&nbsp;<a href="#LoggingDatabase">Logging - Database</a>
+<br>&nbsp;<a href="#LoggingUnknown">Logging - Unknown Traps</a>
 <br>&nbsp;<a href="#Executing an external program">Executing an external
 program</a>
 <br>&nbsp;<a href="#Modes of Operation">Modes of Operation</a>
@@ -159,8 +162,21 @@ tags in MIB files.</blockquote>
 <p><b><font size=+1>0.6 - ???, 2003</font></b>
 <ul>
 <li>
+Added support for logging traps to the NT Event Log</li>
+
+<li>
+Added syslog and NT Event Log support for SNMPTT 'system' events such as
+startup, shutdown, errors handling trap spool directory and files etc</li>
+
+<li>
+Added separate debug file for snmptthandler</li>
+
+<li>
+Cleaned up defaults code for snmptthandler</li>
+
+<li>
 Added ability to translate integer values to enumeration tags defined in
-MIB files.&nbsp; This feature requires the UCD / NET-SNMP Perl module</li>
+MIB files.&nbsp; This feature requires the UCD-SNMP / NET-SNMP Perl module</li>
 
 <li>
 Fixed bug with snmpttconvertmib which would cause the last notification
@@ -282,7 +298,14 @@ Initial release</li>
 </ul>
 
 <p><br><a NAME="Upgrading"></a><b><font size=+2>Upgrading</font></b>
-<p><b><font size=+1>v0.4 to v0.5</font></b>
+<br>&nbsp;
+<p><b><font size=+1>v0.5 to v0.6</font></b>
+<p>To upgrade from v0.5 to v0.6, you should:
+<ol>
+<li>
+.</li>
+</ol>
+<b><font size=+1>v0.4 to v0.5</font></b>
 <p>To upgrade from v0.1, v0.2 to v0.3 to v0.4, you should:
 <ol>
 <li>
@@ -333,32 +356,76 @@ parameter.&nbsp; See <a href="#Command line arguments">Command Line Arguments</a
 <p>A sample <b>snmptt.ini</b> is provided in this package.&nbsp; For Windows
 NT, be sure to copy the <b>snmptt.ini-nt</b> file to <b>%SystemRoot%\snmptt.ini</b>.
 <br>&nbsp;
-<p><a NAME="Logging - Standard"></a><b><font size=+2>Logging - Standard</font></b>
+<p><a NAME="LoggingStandard"></a><b><font size=+2>Logging - Standard</font></b>
 <p>Translated traps can be sent to standard output and to a log file.&nbsp;
 The output format is:
 <blockquote><b>date trap-oid severity category hostname translated-trap</b></blockquote>
-To configure standard output or regular logging, edit the snmptt.ini file
-and modify the following variables:
+To configure standard output or regular logging, edit the <b>snmptt.ini</b>
+file and modify the following variables:
 <blockquote><b>enable_stdout</b>
 <br><b>enable_log</b>
 <br><b>log_file</b></blockquote>
-Translated traps can also be sent to syslog.&nbsp; The format of the entries
-will be similar to above without the date (as syslogd logs the date):
+<a NAME="LoggingSyslog"></a><b><font size=+2>Logging - Syslog</font></b>
+<p>Translated traps can also be sent to syslog.&nbsp; The format of the
+entries will be similar to above without the date (as syslogd logs the
+date):
 <blockquote><b>trap-oid severity category hostname translated-trap</b></blockquote>
 To configure syslog, edit the snmptt ini file and modify the following
 variables:
 <blockquote><b>syslog_enable</b>
 <br><b>syslog_facility</b>
 <br><b>syslog_level</b></blockquote>
-Note:&nbsp; Systems that do not support SYSLOG (such as Windows NT) must
-disable syslog by setting <b>syslog_enable=0</b>..
-<p>Logging of non recognized traps is also possible.&nbsp; This would be
-used mainly for troubleshooting purposes.
-<p>To configure unknown trap logging, edit the snmptt.ini file and modify
-the following variables:
-<blockquote><b>enable_unknown_trap_log</b>
-<br><b>unknown_trap_log_file</b></blockquote>
-<a NAME="Logging - Database"></a><b><font size=+2>Logging - Database</font></b>
+SNMPTT system errors can be sent to syslog by editing the snmptt.ini file
+and modifying the following variables:
+<blockquote><b>syslog_system_enable</b>
+<br><b>syslog_system_facility</b>
+<br><b>syslog_system_level</b></blockquote>
+The following errors are logged:
+<blockquote>SNMPTT (version) started&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(daemon mode only)
+<br>Unable to enter spool dir <i>x</i>
+<br>Unable to open spool dir <i>x</i>
+<br>Unable to read spool dir <i>x</i>
+<br>Could not open trap file <i>x</i>
+<br>Unable to delete trap file <i>x</i> from spool dir
+<br>Reloading configuration file(s)
+<br>SNMPTT (version) shutdown&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(daemon mode only)
+<br>Loading <i>snmpttconfigfile</i>
+<br>Could not open configuration file: <i>snmpttconfigfile</i>
+<br>Finished loading <i>x</i> lines from <i>snmpttconfigfile</i></blockquote>
+<a NAME="LoggingEventLog"></a><b><font size=+2>Logging - EventLog</font></b>
+<p>Translated traps can also be sent to the NT EventLog.&nbsp; The format
+of the entries will be similar to above without the date (as the EventLog
+logs the date):
+<blockquote><b>trap-oid severity category hostname translated-trap</b></blockquote>
+To configure eventlog support, edit the snmptt ini file and modify the
+following variables:
+<blockquote><b>eventlog_enable</b>
+<br><b>eventlog_type</b></blockquote>
+SNMPTT system errors can be sent to the EventLog by editing the snmptt.ini
+file and modifying the following variables:
+<blockquote><b>eventlog_system_enable</b></blockquote>
+The following errors are logged:
+<blockquote>SNMPTT (version) started&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(daemon mode only)
+<br>Unable to enter spool dir <i>x</i>
+<br>Unable to open spool dir <i>x</i>
+<br>Unable to read spool dir <i>x</i>
+<br>Could not open trap file <i>x</i>
+<br>Unable to delete trap file <i>x</i> from spool dir
+<br>Reloading configuration file(s)
+<br>SNMPTT (version) shutdown&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(daemon mode only)
+<br>Loading <i>snmpttconfigfile</i>
+<br>Could not open configuration file: <i>snmpttconfigfile</i>
+<br>Finished loading <i>x</i> lines from <i>snmpttconfigfile</i></blockquote>
+Note:
+<blockquote>To prevent "Event Message Not Found" messages in the Event
+Viewer, an Event Message File must be used.&nbsp; For information on installing
+the message file, see the <a href="#Installation - Windows">Installation
+section for Windows</a>.</blockquote>
+<a NAME="LoggingDatabase"></a><b><font size=+2>Logging - Database</font></b>
 <p>Translated traps can also be sent to a database.&nbsp; MySQL (tested
 under Linux) and ODBC (testing under Windows NT) can be used.
 <p><b><font size=+1>MySQL</font></b>
@@ -417,7 +484,15 @@ All variables are INSERTted into the database as standard text including
 the date and time.&nbsp; The variable lengths I have chosen above should
 be sufficient, but they may need to be increased depending on your environment.
 <br>&nbsp;
-<p><a NAME="Executing an external program"></a><b><font size=+2>Executing
+<p><a NAME="LoggingUnknown"></a><b><font size=+2>Logging - Unknown traps</font></b>
+<p>Logging of non recognized traps is also possible.&nbsp; This would be
+used mainly for troubleshooting purposes.
+<p>To configure unknown trap logging, edit the snmptt.ini file and modify
+the following variables:
+<blockquote><b>enable_unknown_trap_log</b>
+<br><b>unknown_trap_log_file</b></blockquote>
+
+<p><br><a NAME="Executing an external program"></a><b><font size=+2>Executing
 an external program</font></b>
 <p>An external program can be launched when a trap is received.&nbsp; The
 command line is defined in the configuration file.&nbsp; For example, to
@@ -873,7 +948,87 @@ file by adding the following line:
 <b>The
 -On is required otherwise snmptt will NOT recognize the traps.</b>
 <br>&nbsp;
-<p><b><u><font size=+1>Windows NT Service:</font></u></b>
+<p><b><u><font size=+1>Windows NT EventLog:</font></u></b>
+<p>If you have enabled Windows Event Log support, then you must install
+an Event Message File to prevent "Event Message Not Found" messages from
+appearing in the Event Log.&nbsp; Microsoft Knowledge Base article KB166902
+contains information on this error.
+<p>The Event Message File is a binary DLL file.&nbsp; Included with SNMPTT
+is a pre-compiled binary.&nbsp; To compile the DLL yourself, see 'Compiling'
+below.
+<p>To install the DLL:
+<ol>
+<li>
+Backup your system</li>
+
+<li>
+Make sure Event Viewer is not open</li>
+
+<li>
+Copy <b>bin\snmptt-eventlog.dll</b> to <b>%windir%\system32</b></li>
+
+<li>
+Launch the Registry Editor</li>
+
+<li>
+Go to '<b>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Eventlog\Application</b>'</li>
+
+<li>
+Create a new subkey (under Application) called <b>SNMPTT</b></li>
+
+<li>
+Inside of <b>SNMPTT</b>, create a new String Value called <b>EventMessageFile</b>.&nbsp;
+Give it a value of <b>%windir%\system32\snmptt-eventlog.dll</b></li>
+
+<li>
+Inside of <b>SNMPTT</b>, create a new DWORD Value called <b>TypesSupported</b>.&nbsp;
+Give it a vlue of <b>7</b></li>
+</ol>
+To un-install the DLL:
+<ol>
+<li>
+Backup your system</li>
+
+<li>
+Make sure Event Viewer is not open</li>
+
+<li>
+Launch the Registry Editor</li>
+
+<li>
+Go to '<b>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Eventlog\Application</b>'</li>
+
+<li>
+Delete the key <b>SNMPTT</b></li>
+
+<li>
+Delete the file <b>%windir%\system32</b></li>
+</ol>
+Compiling snmptt-eventlog.dll (MS Visual C++ required)
+<ol>
+<li>
+If your environment is not already set up for command line compilation,
+located vcvars32.bat, start a command prompt, and execute it</li>
+
+<li>
+cd into the directory where snmptt-eventlog.mc is located (included with
+SNMPTT) and execute the following commands:</li>
+
+<li>
+mc snmptt-eventlog.mc</li>
+
+<li>
+rc /r snmptt-eventlog.rc</li>
+
+<li>
+link /nodefaultlib /INCREMENTAL:NO /release /nologo -base:0x60000000 -machine:i386
+-dll -noentry -out:snmptt-eventlog.dll snmptt-eventlog.res</li>
+
+<li>
+Install the DLL as described above</li>
+</ol>
+<b><u><font size=+1></font></u></b>
+<p><br><b><u><font size=+1>Windows NT Service:</font></u></b>
 <p>To configure SNMPTT as a service under Windows NT, follow these steps.&nbsp;
 More information can be obtained from the Windows NT Resource Kit.
 <p>1.&nbsp;&nbsp;&nbsp; Install the Windows NT resource kit
