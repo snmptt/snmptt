@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v0.2.2
+# SNMPTTCONVERTMIB v0.2.3
 #
 # Copyright 2002 Alex Burger
 # alex_b@users.sourceforge.net
-# 
+#
 # 8/14/2002
 #
 # This program is free software; you can redistribute it and/or modify
@@ -28,10 +28,10 @@
 ###############################################################################
 #
 # OPTIONS START
-# 
+#
 # Set this to '' to have no default EXEC line added, or modify as needed.
 #$defaultexec = '';
-$defaultexec = '#EXEC qpage -f TRAP notifygroup1';
+$defaultexec = 'qpage -f TRAP notifygroup1';
 
 # Choose what type of quotes (if any) you want around the SUMMARY text pulled from the MIB.
 #$defaultexecquote = '';		# no quotes
@@ -48,13 +48,13 @@ $prepend_type = 1;
 #############################################################################
 #
 
-$snmpttconvertmib_version = "v0.2.2";
+$snmpttconvertmib_version = "v0.2.3";
 
 sub showversion
 {
-	print "\nSNMPTTCONVERTMIB $snmpttconvertmib_version\n";
-	print "(c) 2002 Alex Burger\n";
-	print "http://snmptt.sourceforge.net\n\n";
+  print "\nSNMPTTCONVERTMIB $snmpttconvertmib_version\n";
+  print "(c) 2002 Alex Burger\n";
+  print "http://snmptt.sourceforge.net\n\n";
 }
 
 ##############################################################################
@@ -80,11 +80,12 @@ $no_format_desc = 0;
 $format = 0;
 $format_desc = 0;
 $no_desc_wildcard = 0;
+$exec = '';
 
-GetOptions 	('version' => \$version, 
+GetOptions 	('version' => \$version,
 		'debug:i' => \$debug,
 		'help' => \$help,
-		'in=s' => \$in,  
+		'in=s' => \$in,
 		'out=s' => \$out,
 		'net_snmp_perl' => \$net_snmp_perl,
 		'mibdir=s' => \$mibdir,
@@ -94,91 +95,99 @@ GetOptions 	('version' => \$version,
 		'no_format_desc' => \$no_format_desc,
 		'format=n' => \$format,
 		'format_desc=n' => \$format_desc,
-		'no_desc_wildcard' => \$no_desc_wildcard);
-		
+		'no_desc_wildcard' => \$no_desc_wildcard,
+		'exec=s' => \$exec);
+
 if ($version == 1)
 {
-	&showversion;
-	exit(0);
+  &showversion;
+  exit(0);
 }
 
 if ($help == 1)
 {
-$USAGE = qq/Usage:
-    snmpttconvertmib [<options>] 
+  $USAGE = qq/Usage:
+  snmpttconvertmib [<options>]
 Options:
-    --debug=n                            Set debug level (1 or 2)
-    --help                               Display this message
-    --version                            Display author and version information
-    --net_snmp_perl                      Use NET-SNMP Perl integration instead of
-                                         NET-SNMP snmptranslate utility
-    --in=filename                        Input file
-    --out=filename                       Output file
-    --mibdir=dir                         Directory for mib files when net_snmp_perl is enabled*
-    --nodes=name or file                 If specified, will insert a NODES line after FORMAT or EXEC. 
-                                         The host name(s) separated by spaces, or the name of the
-					 nodes file.  Use quotes for multiple entries.  See NODES section
-					 in readme.html for examples
-    --no_description			 Do not save the description
-    --no_format_summary			 Do not use the --#SUMMARY lines for FORMAT \/ EXEC
-    --no_format_desc			 Do not use the description line for FORMAT \/ EXEC.
-    --format=n				 FORMAT \/ EXEC order preference
-				         0 = --#SUMMARY or description
-					 1 = description or --#SUMMARY
-					 2 = --#SUMMARY and description
-					 3 = description and --#SUMMARY	
-    --format_desc=n			 How to convert the description line for FORMAT \/ EXEC
-    					 0 = First line of description
-					 n = n sentence(s) of description
-    --no_desc_wildcard			 To prevent \$* from being appended to the end of description text
-					 when used on the FORMAT \/ EXEC lines.  A wildcard is only used if 
-    					 the description line contained no variable definitions (\%n).
-					    
-* Note:  If net_snmp_perl is enabled, then the directory path for the MIB file directory is 
-         required.  Not specifying a --mibdir will use the default of \/usr\/share\/snmp\/mibs\/.
+  --debug=n                            Set debug level (1 or 2)
+  --help                               Display this message
+  --version                            Display author and version information
+  --net_snmp_perl                      Use NET-SNMP Perl integration instead of
+				       NET-SNMP snmptranslate utility
+  --in=filename                        Input file
+  --out=filename                       Output file
+  --mibdir=dir                         Directory for mib files when net_snmp_perl is enabled*
+  --nodes=name or file                 If specified, will insert a NODES line after FORMAT or EXEC.
+				       The host name(s) separated by spaces, or the name of the
+				       nodes file.  Use quotes for multiple entries.  See NODES section
+				       in readme.html for examples
+  --no_description		       Do not save the description
+  --no_format_summary		       Do not use the --#SUMMARY lines for FORMAT \/ EXEC
+  --no_format_desc		       Do not use the description line for FORMAT \/ EXEC.
+  --format=n			       FORMAT \/ EXEC order preference
+				       0 = --#SUMMARY or description
+				       1 = description or --#SUMMARY
+				       2 = --#SUMMARY and description
+				       3 = description and --#SUMMARY
+  --format_desc=n		       How to convert the description line for FORMAT \/ EXEC
+				       0 = First line of description
+				       n = n sentence(s) of description
+  --no_desc_wildcard		       To prevent \$* from being appended to the end of description text
+				       when used on the FORMAT \/ EXEC lines.  A wildcard is only used if
+				       the description line contained no variable definitions (\%n).
+  --exec=command                       Command line to use for EXEC line.  Use quotes.  Example:
+    				       "EXEC qpage -f TRAP notifygroup1"
+					 
+* Note:  If net_snmp_perl is enabled, then the directory path for the MIB file directory is
+required.  Not specifying a --mibdir will use the default of \/usr\/share\/snmp\/mibs\/.
 /;
-		
-	&showversion;
-	print $USAGE;
-
-	exit(0);
+  
+  &showversion;
+  print $USAGE . "\n";
+  
+  exit(0);
 }
 
 if ($debug == 1)
 {
-	$DEBUGGING = 1;	
+  $DEBUGGING = 1;
 }
 if ($debug == 2)
 {
-	$DEBUGGING = 2;	
+  $DEBUGGING = 2;
 }
 
 $input = $in;
 $output = $out;
 
+if ($exec ne '')
+{
+  $defaultexec = $exec;
+}
+
 #print "nodes: $nodes\n";
 
 if (($input eq "") || ($output eq ""))
 {
-	print "Missing arguments!\n\n";
-	print "Syntax is: snmpttconvertmib --in=inputmibfile --out=outputfile\n\n";
-	die;
+  print "Missing arguments!\n\n";
+  print "Syntax is: snmpttconvertmib --in=inputmibfile --out=outputfile\n\n";
+  die;
 }
 
 if ($net_snmp_perl == 1)
 {
-	require SNMP;
-	$SNMP::save_descriptions = 0;	# Don't need them - process by hand
-					# to be able to pull out the SUMMARY lines
-	&SNMP::addMibDirs($mibdir);
-	&SNMP::setMib($input);
-
-	print "\n\n*****  Using UCD-SNMP / NET-SNMP Perl module *****\n\n";
+  require SNMP;
+  $SNMP::save_descriptions = 0;	# Don't need them - process by hand
+  # to be able to pull out the SUMMARY lines
+  &SNMP::addMibDirs($mibdir);
+  &SNMP::setMib($input);
+  
+  print "\n\n*****  Using UCD-SNMP / NET-SNMP Perl module *****\n\n";
 }
 else
 {
-	print "\n\n*****  Processing MIB file WITHOUT using UCD-SNMP / NET-SNMP Perl module *****\n\n";
-	check_snmptranslate_version();
+  print "\n\n*****  Processing MIB file WITHOUT using UCD-SNMP / NET-SNMP Perl module *****\n\n";
+  check_snmptranslate_version();
 }
 
 
@@ -187,36 +196,36 @@ print "File to APPEND TO:	$output\n";
 
 if ($net_snmp_perl == 1)
 {
-	print "MIB directory:    	$mibdir\n";
+  print "MIB directory:    	$mibdir\n";
 }
 
 if ($DEBUGGING >= 1)
 {
-	print "\nLoading$input\n";
+  print "\nLoading$input\n";
 }
 
 unless (open INPUTFILE, "<$input")
 {
-	die "Cannot open input file: $!";
+  die "Cannot open input file: $!";
 }
 
 while (<INPUTFILE>)
 {
-	chomp;				# remove <cr> at end of line
-	s/\015//;			# Remove any DOS carriage returns
-	push(@mibfile, $_);		# add to each line to @trapconf array
+  chomp;				# remove <cr> at end of line
+  s/\015//;			# Remove any DOS carriage returns
+  push(@mibfile, $_);		# add to each line to @trapconf array
 }
 
 if ($DEBUGGING >= 1)
 {
-	print "Finished loading $input\n\n";
+  print "Finished loading $input\n\n";
 }
 
 $currentline=0;
 
 unless (open OUTPUTFILE, ">>$output")
 {
-	die "Cannot open output file: $!";
+  die "Cannot open output file: $!";
 }
 
 print OUTPUTFILE "#\n#\n#\n#\n";
@@ -224,869 +233,861 @@ print OUTPUTFILE "MIB: $input converted on " . scalar(localtime) . " using snmpt
 
 if ($net_snmp_perl == 0)
 {
-	# Process the trap files by hand
-
-while ($currentline <= $#mibfile)
-{
-	$line = $mibfile[$currentline];
-	
-	# TRAP-TYPE (V1) / NOTIFICATION-TYPE (V2)
-	# 
-	# eg: 'mngmtAgentTrap-23003 TRAP-TYPE';
-	# eg: 'ciscoSystemClockChanged NOTIFICATION-TYPE';
-	if ( $line =~ /(.*)\s+TRAP-TYPE.*/ || $line =~ /(.*)\s+NOTIFICATION-TYPE.*/ )
-	{	
-		if ( $line =~ /(.*)\s+TRAP-TYPE.*/ )
-		{
-			$trapversion = 'TRAP';
-		}
-		else
-		{
-			$trapversion = 'NOTIFICATION';
-		}
-		
-		$enterprisefound =0;
-		
-		# If the TRAP-TYPE / NOTIFICATION-TYPE line starts with white space, it's probably a import line, so ignore
-		if ( $line =~ /^\s+TRAP-TYPE.*/ || $line =~ /^\s+NOTIFICATION-TYPE.*/  || 
-				$line =~ /^.*,.*NOTIFICATION-TYPE.*/ )
-		{
-			print "skipping a TRAP-TYPE / NOTIFICATION-TYPE line - probably an import line.\n";
-			$currentline++; # Increment to the next line
-			$line = $mibfile[$currentline]; # Get next line
-			next;
-		}
-		
-		$trapname = $1;
-
-		# Remove beginning and trailing white space
-		$trapname =~ /\s*([A-Za-z0-9_-]+)\s*/;
-		$trapname = $1;
-
-		
-		print "#\n";
-		print "Line: $currentline\n";
-		if ($trapversion eq 'TRAP')
-		{
-			print "TRAP-TYPE: $1\n";		# If trapsummary blank, use trapsummary line for FORMAT and EXEC
-		}
-		else
-		{
-			print "NOTIFICATION-TYPE: $1\n";	# If trapsummary blank, use trapsummary line for FORMAT and EXEC
-		}
-		
-		$currentline++; # Increment to the next line
-		$line3 = $mibfile[$currentline];
-
-		$end_of_definition = 0;
-		
-		while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ ) 
-			&& !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) && ($end_of_definition == 0) )
-		{
-			# Keep going through the file until the next TRAP-TYPE / NOTIFICATION-TYPE or the end of the mib file
-			# is reached
-				
-			# Look for DESCRIPTION and anything after (including newline with /s)
-			# and capture that anything in $1
-
-			# If line starts with ENTERPRISE, pull it out
-			# Only applies to SNMPv1 TRAPs
-			# (SNMPv2 NOTIFICATIONS have the enterprise in the ::= line)
-			if ($line3 =~ /ENTERPRISE\s+(.*)/)
-			{
-				$enterprise = $1;
-				$enterprisefound =1;
-			}
-			
-			if ($line3 =~ /DESCRIPTION(.*)/s)
-			{
-				$temp1 = 0;
-				$traptype = "";
-				$trapsummary = "";
-				@description = ();
-				
-				# Start of DESCRIPTION
-				
-				#print "SDESC\n";
-				
-				# If there is more text after the word DESCRIPTION, assume it's the start of 
-				# the description.
-				if ($1 ne "")
-				{
-					# Pull out text and remove beginning and trailing white space
-					if ($1 =~ /\s*(.*)\s*/)
-					{
-						# Remove any quotes
-						$_ = $1;
-						s(\")()g;
-						# "								
-						push (@description, "$_\n");
-
-					}
-				}
-				
-				$currentline++; # Increment to the next line
-				$line4 = $mibfile[$currentline];
-	
-				# Assume the rest is the description up until a ::= or end of the file
-				while (! ($line4 =~ /::=/))
-				{
-					# If next line is a --#TYPE, pull out the information and place in $traptype
-					if ($line4 =~ /--#TYPE(.*)/)
-					{
-							
-						# Pull out text and remove beginning and trailing white space and quotes
-						if ($line4 =~ /\s*--#TYPE\s*(.*)\s*/)
-						{
-							# Remove any quotes
-							$_ = $1;
-							s(\")()g;
-							# "
-							
-							#print ("2\n");
-							$traptype = $_;
-							#print "Type: $traptype \n";
-						}
-						
-						# Increment to next line and continue with the loop
-						$currentline++; # Increment to the next line
-						$line4 = $mibfile[$currentline];
-						next;
-					}
-				  	
-					# If next line is a --#SUMMARY, pull out the information and place in $summary
-					if ($line4 =~ /--#SUMMARY(.*)/)
-					{
-							
-						# Pull out text and remove beginning and trailing white space and quotes
-						if ($line4 =~ /\s*--#SUMMARY\s*(.*)\s*/)
-						{
-							# Remove any quotes
-							$_ = $1;
-							s(\")()g;
-							# "
-							
-							#print ("2\n");
-							$trapsummary = $_;
-							#print "Summary: $trapsummary \n";
-						}
-						
-						# Increment to next line and continue with the loop
-						$currentline++; # Increment to the next line
-						$line4 = $mibfile[$currentline];
-						next;
-					}
-					# If next line is a --#ARGUMENTS, pull out the information and place in $arguments
-					if ($line4 =~ /--#ARGUMENTS {(.*)}/)
-					{
-						@arguments = split /,/, $1;
-						
-						for($i=0;$i <= $#arguments;$i++)
-						{
-							#print "argument $i: $arguments[$i]\n";
-						}
-											
-						# Increment to next line and continue with the loop
-						$currentline++; # Increment to the next line
-						$line4 = $mibfile[$currentline];
-						next;
-					}					
-					# If next line starts with a --#, ignore it and continue with the loop
-					# (we already got the SUMMARY line above)
-					if ($line4 =~ /--#/)
-					{
-						$currentline++; # Increment to the next line
-						$line4 = $mibfile[$currentline];
-						next;
-					}
-
-					# If we did not find text after the word DESCRIPTION, then the NEXT
-					# line must be the first line of description.
-					
-					# Remove beginning and trailing white space
-					$line4 =~ (/\s*(.*)\s*/);
-					if ($1 ne "")
-					{
-						# Remove any quotes
-						$_ = $1;
-						s(\")()g;
-						# "
-													
-						push (@description, "$_\n");
-						#print "c:$_\n";
-					}
-
-					$currentline++; # Increment to the next line
-					$line4 = $mibfile[$currentline];
-				}
-				#print "EDESC\n";
-				
-				if ($line4 =~ /::=/)
-				{
-					$end_of_definition = 1;		# Move on to the next one
-					
-					if ($enterprisefound == 0)
-					{
-						# $line4 should now contain ::= line
-						# # Pull out enterprise from { }
-						# # Would only apply to SNMPv2 NOTIFICATIONS
-						# #print "Line4: $line4\n";
-						$line4 =~ /{(.*)\s\d.*/;
-						
-						#print "\$1=$1\n";
-						$enterprisefound =1;
-						
-						# Remove any spaces
-						$_ = $1;
-						s( )()g;
-						$enterprise = $_;
-						print "Enterprise: $enterprise\n";
-					}					
-				}				
-			}
-			$currentline++; # Increment to the next line
-			$line3 = $mibfile[$currentline];
-		}
-
-		# Combine Trap type and summary together to make new summary
-		if ($traptype ne "" && $prepend_type == 1)
-		{
-			$trapsummary = $traptype . ": " . $trapsummary;
-		}
-		
-		if ($snmptranslate_use_On == 1)
-		{
-			if ($trapversion eq 'TRAP')
-			{
-				$trapoid = `snmptranslate -IR -Ts -On $enterprise#.$trapname`;
-			}
-			else
-			{
-				$trapoid = `snmptranslate -On -IR -Ts $enterprise.$trapname`;
-			}
-		}
-		else
-		{
-			if ($trapversion eq 'TRAP')
-			{
-				$trapoid = `snmptranslate -IR -Ts $enterprise#.$trapname`;
-			}
-			else
-			{
-				$trapoid = `snmptranslate -IR -Ts $enterprise.$trapname`;
-			}
-		}
-		
-		chomp $trapoid;
-		if ($trapoid ne "")
-		{
-			print OUTPUTFILE "#\n#\n#\n";
-			print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" Normal\n";
-	
-			# Loop through trapsummary and replace the %s and %d etc with %1 to %n
-	
-			$j = $#arguments; # j is last element number
-			
-			#print "j is $j\n";
-			
-			# Change the %s or %d etc into $1 etc (starts at $1)
-			$_ = $trapsummary;
-			for ($j=0; $j<= $#arguments; $j++)
-			{
-				$variable = ($arguments[$j])+1;
-				s(%[a-zA-Z])(\$$variable);
-			}
-			
-			#print "new summary: $_\n";
-			
-			$trapsummary = $_;
-			
-			$descriptionline1 = '';
-
-			# Build description line for FORMAT / EXEC
-			if ($format_desc == 0)		# First line of description
-			{			  
-			  $descriptionline1 = $description[0];
-			  chomp ($descriptionline1);
-			}
-			else				# n sentence(s) of description
-			{
-			  # Build single line copy of description
-			  my $description_temp;
-			  foreach my $a (@description)
-			  {
-			    my $b = $a;
-			    chomp($b);
-			    $description_temp = $description_temp . $b . " ";
-			  }
-			  chop $description_temp;
-
-			  # Split up based on sentences
-			  my @description_temp2 = split /\./, $description_temp;
-			  
-			  # Remove white space around each sentence and add a trailing .
-			  for (my $i=0 ; $i <= $#description_temp2; $i++)
-			  {
-			    $description_temp2[$i] =~ /\s*(.*)\s*/;
-			    $description_temp2[$i] = $1 . ".";
-			  }
-
-			  # Build description line based on the number of sentences requested.
-			  for (my $i=1 ; $i <= $format_desc; $i++)
-			  {
-			    $descriptionline1 = $descriptionline1 . $description_temp2[$i-1] . " " ;
-			  }
-			  chop $descriptionline1;	# Remove last space
-			}
-			
-			if ($descriptionline1 ne "")
-			{
-				if ($descriptionline1 =~ /%[a-zA-Z]/)
-				{
-					# Sometimes the variables are in the first line of the description
-					# Change the %s or %d etc into $1 etc (starts at $1)
-					# There is no list of variables, so just put them in order starting at 1 and
-					# going up to 20
-					$_ = $descriptionline1;
-					for ($j=1; $j<= 20; $j++)
-					{
-						s(%[a-zA-Z])(\$$j);
-					}
-					$descriptionline1 = $_;
-					$descriptionlinehadvariables = 1;
-				}
-				else
-				{
-				  if ($no_desc_wildcard == 0)
-				  {
-				    $descriptionline1 = "$descriptionline1 \$*";
-				  }				   
-				}
-			}
-			
-			$formatexec = '';
-			
-			if ($format == 0)	# --#SUMMARY or description
-			{
-			  if ($trapsummary ne '' && $no_format_summary == 0)
-			  {
-			    $formatexec = $trapsummary;
-			  }
-			  elsif ($descriptionline1 ne '' && $no_format_desc == 0)
-			  {
-			    $formatexec = $descriptionline1;
-			  }
-			}
-			elsif ($format == 1)	# description or --#SUMMARY
-			{
-			  if ($descriptionline1 ne '' && $no_format_desc == 0)
-			  {
-			    $formatexec = $descriptionline1;
-			  }
-			  elsif ($trapsummary ne '' && $no_format_summary == 0)
-			  {
-			    $formatexec = $trapsummary;
-			  }
-			}
-			elsif ($format == 2)	# --#SUMMARY and description
-			{
-			  if ($trapsummary ne '' && $no_format_summary == 0)
-			  {
-			    $formatexec = $trapsummary;
-			  }
-			  if ($descriptionline1 ne '' && $no_format_desc == 0)
-			  {
-			    if ($formatexec =~ /\.$/)	# If it already ends in a .
-			    {
-			      $formatexec = $formatexec . " " . $descriptionline1;
-			    }
-			    else
-			    {
-			      $formatexec = $formatexec . ". " . $descriptionline1;
-			    }
-			  }
-			}
-			elsif ($format == 3)	# description and --#SUMMARY
-			{
-			  if ($descriptionline1 ne '' && $no_format_desc == 0)
-			  {
-			    $formatexec = $descriptionline1;
-			  }
-			  if ($trapsummary ne '' && $no_format_summary == 0)
-			  {
-			    $formatexec = $formatexec . " " . $trapsummary;
-			  }
-			}
-			  
-			if ($formatexec ne '')
-			{
-			  print OUTPUTFILE "FORMAT $formatexec\n";
-			  if ($defaultexec ne '')
-			  {
-			    print OUTPUTFILE "$defaultexec $defaultexecquote$formatexec$defaultexecquote\n"
-			  }		
-			}
-			else
-			{
-			  print OUTPUTFILE "FORMAT \$*\n";
-			  if ($defaultexec ne '')
-			  {
-			    print OUTPUTFILE "$defaultexec $defaultexecquote\$*$defaultexecquote\n"
-			  }
-			  #print OUTPUTFILE "EXEC \$*\n";
-			}
-	
-			if ($nodes ne '')
-			{
-				print OUTPUTFILE "NODES $nodes\n";
-			}	
-			
-			if ($no_description == 0)
-			{			  
-			  print OUTPUTFILE "SDESC\n";
-			  #print OUTPUTFILE "$descriptionline1\n";
-			  for ($i=0; $i <= $#description; $i++)
-			  {
-			    print OUTPUTFILE "$description[$i]";
-			  }
-			  print OUTPUTFILE "EDESC\n";
-			}
-
-			$currentline--;
-		}
-		
-		print "OID: $trapoid\n";
-		#print "\@description is ", $#description,"\n";
-		#print "going to next trap / notification\n\n";
-	}
-	
-	$currentline++; # Increment to the next line
-}	
-
-
-sub check_snmptranslate_version
-{
-  $snmptranslate_use_On = 1;
+  # Process the trap files by hand
   
-  if (open SNMPTRANSLATE, "snmptranslate -V 2>&1|") 
+  while ($currentline <= $#mibfile)
   {
-    $snmptranslatever = <SNMPTRANSLATE>;
-    close SNMPTRANSLATE;
+    $line = $mibfile[$currentline];
     
-    chomp ($snmptranslatever);
-    
-    print "snmptranslate version: " . $snmptranslatever. "\n";
-      
-    if ($snmptranslatever =~ /UCD/i || $snmptranslatever =~ /NET-SNMP version: 5.0.1/i)
+    # TRAP-TYPE (V1) / NOTIFICATION-TYPE (V2)
+    #
+    # eg: 'mngmtAgentTrap-23003 TRAP-TYPE';
+    # eg: 'ciscoSystemClockChanged NOTIFICATION-TYPE';
+    if ( $line =~ /(.*)\s+TRAP-TYPE.*/ || $line =~ /(.*)\s+NOTIFICATION-TYPE.*/ )
     {
-      $snmptranslate_use_On = 0;
-      if ($DEBUGGING >= 1)
+      if ( $line =~ /(.*)\s+TRAP-TYPE.*/ )
       {
-	print "snmptranslate is either UCD-SNMP, or NET-SNMP v5.0.1, so do not use the -On switch.  Version found: $snmptranslatever\n";
+        $trapversion = 'TRAP';
+      }
+      else
+      {
+        $trapversion = 'NOTIFICATION';
+      }
+      
+      $enterprisefound =0;
+      
+      # If the TRAP-TYPE / NOTIFICATION-TYPE line starts with white space, it's probably a import line, so ignore
+      if ( $line =~ /^\s+TRAP-TYPE.*/ || $line =~ /^\s+NOTIFICATION-TYPE.*/  ||
+      $line =~ /^.*,.*NOTIFICATION-TYPE.*/ )
+      {
+        print "skipping a TRAP-TYPE / NOTIFICATION-TYPE line - probably an import line.\n";
+        $currentline++; # Increment to the next line
+        $line = $mibfile[$currentline]; # Get next line
+        next;
+      }
+      
+      $trapname = $1;
+      
+      # Remove beginning and trailing white space
+      $trapname =~ /\s*([A-Za-z0-9_-]+)\s*/;
+      $trapname = $1;
+      
+      
+      print "#\n";
+      print "Line: $currentline\n";
+      if ($trapversion eq 'TRAP')
+      {
+        print "TRAP-TYPE: $1\n";		# If trapsummary blank, use trapsummary line for FORMAT and EXEC
+      }
+      else
+      {
+        print "NOTIFICATION-TYPE: $1\n";	# If trapsummary blank, use trapsummary line for FORMAT and EXEC
+      }
+      
+      $currentline++; # Increment to the next line
+      $line3 = $mibfile[$currentline];
+      
+      $end_of_definition = 0;
+      
+      while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ )
+      && !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) && ($end_of_definition == 0) )
+      {
+        # Keep going through the file until the next TRAP-TYPE / NOTIFICATION-TYPE or the end of the mib file
+        # is reached
+        
+        # Look for DESCRIPTION and anything after (including newline with /s)
+        # and capture that anything in $1
+        
+        # If line starts with ENTERPRISE, pull it out
+        # Only applies to SNMPv1 TRAPs
+        # (SNMPv2 NOTIFICATIONS have the enterprise in the ::= line)
+        if ($line3 =~ /ENTERPRISE\s+(.*)/)
+        {
+          $enterprise = $1;
+          $enterprisefound =1;
+        }
+        
+        if ($line3 =~ /DESCRIPTION(.*)/s)
+        {
+          $temp1 = 0;
+          $traptype = "";
+          $trapsummary = "";
+          @description = ();
+          
+          # Start of DESCRIPTION
+          
+          #print "SDESC\n";
+          
+          # If there is more text after the word DESCRIPTION, assume it's the start of
+          # the description.
+          if ($1 ne "")
+          {
+            # Pull out text and remove beginning and trailing white space
+            if ($1 =~ /\s*(.*)\s*/)
+            {
+              # Remove any quotes
+              $_ = $1;
+              s(\")()g;
+              # "
+              push (@description, "$_\n");
+              
+            }
+          }
+          
+          $currentline++; # Increment to the next line
+          $line4 = $mibfile[$currentline];
+          
+          # Assume the rest is the description up until a ::= or end of the file
+          while (! ($line4 =~ /::=/))
+          {
+            # If next line is a --#TYPE, pull out the information and place in $traptype
+            if ($line4 =~ /--#TYPE(.*)/)
+            {
+              
+              # Pull out text and remove beginning and trailing white space and quotes
+              if ($line4 =~ /\s*--#TYPE\s*(.*)\s*/)
+              {
+                # Remove any quotes
+                $_ = $1;
+                s(\")()g;
+                # "
+                
+                #print ("2\n");
+                $traptype = $_;
+                #print "Type: $traptype \n";
+              }
+              
+              # Increment to next line and continue with the loop
+              $currentline++; # Increment to the next line
+              $line4 = $mibfile[$currentline];
+              next;
+            }
+            
+            # If next line is a --#SUMMARY, pull out the information and place in $summary
+            if ($line4 =~ /--#SUMMARY(.*)/)
+            {
+              
+              # Pull out text and remove beginning and trailing white space and quotes
+              if ($line4 =~ /\s*--#SUMMARY\s*(.*)\s*/)
+              {
+                # Remove any quotes
+                $_ = $1;
+                s(\")()g;
+                # "
+                
+                #print ("2\n");
+                $trapsummary = $_;
+                #print "Summary: $trapsummary \n";
+              }
+              
+              # Increment to next line and continue with the loop
+              $currentline++; # Increment to the next line
+              $line4 = $mibfile[$currentline];
+              next;
+            }
+            # If next line is a --#ARGUMENTS, pull out the information and place in $arguments
+            if ($line4 =~ /--#ARGUMENTS {(.*)}/)
+            {
+              @arguments = split /,/, $1;
+              
+              for($i=0;$i <= $#arguments;$i++)
+              {
+                #print "argument $i: $arguments[$i]\n";
+              }
+              
+              # Increment to next line and continue with the loop
+              $currentline++; # Increment to the next line
+              $line4 = $mibfile[$currentline];
+              next;
+            }
+            # If next line starts with a --#, ignore it and continue with the loop
+            # (we already got the SUMMARY line above)
+            if ($line4 =~ /--#/)
+            {
+              $currentline++; # Increment to the next line
+              $line4 = $mibfile[$currentline];
+              next;
+            }
+            
+            # If we did not find text after the word DESCRIPTION, then the NEXT
+            # line must be the first line of description.
+            
+            # Remove beginning and trailing white space
+            $line4 =~ (/\s*(.*)\s*/);
+            if ($1 ne "")
+            {
+              # Remove any quotes
+              $_ = $1;
+              s(\")()g;
+              # "
+              
+              push (@description, "$_\n");
+              #print "c:$_\n";
+            }
+            
+            $currentline++; # Increment to the next line
+            $line4 = $mibfile[$currentline];
+          }
+          #print "EDESC\n";
+          
+          if ($line4 =~ /::=/)
+          {
+            $end_of_definition = 1;		# Move on to the next one
+            
+            if ($enterprisefound == 0)
+            {
+              # $line4 should now contain ::= line
+              # # Pull out enterprise from { }
+              # # Would only apply to SNMPv2 NOTIFICATIONS
+              # #print "Line4: $line4\n";
+              $line4 =~ /{(.*)\s\d.*/;
+              
+              #print "\$1=$1\n";
+              $enterprisefound =1;
+              
+              # Remove any spaces
+              $_ = $1;
+              s( )()g;
+              $enterprise = $_;
+              print "Enterprise: $enterprise\n";
+            }
+          }
+        }
+        $currentline++; # Increment to the next line
+        $line3 = $mibfile[$currentline];
+      }
+      
+      # Combine Trap type and summary together to make new summary
+      if ($traptype ne "" && $prepend_type == 1)
+      {
+        $trapsummary = $traptype . ": " . $trapsummary;
+      }
+      
+      if ($snmptranslate_use_On == 1)
+      {
+        if ($trapversion eq 'TRAP')
+        {
+          $trapoid = `snmptranslate -IR -Ts -On $enterprise#.$trapname`;
+        }
+        else
+        {
+          $trapoid = `snmptranslate -On -IR -Ts $enterprise.$trapname`;
+        }
+      }
+      else
+      {
+        if ($trapversion eq 'TRAP')
+        {
+          $trapoid = `snmptranslate -IR -Ts $enterprise#.$trapname`;
+        }
+        else
+        {
+          $trapoid = `snmptranslate -IR -Ts $enterprise.$trapname`;
+        }
+      }
+      
+      chomp $trapoid;
+      if ($trapoid ne "")
+      {
+        print OUTPUTFILE "#\n#\n#\n";
+        print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" Normal\n";
+        
+        # Loop through trapsummary and replace the %s and %d etc with %1 to %n
+        
+        $j = $#arguments; # j is last element number
+        
+        #print "j is $j\n";
+        
+        # Change the %s or %d etc into $1 etc (starts at $1)
+        $_ = $trapsummary;
+        for ($j=0; $j<= $#arguments; $j++)
+        {
+          $variable = ($arguments[$j])+1;
+          s(%[a-zA-Z])(\$$variable);
+        }
+        
+        #print "new summary: $_\n";
+        
+        $trapsummary = $_;
+        
+        $descriptionline1 = '';
+        
+        # Build description line for FORMAT / EXEC
+        if ($format_desc == 0)		# First line of description
+        {
+          $descriptionline1 = $description[0];
+          chomp ($descriptionline1);
+        }
+        else				# n sentence(s) of description
+        {
+          # Build single line copy of description
+          my $description_temp;
+          foreach my $a (@description)
+          {
+            my $b = $a;
+            chomp($b);
+            $description_temp = $description_temp . $b . " ";
+          }
+          chop $description_temp;
+          
+          # Split up based on sentences
+          my @description_temp2 = split /\./, $description_temp;
+          
+          # Remove white space around each sentence and add a trailing .
+          for (my $i=0 ; $i <= $#description_temp2; $i++)
+          {
+            $description_temp2[$i] =~ /\s*(.*)\s*/;
+            $description_temp2[$i] = $1 . ".";
+          }
+          
+          # Build description line based on the number of sentences requested.
+          for (my $i=1 ; $i <= $format_desc; $i++)
+          {
+            $descriptionline1 = $descriptionline1 . $description_temp2[$i-1] . " " ;
+          }
+          chop $descriptionline1;	# Remove last space
+        }
+        
+        if ($descriptionline1 ne "")
+        {
+          if ($descriptionline1 =~ /%[a-zA-Z]/)
+          {
+            # Sometimes the variables are in the first line of the description
+            # Change the %s or %d etc into $1 etc (starts at $1)
+            # There is no list of variables, so just put them in order starting at 1 and
+            # going up to 20
+            $_ = $descriptionline1;
+            for ($j=1; $j<= 20; $j++)
+            {
+              s(%[a-zA-Z])(\$$j);
+            }
+            $descriptionline1 = $_;
+            $descriptionlinehadvariables = 1;
+          }
+          else
+          {
+            if ($no_desc_wildcard == 0)
+            {
+              $descriptionline1 = "$descriptionline1 \$*";
+            }
+          }
+        }
+        
+        $formatexec = '';
+        
+        if ($format == 0)	# --#SUMMARY or description
+        {
+          if ($trapsummary ne '' && $no_format_summary == 0)
+          {
+            $formatexec = $trapsummary;
+          }
+          elsif ($descriptionline1 ne '' && $no_format_desc == 0)
+          {
+            $formatexec = $descriptionline1;
+          }
+        }
+        elsif ($format == 1)	# description or --#SUMMARY
+        {
+          if ($descriptionline1 ne '' && $no_format_desc == 0)
+          {
+            $formatexec = $descriptionline1;
+          }
+          elsif ($trapsummary ne '' && $no_format_summary == 0)
+          {
+            $formatexec = $trapsummary;
+          }
+        }
+        elsif ($format == 2)	# --#SUMMARY and description
+        {
+          if ($trapsummary ne '' && $no_format_summary == 0)
+          {
+            $formatexec = $trapsummary;
+          }
+          if ($descriptionline1 ne '' && $no_format_desc == 0)
+          {
+            if ($formatexec =~ /\.$/)	# If it already ends in a .
+            {
+              $formatexec = $formatexec . " " . $descriptionline1;
+            }
+            else
+            {
+              $formatexec = $formatexec . ". " . $descriptionline1;
+            }
+          }
+        }
+        elsif ($format == 3)	# description and --#SUMMARY
+        {
+          if ($descriptionline1 ne '' && $no_format_desc == 0)
+          {
+            $formatexec = $descriptionline1;
+          }
+          if ($trapsummary ne '' && $no_format_summary == 0)
+          {
+            $formatexec = $formatexec . " " . $trapsummary;
+          }
+        }
+        
+        if ($formatexec ne '')
+        {
+          print OUTPUTFILE "FORMAT $formatexec\n";
+          if ($defaultexec ne '')
+          {
+            print OUTPUTFILE "EXEC $defaultexec $defaultexecquote$formatexec$defaultexecquote\n"
+          }
+        }
+        else
+        {
+          print OUTPUTFILE "FORMAT \$*\n";
+          if ($defaultexec ne '')
+          {
+            print OUTPUTFILE "EXEC $defaultexec $defaultexecquote\$*$defaultexecquote\n"
+          }
+          #print OUTPUTFILE "EXEC \$*\n";
+        }
+        
+        if ($nodes ne '')
+        {
+          print OUTPUTFILE "NODES $nodes\n";
+        }
+        
+        if ($no_description == 0)
+        {
+          print OUTPUTFILE "SDESC\n";
+          #print OUTPUTFILE "$descriptionline1\n";
+          for ($i=0; $i <= $#description; $i++)
+          {
+            print OUTPUTFILE "$description[$i]";
+          }
+          print OUTPUTFILE "EDESC\n";
+        }
+        
+        $currentline--;
+      }
+      
+      print "OID: $trapoid\n";
+      #print "\@description is ", $#description,"\n";
+      #print "going to next trap / notification\n\n";
+    }
+    
+    $currentline++; # Increment to the next line
+  }
+  
+  
+  sub check_snmptranslate_version
+  {
+    $snmptranslate_use_On = 1;
+    
+    if (open SNMPTRANSLATE, "snmptranslate -V 2>&1|")
+    {
+      $snmptranslatever = <SNMPTRANSLATE>;
+      close SNMPTRANSLATE;
+      
+      chomp ($snmptranslatever);
+      
+      print "snmptranslate version: " . $snmptranslatever. "\n";
+      
+      if ($snmptranslatever =~ /UCD/i || $snmptranslatever =~ /NET-SNMP version: 5.0.1/i)
+      {
+        $snmptranslate_use_On = 0;
+        if ($DEBUGGING >= 1)
+        {
+          print "snmptranslate is either UCD-SNMP, or NET-SNMP v5.0.1, so do not use the -On switch.  Version found: $snmptranslatever\n";
+        }
       }
     }
   }
-}
-
-# End of process the trap files by hand
+  
+  # End of process the trap files by hand
 }
 else
 {
-	#Process the trap files using NET-SNMP Perl
-
-foreach $key (sort keys %SNMP::MIB)
-{
-  if ($SNMP::MIB{$key}{type} eq 'TRAP' || $SNMP::MIB{$key}{type} eq 'NOTIF')
+  #Process the trap files using NET-SNMP Perl
+  
+  foreach $key (sort keys %SNMP::MIB)
   {
-    #print "#\n#\n#\n";
-    
-    if ($SNMP::MIB{$key}{type} eq 'TRAP')
+    if ($SNMP::MIB{$key}{type} eq 'TRAP' || $SNMP::MIB{$key}{type} eq 'NOTIF')
     {
-      print "TRAP-TYPE: $SNMP::MIB{$key}{label}\n";		# If trapsummary blank, use trapsummary line for FORMAT and EXEC
-    }
-    else
-    {
-      print "NOTIFICATION-TYPE: $SNMP::MIB{$key}{label}\n";	# If trapsummary blank, use trapsummary line for FORMAT and EXEC
-    }
-    
-    #print "EVENT $SNMP::MIB{$key}{label} $key \"Status Events\" Normal\n";
-
-    # Determine FORMAT line
-
-    $currentline=0;
-    while ($currentline <= $#mibfile)
-    {
-      $line = $mibfile[$currentline];
-      if ( $line =~ /$SNMP::MIB{$key}{label}\s+TRAP-TYPE.*/  || $line =~ /$SNMP::MIB{$key}{label}\s+NOTIFICATION-TYPE.*/)
-      {
-	$currentline++; # Increment to the next line
-	$line3 = $mibfile[$currentline];
-
-	$end_of_definition = 0;
-		
-	while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ ) 
-			&& !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) && ($end_of_definition == 0) )
-	{
-			# Keep going through the file until the next TRAP-TYPE or the end of the mib file
-			# is reached
-				
-			# Look for DESCRIPTION and anything after (including newline with /s)
-			# and capture that anything in $1
-		
-			if ($line3 =~ /DESCRIPTION(.*)/s)
-			{
-				$temp1 = 0;
-				$traptype = "";
-				$trapsummary = "";
-				@description = ();
-				
-				# Start of DESCRIPTION
-				
-				#print "SDESC\n";
-				
-				# If there is more text after the word DESCRIPTION, assume it's the start of 
-				# the description.  If it is, pull it out and place in $descriptionline1.
-				if ($1 ne "")
-				{
-					# Pull out text and remove beginning and trailing white space
-					if ($1 =~ /\s*(.*)\s*/)
-					{
-						#print ("2\n");
-						# Remove any quotes
-						$_ = $1;
-						s(\")()g;
-						# "								
-						$descriptionline1 = $_;
-						$temp1 = 1;
-
-						push (@description, "$_\n");
-						#print "Line 1a: $_ \n";
-					}
-				}
-				
-				$currentline++; # Increment to the next line
-				$line4 = $mibfile[$currentline];
-	
-				# Assume the rest is the description up until a ::= or end of the file
-				while (! ($line4 =~ /::=/))
-				{
-					# If next line is a --#TYPE, pull out the information and place in $traptype
-					if ($line4 =~ /--#TYPE(.*)/)
-					{
-							
-						# Pull out text and remove beginning and trailing white space and quotes
-						if ($line4 =~ /\s*--#TYPE\s*(.*)\s*/)
-						{
-							# Remove any quotes
-							$_ = $1;
-							s(\")()g;
-							# "
-							
-							#print ("2\n");
-							$traptype = $_;
-							#print "Type: $traptype \n";
-						}
-						
-						# Increment to next line and continue with the loop
-						$currentline++; # Increment to the next line
-						$line4 = $mibfile[$currentline];
-						next;
-					}
-				  	
-					# If next line is a --#SUMMARY, pull out the information and place in $summary
-					if ($line4 =~ /--#SUMMARY(.*)/)
-					{
-							
-						# Pull out text and remove beginning and trailing white space and quotes
-						if ($line4 =~ /\s*--#SUMMARY\s*(.*)\s*/)
-						{
-							# Remove any quotes
-							$_ = $1;
-							s(\")()g;
-							# "
-							
-							#print ("2\n");
-							$trapsummary = $_;
-							#print "Summary: $trapsummary \n";
-						}
-						
-						# Increment to next line and continue with the loop
-						$currentline++; # Increment to the next line
-						$line4 = $mibfile[$currentline];
-						next;
-					}
-					# If next line is a --#ARGUMENTS, pull out the information and place in $arguments
-					if ($line4 =~ /--#ARGUMENTS {(.*)}/)
-					{
-						@arguments = split /,/, $1;
-						
-						for($i=0;$i <= $#arguments;$i++)
-						{
-							#print "argument $i: $arguments[$i]\n";
-						}
-											
-						# Increment to next line and continue with the loop
-						$currentline++; # Increment to the next line
-						$line4 = $mibfile[$currentline];
-						next;
-					}					
-					# If next line starts with a --#, ignore it and continue with the loop
-					# (we already got the SUMMARY line above)
-					if ($line4 =~ /--#/)
-					{
-						$currentline++; # Increment to the next line
-						$line4 = $mibfile[$currentline];
-						next;
-					}
-					# If we did not find text after the word DESCRIPTION, then the NEXT
-					# line must be the first line of description.  Pull that out and place
-					# in $descriptionline1.
-					if ($temp1 == 0)
-					{
-						# Remove beginning and trailing white space
-						$line4 =~ (/\s*(.*)\s*/);
-						# Remove any quotes
-						$_ = $1;
-						s(\")()g;
-						# "								
-						$descriptionline1 = $_;
-						
-						push (@description, "$_\n");
-						#print "Line 1b: $_ \n";
-						$temp1 = 1;
-					}
-					else
-					{
-						# Remove beginning and trailing white space
-						$line4 =~ (/\s*(.*)\s*/);
-						if ($1 ne "")
-						{
-							# Remove any quotes
-							$_ = $1;
-							s(\")()g;
-							# "
-														
-							push (@description, "$_\n");
-							#print "c:$_\n";
-						}
-					}
-
-					$currentline++; # Increment to the next line
-					$line4 = $mibfile[$currentline];
-				}
-				#print "EDESC\n";
-
-				if ($line4 =~ /::=/)
-				{
-					$end_of_definition = 1;		# Move on to the next one
-				}
-			}
-			$currentline++; # Increment to the next line
-			$line3 = $mibfile[$currentline];
-		}
-		
-		# Combine Trap type and summary together to make new summary
-		if ($traptype ne "" && $prepend_type == 1)
-		{
-			$trapsummary = $traptype . ": " . $trapsummary;
-		}
-		
-		$trapoid = $key;
-		$trapname = $SNMP::MIB{$key}{label};	 
-		chomp $trapoid;
-		if ($trapoid ne "")
-		{
-			print OUTPUTFILE "#\n#\n#\n";
-			print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" Normal\n";
-	
-			# Loop through trapsummary and replace the %s and %d etc with %1 to %n
-	
-			$j = $#arguments; # j is last element number
-			
-			#print "j is $j\n";
-			
-			# Change the %s or %d etc into $1 etc (starts at $1)
-			$_ = $trapsummary;
-			for ($j=0; $j<= $#arguments; $j++)
-			{
-				$variable = ($arguments[$j])+1;
-				s(%[a-zA-Z])(\$$variable);
-			}
-			
-			#print "new summary: $_\n";
-			
-			$trapsummary = $_;
-			
-			$descriptionline1 = '';
-
-			# Build description line for FORMAT / EXEC
-			if ($format_desc == 0)		# First line of description
-			{			  
-			  $descriptionline1 = $description[0];
-			  chomp ($descriptionline1);
-			}
-			else				# n sentence(s) of description
-			{
-			  # Build single line copy of description
-			  my $description_temp;
-			  foreach my $a (@description)
-			  {
-			    my $b = $a;
-			    chomp($b);
-			    $description_temp = $description_temp . $b . " ";
-			  }
-			  chop $description_temp;
-
-			  # Split up based on sentences
-			  my @description_temp2 = split /\./, $description_temp;
-			  
-			  # Remove white space around each sentence and add a trailing .
-			  for (my $i=0 ; $i <= $#description_temp2; $i++)
-			  {
-			    $description_temp2[$i] =~ /\s*(.*)\s*/;
-			    $description_temp2[$i] = $1 . ".";
-			  }
-
-			  # Build description line based on the number of sentences requested.
-			  for (my $i=1 ; $i <= $format_desc; $i++)
-			  {
-			    $descriptionline1 = $descriptionline1 . $description_temp2[$i-1] . " " ;
-			  }
-			  chop $descriptionline1;	# Remove last space
-			}
-			
-			if ($descriptionline1 ne "")
-			{
-				if ($descriptionline1 =~ /%[a-zA-Z]/)
-				{
-					# Sometimes the variables are in the first line of the description
-					# Change the %s or %d etc into $1 etc (starts at $1)
-					# There is no list of variables, so just put them in order starting at 1 and
-					# going up to 20
-					$_ = $descriptionline1;
-					for ($j=1; $j<= 20; $j++)
-					{
-						s(%[a-zA-Z])(\$$j);
-					}
-					$descriptionline1 = $_;
-					$descriptionlinehadvariables = 1;
-				}
-				else
-				{
-				  if ($no_desc_wildcard == 0)
-				  {
-				    $descriptionline1 = "$descriptionline1 \$*";
-				  }				   
-				}
-			}
-			
-			$formatexec = '';
-			
-			if ($format == 0)	# --#SUMMARY or description
-			{
-			  if ($trapsummary ne '' && $no_format_summary == 0)
-			  {
-			    $formatexec = $trapsummary;
-			  }
-			  elsif ($descriptionline1 ne '' && $no_format_desc == 0)
-			  {
-			    $formatexec = $descriptionline1;
-			  }
-			}
-			elsif ($format == 1)	# description or --#SUMMARY
-			{
-			  if ($descriptionline1 ne '' && $no_format_desc == 0)
-			  {
-			    $formatexec = $descriptionline1;
-			  }
-			  elsif ($trapsummary ne '' && $no_format_summary == 0)
-			  {
-			    $formatexec = $trapsummary;
-			  }
-			}
-			elsif ($format == 2)	# --#SUMMARY and description
-			{
-			  if ($trapsummary ne '' && $no_format_summary == 0)
-			  {
-			    $formatexec = $trapsummary;
-			  }
-			  if ($descriptionline1 ne '' && $no_format_desc == 0)
-			  {
-			    if ($formatexec =~ /\.$/)	# If it already ends in a .
-			    {
-			      $formatexec = $formatexec . " " . $descriptionline1;
-			    }
-			    else
-			    {
-			      $formatexec = $formatexec . ". " . $descriptionline1;
-			    }
-			  }
-			}
-			elsif ($format == 3)	# description and --#SUMMARY
-			{
-			  if ($descriptionline1 ne '' && $no_format_desc == 0)
-			  {
-			    $formatexec = $descriptionline1;
-			  }
-			  if ($trapsummary ne '' && $no_format_summary == 0)
-			  {
-			    $formatexec = $formatexec . " " . $trapsummary;
-			  }
-			}
-			  
-			if ($formatexec ne '')
-			{
-			  print OUTPUTFILE "FORMAT $formatexec\n";
-			  if ($defaultexec ne '')
-			  {
-			    print OUTPUTFILE "$defaultexec $defaultexecquote$formatexec$defaultexecquote\n"
-			  }		
-			}
-			else
-			{
-			  print OUTPUTFILE "FORMAT \$*\n";
-			  if ($defaultexec ne '')
-			  {
-			    print OUTPUTFILE "$defaultexec $defaultexecquote\$*$defaultexecquote\n"
-			  }
-			  #print OUTPUTFILE "EXEC \$*\n";
-			}
-	
-			if ($nodes ne '')
-			{
-				print OUTPUTFILE "NODES $nodes\n";
-			}	
-			
-			if ($no_description == 0)
-			{			  
-			  print OUTPUTFILE "SDESC\n";
-			  #print OUTPUTFILE "$descriptionline1\n";
-			  for ($i=0; $i <= $#description; $i++)
-			  {
-			    print OUTPUTFILE "$description[$i]";
-			  }
-			  print OUTPUTFILE "EDESC\n";
-			}
-
-			$currentline--;
-		}
-
-		print "OID: $trapoid\n\n";
-		#print "\@description is ", $#description,"\n";
-		#print "going to next trap\n\n";
-	}
-
-		
-
+      #print "#\n#\n#\n";
       
-      $currentline++;
-    } #end of while
-   
+      if ($SNMP::MIB{$key}{type} eq 'TRAP')
+      {
+        print "TRAP-TYPE: $SNMP::MIB{$key}{label}\n";		# If trapsummary blank, use trapsummary line for FORMAT and EXEC
+      }
+      else
+      {
+        print "NOTIFICATION-TYPE: $SNMP::MIB{$key}{label}\n";	# If trapsummary blank, use trapsummary line for FORMAT and EXEC
+      }
+      
+      #print "EVENT $SNMP::MIB{$key}{label} $key \"Status Events\" Normal\n";
+      
+      # Determine FORMAT line
+      
+      $currentline=0;
+      while ($currentline <= $#mibfile)
+      {
+        $line = $mibfile[$currentline];
+        if ( $line =~ /$SNMP::MIB{$key}{label}\s+TRAP-TYPE.*/  || $line =~ /$SNMP::MIB{$key}{label}\s+NOTIFICATION-TYPE.*/)
+        {
+          $currentline++; # Increment to the next line
+          $line3 = $mibfile[$currentline];
+          
+          $end_of_definition = 0;
+          
+          while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ )
+          && !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) && ($end_of_definition == 0) )
+          {
+            # Keep going through the file until the next TRAP-TYPE or the end of the mib file
+            # is reached
+            
+            # Look for DESCRIPTION and anything after (including newline with /s)
+            # and capture that anything in $1
+            
+            if ($line3 =~ /DESCRIPTION(.*)/s)
+            {
+              $temp1 = 0;
+              $traptype = "";
+              $trapsummary = "";
+              @description = ();
+              
+              # Start of DESCRIPTION
+              
+              #print "SDESC\n";
+              
+              # If there is more text after the word DESCRIPTION, assume it's the start of
+              # the description.  If it is, pull it out and place in $descriptionline1.
+              if ($1 ne "")
+              {
+                # Pull out text and remove beginning and trailing white space
+                if ($1 =~ /\s*(.*)\s*/)
+                {
+                  #print ("2\n");
+                  # Remove any quotes
+                  $_ = $1;
+                  s(\")()g;
+                  # "
+                  $descriptionline1 = $_;
+                  $temp1 = 1;
+                  
+                  push (@description, "$_\n");
+                  #print "Line 1a: $_ \n";
+                }
+              }
+              
+              $currentline++; # Increment to the next line
+              $line4 = $mibfile[$currentline];
+              
+              # Assume the rest is the description up until a ::= or end of the file
+              while (! ($line4 =~ /::=/))
+              {
+                # If next line is a --#TYPE, pull out the information and place in $traptype
+                if ($line4 =~ /--#TYPE(.*)/)
+                {
+                  
+                  # Pull out text and remove beginning and trailing white space and quotes
+                  if ($line4 =~ /\s*--#TYPE\s*(.*)\s*/)
+                  {
+                    # Remove any quotes
+                    $_ = $1;
+                    s(\")()g;
+                    # "
+                    
+                    #print ("2\n");
+                    $traptype = $_;
+                    #print "Type: $traptype \n";
+                  }
+                  
+                  # Increment to next line and continue with the loop
+                  $currentline++; # Increment to the next line
+                  $line4 = $mibfile[$currentline];
+                  next;
+                }
+                
+                # If next line is a --#SUMMARY, pull out the information and place in $summary
+                if ($line4 =~ /--#SUMMARY(.*)/)
+                {
+                  
+                  # Pull out text and remove beginning and trailing white space and quotes
+                  if ($line4 =~ /\s*--#SUMMARY\s*(.*)\s*/)
+                  {
+                    # Remove any quotes
+                    $_ = $1;
+                    s(\")()g;
+                    # "
+                    
+                    #print ("2\n");
+                    $trapsummary = $_;
+                    #print "Summary: $trapsummary \n";
+                  }
+                  
+                  # Increment to next line and continue with the loop
+                  $currentline++; # Increment to the next line
+                  $line4 = $mibfile[$currentline];
+                  next;
+                }
+                # If next line is a --#ARGUMENTS, pull out the information and place in $arguments
+                if ($line4 =~ /--#ARGUMENTS {(.*)}/)
+                {
+                  @arguments = split /,/, $1;
+                  
+                  for($i=0;$i <= $#arguments;$i++)
+                  {
+                    #print "argument $i: $arguments[$i]\n";
+                  }
+                  
+                  # Increment to next line and continue with the loop
+                  $currentline++; # Increment to the next line
+                  $line4 = $mibfile[$currentline];
+                  next;
+                }
+                # If next line starts with a --#, ignore it and continue with the loop
+                # (we already got the SUMMARY line above)
+                if ($line4 =~ /--#/)
+                {
+                  $currentline++; # Increment to the next line
+                  $line4 = $mibfile[$currentline];
+                  next;
+                }
+                # If we did not find text after the word DESCRIPTION, then the NEXT
+                # line must be the first line of description.  Pull that out and place
+                # in $descriptionline1.
+                if ($temp1 == 0)
+                {
+                  # Remove beginning and trailing white space
+                  $line4 =~ (/\s*(.*)\s*/);
+                  # Remove any quotes
+                  $_ = $1;
+                  s(\")()g;
+                  # "
+                  $descriptionline1 = $_;
+                  
+                  push (@description, "$_\n");
+                  #print "Line 1b: $_ \n";
+                  $temp1 = 1;
+                }
+                else
+                {
+                  # Remove beginning and trailing white space
+                  $line4 =~ (/\s*(.*)\s*/);
+                  if ($1 ne "")
+                  {
+                    # Remove any quotes
+                    $_ = $1;
+                    s(\")()g;
+                    # "
+                    
+                    push (@description, "$_\n");
+                    #print "c:$_\n";
+                  }
+                }
+                
+                $currentline++; # Increment to the next line
+                $line4 = $mibfile[$currentline];
+              }
+              #print "EDESC\n";
+              
+              if ($line4 =~ /::=/)
+              {
+                $end_of_definition = 1;		# Move on to the next one
+              }
+            }
+            $currentline++; # Increment to the next line
+            $line3 = $mibfile[$currentline];
+          }
+          
+          # Combine Trap type and summary together to make new summary
+          if ($traptype ne "" && $prepend_type == 1)
+          {
+            $trapsummary = $traptype . ": " . $trapsummary;
+          }
+          
+          $trapoid = $key;
+          $trapname = $SNMP::MIB{$key}{label};
+          chomp $trapoid;
+          if ($trapoid ne "")
+          {
+            print OUTPUTFILE "#\n#\n#\n";
+            print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" Normal\n";
+            
+            # Loop through trapsummary and replace the %s and %d etc with %1 to %n
+            
+            $j = $#arguments; # j is last element number
+            
+            #print "j is $j\n";
+            
+            # Change the %s or %d etc into $1 etc (starts at $1)
+            $_ = $trapsummary;
+            for ($j=0; $j<= $#arguments; $j++)
+            {
+              $variable = ($arguments[$j])+1;
+              s(%[a-zA-Z])(\$$variable);
+            }
+            
+            #print "new summary: $_\n";
+            
+            $trapsummary = $_;
+            
+            $descriptionline1 = '';
+            
+            # Build description line for FORMAT / EXEC
+            if ($format_desc == 0)		# First line of description
+            {
+              $descriptionline1 = $description[0];
+              chomp ($descriptionline1);
+            }
+            else				# n sentence(s) of description
+            {
+              # Build single line copy of description
+              my $description_temp;
+              foreach my $a (@description)
+              {
+                my $b = $a;
+                chomp($b);
+                $description_temp = $description_temp . $b . " ";
+              }
+              chop $description_temp;
+              
+              # Split up based on sentences
+              my @description_temp2 = split /\./, $description_temp;
+              
+              # Remove white space around each sentence and add a trailing .
+              for (my $i=0 ; $i <= $#description_temp2; $i++)
+              {
+                $description_temp2[$i] =~ /\s*(.*)\s*/;
+                $description_temp2[$i] = $1 . ".";
+              }
+              
+              # Build description line based on the number of sentences requested.
+              for (my $i=1 ; $i <= $format_desc; $i++)
+              {
+                $descriptionline1 = $descriptionline1 . $description_temp2[$i-1] . " " ;
+              }
+              chop $descriptionline1;	# Remove last space
+            }
+            
+            if ($descriptionline1 ne "")
+            {
+              if ($descriptionline1 =~ /%[a-zA-Z]/)
+              {
+                # Sometimes the variables are in the first line of the description
+                # Change the %s or %d etc into $1 etc (starts at $1)
+                # There is no list of variables, so just put them in order starting at 1 and
+                # going up to 20
+                $_ = $descriptionline1;
+                for ($j=1; $j<= 20; $j++)
+                {
+                  s(%[a-zA-Z])(\$$j);
+                }
+                $descriptionline1 = $_;
+                $descriptionlinehadvariables = 1;
+              }
+              else
+              {
+                if ($no_desc_wildcard == 0)
+                {
+                  $descriptionline1 = "$descriptionline1 \$*";
+                }
+              }
+            }
+            
+            $formatexec = '';
+            
+            if ($format == 0)	# --#SUMMARY or description
+            {
+              if ($trapsummary ne '' && $no_format_summary == 0)
+              {
+                $formatexec = $trapsummary;
+              }
+              elsif ($descriptionline1 ne '' && $no_format_desc == 0)
+              {
+                $formatexec = $descriptionline1;
+              }
+            }
+            elsif ($format == 1)	# description or --#SUMMARY
+            {
+              if ($descriptionline1 ne '' && $no_format_desc == 0)
+              {
+                $formatexec = $descriptionline1;
+              }
+              elsif ($trapsummary ne '' && $no_format_summary == 0)
+              {
+                $formatexec = $trapsummary;
+              }
+            }
+            elsif ($format == 2)	# --#SUMMARY and description
+            {
+              if ($trapsummary ne '' && $no_format_summary == 0)
+              {
+                $formatexec = $trapsummary;
+              }
+              if ($descriptionline1 ne '' && $no_format_desc == 0)
+              {
+                if ($formatexec =~ /\.$/)	# If it already ends in a .
+                {
+                  $formatexec = $formatexec . " " . $descriptionline1;
+                }
+                else
+                {
+                  $formatexec = $formatexec . ". " . $descriptionline1;
+                }
+              }
+            }
+            elsif ($format == 3)	# description and --#SUMMARY
+            {
+              if ($descriptionline1 ne '' && $no_format_desc == 0)
+              {
+                $formatexec = $descriptionline1;
+              }
+              if ($trapsummary ne '' && $no_format_summary == 0)
+              {
+                $formatexec = $formatexec . " " . $trapsummary;
+              }
+            }
+            
+            if ($formatexec ne '')
+            {
+              print OUTPUTFILE "FORMAT $formatexec\n";
+              if ($defaultexec ne '')
+              {
+                print OUTPUTFILE "EXEC $defaultexec $defaultexecquote$formatexec$defaultexecquote\n"
+              }
+            }
+            else
+            {
+              print OUTPUTFILE "FORMAT \$*\n";
+              if ($defaultexec ne '')
+              {
+                print OUTPUTFILE "EXEC $defaultexec $defaultexecquote\$*$defaultexecquote\n"
+              }
+              #print OUTPUTFILE "EXEC \$*\n";
+            }
+            
+            if ($nodes ne '')
+            {
+              print OUTPUTFILE "NODES $nodes\n";
+            }
+            
+            if ($no_description == 0)
+            {
+              print OUTPUTFILE "SDESC\n";
+              #print OUTPUTFILE "$descriptionline1\n";
+              for ($i=0; $i <= $#description; $i++)
+              {
+                print OUTPUTFILE "$description[$i]";
+              }
+              print OUTPUTFILE "EDESC\n";
+            }
+            
+            $currentline--;
+          }
+          
+          print "OID: $trapoid\n\n";
+          #print "\@description is ", $#description,"\n";
+          #print "going to next trap\n\n";
+        }
+        $currentline++;
+      } #end of while
+    }
   }
-}
-
-
-
-	#End of process the trap files using NET-SNMP Perl
+  #End of process the trap files using NET-SNMP Perl
 }
 

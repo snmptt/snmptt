@@ -1,3 +1,6 @@
+March 31th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Snmpttconvertmib:  --exec command line option
+
 March 28th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Snmpttconvert, snmpttconvertmib:  Will strip DOS carriage return from
   input files if detected.
