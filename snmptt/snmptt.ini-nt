@@ -225,6 +225,12 @@ eventlog_system_enable = 0
 # This requires DBI:: and DBD::mysql
 mysql_dbi_enable = 0
 
+# MySQL: Hostname of database server (optional - default localhost)
+mysql_dbi_host = localhost
+
+# MySQL: Port number of database server (optional - default 3306)
+mysql_dbi_port = 3306
+
 # MySQL: Database to use
 mysql_dbi_database = snmptt
 
@@ -240,6 +246,12 @@ mysql_dbi_password = password
 # PostgreSQL: Set to 1 to enable logging to a PostgreSQL database via DBI (Linux / Windows)
 # This requires DBI:: and DBD::PgPP
 postgresql_dbi_enable = 0
+
+# PostgreSQL: Hostname of database server (optional - default 127.0.0.1)
+postgresql_dbi_host = 127.0.0.1
+
+# PostgreSQL: Port number of database server (optional - default 5432)
+postgresql_dbi_port = 5432
 
 # PostgreSQL: Database to use
 postgresql_dbi_database = snmptt

@@ -249,7 +249,8 @@ if ($mysql_dbi_enable == 1)
 	require DBI;
 	require DBD::mysql;
 	
-	unless ($dbh_mysql = DBI->connect("DBI:mysql:$mysql_dbi_database",$mysql_dbi_username,$mysql_dbi_password) )
+	unless ($dbh_mysql = DBI->connect("DBI:mysql:database=$mysql_dbi_database;host=$mysql_dbi_host;
+                port=$mysql_dbi_port",$mysql_dbi_username,$mysql_dbi_password) )
 	{
 	  warn "MySQL error: Unable to connect to database: $DBI::errstr\n";
 	  if ($syslog_system_enable == 1)
@@ -268,7 +269,9 @@ if ($postgresql_dbi_enable == 1)
 	require DBI;
 	require DBD::PgPP;
 	
-	unless ($dbh_postgresql = DBI->connect("DBI:PgPP:$postgresql_dbi_database",$postgresql_dbi_username,$postgresql_dbi_password) )
+	unless ($dbh_postgresql = DBI->connect("DBI:PgPP:dbname=$postgresql_dbi_database;
+                host=$postgresql_dbi_host;port=$postgresql_dbi_port",
+                $postgresql_dbi_username,$postgresql_dbi_password) )
 	{
 	  warn "Postgres error: Unable to connect to database: $DBI::errstr\n";
 	  if ($syslog_system_enable == 1)
@@ -2547,12 +2550,16 @@ sub loadsnmpttini {
 	# SQL
 	$db_translate_enterprise = $cfg->val('SQL', 'db_translate_enterprise');
 	$mysql_dbi_enable = $cfg->val('SQL', 'mysql_dbi_enable');
+	$mysql_dbi_host = $cfg->val('SQL', 'mysql_dbi_host');
+	$mysql_dbi_port = $cfg->val('SQL', 'mysql_dbi_port');
 	$mysql_dbi_database = $cfg->val('SQL', 'mysql_dbi_database');
 	$mysql_dbi_table = $cfg->val('SQL', 'mysql_dbi_table');
 	$mysql_dbi_username = $cfg->val('SQL', 'mysql_dbi_username');
 	$mysql_dbi_password = $cfg->val('SQL', 'mysql_dbi_password');
 
 	$postgresql_dbi_enable = $cfg->val('SQL', 'postgresql_dbi_enable');
+	$postgresql_dbi_host = $cfg->val('SQL', 'postgresql_dbi_host');
+	$postgresql_dbi_port = $cfg->val('SQL', 'postgresql_dbi_port');
 	$postgresql_dbi_database = $cfg->val('SQL', 'postgresql_dbi_database');
 	$postgresql_dbi_table = $cfg->val('SQL', 'postgresql_dbi_table');
 	$postgresql_dbi_username = $cfg->val('SQL', 'postgresql_dbi_username');
@@ -2622,11 +2629,15 @@ sub loadsnmpttini {
 	if (! defined ($exec_enable)) { $exec_enable = 1} ;
 	if (! defined ($db_translate_enterprise)) { $db_translate_enterprise = 0} ;
 	if (! defined ($mysql_dbi_enable)) { $mysql_dbi_enable = 0} ;
+	if (! defined ($mysql_dbi_host)) { $mysql_dbi_host = 'localhost'} ;
+	if (! defined ($mysql_dbi_port)) { $mysql_dbi_port = '3306'} ;
 	if (! defined ($mysql_dbi_database)) { $mysql_dbi_database = ''} ;
 	if (! defined ($mysql_dbi_table)) { $mysql_dbi_table = ''} ;
 	if (! defined ($mysql_dbi_username)) { $mysql_dbi_username = ''} ;
 	if (! defined ($mysql_dbi_password)) { $mysql_dbi_password = ''} ;
 	if (! defined ($postgresql_dbi_enable)) { $postgresql_dbi_enable = 0} ;
+	if (! defined ($postgresql_dbi_host)) { $postgresql_dbi_host = 'localhost'} ;
+	if (! defined ($postgresql_dbi_port)) { $postgresql_dbi_port = '5432'} ;
 	if (! defined ($postgresql_dbi_database)) { $postgresql_dbi_database = ''} ;
 	if (! defined ($postgresql_dbi_table)) { $postgresql_dbi_table = ''} ;
 	if (! defined ($postgresql_dbi_username)) { $postgresql_dbi_username = ''} ;

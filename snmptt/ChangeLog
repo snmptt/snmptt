@@ -1,6 +1,8 @@
-June 24th, 2003: Alex Burger <alex_b@users.sourceforge.net>
-- Added remove_backslash_from_quotes option
-- Snmpttconvertmib: Improved formatting of variables output
+July 2nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added remote database support (host & port) for MySQL
+
+June 28th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added remote database support (host & port) for PostreSQL
 
 June 24th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Snmpttconvertmib: Took out most of the net_snmp_perl code
