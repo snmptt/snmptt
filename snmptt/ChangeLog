@@ -1,4 +1,7 @@
 April 20th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- If agent IP address missing, copies IP from host IP address
+- If host name not resolved, resolves via DNS if enabled
+- If agent IP same as host IP, copies host DNS instead of resolving.
 - Added dns_enable option and changed (nearly) all $var[0] 
   to $agent_dns_name
 

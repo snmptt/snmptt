@@ -2106,24 +2106,69 @@ sub readtrap
 		
 	}
 
-	$agent_dns_name = $var[4];	# Default to IP address
-	if ($dns_enable == 1 && $var[4] ne '')
+	if ($dns_enable == 1 && $var[0] =~  /^\d+\.\d+\.\d+\.\d+$/) # Only if it's not already resolved
 	{
-	  my $temp = gethostbyaddr(Socket::inet_aton($var[4]),Socket::AF_INET());
+	  my $temp = gethostbyaddr(Socket::inet_aton($var[0]),Socket::AF_INET());
 	  if (defined ($temp))
 	  {
-	    $agent_dns_name = $temp;
 	    if ($DEBUGGING => 1)
 	    {
-	      print "Agent IP address ($var[4]) resolved to: $agent_dns_name\n\n";
+	      print "Host IP address ($var[0]) resolved to: $temp\n\n";
 	    }
+	    $var[0] = $temp;
 	  }
 	  else
 	  {
 	    if ($DEBUGGING => 1)
 	    {
-	      print "Agent IP address ($var[4]) could not be resolved by DNS.  Variable \$A etc will use the IP address\n\n";
+	      print "Host IP address ($var[0]) could not be resolved by DNS.  Variable \$r / $R etc will use the IP address\n\n";
 	    }
+	  }
+	}
+
+        # If the agent IP is blank, copy the IP from the host IP.
+        # var[4] would only be blank if it wasn't passed from snmptrapd, which
+        # should only happen with ucd-snmp 4.2.3, which you should be using anyway!
+        if ($var[4] eq '')
+        {
+          $var[4] = $var[1];
+          if ($DEBUGGING => 1)
+          {
+            print "Agent IP address was blank, so setting to the same as the host IP address of $var[1]\n\n";
+          }
+        }
+
+        # If the agent IP is the same as the host IP, then just use the host DNS name, no need
+        # to look up, as it's obviously the same..
+        if ($var[4] eq $var[1])
+        {
+          if ($DEBUGGING => 1)
+          {
+            print "Agent IP address ($var[4]) is the same as the host IP, so copying the host name: $var[0]\n\n";
+          }
+          $agent_dns_name = $var[0];
+        }
+        else
+        {
+          $agent_dns_name = $var[4];     # Default to IP address
+	  if ($dns_enable == 1 && $var[4] ne '')
+	  {
+	    my $temp = gethostbyaddr(Socket::inet_aton($var[4]),Socket::AF_INET());
+	    if (defined ($temp))
+	    {
+	      if ($DEBUGGING => 1)
+	      {
+	        print "Agent IP address ($var[4]) resolved to: $temp\n\n";
+	      }
+	      $agent_dns_name = $temp;
+	    }
+	    else
+	    {
+	      if ($DEBUGGING => 1)
+	      {
+	        print "Agent IP address ($var[4]) could not be resolved by DNS.  Variable \$A etc will use the IP address\n\n";
+	      }
+            }
 	  }
 	}
 
@@ -2154,10 +2199,13 @@ sub readtrap
 		{
 			print "Value $i: $var[$i]\n\n";
 		}
+               
+                print "Agent dns name: $agent_dns_name\n\n";
+
 		#print out all enterprise specific variables
 		for ($i=0;$i <= $#entvar;$i++)
 		{
-			print "Value $i: $entvarname[$i]=$entvar[$i]\n\n";
+			print "Ent Value $i: $entvarname[$i]=$entvar[$i]\n\n";
 		}
 	}
 		
