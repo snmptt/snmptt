@@ -1,3 +1,8 @@
+June 18th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- MySQL:  Now does a ping before trying to do the INSERT even if
+  mysql_ping_interval is disabled.
+- Set default for mysql_ping_interval in snmptt to 500 match the .ini default.
+
 June 17th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Removed escape_sequences_enable option and replaced it with variable
   substitutions $Fa, $Ff, $Fn, $Fr and $Ft.

@@ -1290,6 +1290,9 @@ sub processtrap
                             my $community = $var[5];
                             $community =~ s(\')(\\\')g;   #'
                             $community =~ s(\")(\\\")g;   #"				
+
+                            # Make sure the connect is up
+                            &ping_mysql();
                               
                             unless (defined ($dbh_mysql->do(
                                   "INSERT INTO $mysql_dbi_table (eventname, eventid, trapoid, enterprise, 
@@ -3329,7 +3332,7 @@ sub loadsnmpttini {
 	if (! defined ($mysql_dbi_table_unknown)) { $mysql_dbi_table_unknown = ''} ;
 	if (! defined ($mysql_dbi_username)) { $mysql_dbi_username = ''} ;
 	if (! defined ($mysql_dbi_password)) { $mysql_dbi_password = ''} ;
-	if (! defined ($mysql_ping_interval)) { $mysql_ping_interval = 0} ;
+	if (! defined ($mysql_ping_interval)) { $mysql_ping_interval = 500} ;
 	if (! defined ($postgresql_dbi_enable)) { $postgresql_dbi_enable = 0} ;
 	if (! defined ($postgresql_dbi_module)) { $postgresql_dbi_module = 0} ;
 	if (! defined ($postgresql_dbi_hostport_enable)) { $postgresql_dbi_hostport_enable = 0} ;

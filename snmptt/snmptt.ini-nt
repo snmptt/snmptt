@@ -308,7 +308,8 @@ mysql_dbi_password = password
 # MySQL: How often in seconds the database should be 'pinged' to ensure the
 # connection is still valid.  If *any* error is generate by the ping such as 
 # 'Unable to connect to database', it will attempt to re-create the database
-# connection.
+# connection.  Set to 0 to disable pinging.
+# disabled = 0
 # 5 minutes = 300
 # 15 minutes = 900
 # 30 minutes = 1800
