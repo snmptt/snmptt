@@ -154,7 +154,7 @@ Options:
 			 line contained no variable definitions (\%n).
   --exec=command         Command line to use for EXEC line.  Use quotes.  
   			 Example:
-    			   "EXEC qpage -f TRAP notifygroup1"
+    			   "qpage -f TRAP notifygroup1"
 					 
 * Note:  If net_snmp_perl is enabled, then the directory path for the MIB file directory is
 required.  Not specifying a --mibdir will use the default of \/usr\/share\/snmp\/mibs\/.

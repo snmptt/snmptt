@@ -1,18 +1,21 @@
-June  11th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+June 18th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Change help for snmpttconvertmib --exec= line
+
+June 11th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Changed ODBC & WinODBC code to not escape quotes.  Instead, double up
   single quotes, and do not touch double quotes.
 
-May  27th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+May 27th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Added trapoid database column to contain the actual trap OID received from
   Net-SNMP.  eventid will contain what was matched in the .conf file.
 
-May  9th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+May 9th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug when using wildcards.  The received trap was reset to the 
   matching EVENT entry which contained the .*.  This caused things like
   $S not to work.  Changed so that actual received trap is not overwritten
   with what it matched to in the EVENT table.
 
-May  7th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+May 7th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - SNMPTT will strip DOS carriage return from snmptt.conf files if detected.
 
 April 29th, 2003: Alex Burger <alex_b@users.sourceforge.net>
