@@ -1454,11 +1454,16 @@ a text file, start snmptrapd using:
 This will cause <b>ALL</b> snmptrapd messages to be logged to the file
 which means all snmptrapd 'system' messages such as startup and shutdown
 will not be logged to syslog.
-<p>Future versions of snmptrapd (possibly 5.1) should contain a new switch
-(-t) to prevent TRAP messages from being logged to syslog, but allowing
-system messages to continue to be logged.
-<br>&nbsp;
-<p><b>Q:&nbsp; I want to enable the Perl support for UCD-SNMP / NET-SNMP,
+<p>A patch for NET-SNMP 5.0.7 is available that adds a new switch (-t)
+to prevent TRAP messages from being logged to syslog, but allowing system
+messages to continue to be logged.&nbsp; The patch is available from the
+<a href="http://sourceforge.net/tracker/?func=detail&atid=312694&aid=695312&group_id=12694">Net-SNMP
+patch section</a>.&nbsp; This patch should be included in the 5.1 (not
+5.0.8) release of NET-SNMP.&nbsp; With this patch, snmptrapd should be
+started using:
+<blockquote><b>snmptrapd -On -t</b></blockquote>
+
+<p><br><b>Q:&nbsp; I want to enable the Perl support for UCD-SNMP / NET-SNMP,
 but I installed UCD-SNMP / NET-SNMP using RPMs.&nbsp; What's the easiest
 way to install the module without recompiling everything?</b>
 <p>A:&nbsp; You should not have to re-compile the entire package.&nbsp;
