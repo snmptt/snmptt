@@ -10,39 +10,39 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge.net Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.5.1</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; February 27th, 2003
-<p>&nbsp;<a href="#License">License</a>
+<br>This file was last updated on:&nbsp; March 7th, 2003
+<p><a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
-<blockquote>&nbsp;<a href="#What is it">What is it?</a>
-<br>&nbsp;<a href="#Downloading">Downloading</a>
-<br>&nbsp;<a href="#Features">Features</a>
-<br>&nbsp;<a href="#Requirements">Requirements</a>
-<br>&nbsp;<a href="#Whats New">What's New</a>
-<br>&nbsp;<a href="#Upgrading">Upgrading</a>
-<br>&nbsp;<a href="#Configuration Options">Configuration Options - snmptt.ini</a>
-<br>&nbsp;<a href="#LoggingStandard">Logging - Standard</a>
-<br>&nbsp;<a href="#LoggingSyslog">Logging - Syslog</a>
-<br>&nbsp;<a href="#LoggingEventLog">Logging - EventLog</a>
-<br>&nbsp;<a href="#LoggingDatabase">Logging - Database</a>
-<br>&nbsp;<a href="#LoggingUnknown">Logging - Unknown Traps</a>
-<br>&nbsp;<a href="#Executing an external program">Executing an external
-program</a>
-<br>&nbsp;<a href="#Modes of Operation">Modes of Operation</a>
-<br>&nbsp;<a href="#Command line arguments">Command line arguments</a>
-<br>&nbsp;<a href="#SNMPTT.CONF Configuration file format">SNMPTT.CONF
-Configuration file format</a>
-<br>&nbsp;<a href="#SNMPTT.CONF Configuration file Notes">SNMPTT.CONF Configuration
+<blockquote><a href="#What is it">What is it?</a>
+<br><a href="#Downloading">Downloading</a>
+<br><a href="#Features">Features</a>
+<br><a href="#Requirements">Requirements</a>
+<br><a href="#Whats New">What's New</a>
+<br><a href="#Upgrading">Upgrading</a>
+<br><a href="#Configuration Options">Configuration Options - snmptt.ini</a>
+<br><a href="#LoggingStandard">Logging - Standard</a>
+<br><a href="#LoggingSyslog">Logging - Syslog</a>
+<br><a href="#LoggingEventLog">Logging - EventLog</a>
+<br><a href="#LoggingDatabase">Logging - Database</a>
+<br><a href="#LoggingUnknown">Logging - Unknown Traps</a>
+<br><a href="#Executing an external program">Executing an external program</a>
+<br><a href="#Modes of Operation">Modes of Operation</a>
+<br><a href="#Command line arguments">Command line arguments</a>
+<br><a href="#SNMPTT.CONF Configuration file format">SNMPTT.CONF Configuration
+file format</a>
+<br><a href="#SNMPTT.CONF Configuration file Notes">SNMPTT.CONF Configuration
 file Notes</a>
-<br>&nbsp;<a href="#Sample1 SNMPTT.CONF file">Sample1 SNMPTT.CONF file</a>
-<br>&nbsp;<a href="#Sample2 SNMPTT.CONF file">Sample2 SNMPTT.CONF file</a>
-<br>&nbsp;<a href="#Notes">Notes</a>
-<br>&nbsp;<a href="#Installation - Unix">Installation - Unix</a>
-<br>&nbsp;<a href="#Installation - Windows">Installation - Windows</a>
-<br>&nbsp;<a href="#Limitations">Limitations</a>
-<br>&nbsp;<a href="#Feedback">Feedback &amp; Bugs</a></blockquote>
-&nbsp;<a href="#SNMP Trap Translator Convert">SNMP Trap Translator Convert</a>
-<p>&nbsp;<a href="#SNMP Trap Translator Convert MIB">SNMP Trap Translator
-Convert MIB</a>
+<br><a href="#Sample1 SNMPTT.CONF file">Sample1 SNMPTT.CONF file</a>
+<br><a href="#Sample2 SNMPTT.CONF file">Sample2 SNMPTT.CONF file</a>
+<br><a href="#Notes">Notes</a>
+<br><a href="#Installation - Unix">Installation - Unix</a>
+<br><a href="#Installation - Windows">Installation - Windows</a>
+<br><a href="#Limitations">Limitations</a>
+<br><a href="#Feedback">Feedback &amp; Bugs</a></blockquote>
+<a href="#SNMP Trap Translator Convert">SNMP Trap Translator Convert</a>
+<p><a href="#SNMP Trap Translator Convert MIB">SNMP Trap Translator Convert
+MIB</a>
+<p><a href="#FAQ-Troubleshooting">FAQ / Troubleshooting</a>
 <br>&nbsp;
 <br>&nbsp;
 <p><a NAME="License"></a><b><font size=+2>License</font></b>
@@ -1341,12 +1341,56 @@ variables, then that line will be used to define the <b>FORMAT</b> and
 <b>EXEC</b>
 lines followed by a <b>$*</b> which will dump all received variables.
 <br>&nbsp;
-<p><b><font size=+2>Troubleshooting</font></b>
-<p>If you find that the MIB file is not converting properly, make sure
-it does not contain DOS carriage returns.&nbsp; Displaying the file with
-the joe editor will show <b><u>M</u></b>'s at the end of each line.&nbsp;
-To create a new file without them, type:
+<p><a NAME="FAQ-Troubleshooting"></a><b><font size=+3>Faq / Troubleshooting</font></b>
+<p><b>Q: When I try to convert a MIB, it will not convert properly.&nbsp;
+Why?</b>
+<p>A:&nbsp; If you are using Unix and transferred the MIB file from Windows
+(or downloaded a ZIP file containing the MIB), you need to make sure it
+does not contain DOS carriage returns.&nbsp; Displaying the file with the
+<b>joe</b> text editor will show <b><u>M</u></b>'s at the end of each line.&nbsp;
+To strip them out and craete a new file, type:
 <p><b>cat <i>mib-file</i> | tr -d '\015' > <i>mib-file.new</i></b>
+<p><b>Q: I have disabled syslog support in SNMPTT, but my syslog (or NT
+Event Log) is still filling up with trap messages.&nbsp; How do I disable
+them?</b>
+<br><b>Q: I am using syslog (or NT Event Log) to log trap messages, but
+there are two log entries for each trap received.&nbsp; How do I prevent
+it?</b>
+<p>A: What you are seeing are <b>snmptrapd</b> trap messages, not SNMPTT
+messages.&nbsp; SNMPTT trap messages start with '<b>TRAPD:</b>' while snmptrapd
+messages start with '<b>snmptrapd[xxx]:</b>'.&nbsp; If you do not start
+snmptrapd with either the <b>-P</b> or <b>-o</b> (lowercase o) switches,
+syslog support will be forced on.&nbsp; Snmptrapd should be started using
+'<b>snmptrapd -On</b>' and this results in syslog being forced on.&nbsp;
+The reason for this is the original design of snmptrapd assumed that if
+you are not going to display messages on the screen or log to a file, then
+you must want syslog output.
+<p>A workaround is to have snmptrapd log all messages to /dev/null, or
+to a text file that can be regularily purged if needed.&nbsp; To log to
+a text file, start snmptrapd using:
+<blockquote><b>snmptrapd -On -o /var/log/snmptrapd.log</b></blockquote>
+This will cause <b>ALL</b> snmptrapd messages to be logged to the file
+which means all snmptrapd 'system' messages such as startup and shutdown
+will not be logged to syslog.
+<p>Future versions of snmptrapd (possibly 5.0.8) should contain a new switch
+(-t) to prevent TRAP messages from being logged to syslog, but allowing
+system messages to continue to be logged.
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
 <br>&nbsp;
 <br>&nbsp;
 <br>&nbsp;
