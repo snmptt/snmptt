@@ -144,8 +144,8 @@ Optional: Win32::ODBC module.&nbsp; Required for ODBC (SQL etc) access
 on Windows (DBD::ODBC not required if using Win32::ODBC)</li>
 
 <li>
-Optional: NET-SNMP Perl module.&nbsp; Only required if translation of integers
-is enabled</li>
+Optional: NET-SNMP Perl module.&nbsp; Only required to translate variable
+names ($vn) or if translation of integers is enabled</li>
 </ul>
 All development and testing was done on Mandrake Linux 8.1 using UCD-SNMP
 v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm).&nbsp; I have also tested
@@ -165,6 +165,14 @@ tags in MIB files.</blockquote>
 <p><br><a NAME="Whats New"></a><b><font size=+2>What's New</font></b>
 <p><b><font size=+1>0.6 - ???, 2003</font></b>
 <ul>
+<li>
+Added variable expansion for variable names using $v<i>n.&nbsp; </i>This
+feature requires the UCD-SNMP / NET-SNMP Perl module</li>
+
+<li>
+Fixed bug that would prevent variables numbered 10 or higher from being
+translated correctly</li>
+
 <li>
 Added the option <b>keep_unlogged_traps</b> to have SNMPTT erase the spooled
 trap file only after it successfully logs to at least one or all log systems.&nbsp;
@@ -760,7 +768,9 @@ variables:
 <br>$$&nbsp; - Print a $
 <br>$@ - Number of seconds since the epoch
 <br>$*&nbsp; - Expand all variable-bindings
-<br>$<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) <b>(**)</b></blockquote>
+<br>$<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) <b>(**)</b>
+<br>$v<i>n</i>&nbsp; - Expand variable name of the variable-binding n (1-<i>n</i>)
+<b>(***)</b></blockquote>
 Example:
 <p>FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6
 <p>Note: The trap OID, severity, category and hostname will always be prepended
@@ -775,22 +785,41 @@ You can also enable the <b>strip_domain</b> / <b>strip_domain_list</b>
 options to have SNMPTT strip the domain of any FQDN host.&nbsp; See the
 .ini file for details.</blockquote>
 ** Note:
-<blockquote>If <b>translate_integers</b> is enabled in the <b>snmptt.ini</b>
+<blockquote>If&nbsp; <b>translate_integers</b> is enabled in the <b>snmptt.ini</b>
 file, SNMPTT will attempt to convert integer values received in traps into
-text by performing a lookup in the MIB file.&nbsp; For this to work, you
-must ensure UCD-SNMP / NET-SNMP is configured correctly with all the required
-MIBS.&nbsp; If the option is enabled, but the value can not be found, the
-integer value will be used.&nbsp; If the MIB files are present, but translations
-do not occur, ensure UCD-SNMP / NET-SNMP is correctly configured to process
-all the required mibs.&nbsp; This is configured in the <b>snmp.conf</b>
-file.&nbsp; Alternatively, you can try setting the <b>mibs_enviroment</b>
-variable in <b>snmptt.ini</b> to <b>ALL</b> (no quotes) to force all MIBS
-to be initialized at SNMPTT startup.
+text by performing a lookup in the MIB file.
+<p>For this feature to work, you must ensure UCD-SNMP / NET-SNMP is configured
+correctly with all the required MIBS.&nbsp; If the option is enabled, but
+the value can not be found, the integer value will be used.&nbsp; If the
+MIB files are present, but translations do not occur, ensure UCD-SNMP /
+NET-SNMP is correctly configured to process all the required mibs.&nbsp;
+This is configured in the <b>snmp.conf</b> file.&nbsp; Alternatively, you
+can try setting the <b>mibs_enviroment</b> variable in <b>snmptt.ini</b>
+to <b>ALL</b> (no quotes) to force all MIBS to be initialized at SNMPTT
+startup.
 <p>If <b>translate_integers</b> is enabled while using stand-alone mode,
 it may take longer to process each trap due to the initialization of the
 MIB files.
 <p>You must have the UCD-SNMP / NET-SNMP Perl module installed for this
-to work.</blockquote>
+to work and you must enable support for it by enabling <b>net_snmp_perl_enable</b>
+in the snmptt.ini file.
+<br>&nbsp;</blockquote>
+*** Note:
+<blockquote>$v<i>n</i> variable names are translated into the text name
+by performing a lookup in the MIB file.&nbsp; You must have the UCD-SNMP
+/ NET-SNMP Perl module installed for this to work and you must enable support
+for it by enabling <b>net_snmp_perl_enable</b> in the snmptt.ini file.&nbsp;
+If <b>net_snmp_perl_enable</b> is not enabled, the $v<i>n</i> variable
+will be replaced with the text 'variable<i>n</i>' where <i>n</i> is the
+variable number (1+).
+<p>For the name translation to work, you must ensure UCD-SNMP / NET-SNMP
+is configured correctly with all the required MIBS.&nbsp; If the option
+is enabled and the correct name is not returned, ensure UCD-SNMP / NET-SNMP
+is correctly configured to process all the required mibs.&nbsp; This is
+configured in the <b>snmp.conf</b> file.&nbsp; Alternatively, you can try
+setting the <b>mibs_enviroment</b> variable in <b>snmptt.ini</b> to <b>ALL</b>
+(no quotes) to force all MIBS to be initialized at SNMPTT startup.
+<br>&nbsp;</blockquote>
 </blockquote>
 <b>EXEC:</b>
 <blockquote>[<b>EXEC</b> command_string]
@@ -1342,29 +1371,48 @@ variables, then that line will be used to define the <b>FORMAT</b> and
 lines followed by a <b>$*</b> which will dump all received variables.
 <br>&nbsp;
 <p><a NAME="FAQ-Troubleshooting"></a><b><font size=+3>Faq / Troubleshooting</font></b>
-<p><b>Q: When I try to convert a MIB, it will not convert properly.&nbsp;
+<p><b>Q:&nbsp; SNMPTT is not working!&nbsp; How do I troubleshoot it?</b>
+<p>A:&nbsp; Start by enabling enable_unknown_trap_log in the snmptt.ini
+file.&nbsp; Look inside this file to see if the traps are being passed
+correctly to SNMPTT but not being handled correctly.&nbsp; Next, enable
+debug mode of 2 and specify a debug text file to log to in the snmptt.ini
+file.&nbsp; After a trap is received, take a look at the file to try to
+determine what is going wrong.&nbsp; Disable both logs when you are finished.
+<br>&nbsp;
+<p><b>Q:&nbsp; When I try to convert a MIB, it will not convert properly.&nbsp;
 Why?</b>
 <p>A:&nbsp; If you are using Unix and transferred the MIB file from Windows
 (or downloaded a ZIP file containing the MIB), you need to make sure it
 does not contain DOS carriage returns.&nbsp; Displaying the file with the
-<b>joe</b> text editor will show <b><u>M</u></b>'s at the end of each line.&nbsp;
+<b>joe</b>
+text editor will show <b><u>M</u></b>'s at the end of each line.&nbsp;
 To strip them out and craete a new file, type:
 <p><b>cat <i>mib-file</i> | tr -d '\015' > <i>mib-file.new</i></b>
-<p><b>Q: I have disabled syslog support in SNMPTT, but my syslog (or NT
-Event Log) is still filling up with trap messages.&nbsp; How do I disable
-them?</b>
-<br><b>Q: I am using syslog (or NT Event Log) to log trap messages, but
-there are two log entries for each trap received.&nbsp; How do I prevent
+<br>&nbsp;
+<p><b>Q:&nbsp; I have configured SNMPTT correctly with a snmptt.ini file,
+snmptt.conf file(s) etc and it still does not process traps.&nbsp; Everything
+appears in the snmpttunknowntrap.log file.&nbsp; What did I do wrong?</b>
+<p>A:&nbsp; You probably didn't start snmptrapd correctly.&nbsp; Make sure
+it is started using:
+<blockquote><b>snmptrapd -On</b></blockquote>
+If it is not started with -On, then it will not pass traps using numeric
+OIDs and SNMPTT will not process them.
+<br>&nbsp;
+<p><b>Q:&nbsp; I have disabled syslog support in SNMPTT, but my syslog
+(or NT Event Log) is still filling up with trap messages.&nbsp; How do
+I disable them?</b>
+<br><b>Q:&nbsp; I am using syslog (or NT Event Log) to log trap messages,
+but there are two log entries for each trap received.&nbsp; How do I prevent
 it?</b>
-<p>A: What you are seeing are <b>snmptrapd</b> trap messages, not SNMPTT
-messages.&nbsp; SNMPTT trap messages start with '<b>TRAPD:</b>' while snmptrapd
-messages start with '<b>snmptrapd[xxx]:</b>'.&nbsp; If you do not start
-snmptrapd with either the <b>-P</b> or <b>-o</b> (lowercase o) switches,
-syslog support will be forced on.&nbsp; Snmptrapd should be started using
-'<b>snmptrapd -On</b>' and this results in syslog being forced on.&nbsp;
-The reason for this is the original design of snmptrapd assumed that if
-you are not going to display messages on the screen or log to a file, then
-you must want syslog output.
+<p>A:&nbsp; What you are seeing are <b>snmptrapd</b> trap messages, not
+SNMPTT messages.&nbsp; SNMPTT trap messages start with '<b>TRAPD:</b>'
+while snmptrapd messages start with '<b>snmptrapd[xxx]:</b>'.&nbsp; If
+you do not start snmptrapd with either the <b>-P</b> or <b>-o</b> (lowercase
+o) switches, syslog support will be forced on.&nbsp; Snmptrapd should be
+started using '<b>snmptrapd -On</b>' and this results in syslog being forced
+on.&nbsp; The reason for this is the original design of snmptrapd assumed
+that if you are not going to display messages on the screen or log to a
+file, then you must want syslog output.
 <p>A workaround is to have snmptrapd log all messages to /dev/null, or
 to a text file that can be regularily purged if needed.&nbsp; To log to
 a text file, start snmptrapd using:
@@ -1372,12 +1420,58 @@ a text file, start snmptrapd using:
 This will cause <b>ALL</b> snmptrapd messages to be logged to the file
 which means all snmptrapd 'system' messages such as startup and shutdown
 will not be logged to syslog.
-<p>Future versions of snmptrapd (possibly 5.0.8) should contain a new switch
+<p>Future versions of snmptrapd (possibly 5.1) should contain a new switch
 (-t) to prevent TRAP messages from being logged to syslog, but allowing
 system messages to continue to be logged.
 <br>&nbsp;
-<br>&nbsp;
-<br>&nbsp;
+<p><b>Q:&nbsp; I want to enable the Perl support for UCD-SNMP / NET-SNMP,
+but I installed UCD-SNMP / NET-SNMP using RPMs.&nbsp; What's the easiest
+way to install the module without recompiling everything?</b>
+<p>A:&nbsp; You should not have to re-compile the entire package.&nbsp;
+Try the following:
+<ol>
+<li>
+Download the source RPM that matches the binary RPM you downloaded.&nbsp;
+For example: ucd-snmp-4.2.3-1.src.rpm</li>
+
+<li>
+Install the RPM</li>
+
+<li>
+Locate the installed source code.&nbsp; For Mandrake, it should be in /usr/src/RPM/SOURCES</li>
+
+<li>
+Go into the sub directory perl/SNMP</li>
+
+<li>
+Follow the instructions in the README file</li>
+</ol>
+<b></b>
+<p><br><b>Q:&nbsp; I have enable net_snmp_perl_enable but the variable
+names are not being translated into text using $v<i>n</i>.&nbsp; How do
+I troubleshoot it?</b>
+<br><b>Q:&nbsp; I have enabled translate_integers but the integer values
+are not being translated into text.&nbsp;&nbsp; How do I troubleshoot it?</b>
+<p>A:&nbsp; You must have the UCD-SNMP / NET-SNMP Perl module installed
+and working, and must ensure UCD-SNMP / NET-SNMP is configured correctly
+with all the required MIBS.
+<p>For starters, make sure the SNMP module is working.&nbsp; Type:
+<blockquote>perl
+<br>use SNMP;</blockquote>
+If you get an error after typing 'use SNMP', then the module is not installed
+correctly.&nbsp; Re-install the module and make sure you execute the tests
+while building.
+<p>If the MIB files are present, but translations do not occur, ensure
+UCD-SNMP / NET-SNMP is correctly configured to process all the required
+mibs.&nbsp; This is configured in the snmp.conf file.&nbsp; Alternatively,
+you can try setting the <b>mibs_enviroment</b> variable in snmptt.ini to
+<b>ALL</b> (no quotes) to force all MIBS to be initialized at SNMPTT startup.
+<p>If everything appears to be fine, try translating the variable name
+by hand by using snmptranslate.&nbsp; Get the variable name OID from the
+snmptt.debug file from the second Value 0+ section, and type:
+<blockquote>snmptranslate -Td <i>oid</i></blockquote>
+This should return the OBJECT-TYPE for the variable if it exists in a MIB
+file
 <br>&nbsp;
 <br>&nbsp;
 <br>&nbsp;

@@ -1,5 +1,5 @@
 #
-# SNMPTT 0.5 Configuration File
+# SNMPTT 0.6 Configuration File
 #
 # Windows NT
 #
@@ -35,13 +35,19 @@ strip_domain_list = <<END
 domain.com
 END
 
+# Set to 1 to enable the use of the Perl module from the UCD-SNMP / NET-SNMP package.
+# This is required for $v variable substitution to work, and also for some other options
+# that are enabled in this .ini file.
+# Set to 0 to disable the use of the Perl module from the UCD-SNMP / NET-SNMP package.
+# Note: Enabling this with stand-alone mode can cause SNMPTT to run very slowly due to
+#       the loading of the MIBS at startup.
+net_snmp_perl_enable = 0;
+
 # Set to 0 to disable converting INTEGER values to enumeration tags as defined in the 
 # MIB files
 # Set to 1 to enable converting INTEGER values to enumeration tags as defined in the 
 # MIB files
-# Note: This requires the Perl module from the UCD/NET-SNMP package.
-#       Enabling this with stand-alone mode can cause SNMPTT to run very slowly due to
-#       the loading of the MIBS at startup.
+# Note: net_snmp_perl_enable *must* be enabled
 translate_integers = 0
 
 # Allows you to set the MIBS environment variable used by SNMPTT

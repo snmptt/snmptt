@@ -206,7 +206,7 @@ if ($eventlog_system_enable == 1 && $daemon == 1)
   eventlog_system("SNMPTT $snmptt_version started",0,$eventlog_information);
 }
 
-if ($translate_integers == 1)
+if ($net_snmp_perl_enable == 1)
 {
 	require SNMP;
 	if (defined ($mibs_environment))
@@ -910,16 +910,32 @@ sub substitute
 {
 	# Perform substitution on $_ variable
 
-	# $n - Variable-bindings
-	for($i=1;$i <= $#entvar+1; $i++)
+	# $v - Names of variable-bindings 
+	# Count down backwards to make sure $10 is not mistaken for $1
+	for($i=$#entvarname+1;$i > 0; $i--)
 	{
-	  if ($translate_integers == 1)
+	  if ($net_snmp_perl_enable == 1)
+	  {
+	    my $temp = &SNMP::translateObj($entvarname[$i-1],0);
+	    s(\$v$i)($temp)g;
+	  }
+	  else
+	  {
+	    s(\$v$i)(variable$i)g;
+	  }
+	}
+
+	# $n - Variable-bindings
+	# Count down backwards to make sure $10 is not mistaken for $1
+	for($i=$#entvar+1;$i > 0; $i--)
+	{
+	  if ($translate_integers == 1 && $net_snmp_perl_enable == 1)
 	  {
 	    if ($entvar[$i-1] =~ /\d+/)				# Check to see if value is numerical
 	    {
 	      if ($DEBUGGING >= 2)
 	      {
-		print "\nVariable $entvarname[$i-1] with value $entvar[$i-1] is numerical\n";
+		print "\nVariable $entvarname[$i-1] with value $entvar[$i-1] may be numerical\n";
 	      }
 	      if ($vartype = &SNMP::getType($entvarname[$i-1]) eq "INTEGER") # Make sure it's a SNMP INTEGER type
 	      {
@@ -1743,6 +1759,7 @@ sub loadsnmpttini {
 	$multiple_event = $cfg->val('General', 'multiple_event');
 	$strip_domain = $cfg->val('General', 'strip_domain');
 	@strip_domain_list = $cfg->val('General', 'strip_domain_list');
+	$net_snmp_perl_enable = $cfg->val('General', 'net_snmp_perl_enable');
 	$translate_integers = $cfg->val('General', 'translate_integers');
 	$mibs_environment = $cfg->val('General', 'mibs_environment');
 	
@@ -1809,6 +1826,7 @@ sub loadsnmpttini {
 	# 
 	if (! defined ($multiple_event)) { $multiple_event = 0} ;
 	if (! defined ($strip_domain)) { $strip_domain = 0} ;
+	if (! defined ($net_snmp_perl_enable)) { $net_snmp_perl_enable = 1} ;
 	if (! defined ($translate_integers)) { $translate_integers = 0} ;
 	if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($spool_directory)) { $spool_directory = ''} ;
