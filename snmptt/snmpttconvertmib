@@ -355,9 +355,10 @@ if (1)
 	  if ($1 ne "")
           {
             $templine = $templine . $1;
+            $templine =~ s/--.*//; # Remove any trailing comments
 	  }
 	  
-	  if ($templine =~ /(.*)\}$/)	# Ends with a }, so we're done
+	  if ($templine =~ /\}/)	# Contains a }, so we're done
 	  {
 	    # DONE!
 	  }
@@ -365,25 +366,25 @@ if (1)
 	  {
 	    $currentline++; # Increment to the next line
 	    my $line4 = $mibfile[$currentline];
+            $line4 =~ s/--.*//; # Remove any trailing comments
 	    my $keepdigging = 1;
-	    while ($keepdigging == 1)
+	    while (($currentline <= $#mibfile) && ($keepdigging == 1))
 	    {
-	      if ($line4 =~ /(.*)\}$/)	# Ends with a }, so we're done
+              $templine = $templine . $line4;
+	      if ($line4 =~ /\}/)	# Contains a }, so we're done
 	      {
-		$templine = $templine . $line4;
 		$keepdigging = 0;
 	      }
 	      else
 	      {
-                $line4 =~ s/--.*//; # Remove any trailing comments
-		$templine = $templine . $line4;
 		$currentline++; # Increment to the next line
 		$line4 = $mibfile[$currentline];
+                $line4 =~ s/--.*//; # Remove any trailing comments
 	      }
 	    }
 	  }
 	  $templine =~ s/\s//g;	# Remove any white space
-	  $templine =~ /\{(.*)\}/;
+	  $templine =~ /\{(.*)\}/; # Remove brackets
 	  @variables = split /\,/, $1;
 	  print "Variables: @variables\n";
 	}

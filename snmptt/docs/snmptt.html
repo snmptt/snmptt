@@ -16,7 +16,7 @@
 <body>
 <h1>SNMP Trap Translator v0.9.3</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on:&nbsp; July 5th, 2004
+This file was last updated on:&nbsp; July 14th, 2004
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -279,7 +279,11 @@ module is recommended.<br /></span></blockquote>
   <li>Fixed bug with with handling traps in symbolic format
   (snmptrapd without -On)</li>
   <li>Added <a href="http://kodu.neti.ee/%7Eristo/sec/">Simple Event Correlator (SEC)</a> integration documentation</li>
-  <li>SNMPTTConvertMIB:  Fixed bug that prevented the variable list (OBJECTS) of V2 MIB files from being converted
+  <li>SNMPTTConvertMIB:</li>
+  <ul>
+    <li>Fixed bug that prevented the variable list (OBJECTS) of V2 MIB files from being converted</li>
+    <li>Fixed bug that caused an infinite loop processing the VARIABLES/OBJECTS section if the line in the MIB file contained spaces after the closing bracket</li>
+  </ul>
 </ul>
 <h3><b>0.9</b><b>- November 3rd, 2003</b></h3>
 <ul>

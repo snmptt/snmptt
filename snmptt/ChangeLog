@@ -1,3 +1,7 @@
+July 14th, 2004: Alex Burger <alex_b@users.sourceforge.net>
+- snmpttconvertmib:  Fix bug with infinite loop when processing VARIABLES
+  section if MIB file had spaces after }.  Thanks to mike at mccartney.net
+
 July 5th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Add SEC documentation
 - Update help for snmpttconvertmib
