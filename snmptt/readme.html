@@ -381,23 +381,26 @@ and modifying the following variables:
 <br><b>syslog_system_facility</b>
 <br><b>syslog_system_level</b></blockquote>
 The following errors are logged:
-<blockquote>SNMPTT (version) started&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-(daemon mode only)
-<br>Unable to enter spool dir <i>x</i>
-<br>Unable to open spool dir <i>x</i>
-<br>Unable to read spool dir <i>x</i>
-<br>Could not open trap file <i>x</i>
-<br>Unable to delete trap file <i>x</i> from spool dir
-<br>Reloading configuration file(s)
-<br>SNMPTT (version) shutdown&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-(daemon mode only)
-<br>Loading <i>snmpttconfigfile</i>
-<br>Could not open configuration file: <i>snmpttconfigfile</i>
-<br>Finished loading <i>x</i> lines from <i>snmpttconfigfile</i></blockquote>
+<blockquote>SNMPTT (version) started <b>(*)</b>
+<br>Unable to enter spool dir <i>x</i> <b>(*)</b>
+<br>Unable to open spool dir <i>x</i> <b>(*)</b>
+<br>Unable to read spool dir <i>x</i> <b>(*)</b>
+<br>Could not open trap file <i>x</i> <b>(*)</b>
+<br>Unable to delete trap file <i>x</i> from spool dir <b>(*)</b>
+<br>Reloading configuration file(s) <b>(*)</b>
+<br>SNMPTT (version) shutdown <b>(*)</b>
+<br>Loading <i>snmpttconfigfile</i> <b>(*)</b>
+<br>Could not open configuration file: <i>snmpttconfigfile</i><b>(*)</b>
+<br>Finished loading <i>x</i> lines from <i>snmpttconfigfile</i> <b>(*)</b>
+<br>MySQL error: Unable to connect to database
+<br>Can not open log file <i>logfile</i>
+<br>MySQL error: Unable to prepare query
+<br>MySQL error: Unable to execute query
+<p><b>* (daemon mode only)</b></blockquote>
 <a NAME="LoggingEventLog"></a><b><font size=+2>Logging - EventLog</font></b>
-<p>Translated traps can also be sent to the NT EventLog.&nbsp; The format
-of the entries will be similar to above without the date (as the EventLog
-logs the date):
+<p>Translated traps can also be sent to the NT EventLog.&nbsp; All traps
+are logged under EventID 2.&nbsp; The format of the entries will be similar
+to above without the date (as the EventLog logs the date):
 <blockquote><b>trap-oid severity category hostname translated-trap</b></blockquote>
 To configure eventlog support, edit the snmptt ini file and modify the
 following variables:
@@ -407,19 +410,24 @@ SNMPTT system errors can be sent to the EventLog by editing the snmptt.ini
 file and modifying the following variables:
 <blockquote><b>eventlog_system_enable</b></blockquote>
 The following errors are logged:
-<blockquote>SNMPTT (version) started&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-(daemon mode only)
-<br>Unable to enter spool dir <i>x</i>
-<br>Unable to open spool dir <i>x</i>
-<br>Unable to read spool dir <i>x</i>
-<br>Could not open trap file <i>x</i>
-<br>Unable to delete trap file <i>x</i> from spool dir
-<br>Reloading configuration file(s)
-<br>SNMPTT (version) shutdown&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-(daemon mode only)
-<br>Loading <i>snmpttconfigfile</i>
-<br>Could not open configuration file: <i>snmpttconfigfile</i>
-<br>Finished loading <i>x</i> lines from <i>snmpttconfigfile</i></blockquote>
+<blockquote>EventID 0: SNMPTT (version) started <b>(*)</b>
+<br>EventID 3: Unable to enter spool dir <i>x</i> <b>(*)</b>
+<br>EventID 4: Unable to open spool dir <i>x</i> <b>(*)</b>
+<br>EventID 5: Unable to read spool dir <i>x</i> <b>(*)</b>
+<br>EventID 6: Could not open trap file <i>x</i> <b>(*)</b>
+<br>EventID 7: Unable to delete trap file <i>x</i> from spool dir <b>(*)</b>
+<br>EventID 8: Reloading configuration file(s) <b>(*)</b>
+<br>EventID 1: SNMPTT (version) shutdown <b>(*)</b>
+<br>EventID 9: Loading <i>snmpttconfigfile</i> <b>(*)</b>
+<br>EventID 10: Could not open configuration file: <i>snmpttconfigfile</i><b>(*)</b>
+<br>EventID 11: Finished loading <i>x</i> lines from <i>snmpttconfigfile</i><b>(*)</b>
+<br>EventID 12: MySQL error: Unable to connect to database
+<br>EventID 13: SQL error: Unable to connect to DSN <i>dsn</i>
+<br>EventID 14: Can not open log file <i>logfile</i>
+<br>EventID 15: MySQL error: Unable to prepare query
+<br>EventID 16: MySQL error: Unable to execute query
+<br>EventID 17: SQL error: Unable to perform INSERT INTO
+<p><b>* (daemon mode only)</b></blockquote>
 Note:
 <blockquote>To prevent "Event Message Not Found" messages in the Event
 Viewer, an Event Message File must be used.&nbsp; For information on installing
@@ -1027,7 +1035,7 @@ link /nodefaultlib /INCREMENTAL:NO /release /nologo -base:0x60000000 -machine:i3
 <li>
 Install the DLL as described above</li>
 </ol>
-<b><u><font size=+1></font></u></b>
+
 <p><br><b><u><font size=+1>Windows NT Service:</font></u></b>
 <p>To configure SNMPTT as a service under Windows NT, follow these steps.&nbsp;
 More information can be obtained from the Windows NT Resource Kit.

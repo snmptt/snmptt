@@ -219,16 +219,35 @@ if ($translate_integers == 1)
 if ($mysql_dbi_enable == 1)
 {
 	require DBI;
-	$dbhmysql = DBI->connect("DBI:mysql:$mysql_dbi_database",$mysql_dbi_username,$mysql_dbi_password);
-	warn "Unable to connect: $DBI::errstr\n" unless (defined $dbhmysql);
+	
+	unless ($dbhmysql = DBI->connect("DBI:mysql:$mysql_dbi_database",$mysql_dbi_username,$mysql_dbi_password) )
+	{
+	  warn "MySQL error: Unable to connect to database: $DBI::errstr\n";
+	  if ($syslog_system_enable == 1)
+	  {
+	    syslog_system("MySQL error: Unable to connect to database: $DBI::errstr");
+	  }
+	  if ($eventlog_system_enable == 1)
+	  {
+	    eventlog_system("MySQL error: Unable to connect to database: $DBI::errstr",12,$eventlog_error);
+	  }
 
+	}
 }
 
 if ($sql_win32_odbc_enable == 1)
 {
 	require Win32::ODBC;
-	$dbhodbc = new Win32::ODBC("DSN=$sql_win32_odbc_dsn","UID=$sql_win32_odbc_username","PWD=$sql_win32_odbc_password");
-	warn "Unable to connect to DSN $sql_win32_odbc_dsn:" . Win32::ODBC::Error() . "\n" unless (defined $dbhodbc);
+	unless ($dbhodbc = new Win32::ODBC("DSN=$sql_win32_odbc_dsn","UID=$sql_win32_odbc_username","PWD=$sql_win32_odbc_password") )
+	{
+	  warn "SQL error: Unable to connect to DSN $sql_win32_odbc_dsn:" . Win32::ODBC::Error() . "\n";
+
+	  if ($eventlog_system_enable == 1)
+	  {
+	    eventlog_system("SQL error: Unable to connect to DSN $sql_win32_odbc_dsn:" . Win32::ODBC::Error(),13,$eventlog_error);
+	  }
+	}
+
 
 }
 
@@ -657,7 +676,17 @@ sub processtrap
 				}
 				else
 				{
-					warn "Can not open log_file: $!";
+				  warn "Can not open log file $log_file: $!";
+
+				  if ($syslog_system_enable == 1)
+				  {
+				    syslog_system("Can not open log file $log_file");
+				  }
+
+				  if ($eventlog_system_enable == 1)
+				  {
+				    eventlog_system("Can not open log file $log_file",14,$eventlog_information);
+				  }
 				}
 			}
 	
@@ -690,38 +719,73 @@ sub processtrap
 			  }
 			}
 			
-			if ($mysql_dbi_enable == 1)
+			if ($mysql_dbi_enable == 1 && defined ($dbhmysql))
 			{
 				$message = $_;
 				
-				$sth = $dbhmysql->prepare(
+				unless ($sth = $dbhmysql->prepare(
 					"INSERT $mysql_dbi_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES 
-					(?,?,?,?,?,?,?,?,?,?,?)") or
-				 warn "Unable to prepare our query: ".$dbh->errstr."\n";
+					(?,?,?,?,?,?,?,?,?,?,?)") )
+					{
+					  warn "MySQL error: Unable to prepare query: ".$dbh->errstr."\n";
+
+					  if ($syslog_system_enable == 1)
+					  {
+					    syslog_system("MySQL error: Unable to prepare query: ".$dbh->errstr);
+					  }
+					  
+					  if ($eventlog_system_enable == 1)
+					  {
+					    eventlog_system("MySQL error: Unable to prepare query: ".$dbh->errstr,
+					    		15,$eventlog_information);
+					  }
+
+					}
 
 				 if (defined $sth) {
-					 $sth->execute($event2[0],$receivedtrap,@var[6],@var[5],@var[0],@var[4],$event2[1],
-					 $event2[2],@var[2],$trap_date_time,$message)
-					 or warn "Unable to execute our query: ".$dbhmysql->errstr."\n";
-
-				 	$sth->finish;
+				   unless ($sth->execute($event2[0],$receivedtrap,@var[6],@var[5],@var[0],@var[4],
+				   		$event2[1],$event2[2],@var[2],$trap_date_time,$message) )
+				   {
+				     warn "MySQL error: Unable to execute query: ".$dbhmysql->errstr."\n";
+				     
+				     if ($syslog_system_enable == 1)
+				     {
+				       syslog_system("MySQL error: Unable to execute query: ".$dbh->errstr);
+				     }
+				     
+				     if ($eventlog_system_enable == 1)
+				     {
+				       eventlog_system("MySQL error: Unable to execute query: ".$dbh->errstr,
+				       16,$eventlog_information);
+				     }
+				     
+				   }
+				   
+				   $sth->finish;
 				 }
 			}				 
 			
-			if ($sql_win32_odbc_enable == 1)
+			if ($sql_win32_odbc_enable == 1 && defined ($dbhodbc) )
 			{
 				$message = $_;
 				
-				if (defined $dbhodbc->Sql
+				# if defined, there's an error
+				if (defined ($dbhodbc->Sql
 				        ("INSERT INTO $sql_win32_odbc_table (eventname, eventid, enterprise, community, 
 					hostname, agentip, category, severity, uptime, traptime, formatline) VALUES (
 					\'$event2[0]\',\'$receivedtrap'\,\'@var[6]\',\'@var[5]\',\'@var[0]\',\'@var[4]\',
 					\'$event2[1]\',\'$event2[2]\',\'@var[2]\',\'".$trap_date_time."\',
-					\'$message\')" ) )
+					\'$message\')" ) ) )
 				{					
-					warn "Unable to perform INSERT INTO: ".Win32::ODBC::Error()."\n";
-		 	 	}
+				  warn "Unable to perform INSERT INTO: ".Win32::ODBC::Error()."\n";
+				  
+				  if ($eventlog_system_enable == 1)
+				  {
+				    eventlog_system("SQL error: Unable to perform INSERT INTO: ".Win32::ODBC::Error(),
+				    17,$eventlog_error);
+				  }
+				}
 			}				 
 
 			
@@ -929,7 +993,7 @@ sub loadsnmpttconf
 	  {
 	    syslog_system("Loading $snmpttconffile");
 	  }
-	  if ($eventlog_system_enable == 1)
+	  if ($eventlog_system_enable == 1 && $daemon == 1)
 	  {
 	    eventlog_system("Loading $snmpttconffile",9,$eventlog_information);
 	  }
@@ -946,7 +1010,7 @@ sub loadsnmpttconf
 	    {
 	      syslog_system("Could not open configuration file: $snmpttconffile");
 	    }
-	    if ($eventlog_system_enable == 1)
+	    if ($eventlog_system_enable == 1 && $daemon == 1)
 	    {
 	      eventlog_system("Could not open configuration file: $snmpttconffile",10,$eventlog_error);
 	    }
@@ -969,7 +1033,7 @@ sub loadsnmpttconf
 	  {
 	    syslog_system("Finished loading $tempcount lines from $snmpttconffile");
 	  }
-	  if ($eventlog_system_enable == 1)
+	  if ($eventlog_system_enable == 1 && $daemon == 1)
 	  {
 	    eventlog_system("Finished loading $tempcount lines from $snmpttconffile",11,$eventlog_information);
 	  }
