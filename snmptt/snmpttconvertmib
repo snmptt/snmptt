@@ -30,8 +30,8 @@
 # OPTIONS START
 #
 # Set this to '' to have no default EXEC line added, or modify as needed.
-#$defaultexec = '';
-$defaultexec = 'qpage -f TRAP notifygroup1';
+# Can also set on the command line with --exec='string'
+$defaultexec = '';
 
 # Choose what type of quotes (if any) you want around the SUMMARY text pulled from the MIB.
 #$defaultexecquote = '';		# no quotes
@@ -63,6 +63,8 @@ sub showversion
 $| = 1;
 
 use Getopt::Long;
+use File::Basename;
+use File::Spec;
 
 $DEBUGGING = 0;
 
@@ -127,12 +129,20 @@ if ($debug == 2)
   $DEBUGGING = 2;
 }
 
-$input = $in;
-$output = $out;
+# Get complete path of input file (MIB) in a portable way (needed for -m switch for snmptranslate)
+$dirname = dirname $in;
+$basename = basename $in;
+$input = File::Spec->catfile($dirname, $basename);
+
+# Get complete path of output file (.conf) in a portable way 
+$dirname = dirname $out;
+$basename = basename $out;
+$output = File::Spec->catfile($dirname, $basename);
 
 if ($exec ne '')
 {
   $defaultexec = $exec;
+  print "exec: $exec\n";
 }
 
 #print "nodes: $nodes\n";
@@ -141,7 +151,7 @@ if (($input eq "") || ($output eq ""))
 {
   print "\nMissing arguments!\n";
   &show_help();
-  die;
+  exit 1;
 }
 
 if ($net_snmp_perl == 1)
@@ -154,8 +164,13 @@ check_snmptranslate_version();
 
 
 print "severity: $severity\n";
-print "\nFile to load is:	$input\n";
-print "File to APPEND TO:	$output\n";
+print "\nFile to load is:        $input\n";
+print "File to APPEND TO:      $output\n";
+
+# Set MIBS environment variable to the filename of the MIB file (not the mib name - if a file contains
+# multiple MIB definitions in one file, the mib name will not work - at least with 5.0.8 and older)
+$ENV{MIBS} = $input;
+print "\nMIBS environment var:   $ENV{MIBS}\n";
 
 if ($DEBUGGING >= 1)
 {
@@ -169,7 +184,7 @@ unless (open INPUTFILE, "<$input")
 
 while (<INPUTFILE>)
 {
-  chomp;				# remove <cr> at end of line
+  chomp;			# remove <cr> at end of line
   s/\015//;			# Remove any DOS carriage returns
   push(@mibfile, $_);		# add to each line to @trapconf array
 }
@@ -186,9 +201,8 @@ unless (open OUTPUTFILE, ">>$output")
   die "Cannot open output file: $!";
 }
 
-print OUTPUTFILE "#\n#\n#\n#\n";
-print OUTPUTFILE "MIB: $input converted on " . scalar(localtime) . " using snmpttconvertmib $snmpttconvertmib_version\n";
-
+# A mib file can contain multiple BEGIN definitions.  This finds the first on
+# to make sure we have at least one definition.
 # Determine name of MIB file
 $mib_name = '';
 while ($currentline <= $#mibfile)
@@ -198,7 +212,6 @@ while ($currentline <= $#mibfile)
   {
     $mib_name = $1;
     $mib_name =~ s/\s+//g;
-    print "Name of MIB:            $mib_name\n";
     last;
   }
   $currentline++;
@@ -211,9 +224,6 @@ if ($mib_name eq '')
   exit (1);
 }
 
-# Set MIBS environment to only point to the selected MIB.  Speeds things up!
-$ENV{'MIBS'} = $mib_name;
-
 if ($net_snmp_perl == 1)
 {
   require SNMP;
@@ -225,7 +235,11 @@ if ($net_snmp_perl == 1)
   print "\n\n*****  Using UCD-SNMP / NET-SNMP Perl module *****\n\n";
 }
 
+my $total_translations = 0;
+my $successful_translations = 0;
+my $failed_translations = 0;
 $currentline=0;
+
 #if ($net_snmp_perl == 0)
 if (1)
 {
@@ -234,12 +248,25 @@ if (1)
   while ($currentline <= $#mibfile)
   {
     $line = $mibfile[$currentline];
+    
+    if ($line =~ /(.*)DEFINITIONS\s+::=\s+BEGIN/)
+    {
+      $mib_name = $1;
+      $mib_name =~ s/\s+//g;
+      print "\n\nProcessing MIB:         $mib_name\n";
+     
+      print OUTPUTFILE "#\n#\n#\n#\n";
+      print OUTPUTFILE "MIB: $mib_name (file:$input) converted on " . scalar(localtime) . " using snmpttconvertmib $snmpttconvertmib_version\n";
+      
+      $currentline++; # Increment to the next line
+      next;
+    }
 
     # TRAP-TYPE (V1) / NOTIFICATION-TYPE (V2)
     #
     # eg: 'mngmtAgentTrap-23003 TRAP-TYPE';
     # eg: 'ciscoSystemClockChanged NOTIFICATION-TYPE';
-    if ( $line =~ /(.*)\s+TRAP-TYPE.*/ || $line =~ /(.*)\s+NOTIFICATION-TYPE.*/ )
+    if ( $line =~ /(.*)\s+TRAP-TYPE.*/ || $line =~ /(.*)\s+(?<!--)NOTIFICATION-TYPE.*/ )
     {
       if ( $line =~ /(.*)\s+TRAP-TYPE.*/ )
       {
@@ -250,6 +277,15 @@ if (1)
         $trapversion = 'NOTIFICATION';
       }
       
+      # Make sure it doesn't start with a --.  If it does, it's a comment line..  Skip it
+      if ($line =~/.*--.*TRAP-TYPE/ || $line =~/.*--.*NOTIFICATION-TYPE/)
+      {
+	# Comment line
+	$currentline++; # Increment to the next line
+	$line = $mibfile[$currentline]; # Get next line
+	next;
+      }
+
       $enterprisefound = 0;
       
       @variables = ();
@@ -287,11 +323,11 @@ if (1)
       
       $end_of_definition = 0;
       
-      while ( ($currentline <= $#mibfile) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ )
+      while ( ($currentline <= $#mibfile) && !($line3 =~ /\s+END\s+/) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ )
       && !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) && ($end_of_definition == 0) )
       {
         # Keep going through the file until the next TRAP-TYPE / NOTIFICATION-TYPE or the end of the mib file
-        # is reached
+        # is reached, or the end of the section (between BEGIN and END)
         
         # Look for DESCRIPTION and anything after (including newline with /s)
         # and capture that anything in $1
@@ -540,25 +576,11 @@ if (1)
       
       if ($snmptranslate_use_On == 1)
       {
-        if ($trapversion eq 'TRAP')
-        {
-          $trapoid = `snmptranslate -IR -Ts -On $trap_lookup`;
-        }
-        else
-        {
-          $trapoid = `snmptranslate -On -IR -Ts $trap_lookup`;
-        }
+	$trapoid = `snmptranslate -IR -Ts -On $trap_lookup`;
       }
       else
       {
-        if ($trapversion eq 'TRAP')
-        {
-          $trapoid = `snmptranslate -IR -Ts $trap_lookup`;
-        }
-        else
-        {
-          $trapoid = `snmptranslate -IR -Ts $trap_lookup`;
-        }
+	$trapoid = `snmptranslate -IR -Ts $trap_lookup`;
       }
       
       chomp $trapoid;
@@ -782,6 +804,17 @@ if (1)
       }
       
       print "OID: $trapoid\n";
+
+      $total_translations++;
+      if ($trapoid eq '')
+      {
+	$failed_translations++;
+      }
+      else
+      {
+	$successful_translations++;
+      }
+      
       #print "\@description is ", $#description,"\n";
       #print "going to next trap / notification\n\n";
     }
@@ -814,6 +847,11 @@ if (1)
     }
   }
   # End of process the trap files by hand
+
+  print "\n\nDone\n\n";
+  print "Total translations:        $total_translations\n";
+  print "Successful translations:   $successful_translations\n";
+  print "Failed translations:       $failed_translations\n";
 }
 
 
@@ -860,7 +898,7 @@ Options:
   --exec=command         Command line to use for EXEC line.  Use SINGLE quotes
                          with Unix.  Example:
     			   'qpage -f TRAP notifygroup1'
-
+			   
   Note:  The only benefit in using the --net_snmp_perl switch (which requires the
          Net-SNMP Perl module to be installed) is that the Variables: description section 
          will include:

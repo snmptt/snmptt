@@ -106,13 +106,14 @@ Options:
 	exit(0);
 }
 
-if ($debug == 1)
+if ($debug >= 1)
 {
-	$DEBUGGING = 1;	
-	$debugcmdline = 1;
+  $DEBUGGING = $debug;	
+  $debugcmdline = 1;
 }
 else
 {
+  $DEBUGGING = 0;	
   $debugcmdline = 0;
 }
 
@@ -124,12 +125,6 @@ if ($daemon == 1)
 else
 {
  	$daemoncmdline = 0;
-}
-
-if ($debug == 2)
-{
-	$DEBUGGING = 2;	
-	$debugcmdline = 1;
 }
 
 if ($dump ==1)
@@ -194,11 +189,15 @@ if ($DEBUGGING >= 1)
 {
 	if ($DEBUGGING_FILE ne '') 
 	{
-	  	open DEBUGFILE, ">>$DEBUGGING_FILE"
-			or warn "could not open debug output file ($!)";
-	
-		select DEBUGFILE;	# change default output to debug file
-		$debug_file_used = 1;
+	  if (open DEBUGFILE, ">>$DEBUGGING_FILE")
+	  {
+	    select DEBUGFILE;	# change default output to debug file
+	    $debug_file_used = 1;
+	  }
+	  else
+	  {
+	    warn "could not open debug output file ($!)";
+	  }
 	}
 	
 	# print out time
@@ -222,9 +221,15 @@ if ($net_snmp_perl_enable == 1)
 	{
 	  $ENV{'MIBS'} = $mibs_environment;
 	}
+	my $noperlwarning;
 	&SNMP::initMib();
+
 	$SNMP::best_guess = $net_snmp_perl_best_guess;
+	$noperlwarning = $SNMP::best_guess;  # Just to get rid of the Perl warning that var used only once
+
 	$SNMP::use_long_names = 0;	# Set to 0, otherwise getType may fail when using a long name on 4.2.x
+	$noperlwarning = $SNMP::use_long_names;  # Just to get rid of the Perl warning that var used only once
+
 	if ($DEBUGGING >= 1)
 	{
 	  print "********** Net-SNMP version $SNMP::VERSION Perl module enabled **********\n\n";
@@ -678,7 +683,7 @@ sub processtrap
 		@event2 = ();
 		
 		# Flush out @nodes
-		@nodes = ();
+		#@nodes = ();
 		@nodes2 = ();
 	
 		#	$event2[0]=$event{"$receivedtrap_entry"}[0];	# 0: name of trap	
@@ -926,13 +931,13 @@ sub processtrap
 			
 			if ($stdout_enable == 1)
 			{
-			  select STDOUT;
+			  #select STDOUT;
 			  print STDOUT "$message";
 
-			  if ($debug_file_used == 1)
-			  {
-			    select DEBUGFILE;
-			  }
+			  #if ($debug_file_used == 1)
+			  #{
+			  #  select DEBUGFILE;
+			  #}
 			}
 
 			if ($DEBUGGING >= 1)
@@ -2263,7 +2268,7 @@ sub readtrap
 	  {
 	    if ($DEBUGGING => 1)
 	    {
-	      print "Host IP address ($var[0]) could not be resolved by DNS.  Variable \$r / $R etc will use the IP address\n\n";
+	      print "Host IP address ($var[0]) could not be resolved by DNS.  Variable \$r / \$R etc will use the IP address\n\n";
 	    }
 	  }
 	}
@@ -2597,7 +2602,7 @@ sub loadsnmpttini {
 	}
 	else
 	{
-	  if ($DEBUGGING >= 1) {
+	  if ($DEBUGGING >= 0) {
 	  	print "Config file could not be loaded\n";
 	  }
 	  exit(1);
@@ -2605,7 +2610,7 @@ sub loadsnmpttini {
 	
 	if (! $cfg)
 	{
-	  if ($DEBUGGING >= 1) {
+	  if ($DEBUGGING >= 0) {
 		  print "Error in config file - please check the syntax in the config file\n";
 	  }
 	  exit(1);
@@ -2898,7 +2903,7 @@ sub checkip
     my $cidr_binary = dec2bin($1) . dec2bin($2) .dec2bin($3) .dec2bin($4);
     my $net_bits = $5;
     my $host_bits = 32 - $net_bits;
-    my $cidr_binary = substr($cidr_binary, 0, $net_bits);
+    $cidr_binary = substr($cidr_binary, 0, $net_bits);
     
     # Get network number for ip_address
     my $node1_binary_net = substr($node1_binary, 0, $net_bits);
@@ -3159,8 +3164,7 @@ sub resolve_value_ip_addresses_sub
   return $string;    
 }
 
-
-sub match(match)
+sub match
 {
   my $match = shift;
   my $value;
@@ -3240,7 +3244,7 @@ sub match(match)
   }
 }
 
-sub match_result(result, not)
+sub match_result
 {
   my $result = shift;
   my $not = shift;
@@ -3256,7 +3260,7 @@ sub match_result(result, not)
   return 0;
 }
 
-sub match_number(value, match)
+sub match_number
 {
   my $value = shift;
   my $match = shift;
@@ -3332,7 +3336,7 @@ sub match_regex
   return 0;
 }
 
-sub my_translateObj (oid, mode)
+sub my_translateObj
 {
   my $oid = shift;
   my $mode = shift;
@@ -3340,8 +3344,6 @@ sub my_translateObj (oid, mode)
   my $use_long = 0;
   my $include_module = 0;
   my $temp;
-  my $use_long = 0;
-  my $include_module = 0;
     
   if ($mode == 1) 	# Short text
   {
@@ -3377,7 +3379,7 @@ sub my_translateObj (oid, mode)
 }
 
 # Strip domain name from hostname
-sub strip_domain_name(name, mode)
+sub strip_domain_name
 {
   my $name = shift;
   my $mode = shift;
@@ -3415,7 +3417,7 @@ sub strip_domain_name(name, mode)
   return $name;
 }
 
-sub my_getType(oid)
+sub my_getType
 {
   my $oid = shift;
 
@@ -3447,7 +3449,7 @@ sub my_getType(oid)
   }
 }
 
-sub my_mapEnum(oid, value)
+sub my_mapEnum
 {
   my $oid = shift;
   my $value = shift;
@@ -3480,7 +3482,7 @@ sub my_mapEnum(oid, value)
   }
 }
  
-sub process_nodes(nodes_list)
+sub process_nodes
 {
   my $nodes_list = shift;
   my @nodes = ();

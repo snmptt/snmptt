@@ -1,3 +1,27 @@
+September 7th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Snmpttconvertmib:  Problem from below must be a Net-SNMP bug.
+  MIBS environment variable now set to the filename of the MIB
+  instead of the MIB module name.
+- Snmpttconvertmib:  Checks for TRAP / NOTIF lines that have a --
+  in it.  Ignores them - comments..
+
+September 5th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Snmpttconvertmib now exits with exit 1 instead of die when
+  not enough parameters specified
+- Snmpttconvertmib: Some mib files contain multiple BEGIN/END 
+  statements and they were not being handled correctly.  Script
+  now looks for them throughout the file and sets the mib_name
+  variable correctly so lookups are correct with snmptranslate.
+  May be a bug in Net-SNMP:  If you set the MIBS environment
+  variable to anything except ALL or the first BEGIN value
+  in a file that contains multiple BEGIN/ENDs, then snmptranslate
+  does not work.  For now, MIBS environment is set to the first
+  occurance only.  If it turns out to be a bug in Net-SNMP, it
+  will be changed here to account for it.  Also added a --mibs=s
+  parameter to override the environment variable.
+- Snmpttconvertmib:  exec defaults to blank instead of qpage...
+- Clean up some warnings when running with perl -w
+
 September 4rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Finished fix for translate_value_oids_sub.  Both while loops now
   have a break out to prevent an infinit loop, although it should
