@@ -10,7 +10,7 @@
 <a href="http://sourceforge.net"><img SRC="sflogo.php" ALT="SourceForge Logo" BORDER=0 height=62 width=210></a>
 <br><b><font size=+3>SNMP Trap Translator v0.2.2</font></b>
 <br><b>(SNMPTT)</b>
-<br>This file was last updated on:&nbsp; August 30th, 2002
+<br>This file was last updated on:&nbsp; August 31st, 2002
 <p>&nbsp;<a href="#License">License</a>
 <p><a href="#What is it">SNMPTT</a>
 <blockquote>&nbsp;<a href="#What is it">What is it?</a>
@@ -392,11 +392,12 @@ variables:
 <br>$e&nbsp; - Trap OID in number format
 <br>$E&nbsp; - Trap OID in number format
 <br>$A&nbsp; - Trap agent IP address
-<br>$S# - Number of variable-bindings in the trap
+<br>$# - Number of variable-bindings in the trap starting at 1
 <br>$$&nbsp; - Print a $
 <br>$r&nbsp; - Hostname
 <br>$s&nbsp; - Severity
 <br>$S&nbsp; - Event name
+<br>$T&nbsp; - Uptime:&nbsp; Time since network entity was initialized
 <br>$x&nbsp; - Current date &amp; time
 <br>$*&nbsp; - Expand all variable-bindings
 <br>$n&nbsp; - Expand variable-binding n (1-n)</blockquote>
@@ -497,8 +498,7 @@ A trap is handled once using the first match in the configuration file</li>
 <li>
 If an exact match exists, the wildcard match is NOT performed</li>
 
-<br>If an exact match does NOT exists, the wildcard match IS performed
-<br>&nbsp;</ul>
+<br>If an exact match does NOT exists, the wildcard match IS performed</ul>
 <a NAME="Sample1 SNMPTT.CONF file"></a><b><font size=+2>Sample1 SNMPTT.CONF
 file</font></b>
 <p>Following is a sample of two defined traps in <b>snmptt.conf:</b>

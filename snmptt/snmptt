@@ -631,6 +631,9 @@ sub substitute
 
 	# $r - Hostname
 	s(\$r)(@var[0])g;
+
+	# $T - Uptime
+	s(\$T)(@var[2])g;
 	
 	# $x - Current time
 	$now = scalar(localtime);
