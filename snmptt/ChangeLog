@@ -1,3 +1,8 @@
+September 15th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Bug fix - sometimes Net-SNMP would pass a quoted line on multiple
+  lines.  They are now combined into one in snmptt.  Thanks to
+  António Cardoso.
+
 September 12th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fix MATCH.  sub match_result was not returning a 0 (didn't really
   matter).  If a match regex contained a space, it was removed...  Fixed

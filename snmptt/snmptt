@@ -2081,7 +2081,7 @@ sub readtrap
 	if ( $daemon == 1)
 	{
 	  chomp($trap_date_time_epoch = (<$input>));	# Pull time trap was spooled
-	  $trap_date_time_epoch =~ s(`)(')g;	#` Replace any back ticks / quotes with regular quotes
+	  $trap_date_time_epoch =~ s(`)(')g;	#` Replace any back ticks with regular single quote
 	}
 	else
 	{
@@ -2102,10 +2102,10 @@ sub readtrap
 	}
 	
 	chomp($tempvar[0]=<$input>);	# hostname
-	$tempvar[0] =~ s(`)(')g;	#` Replace any back ticks / quotes with regular quotes
+	$tempvar[0] =~ s(`)(')g;	#` Replace any back ticks with regular single quote
 	
 	chomp($tempvar[1]=<$input>);	# ip address
-	$tempvar[1] =~ s(`)(')g;	#` Replace any back ticks / quotes with regular quotes
+	$tempvar[1] =~ s(`)(')g;	#` Replace any back ticks with regular single quote
 	
 	# Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
 	# out just the IP address
@@ -2117,7 +2117,7 @@ sub readtrap
 	$linenum = 1;
 	while (defined($line = <$input>))
 	{
-	  $line =~ s(`)(')g;	#` Replace any back ticks / quotes with regular quotes
+	  $line =~ s(`)(')g;	#` Replace any back ticks with regular single quote
 	  
 	  if ($remove_backslash_from_quotes == 1)  # Remove escape from quotes if enabled
 	  {
@@ -2144,9 +2144,31 @@ sub readtrap
 	      $variable_fix = 1;
 	    }
 	  }
-	
+
+	  
+
 	  if ($variable_fix == 0 )
 	  {
+	    # If line begins with a double quote (") but does not END in a double quote then we need to merge
+	    # the following lines together into one until we find the closing double quote.
+	    # Net-SNMP sometimes divides long lines into multiple lines..
+	    if ( ($temp2 =~ /^\"/) && ( ! ($temp2 =~ /\"$/)) )
+	    {
+	      if ($DEBUGGING >= 2) {
+		print "  Multi-line value detected - merging onto one line...\n";
+	      }
+	      chomp $temp2;				# Remove the newline character
+	      while (defined($line2 = <$input>))
+	      {
+		chomp $line2;
+		$temp2.=" ".$line2;
+		if ($line2 =~ /\"$/)
+		{
+		  last;
+		}
+	      }
+	    }
+
 	    # Check to see if OID passed from snmptrapd is fully numeric.  If not, try to translate
 	    if (! ($temp1 =~ /^(\.\d+)+$/)) 
 	    {
@@ -2215,6 +2237,26 @@ sub readtrap
 	    if ($DEBUGGING >= 2)
 	    {
 	      print "Data passed from snmptrapd is incorrect.  UCD-SNMP v4.2.3 is known to cause this\n";
+	    }
+
+	    # If line begins with a double quote (") but does not END in a double quote then we need to merge
+	    # the following lines together into one until we find the closing double quote.
+	    # Net-SNMP sometimes divides long lines into multiple lines..
+	    if ( ($line =~ /^\"/) && ( ! ($line =~ /\"$/)) )
+	    {
+	      if ($DEBUGGING >= 2) {
+		print "  Multi-line value detected - merging onto one line...\n";
+	      }
+	      chomp $line;				# Remove the newline character
+	      while (defined($line2 = <$input>))
+	      {
+		chomp $line2;
+		$line.=" ".$line2;
+		if ($line2 =~ /\"$/)
+		{
+		  last;
+		}
+	      }
 	    }
 
 	    # If the value is blank, set it to (null)
