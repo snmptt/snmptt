@@ -202,7 +202,7 @@ if ($DEBUGGING >= 1)
 	}
 	
 	# print out time
-	print "********** SNMPTT $snmptt_version started: ",scalar(localtime),"**********\n\n"
+	print "********** SNMPTT $snmptt_version started: ",scalar(localtime)," **********\n\n"
 }
 
 if ($syslog_system_enable == 1 && $daemon == 1)
@@ -225,6 +225,10 @@ if ($net_snmp_perl_enable == 1)
 	&SNMP::initMib();
 	$SNMP::best_guess = $net_snmp_perl_best_guess;
 	$SNMP::use_long_names = 0;
+	if ($DEBUGGING >= 1)
+	{
+	  print "********** Net-SNMP version $SNMP::VERSION Perl module enabled **********\n\n";
+	}
 }
 
 if ($mysql_dbi_enable == 1)

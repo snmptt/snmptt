@@ -155,8 +155,8 @@ UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm) an Net-SNMP
 5.0.8.&nbsp; I have also tested the program with Windows 2000 using the
 native version of Net-SNMP 5.0.8 compiled with MSVC++ and also under
 Cygwin with gcc etc.&nbsp; Note:&nbsp; The Net-SNMP Perl module works
-fine under native Windows and with Cygwin.&nbsp; See the FAQ section
-for information on compiling Net-SNMP with Perl support.<br>
+fine under native Windows and with Cygwin.&nbsp; See the FAQ section for
+information on compiling Net-SNMP with Perl support.<br>
 <br>
 Both SNMP V1 and V2 traps have been tested.
 <p>UCD-SNMP v4.2.3 appears to have a bug that prevents it from working
@@ -178,9 +178,10 @@ traps using symbolic form, or you enable the options <span
 <a name="Whats-New"></a><b><font size="+2">What's New</font></b> </p>
 <p><b><font size="+1">0.7 - ??</font></b><b><font size="+1">, 2003</font></b></p>
 <ul>
-  <li>Fixes a vulnerability by replacing back ticks (`) in recived
+  <li>Fixes a vulnerability by replacing back ticks (`) in received
 traps with with forward ticks (').&nbsp; This prevents data contained in
-traps from being executed when using the EXEC feature<br>
+traps from being executed when using the EXEC feature on systems that
+process back ticks from Perl system() calls.<br>
   </li>
   <li>Added the ability for traps passed from <span
  style="font-weight: bold;">snmptrapd </span>or loaded from the <span
