@@ -1,3 +1,7 @@
+March 22nd, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Cleanup snmpttconvertmib code - combine V1 and V2 trap conversion
+  into one.
+
 March 21th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Removed unused emerg ini setting, init $debugcmdline and 
   $debugfilecmdline, remove unused $vartype variable, change a \1 to $1
