@@ -1,4 +1,10 @@
 March 13th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed bug with handling trap data that contains spaces but is not inside of quotes
+  for traps received from snmptrapd 4.2.3
+- Fixed bug with translation of integers.  If the value could not be translated,
+  it should use the non-translated value
+- If a variable is passed from snmptrapd that is blank, snmptt will replace it with
+  (null)
 - snmpttconvertmib now checks the version of snmptranslate before converting
   the mib.  To ensure OIDs are outputted as numerical, the -On switch is added 
   to the snmptranslate command when snmptranslate is v5.0.2 or newer.

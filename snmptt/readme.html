@@ -171,11 +171,20 @@ the very least use the <b>snmptrapd</b> program from v4.2.5.
 <blockquote>SNMPTT only requies the the NET-SNMP Perl module if you enable
 the translation of integer values (translate_integers = 1) to enumeration
 tags in MIB files or want to have variable names translated into text from
-the MIB files.</blockquote>
+the
+MIB files.</blockquote>
 
 <p><br><a NAME="Whats New"></a><b><font size=+2>What's New</font></b>
 <p><b><font size=+1>0.6 - ???, 2003</font></b>
 <ul>
+<li>
+Snmpttconvertmib now checks the version of snmptranslate before converting
+the mib to ensure snmptranslate is called correctly</li>
+
+<li>
+If a variable is passed from snmptrapd that is blank, snmptt will replace
+it with (null)</li>
+
 <li>
 Added new variable substitutions: <b>$v<i>n</i></b> (variable name), <b>$+<i>n</i></b>(variable
 name:value),
@@ -1565,8 +1574,9 @@ appearing as text instead of being numberical.&nbsp; Why?</b>
 
 <p><br>A:&nbsp; <b>Snmpttconvertmib</b> uses the <b>snmptranslate</b> command
 to convert MIB files.&nbsp; With Net-SNMP v5.0.2 and newer, setting the
-<b>-On</b> switch on the <b>snmptranslate</b> command causes the output
-to be in numerical format, which is what is needed for <b>snmpttconvertmib</b>.
+<b>-On</b>
+switch on the <b>snmptranslate</b> command causes the output to be in numerical
+format, which is what is needed for <b>snmpttconvertmib</b>.
 <p>With Net-SNMP v5.0.1 and all versions of UCD-SNMP, setting the -On switch
 will TOGGLE the setting of using numerical output.&nbsp; With Net-SNMP
 v5.0.2 and newer, setting the -On switch will FORCE the output to be numerical.
@@ -1577,8 +1587,9 @@ modify your <b>snmp.conf</b> file (for UCD-SNMP / Net-SNMP), and add or
 modify the line:
 <blockquote><b>printNumericOids 1</b></blockquote>
 This will cause all applications to output in numerical format including
-<b>snmptranslate</b>.&nbsp; Note: This will affect other UCD-SNMP / Net-SNMP
-programs you are using, if any.
+<b>snmptranslate</b>.&nbsp;
+Note: This will affect other UCD-SNMP / Net-SNMP programs you are using,
+if any.
 <br>&nbsp;
 <br>&nbsp;
 <br>&nbsp;
