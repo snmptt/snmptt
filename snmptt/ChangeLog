@@ -1,5 +1,8 @@
+September 11th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Added negative NODES entry support 
+
 September 8th, 2003: Alex Burger <alex_b@users.sourceforge.net>
-- Add snmptt.pid support
+- Added snmptt.pid support
 
 September 7th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Snmpttconvertmib:  Problem from below must be a Net-SNMP bug.

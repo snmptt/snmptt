@@ -1554,38 +1554,80 @@ the
 page above, you must use the variables such as $r, $x and $X.</blockquote>
   <a name="SNMPTT.CONF-NODES"></a><b>NODES:</b>
   <blockquote>[<b>NODES</b> sources_list]
-    <p>There can be multiple NODES lines per EVENT.</p>
     <p>Used to limit which devices can be mapped to this EVENT
-definition.<br>
+definition.&nbsp; <br>
     </p>
+There can be multiple NODES lines per EVENT.
     <p>Optional string containing any combination of host names, IP
 addresses, CIDR network address, network IP address ranges, or a
 filename.&nbsp; If this keyword omitted then ALL sources will be
-accepted. </p>
-    <p>If a filename is specified, it must be specified with a full
-path.&nbsp; The file is loaded each time a trap is processed, so it can
-be modified without restarting SNMPTT.<br>
+accepted.&nbsp; Each entry is checked for a match.&nbsp; As soon as one
+match occurs, searching stops.<br>
     </p>
-Examples:
-    <blockquote>NODES fred barney betty wilma <br>
-&nbsp; or<br>
-NODES /etc/snmptt-nodes<br>
-&nbsp; or<br>
-NODES /etc/snmptt-nodes /etc/snmptt-nodes2<br>
-&nbsp; or<br>
-NODES 192.168.4.0/22 192.168.60.0-192.168.61.255 /etc/snmptt-nodes2<br>
-&nbsp; or<br>
-NODES fred /etc/snmptt-nodes pebbles /etc/snmptt-nodes2 barney<br>
+    <p>For example, if you only wanted devices on the subnet
+192.168.1.0/24 to trigger this EVENT, you could use a NODES entry of:<br>
+    </p>
+    <p style="margin-left: 40px;"><span style="font-weight: bold;">NODES
+192.168.1.0/24</span><br>
+    </p>
+    <p>If a filename is specified, it must be specified with a full
+path.&nbsp; <br>
+    </p>
+Example 1:<br>
+    <blockquote>This example will match any hosts called <span
+ style="font-weight: bold;">fred</span>, <span
+ style="font-weight: bold;">barney</span>, <span
+ style="font-weight: bold;">betty </span>or <span
+ style="font-weight: bold;">wilma</span>:<br>
+      <br>
+      <span style="font-weight: bold;">NODES fred barney betty
+wilma&nbsp; </span> <br>
+    </blockquote>
+Example 2:<br>
+    <blockquote>This example will load the file /etc/snmptt-nodes (see
+below), and match any hosts called <span style="font-weight: bold;">fred</span>,
+      <span style="font-weight: bold;">barney</span>, <span
+ style="font-weight: bold;">betty</span>, network ip addresses&nbsp; <span
+ style="font-weight: bold;">192.168.1.1, 192.168.1.2,
+192.168.1.3, 192.168.2.1</span>, network range <span
+ style="font-weight: bold;">192.168.50.0/22</span> or network range <span
+ style="font-weight: bold;">192.168.60.0-192.168.61.255</span>:<br>
+      <br>
+      <span style="font-weight: bold;">NODES /etc/snmptt-nodes</span><br>
+    </blockquote>
+Example 3:<br>
+    <blockquote>This example will load both files <span
+ style="font-weight: bold;">/etc/snmptt-nodes</span> and <span
+ style="font-weight: bold;">/etc/snmptt-nodes2</span> (see above
+example):<br>
+      <br>
+      <span style="font-weight: bold;">NODES /etc/snmptt-nodes
+/etc/snmptt-nodes2</span><br>
+    </blockquote>
+Example 4:<br>
+    <blockquote><span style="font-weight: bold;">NODES 192.168.4.0/22
+192.168.60.0-192.168.61.255 /etc/snmptt-nodes2</span><br>
+    </blockquote>
+Example 5:<br>
+    <blockquote>NODES <span style="font-weight: bold;">fred
+/etc/snmptt-nodes pebbles /etc/snmptt-nodes2 barney</span><br>
     </blockquote>
 where snmptt-nodes contains:
-    <blockquote>fred<br>
-barney betty<br>
-# comment lines <br>
-192.168.1.1 192.168.1.2 192.168.1.3<br>
-192.168.2.1 <br>
-192.168.50.0/22<br>
-192.168.60.0-192.168.61.255<br>
-wilma <br>
+    <blockquote><span style="font-weight: bold;">fred</span><br
+ style="font-weight: bold;">
+      <span style="font-weight: bold;">barney betty</span><br
+ style="font-weight: bold;">
+      <span style="font-weight: bold;"># comment lines </span><br
+ style="font-weight: bold;">
+      <span style="font-weight: bold;">192.168.1.1 192.168.1.2
+192.168.1.3</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">192.168.2.1 </span><br
+ style="font-weight: bold;">
+      <span style="font-weight: bold;">192.168.50.0/22</span><br
+ style="font-weight: bold;">
+      <span style="font-weight: bold;">192.168.60.0-192.168.61.255</span><br
+ style="font-weight: bold;">
+      <span style="font-weight: bold;">wilma</span> <br>
     </blockquote>
 Notes:
     <blockquote>The names are NOT case sensitive and comment lines are
@@ -1926,7 +1968,7 @@ REGEX expression is
 needed.&nbsp; The following uses the $+1 variable on the FORMAT line so
 REGEX can parse out the IP address.&nbsp; <br>
 <br>
-FORMAT line before:&nbsp;<span style="font-weight: bold;"> Peer:$+1<br>
+FORMAT line before:&nbsp;<span style="font-weight: bold;"> Peer:$+2<br>
 <br>
 </span>FORMAT line after substitution, but before REGEX:&nbsp; <span
  style="font-weight: bold;">Peer:bgpPeerState</span>.<span
@@ -1934,8 +1976,8 @@ FORMAT line before:&nbsp;<span style="font-weight: bold;"> Peer:$+1<br>
 </span></div>
 <br>
 <div style="margin-left: 40px;"><span style="font-weight: bold;">REGEX
-(Peer:.*\.(\d+\.\d+\.\d+\.\d+):(.*))("Peer: $1 has transitioned to $2")e</span><br
- style="font-weight: bold;">
+(Peer:.*\.(\d+\.\d+\.\d+\.\d+):(.*))("Peer: $1 has transitioned to a
+state of $2")e</span><br style="font-weight: bold;">
 <br>
 FORMAT line after:&nbsp; <span style="font-weight: bold;">Peer
 192.168.1.1 has transitioned to idle</span></div>
