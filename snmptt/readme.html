@@ -722,8 +722,8 @@ Permissions etc should also be defined. </p>
   <b><tt>CREATE TABLE snmptt (</tt></b> <br>
   <b><tt>eventname VARCHAR(50),</tt></b> <br>
   <b><tt>eventid VARCHAR(50),</tt></b> <br>
-  <b><tt>trapoid VARCHAR(50),<br>
-enterprise VARCHAR(50),</tt></b> <br>
+  <b><tt>trapoid VARCHAR(100),<br>
+enterprise VARCHAR(100),</tt></b> <br>
   <b><tt>community VARCHAR(20),</tt></b> <br>
   <b><tt>hostname VARCHAR(100),</tt></b> <br>
   <b><tt>agentip&nbsp; VARCHAR(16),</tt></b> <br>
@@ -761,8 +761,8 @@ psql snmptt<br>
   <b><tt>CREATE TABLE snmptt (</tt></b> <br>
   <b><tt>eventname VARCHAR(50),</tt></b> <br>
   <b><tt>eventid VARCHAR(50),</tt></b> <b><tt><br>
-trapoid VARCHAR(50),<br>
-enterprise VARCHAR(50),</tt></b> <br>
+trapoid VARCHAR(100),<br>
+enterprise VARCHAR(100),</tt></b> <br>
   <b><tt>community VARCHAR(20),</tt></b> <br>
   <b><tt>hostname VARCHAR(100),</tt></b> <br>
   <b><tt>agentip&nbsp; VARCHAR(16),</tt></b> <br>
@@ -800,8 +800,8 @@ existing database.&nbsp; Permissions etc should also be defined. </p>
 <blockquote><b><tt>CREATE TABLE snmptt (</tt></b> <br>
   <b><tt>eventname character(50) NULL,</tt></b> <br>
   <b><tt>eventid&nbsp; character(50) NULL,</tt></b> <br>
-  <b><tt>trapoid</tt></b><b><tt>&nbsp; character(50) NULL,</tt></b><br>
-  <b><tt>enterprise character(50) NULL,</tt></b> <br>
+  <b><tt>trapoid</tt></b><b><tt>&nbsp; character(100) NULL,</tt></b><br>
+  <b><tt>enterprise character(100) NULL,</tt></b> <br>
   <b><tt>community character(20) NULL,</tt></b> <br>
   <b><tt>hostname character(100) NULL,</tt></b> <br>
   <b><tt>agentip&nbsp; character(16) NULL,</tt></b> <br>

@@ -74,9 +74,11 @@ net_snmp_perl_best_guess = 0
 # Set to 3 to translate the trap OID to long text (eg: iso...snmpTraps.linkUp)
 # Set to 4 to translate the trap OID to long text with module name (eg: 
 # IF-MIB::iso...snmpTraps.linkUp)
-# Note: The output of the long format will vary depending on the version of Net-SNMP you
-#       are using.
-# Note: net_snmp_perl_enable *must* be enabled
+# Note: -The output of the long format will vary depending on the version of Net-SNMP you
+#        are using.
+#       -net_snmp_perl_enable *must* be enabled
+#       -If using database logging, ensure the trapoid column is large enough to hold the
+#        entire line
 translate_log_trap_oid = 0
 
 # Configures how OIDs contained in the VALUE of the variable bindings are handled.
