@@ -180,6 +180,9 @@ traps using symbolic form, or you enable the options <span
 <p><b><font size="+1">0.8</font></b><b><font size="+1"> - ???</font></b><b><font
  size="+1">, 2003</font></b></p>
 <ul>
+  <li>Added <span style="font-weight: bold;">MATCH </span>keyword
+support to allow trap matching based on values contained inside the trap
+enterprise variables</li>
   <li>Added <span style="font-weight: bold;">trapoid </span>column
 for database logging to contain the actual trap received.&nbsp; The <span
  style="font-weight: bold;">eventid</span> column will contain the
@@ -222,9 +225,6 @@ and $e is always the numerical enterprise OID</li>
   <li>The enterprise column when logging to a database now follows the <span
  style="font-weight: bold;">db_translate_enterprise</span> setting<br>
   </li>
-  <li>Added <span style="font-weight: bold;">MATCH </span>keyword
-support to allow trap matching based on values contained inside the trap
-enterprise variables</li>
   <li>Snmpttconvertmib</li>
   <ul>
     <li>Now prints the variables contained in each trap unless
@@ -1049,7 +1049,7 @@ $G&nbsp; - Generic trap number (0 if enterprise trap) <br>
 $S&nbsp; - Specific trap number (0 if generic trap) <br>
 $N&nbsp; - Event name defined in .conf file of matched entry<br>
 $n&nbsp; - Event OID defined in .conf file of matched entry (could be a
-wildcard OID)<br>
+wildcard OID) (not the same as $<span style="font-style: italic;">n</span>)<br>
 $O - Trap OID in symbolic format <b>(see Note 4)</b><br>
 $o - Trap OID in numerical format <b>(see Note 4)</b><br>
 $R, $r&nbsp; - Hostname <b>(see Note 1)</b> <br>
@@ -1241,7 +1241,7 @@ for important DNS information.</p>
  style="font-weight: bold;">$n:</span><span style="font-weight: bold;">[!][(&nbsp;&nbsp;&nbsp;
 ) | n | n-n | &gt; n | &lt; n | x.x.x.x | x.x.x.x-x.x.x.x | x.x.x.x/x]]</span></div>
   <p style="margin-left: 40px;">Optional match expression that must be
-evaulated to true for the trap to be considered a match to this EVENT
+evaluated to true for the trap to be considered a match to this EVENT
 definition.<br>
   </p>
   <p style="margin-left: 40px;">If a MATCH statement exists, and no
@@ -1341,8 +1341,9 @@ backslashed (\).<br>
 <br>
 If no MATCH MODE= line exists, it defaults to 'or'.<br>
 <br>
-There can be only one match mode per EVENT.&nbsp; If multiple MATCH
-MODE= lines exists, the last one in the list is used.<br>
+There can be only one match <span style="font-weight: bold;">mode </span>per
+EVENT.&nbsp; If multiple MATCH MODE= lines exists, the last one in the
+list is used.<br>
 <br>
 Regular expression searches are not case sensitive<br>
 <br>
@@ -1469,7 +1470,9 @@ configuration file, the following rules apply: </p>
   <li> The received trap OID matches a defined OID in the configuration
 file</li>
   <li> <b>AND</b> <b>( </b>the hostname matches a defined hostname in
-the NODES entry <b>OR</b> the NODES entry is blank<b>)</b></li>
+the NODES entry <b>OR</b> there is no NODES entry <b>)</b></li>
+  <li> <b>AND</b> <b>( </b>the MATCH statement evaluates to TRUE <b>OR</b>
+the there is no MATCH entry&nbsp; <b>)</b></li>
 </ul>
 <b>If multiple_event is set to 1 in snmptt.ini:</b>
 <ul>
@@ -1478,17 +1481,19 @@ configuration file</li>
   <li> If any number of exact matches exist, the wildcard match is NOT
 performed</li>
   <li> If an exact match does NOT exist, the wildcard match IS performed
-if the hostname matches a defined hostname in the NODES entry <b>OR</b>
-the NODES entry is blank</li>
+if <b>( </b>the hostname matches a defined hostname in the NODES entry <b>OR</b>
+there is no NODES entry <b>)</b> <b>AND</b> <b>( </b>the MATCH
+statement evaluates to TRUE <b>OR</b> the there is no MATCH entry&nbsp; <b>)</b></li>
 </ul>
 <b>If multiple_event is set to 0 in snmptt.ini:</b>
 <ul>
   <li> A trap is handled once using the first match in the configuration
 file</li>
   <li> If an exact match exists, the wildcard match is NOT performed</li>
-  <li> If an exact match does NOT exist, the wildcard match IS
-performedifthe hostname matches a defined hostname in the NODES entry <b>OR</b>
-the NODES entry is blank</li>
+  <li> If an exact match does NOT exist, the wildcard match IS performed
+if <b>( </b>the hostname matches a defined hostname in the NODES entry <b>OR</b>
+there is no NODES entry <b>)</b> <b>AND</b> <b>( </b>the MATCH
+statement evaluates to TRUE <b>OR</b> the there is no MATCH entry&nbsp; <b>)</b></li>
 </ul>
 <br>
 <a name="DNS"></a><b><font size="+2">Name resolution / DNS</font></b>
