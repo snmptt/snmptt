@@ -42,7 +42,7 @@ END
 # Note: This requires the Perl module from the UCD/NET-SNMP package.
 #       Enabling this with stand-alone mode can cause SNMPTT to run very slowly due to
 #       the loading of the MIBS at startup.
-translate_integers = 1
+translate_integers = 0
 
 # Allows you to set the MIBS environment variable used by SNMPTT
 # Leave blank or comment out to have the systems enviroment settings used
