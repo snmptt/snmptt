@@ -129,6 +129,13 @@ if ($debug == 2)
   $DEBUGGING = 2;
 }
 
+if (($input eq "") || ($output eq ""))
+{
+  print "\nMissing arguments!\n";
+  &show_help();
+  exit 1;
+}
+
 # Get complete path of input file (MIB) in a portable way (needed for -m switch for snmptranslate)
 $dirname = dirname $in;
 $basename = basename $in;
@@ -146,13 +153,6 @@ if ($exec ne '')
 }
 
 #print "nodes: $nodes\n";
-
-if (($input eq "") || ($output eq ""))
-{
-  print "\nMissing arguments!\n";
-  &show_help();
-  exit 1;
-}
 
 if ($net_snmp_perl == 1)
 {  

@@ -12,7 +12,7 @@
 <br>
 <b><font size="+3">SNMP Trap Translator v0.7.2</font></b><br>
 <b>(SNMPTT)</b> <br>
-This file was last updated on:&nbsp; September 4th, 2003
+This file was last updated on:&nbsp; September 8th, 2003
 <p><a href="#License">License</a> </p>
 <p><a href="#What-is-it">SNMPTT</a> </p>
 <blockquote><a href="#What-is-it">What is it?</a> <br>
@@ -174,10 +174,10 @@ not required if using Win32::ODBC)</li>
   <li> Optional: <a
  href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">Net-SNMP
 Perl module</a>.&nbsp; Only required for features that perform
-conversions between symbolic and numeric OIDs.&nbsp; Net-SNMP 5.0.8
+conversions between symbolic and numeric OIDs.&nbsp; Net-SNMP 5.0.8+
 with <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">patch
-722075</a>, or Net-SNMP 5.0.9 recommended. </li>
+722075</a>, or Net-SNMP 5.1 recommended. </li>
 </ul>
 All development and testing was done on Mandrake Linux 8.1 using
 UCD-SNMP v4.2.1 (package ucd-snmp-4.2.1-5mdk.i586.rpm) and Net-SNMP
@@ -1099,8 +1099,9 @@ in the snmptt.ini file.&nbsp; For example:<br>
       <div style="margin-left: 40px;">The current version of Net-SNMP
 (5.0.8 at the time of this writing) and everything before it does not
 support including the module name (eg: <span style="font-weight: bold;">IF-MIB::</span>)
-when translating an OID.&nbsp; A patch is available for 5.0.8 that will
-appear in later releases of Net-SNMP (5.0.9+).&nbsp; The patch can be
+when translating an OID.&nbsp; A patch is available for 5.0.8+ that
+will
+appear in later releases of Net-SNMP (5.1+).&nbsp; The patch can be
 downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.&nbsp; If the version of Net-SNMP you are using does not
@@ -1272,8 +1273,8 @@ everything before it does not support including the module name (eg: <span
  style="font-weight: bold;">IF-MIB::</span>) when translating an OID
 and most of the 5.0.x versions do not properly tranlsate numeric OIDs
 to
-long symbolic names.&nbsp; A patch is available for 5.0.8 that will
-appear in later releases of Net-SNMP (5.0.9+).&nbsp; The patch can be
+long symbolic names.&nbsp; A patch is available for 5.0.8+ that will
+appear in later releases of Net-SNMP (5.1+).&nbsp; The patch can be
 downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.<br>
@@ -1294,8 +1295,8 @@ everything before it does not support including the module name (eg: <span
  style="font-weight: bold;">IF-MIB::</span>) when translating an OID
 and most of the 5.0.x versions do not properly tranlsate numeric OIDs
 to
-long symbolic names.&nbsp; A patch is available for 5.0.8 that will
-appear in later releases of Net-SNMP (5.0.9+).&nbsp; The patch can be
+long symbolic names.&nbsp; A patch is available for 5.0.8+ that will
+appear in later releases of Net-SNMP (5.1+).&nbsp; The patch can be
 downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.</blockquote>
@@ -2482,13 +2483,16 @@ becomes the active NIC. <br>
 EDESC</blockquote>
 <p><br>
 Notes: </p>
-<blockquote>The #EXEC line is added by default.&nbsp; This can be
-changed by editing the <b>SNMPTTCONVERTMIB</b> script or specifying
-the
-EXEC line on the command line with <span style="font-weight: bold;">--exec=</span>.
+<blockquote>To specifiy an EXEC statement, use the <span
+ style="font-weight: bold;">--exec=</span> command line
+option.&nbsp;&nbsp;
   <p>To prevent the --#TYPE text from being prepended to the --#SUMMARY
 line, change <b>$prepend_type</b> to <b>0</b> in the <b>SNMPTTCONVERTMIB</b>
-script.</p>
+script.<br>
+  </p>
+  <p>See the help screen for more options (<span
+ style="font-weight: bold;">snmpttconvertmib --h</span>).<br>
+  </p>
 </blockquote>
 <p><br>
 <b><font size="+2">Requirements</font></b> </p>
@@ -2507,9 +2511,10 @@ module</a></b> <br>
 <p>Snmpttconvertmib converts a MIB file using the <span
  style="font-weight: bold;">snmptranslate </span>utility.&nbsp; <br>
 </p>
-<p>If the Net-SNMP Perl module is enabled using --net_snmp_perl on the
+<p>If the Net-SNMP Perl module is enabled using <span
+ style="font-weight: bold;">--net_snmp_perl</span> on the
 command line, it can provide more detailed variable descriptions in the
-DESC sestion such as:<br>
+DESC sestion if available such as:<br>
 </p>
 <ul>
   <li>variable syntax</li>
@@ -2618,7 +2623,8 @@ line if enabled.<br>
 <p><b></b><b>SNMPTRANSLATE</b> is used with the following syntax to
 find
 the <b>OID</b> of the trap: </p>
-<p><b>snmptranslate -IR -Ts <i>mib-name::</i><i>trapname</i></b> </p>
+<p><b>snmptranslate -IR -Ts <i>mib-name::</i><i>trapname</i> -m <span
+ style="font-style: italic;">mib-filename</span></b> </p>
 <p>Note: If&nbsp; Net-SNMP 5.0.2 or newer is detected, the command line
 also includes the -On switch.&nbsp; See the <a
  href="file:///h:/cvs/snmptt/readme.html#FAQ-Troubleshooting">FAQ</a>.</p>
@@ -2747,11 +2753,11 @@ symbolic form.&nbsp; The Perl module (used by SNMPTT) in Net-SNMP 5.0.8
 and previous versions should be able to handle single symbolic names
 (eg: coldTrap).&nbsp; UCD-SNMP may not properly convert symbolic names
 to numeric OIDs which could result in traps not being matched.&nbsp; A
-patch is available from the Net-SNMP web site for 5.0.8 to allow it to
+patch is available from the Net-SNMP web site for 5.0.8+ to allow it to
 handle other symbolic names such as module::symbolic name (eg:
 SNMPv2-MIB::coldTrap) etc.&nbsp; The patch can be downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
-patch page</a>.&nbsp; Net-SNMP 5.0.9 and higher will contain this patch.<br>
+patch page</a>.&nbsp; Net-SNMP 5.1 and higher will contain this patch.<br>
 </p>
 <p><b><br>
 Q:&nbsp; I have disabled syslog support in SNMPTT, but my syslog (or NT
@@ -2895,8 +2901,8 @@ writing) and everything before it does not support including the module
 name (eg: <span style="font-weight: bold;">IF-MIB::</span>) when
 translating an OID and most of the 5.0.x versions do not properly
 tranlsate numeric OIDs to long symbolic names.&nbsp; A patch is
-available for 5.0.8 that will appear in later releases of Net-SNMP
-(5.0.9+).&nbsp; The patch can be downloaded from the <a
+available for 5.0.8+ that will appear in later releases of Net-SNMP
+(5.1+).&nbsp; The patch can be downloaded from the <a
  href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">Net-SNMP
 patch page</a>.<br>
 <br>
