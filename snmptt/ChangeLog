@@ -1,3 +1,6 @@
+September 8th, 2003: Alex Burger <alex_b@users.sourceforge.net>
+- Add snmptt.pid support
+
 September 7th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Snmpttconvertmib:  Problem from below must be a Net-SNMP bug.
   MIBS environment variable now set to the filename of the MIB

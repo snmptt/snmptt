@@ -289,7 +289,10 @@ numerical enterprise OID</li>
 report the correct number of enterprise variables (was 1 lower than it
 should have been)</li>
   <li>Added <a href="http://www.nagios.org">Nagios</a> / <a
- href="http:/www.netsaint.org">Netsaint</a> integration documentation<br>
+ href="http:/www.netsaint.org">Netsaint</a> integration documentation</li>
+  <li>PID file created (/var/run/snmptt.pid) when running in daemon
+mode on Linux / Unix.&nbsp; snmptt-init.d script updated to remove the
+pid file when stopping.<br>
   </li>
   <li>Snmpttconvertmib</li>
   <ul>
@@ -994,11 +997,14 @@ by SNMPTT is used.&nbsp; Setting <b>use_trap_time</b> to <b>0</b> can
 result in inaccurate time stamps in log files due to the length of time
 SNMPTT sleeps between spool directory polling. </p>
 <p>Note:&nbsp; When running on a <b>non</b> Windows platform, SNMPTT
-will fork to the background if <b>daemon_fork</b> is set to 1. <br>
+will fork to the background and create a pid file in <span
+ style="font-weight: bold;">/var/run/snmptt.pid</span> if <b>daemon_fork</b>
+is set to 1.<br>
 </p>
 <p>Sending the HUP signal to SNMPTT when running as a daemon will cause
-it to reload the configuration file including the .ini file and any
-snmptt.conf files listed in the .ini file.&nbsp; A reload can also be
+it to reload the configuration file including the .ini file, any
+snmptt.conf files listed in the .ini file and any NODES files if
+dynamic_nodes is disabled.&nbsp; A reload can also be
 forced by adding a file to the spool directory called <span
  style="font-weight: bold;">!reload</span>.&nbsp; The filename is <span
  style="font-weight: bold;">not </span>case sensitive.&nbsp; If this
@@ -1924,20 +1930,20 @@ the command line:&nbsp; <span style="font-weight: bold;">snmptrapd -On</span>.<b
 &nbsp;&nbsp;&nbsp;&nbsp; You should be able to edit the <b>/etc/rc.d/init.d/snmptrapd</b>
 script if you have one and change <br>
 &nbsp;&nbsp;&nbsp;&nbsp; the <b>OPTIONS</b> to <b>"-On"</b>. <b><br>
-<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; Note:&nbsp;
+<span style="font-weight: bold;"><br>
+</span></b>
+<div style="margin-left: 40px;"><b><span style="font-weight: bold;">Note:&nbsp;
 The -On is recommended.&nbsp; This will make snmptrapd pass OIDs in
-numeric form</span><br style="font-weight: bold;">
-<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; and prevent
+numeric form </span><span style="font-weight: bold;">and prevent
 SNMPTT from having to translate the symbolic name to numerical
-form.&nbsp; If</span><br style="font-weight: bold;">
-<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; the </span></b><span
+form.&nbsp; If </span><span style="font-weight: bold;">the </span></b><span
  style="font-weight: bold;">UCD-SNMP / Net-SNMP Perl module is not
-installed, then you MUST use the <br>
-&nbsp;&nbsp;&nbsp;&nbsp; -On switch.&nbsp; Depending on the version of
-UCD-SNMP / Net-SNMP, some symbolic names<br>
-&nbsp;&nbsp;&nbsp;&nbsp; may not translate correctly.&nbsp; See the FAQ
-section for more info.<br>
-</span>
+installed, then you MUST use the -On switch.&nbsp; Depending on the
+version of
+UCD-SNMP / Net-SNMP, some symbolic names may not translate
+correctly.&nbsp; See the FAQ
+section for more info.</span><br>
+<span style="font-weight: bold;"></span></div>
 <p>&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your <b>snmp.conf</b>
 file to include the line: <b>printNumericOids 1.&nbsp; </b>This
 setting will take effect no matter what is used on the command line. </p>

@@ -362,10 +362,14 @@ if ($daemon == 1)
 
 	&loadsnmpttconf;	# Load SNMPTT.CONF file
 
-	# Only fork to the background if not Win32
+        # Only fork to the background if not Win32
 	if (($^O ne "MSWin32") && ($daemon_fork==1))
 	{
-		use POSIX qw(setsid);
+	        use POSIX qw(setsid);
+		use Cwd;
+
+		my $working_dir = cwd;
+		print "cwd: $working_dir\n";
 	
 		chdir '/'
 		   or die "Can't chdir to /: $!";
@@ -377,6 +381,18 @@ if ($daemon == 1)
 		   or die "Can't write to /dev/null: $!";
 		defined(my $pid = fork)
 		   or die "Can't fork: $!";
+
+		if ( ! (open(PID, ">/var/run/snmptt.pid") ))
+		{
+		  open(PID, ">$working_dir/snmptt.pid");
+		}
+
+		if (defined (PID))
+		{
+		  print(PID "$pid\n");
+		  close(PID);
+		}
+
 		exit if $pid;
 		POSIX:setsid
 		   or die "Can't start a new session: $!";

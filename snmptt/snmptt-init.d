@@ -1,12 +1,13 @@
 #!/bin/bash
 # init file for snmptt
 # Alex Burger - 8/29/02
+# 	      - 9/8/03 - Added snmptt.pid support to Stop function
 #
 # chkconfig: - 50 50
 # description: Simple Network Management Protocol (SNMP) Daemon
 #
 # processname: /usr/sbin/snmptt
-# pidfile: /var/run/snmptt
+# pidfile: /var/run/snmptt.pid
 
 # source function library
 . /etc/init.d/functions
@@ -30,6 +31,9 @@ stop() {
 	RETVAL=$?
 	echo
 	rm -f /var/lock/subsys/snmptt
+	if test -f /var/run/snmptt.pid ; then
+	  [ $RETVAL -eq 0 ] && rm -f /var/run/snmptt.pid
+	fi
 	return $RETVAL
 }
 
