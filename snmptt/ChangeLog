@@ -1,5 +1,5 @@
 March 24th, 2003: Alex Burger <alex_b@users.sourceforge.net>
-- Can not specify a NODES entry with snmpttconvertmib
+- Can now specify a NODES entry with snmpttconvertmib
 
 March 23rd, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Re-fixed bug in snmpttconvertmib that would cause the last trap
