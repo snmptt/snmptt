@@ -25,8 +25,10 @@ January 6th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 
 December 3rd, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - By default, snmpttconvertmib will now prepend the --TYPE line 
-  to the summary line.  Can be disabled in the script in the 
-  OPTIONS section
+  to the summary line followed by a ':'.  This can be disabled 
+  in the script in the OPTIONS section.  This should create a 
+  more descriptive FORMAT / EXEC line.  Example: 
+  "Status Trap: NIC switchover to slot $3"
 - Changed version to snmptt_0.4.1
 - Changed version to snmpttconvertmib_0.1.1
 

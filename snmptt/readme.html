@@ -164,8 +164,8 @@ Changed SNMPTTHANDLER to output the current date and time on the first
 line of the spool file</li>
 
 <li>
-Fixed code for default variable settings for .ini file.&nbsp; Defaults
-were not being set correctly if variable was not defined in .ini file.</li>
+Fixed bug with default variable settings being ignored.&nbsp; Defaults
+were not being set correctly if variable was not defined in the .ini file.</li>
 
 <li>
 Fixed bug with SNMPTT ignoring the daemon mode parameter in the .ini file</li>
@@ -178,6 +178,10 @@ when running in daemon mode</li>
 Added <b>fqdn_enable</b> configuration option to enable / disable the removal
 of the domain name from the host name passed to SNMPTT.&nbsp; Defaults
 to disabled (strip domain name)</li>
+
+<li>
+SNMPTTCONVERTMIB now prepends the contents of the --#TYPE line (if present)
+to the --#SUMMARY line to provide a more descriptive FORMAT / EXEC line</li>
 </ul>
 <b><font size=+1>0.4 - November 18th, 2002</font></b>
 <ul>
@@ -272,7 +276,7 @@ v0.4, or leave as 1 (recommended default) and test</li>
 
 <li>
 Replace <b><u>both</u></b> <b>SNMPTTHANDLER</b> and <b>SNMPTT</b> with
-the new versions</li>
+the new versions contained in the v0.5 package.</li>
 </ol>
 <b><font size=+1>v0.1, v0.2 or v0.3 to v0.4</font></b>
 <p>To upgrade from v0.1, v0.2 to v0.3 to v0.4, you should:
