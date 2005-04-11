@@ -465,7 +465,7 @@ if (1)
               next;
             }
             # If next line is a --#ARGUMENTS, pull out the information and place in $arguments
-            if ($line4 =~ /--#ARGUMENTS {(.*)}/)
+            if ($line4 =~ /--#ARGUMENTS\s*{(.*)}/)
             {
               @arguments = split /,/, $1;
               

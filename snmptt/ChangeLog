@@ -1,3 +1,8 @@
+April 11th, 2005: Alex Burger <alex_b@users.sourceforge.net>
+- Fix bug in snmpttconvertmib:  --ARGUMENTS {} line was expected to have
+  one space between ARGUMENTS and {}.  It can now be any amount of white
+  space, or no space at all.
+
 November 19th, 2004: Alex Burger <alex_b@users.sourceforge.net>
 - Allow for .* wildcard.  Only .x.* worked before.
 
