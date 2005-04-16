@@ -1,0 +1,45 @@
+April 16th, 2005
+
+snmptt_1.0.1.tar.gz:
+
+-fresh cvs checkout
+
+-update version in:
+        snmptt
+        snmpttconvert
+        snmpttconvertmib
+        snmptthandler
+        snmptt.ini
+        snmptt-nt.ini
+        docs/snmptt.html
+        docs/snmpttconvert.html
+        docs/snmpttconvertmib.html
+
+-update docs/snmptt.html:
+        Last updated date
+        What's new date and text
+        Upgrading date and text
+
+-update ChangeLog with release info
+
+-commit changes to CVS
+
+cd snmptt
+find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.0.1
+cd ../snmptt_1.0.1
+su
+rm -f docs/build
+chmod -R 664 *
+chmod 775 bin
+chmod 775 contrib
+chmod 775 docs
+chmod 775 examples
+chmod +x snmptt
+chmod +x snmpttconvert
+chmod +x snmpttconvertmib
+chmod +x snmptthandler
+chmod +x snmptt-net-snmp-test
+chown root.root * -R
+cd ..
+tar cvfz snmptt_1.0.1.tar.gz snmptt_1.0.1
+
