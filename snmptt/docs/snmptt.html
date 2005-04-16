@@ -13,9 +13,11 @@
 <title>SNMP Trap Translator</title>
 </head>
 <body>
-<h1>SNMP Trap Translator v1.0</h1>
+  
+<h1>SNMP Trap Translator v1.0.1</h1>
+  
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on:&nbsp; August 30th, 2004
+This file was last updated on:&nbsp; April 16th, 2005
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -68,11 +70,11 @@ Notes</a><br />
 <a href="#Integration-with-other-software">Integration with other
 software</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#Nagios-Netsaint">Nagios / Netsaint</a><br />
-<b>&nbsp;&nbsp;</b> <a href="#SEC">Simple Event Correlator
-(SEC)</a></blockquote>
+<b>&nbsp;&nbsp;</b> <a href="#SEC">Simple Event Correlator (SEC)</a><br />
+<b>&nbsp;&nbsp;</b> <a href="#EventWin">Windows Event Log forwarding</a></blockquote>
 <br />
 <h2><a id="License" name="License"></a>License</h2>
-<p>Copyright 2002-2004 Alex Burger<br />
+<p>Copyright 2002-2005 Alex Burger<br />
 alex_b@users.sourceforge.net<br />
 4/3/2002</p>
 <p>This program is free software; you can redistribute it and/or modify<br />
@@ -230,6 +232,17 @@ variable names translated into symbolic form, want to be able to have
 <b>translate_integers</b>, <b>translate_trap_oid</b> or <b>translate_oids</b>.
 Although not required, using the Perl module is recommended.</blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
+
+<h3><b>1.0.1</b> <b>-  ??, 2005</b></h3>
+<ul>
+  <li>Fixed bug that prevented the wildcard .* from being accepted on the EVENT line.</li>
+  <li>Fixed bug in snmpttconvertmib that prevented some MIBs from being accepted due to
+  spacing in the DEFINITIONS::= line.</li>
+  <li>Fixed bug in snmpttconvertmib that prevented --ARGUMENTS {} from being parsed 
+  due to spacing.</li>
+  <li>Added Windows Event Log forwarding documentation to integration section.
+</ul>
+
 <h3><b>1.0</b> <b>- August 30, 2004</b></h3>
 <ul>
 <li>SQL database connections are now opened after forking to the background
@@ -605,6 +618,15 @@ load</li>
 <li>Initial release</li>
 </ul>
 <h2><a id="Upgrading" name="Upgrading"></a>Upgrading</h2>
+
+<h3><b>v1.0 to v1.0.1</b></h3>
+<p>To upgrade from v1.0 to v1.0.1, you should:</p>
+<ol>
+  <li>Replace <b>snmptt</b> and <b>snmpttconvertmib</b> with the new versions
+  contained in the v1.0.1 package.&nbsp; Make sure the files are executable
+  (<b>chmod +x <i>filename</i></b>).</li>
+</ol>
+
 <h3><b>v0.9 to v1.0</b></h3>
 <p>To upgrade from v0.9 to v1.0, you should:</p>
 <ol>
@@ -2926,6 +2948,233 @@ print ".1.3.6.1.6.3.1.1.4.3.0 .1.3.6.1.4.1.9999\n";<br />
 close TRAP;</div>
 <br />
 <h4>5. Test</h4>
+
+<h3><a id='EventWin' name='EventWin'</a><b>Windows Event Log forwarding</b></h3>
+
+<h4>Overview</h4>
+
+<p>The Windows utility Event to Trap Translator (<b>evntwin.exe </b>and<b>
+evntcmd.exe)</b> can be used to configure Windows to forward user selectable
+Event Log entries to an SNMP manager when using the Microsoft SNMP
+service.  SNMPTT can be configured to process these traps like any other trap.
+  If the Event to Trap Translator is not already installed on your machine, it 
+  should be available from the Microsoft Resource Kit, SMS or after installation 
+  of the Microsoft SNMP service (Windows 2000 AS and Windows XP or higher).</p>
+
+<p><b>This section will outline the basic steps to configure Windows to forward
+event log entries to Net-SNMP / SNMPTT when using the Microsoft SNMP server
+(not the Net-SNMP snmpd.exe agent).&nbsp; It will not attempt to explain how
+evntwin.exe and evntcmd.exe function.&nbsp; Documentation on using
+evntwin.exe and evntcmd.exe is available on the Microsoft web site and should
+be reviewed.   </span>You should have a
+functioning SNMPTT system that can at least log translated traps to a log file
+before attempting this.</b></p>
+
+<h4>SNMP Service</h4>
+
+<p>The Windows SNMP Service is the Microsoft SNMP agent.  The agent is responsible for handling SNMP
+requests from management stations such as queries for CPU utilization, disk space
+etc.  The agent is also responsible for
+sending traps to management stations when an event occurs.</p>
+
+<p>Note: The Microsoft SNMP Trap Service is used to RECEIVE SNMP traps which
+is similar to the Net-SNMP <b>snmptrapd.exe</b> daemon.  The SNMP Trap Service is NOT used to send
+traps and is not required.</p>
+
+<h4><Configuring the trap destination</h4>
+
+<p>The Windows SNMP agent needs to be configured to forward traps to your
+Net-SNMP / SNMPTT management station.  
+</span>This is done using the following steps:</p>
+
+<ul>
+  <li>Click <b>Start - Settings - Control Panel</b></li>
+  <li>Open <b>Administrative Tools</b></li>
+  <li>Open <b>Services</b></li>
+  <li>Open <b>Local Policies</b></li>
+  <li>Open <b>SNMP Service</b></li>
+  <li>Click the <b>Traps</b> tab<b></b></li>
+  <li>Enter a community name and click Add to List</li>
+  <li>Click Add and enter the IP address of the management station</li>
+  <li>Click Apply</li>
+  <li>Click OK</li>
+  <li>Right-click on <b>SNMP Service</b> and select <b>Restart</b></li>
+</ul>
+
+<p>After the service is restarted, a coldStart trap will be sent to the
+management station.   If SNMPTT has been
+configured to translate coldStart messages, you should see a log entry similar
+to the following:</p>
+
+<p><b>Thu Sep 9 21:33:06 2004
+.1.3.6.1.6.3.1.1.5.1 Normal &quot;Status Events&quot; server1 - Device
+reinitialized (coldStart)</b></p>
+
+Note:If the SNMP Service is not listed in the Services Control Panel, then it
+needs to be installed using Add/Remove Programs.  Under Add/Remove
+Windows Components, select <b>Management and Monitoring Tools</b> and then <b>Simple
+Network Management Protocol</b>.
+
+<h4>Configuring the Event to Trap Translator</h4>
+
+<p>The following steps explain how to configure the Event to Trap Translator
+to forward system logon failures to SNMPTT:</p>
+
+<ul>
+  <li>Launch <b>evntwin.exe</b></li>
+  <li>For <b>Configuration Type</b> select <b>Custom</b></li>
+  <li>Click the <b>Edit</b> button</li>
+  <li>Inside <b>Event Sources</b>, expand <b>Security</b> and then click <b>Security</b></li>
+  <li>Locate Event ID <b>529</b> (Logon Failure:%n%tReason:%t%tUnknown username or bad password%n.)</li>
+  <li>Click <b>Add</b></li>
+  <li>Click <b>OK</b></li>
+  <li>Click <b>Apply</b></li>
+</ul>
+
+<p>The SNMP agent should now forward all logon failures to the SNMP management
+station.  A restart of the SNMP service should not be necessary.</p>
+
+<h4>Configuring SNMPTT to accept the Microsoft traps</h4>
+
+<p>An SNMPTT.CONF file needs to be created to handle the Microsoft traps.  As documented in Microsoft knowledge base
+article 318464, all Microsoft traps start with .1.3.6.1.4.1.311.1.13.1.  For simplicity, a single SNMPTT.CONF EVENT
+entry will be used with a wildcard to accept all Microsoft traps.  
+Following is an example <b>snmptt.conf.microsoft</b>
+file which needs to be included in the list of .conf files in the <b>TrapFiles</b>
+section in <b>snmptt.ini</b>:</p>
+
+<p>EVENT EventLog .1.3.6.1.4.1.311.1.13.1.* &quot;Regular&quot; Normal</p>
+
+<p>FORMAT EventLog entry: $1</p>
+
+<p>The first enterprise variable ($1) contains the complete text that is
+displayed in the Event Log Description box.  Variables are described in more 
+detail in the <b>Advanced Section</b>.</p>
+
+<p>After creating the <b>snmptt.conf.microsoft</b> file and adding it to the <b>snmptt.ini</b>,
+restart snmptt.</p>
+
+<h4>Testing</h4>
+
+<p>To test that the trap is received by SNMPTT, a logon failure in Windows
+should be created.</p>
+
+<p>Your default installation of Windows may not create Event
+Log entries for unsuccessful logins.   To configure Windows to log all failed logins, follow these steps:</p>
+
+<ul>
+  <li>Click <b>Start - Settings - Control - Panel</b></li>
+  <li>Open <b>Administrative Tools</b></li>
+  <li>Open <b>Local Security Policy</b></li>
+  <li>Open <b>Local Policies</b></li>
+  <li>Open <b>Audit Policy</b></li>
+  <li>Enable auditing of failures for <b>Audit account logon events</b></li>
+  <li>Enable auditing of failures for <b>Audit logon events</b></li>
+</ul>
+
+<p>The settings should take effect immediately, and a reboot
+should not be required.</p>
+
+<p>To generate an event log entry, you can either log off and
+try to log on to the system with an invalid username and password, or use the <b>runas.exe</b>
+command from a command prompt.  For example:</p>
+
+<ul>
+ <li class=MsoNormal style='mso-list:l2 level1 lfo3;tab-stops:list 36.0pt'><b>runas
+     /user:fakeuser cmd</b></li>
+</ul>
+
+<p>When prompted for a password, press <b>Enter</b>.</p>
+
+<p>SNMPTT should log something similar to the following:</p>
+
+<p><b>Thu Sep 9 21:05:40 2004 .1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121.0.529 Normal
+&quot;Regular&quot; server1 - Event Log entry: Logon Failure:.....Reason:..Unknown
+user name or bad password.....User Name:.fakeuser.....Domain:.......Logon
+Type:.joint-iso-ccitt.....Logon Process:.seclogon.....Authentication
+Package:.Negotiate.....Workstation Name:.SERVER1.</b></p>
+
+<p>The text in the log entry should match the text in the <b>Description</b>
+field of the Event Log entry but without the formatting.</p>
+
+<h4>Advanced Configuration</h4>
+
+<h4>Specific EVENTs</h4>
+
+<p>Instead of using a wildcard EVENT entry to match all Microsoft traps, it is
+possible to create EVENT entries for each trap.  As SNMPTT will only match using wildcard entries if there is no
+exact EVENT match, it may be desirable to create EVENT entries for a select
+number of important events, and keep the wildcard to catch any others.</p>
+
+<p>To determine the trap OID that will be used for the EVENT, display the entry
+in <b>evntwin.exe</b> and combine the <b>Enterprise OID</b>, a <b>0</b> and
+the <b>Trap Specific ID</b>.   </span>For
+example, for the security event ID 529 used above:</p>
+
+<p>Enterprise OID: 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121</p>
+
+<p>Trap Specific ID: 529</p>
+
+<p>Based on the information above, the following EVENT line would be used::</p>
+
+<p>EVENT EventLog 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121.<b>0</b>.529
+&quot;Regular&quot; Normal</p>
+
+<h4>Enterprise variables</h4>
+
+<p>Each trap sent from the Event to Trap Translator contains the text
+displayed in the Description, User and Computer fields for the Event Log.  Also passed are the individual variables
+which are used by the Windows SNMP Service to create the Description field in
+the Event Log.</p>
+
+<p>The following lists the enterprise variables that can be used in SNMPTT for
+each trap:</p>
+
+<ul style="list-style-type: none">
+  <li>$1:Event Log Description</li>
+  <li>$2:Event Log User</li>
+  <li>$3:Event Log Computer</li>
+  <li>$4:?</li>
+  <li>$5:?</li>
+  <li>$6:Event to Trap Translator variable %1</li>
+  <li>$7:Event to Trap Translator variable %2</li>
+  <li>$8:Event to Trap Translator variable %3</li>
+  <li>$9:Event to Trap Translator variable %4</li>
+  <li>$<i>n</i>:Event to Trap Translator variable %<i>n-5</i></li>
+</ul>
+
+<p>As the individual variables are passed in the trap, it is possible to recreate the FORMAT line instead of using
+the passed Description ($1) field.  For example, $1 in the previous example contains:</p>
+
+<p><b>Logon Failure:.....Reason:..Unknown user name or bad
+password.....User Name:.fakeuser.....Domain:.......Logon
+Type:.joint-iso-ccitt.....Logon Process:.seclogon.....Authentication
+Package:.Negotiate.....Workstation Name:.SERVER1.</b></p>
+
+<p>By reviewing the Description field
+as defined in the <b>evntwin.exe</b> utility, a new cleaned up FORMAT line can
+be used that doesnt contain all the .s.</p>
+
+<p>Following is the text from the
+Description field in <b>evntwin.exe</b> which will be used as a
+reference.  Notice the use of %<i>n</i>
+variables which are equivalent to the SNMPTT $n variables +5 (%1 = SNMPTTs
+$6).  Note:  In the example below, %n is a newline and %t is a tab while %<i>n</i> is a variable number.</p>
+
+<p>Logon Failure:%n %tReason:%t%tUnknown user name or bad
+password%n %tUser Name:%t%1%n %tDomain:%t%t%2%n %tLogon Type:%t%3%n  
+%tLogon Process:%t%4%n  
+%tAuthentication Package:%t%5%n  
+%tWorkstation Name:%t%6</p>
+
+<p>The EVENT entry could be cleaned up using:</p>
+
+<p><b>EVENT EventLog 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121.<b>0</b>.529
+  &quot;Regular&quot; Normal<br />
+FORMAT Logon Failure: Reason: Unknown user name or bad password.  User Name: $6, Domain: $7, Logon Type: $8,
+Logon Process: $9, Auth package: $10, Workstation name: $11</b></p>
+
 </blockquote>
 </body>
 </html>
+
