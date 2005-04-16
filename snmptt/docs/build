@@ -43,3 +43,21 @@ chown root.root * -R
 cd ..
 tar cvfz snmptt_1.0.1.tar.gz snmptt_1.0.1
 
+SourceForge:
+-upload file
+-create file release, notify users
+-create news release
+-post message to snmptt-users, snmptt-developer
+
+Web site:
+-create News section
+-update Change Log page
+-update Documentation pages
+-update License page
+
+Freshmeat:
+-create new release
+
+
+
+

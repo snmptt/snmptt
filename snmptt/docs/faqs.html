@@ -14,7 +14,7 @@
 <body>
 <h1>SNMPTT FAQ / Troubleshooting</h1>
 <b>(<a href="http://www.snmptt.org">www.snmptt.org</a>)</b><br />
-This file was last updated on:&nbsp; August 30th, 2004<br />
+This file was last updated on:&nbsp; April 16th, 2005<br />
 <br />
 <b>Q:&nbsp; What version of Net-SNMP should I run?</b>
 <p>A:&nbsp; If you have no plans on using the Net-SNMP Perl module (see the
@@ -70,8 +70,12 @@ features may not work correctly.&nbsp; The use of Net-SNMP 5.1.1 or 5.0.8 /
 5.0.9 with patch 72205 is <span style="font-weight: bold;">highly
 recommended</span>.<br />
 <br />
-Note:&nbsp; Do not confuse the CPAN module Net::SNMP with the Net-SNMP Perl
-module.&nbsp; They are two completely unrelated programs.&nbsp; Net::SNMP is a
+Note1:&nbsp; In addition to the regular Perl modules, Net-SNMP allows Perl to be 
+embedded into the SNMP agent by specifying --enable-embedded-perl during compilation.  
+This is <b>not</b> currently required by SNMPTT.<br />
+<br />
+Note2:&nbsp; Do not confuse the CPAN module Net::SNMP (use Net::SNMP;) with the Net-SNMP Perl
+module (use SNMP;).&nbsp; They are two completely unrelated programs.&nbsp; Net::SNMP is a
 stand-alone SNMP module for Perl, while the Net-SNMP Perl module is a Perl
 extension of the <a href="http://www.net-snmp.org">Net-SNMP</a> software and
 is included with <a href="http://www.net-snmp.org">Net-SNMP</a>.<br />
@@ -116,7 +120,7 @@ Q:&nbsp; How to I enable the Perl support for UCD-SNMP / Net-SNMP under
 Windows</span></b><span style="font-weight: bold;">?</span></p>
 <p style="font-weight: bold; text-decoration: underline;">Native Windows:</p>
 <p style="margin-left: 40px;">Install ActiveState ActivePerl and then the
-ActivePerl ppm module included in the Net-SNMP binary available from the
+ActivePerl <b>.ppm</b> module included in the Net-SNMP binary available from the
 <a href="http://www.net-snmp.org">Net-SNMP web site</a>.</p>
 <p style="margin-left: 40px;">If you compiled your own version of Net-SNMP,
 see the perl/README document for instructions on compiling the Perl
@@ -283,8 +287,7 @@ installed UCD-SNMP / NE-SNMP Perl module.&nbsp; The value of <span style=
 "font-weight: bold;">best_guess</span> can be specified on the command line to
 determine how translations should occur.<br />
 <br />
-<p><b>Q:&nbsp; I converted a MIB using snmpttconvertmib (default snmptranslate
-mode) but the OIDs are appearing as text instead of being numerical.&nbsp;
+<p><b>Q:&nbsp; I converted a MIB using snmpttconvertmib but the OIDs are appearing as text instead of being numerical.&nbsp;
 Why?</b></p>
 <blockquote><b>For example:</b></blockquote>
 <blockquote><b>EVENT linkUp
