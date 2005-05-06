@@ -23,6 +23,7 @@ snmptt_1.0.1.tar.gz:
 -update ChangeLog with release info
 
 -commit changes to CVS
+-tag with new version
 
 cd snmptt
 find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.0.1
