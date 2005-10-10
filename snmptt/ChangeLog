@@ -1,3 +1,12 @@
+Oct 9th, 2005: Alex Burger <alex_b@users.sourceforge.net>
+- Changed PostgreSQL INSERT statements to PREPARE / EXECUTE to 
+  prevent issue with trap data being interpreted as placeholders
+  in the SQL statement which was causing logging errors.
+
+April 16th, 2005: Alex Burger <alex_b@users.sourceforge.net>
+- snmpttconvertmib was not printing 'Processing MIB xxx' if 
+  DEFINITIONS::= line didn't contain spaces (similar to 11/19/04).
+
 April 15th, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - Added Windows Event Log forwarding documentation to integration section
 

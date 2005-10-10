@@ -1350,36 +1350,69 @@ sub processtrap
                             my $community = $var[5];
                             $community =~ s(\')(\\\')g;   #'
                             $community =~ s(\")(\\\")g;   #"
-                              
-                            unless (defined ($dbh_postgresql->do(
-                                  "INSERT INTO $postgresql_dbi_table (eventname, eventid, trapoid, enterprise, 
-                                  community, hostname, agentip, category, severity, uptime, traptime, 
-                                  formatline) VALUES (
-                                  \'$event2[0]\',\'$receivedtrap_entry'\,\'$receivedtrap_trans'\,
-                                  \'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
-                                  \'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
-                                  \'$message_short2\')" ) ) )
-                            {
-                              my $msg = "Postgres error: Unable to perform INSERT INTO: ".$dbh_postgresql->errstr;
-                              
+                            
+                            my $prepare_successful = 0;
+                            my $do_successful = 0;
+                            
+                            my $sql_statement = "INSERT INTO $postgresql_dbi_table (eventname, eventid, 
+                                  trapoid, enterprise, community, hostname, agentip, category, severity, 
+                                  uptime, traptime, formatline) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+                            
+                            my $sth_postgresql = $dbh_postgresql->prepare($sql_statement);
+                            unless (defined ($sth_postgresql)) {
+                              my $msg = "Postgres error: Unable to perform PREPARE: ".$dbh_postgresql->errstr;
+
                               warn $msg, "\n";
 
                               if ($DEBUGGING >= 1)
                               {
                                 print $msg, "\n";
                               }
-                              
+
                               if ($syslog_system_enable == 1)
                               {
                                 syslog_system($msg);
                               }
-                              
+
                               if ($eventlog_system_enable == 1)
                               {
-                                eventlog_system($msg,19,$eventlog_error);
+                                eventlog_system($msg,22,$eventlog_error);
                               }
                             }
-                            else
+                            else {
+                              $prepare_successful = 1;
+                            }
+
+                            if ($prepare_successful == 1)
+                            {
+                              unless (defined ($sth_postgresql->execute($event2[0],$receivedtrap_entry,
+                              $receivedtrap_trans,$db_enterprise,$community,$agent_dns_name,$var[4],$event2[1],
+                              $event2[2],$var[2],$trap_date_time,$message_short2))) {
+                                my $msg = "Postgres error: Unable to perform INSERT INTO (EXECUTE): ".$dbh_postgresql->errstr;
+
+                                warn $msg, "\n";
+
+                                if ($DEBUGGING >= 1)
+                                {
+                                  print $msg, "\n";
+                                }
+
+                                if ($syslog_system_enable == 1)
+                                {
+                                  syslog_system($msg);
+                                }
+
+                                if ($eventlog_system_enable == 1)
+                                {
+                                  eventlog_system($msg,19,$eventlog_error);
+                                }
+                              }
+                              else {
+                                $do_successful = 1;
+                              }
+                            }
+                            
+                            if ($do_successful == 1)  
                             {
                               $trap_successfully_logged++;
                             }
@@ -3028,28 +3061,64 @@ sub searchfortrap
 				$community =~ s(\')(\\\')g;   #'
 				$community =~ s(\")(\\\")g;   #"
 				
-				unless (defined ($dbh_postgresql->do(
-					"INSERT INTO $postgresql_dbi_table_unknown (trapoid, enterprise, 
-					community, hostname, agentip, uptime, traptime, 
-					formatline) VALUES (
-					\'$receivedtrap_trans'\,
-					\'$db_enterprise\',\'$community\',\'$agent_dns_name\',\'$var[4]\',
-					\'$var[2]\',\'".$trap_date_time."\',
-					\'$message_short2\')" ) ) )
-					{
-					  warn "Postgres error: Unable to perform INSERT INTO: ".$dbh_postgresql->errstr."\n";
+                                my $prepare_successful = 0;
+                                my $do_successful = 0;
 
-					  if ($syslog_system_enable == 1)
-					  {
-					    syslog_system("Postgres error: Unable to perform INSERT INTO: ".$dbh_postgresql->errstr);
-					  }
-					  
-					  if ($eventlog_system_enable == 1)
-					  {
-					    eventlog_system("Postgres error: Unable to perform INSERT INTO: ".$dbh_postgresql->errstr,
-					    		19,$eventlog_error);
-					  }
-				 }
+                                my $sql_statement = "INSERT INTO $postgresql_dbi_table_unknown (trapoid, enterprise,
+                                      community, hostname, agentip, uptime, traptime,
+                                      formatline) VALUES (?,?,?,?,?,?,?,?)";
+                                                            
+                                my $sth_postgresql = $dbh_postgresql->prepare($sql_statement);
+                                unless (defined ($sth_postgresql)) {
+				  my $msg = "Postgres error: Unable to perform PREPARE: ".$dbh_postgresql->errstr;
+
+                                  warn $msg, "\n";
+
+                                  if ($DEBUGGING >= 1)
+                                  {
+                                    print $msg, "\n";                                  
+                                  }
+
+                                  if ($syslog_system_enable == 1)
+                                  {
+                                    syslog_system($msg);
+                                  }
+
+                                  if ($eventlog_system_enable == 1)
+                                  {
+                                    eventlog_system($msg,22,$eventlog_error);
+                                  }
+                                }
+                                else {
+                                  $prepare_successful = 1;
+                                }
+
+                                if ($prepare_successful == 1)
+                                {
+                                  unless (defined ($sth_postgresql->execute($receivedtrap_trans,$db_enterprise,
+                                  $community,$agent_dns_name,$var[4],$var[2],$trap_date_time,$message_short2))) {
+                                    my $msg = "Postgres error: Unable to perform INSERT INTO (EXECUTE): ".$dbh_postgresql->errstr;
+                                    warn $msg, "\n";
+
+                                    if ($DEBUGGING >= 1)
+                                    {
+                                      print $msg, "\n";
+                                    }
+
+                                    if ($syslog_system_enable == 1)
+                                    {
+                                      syslog_system($msg);
+                                    }
+
+                                    if ($eventlog_system_enable == 1)
+                                    {
+                                      eventlog_system($msg,19,$eventlog_error);
+                                    }
+                                  }
+                                  else {
+                                    $do_successful = 1;
+                                  }
+                                }
 			}
 			
 			if ($dbd_odbc_enable == 1 && defined ($dbh_odbc) && $dbd_odbc_table_unknown ne "")
