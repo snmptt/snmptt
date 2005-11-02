@@ -18,6 +18,8 @@ Nov 2nd, 2005: Alex Burger <alex_b@users.sourceforge.net>
   command will be all standard and enterprise variables, similar 
   to unknown_trap_log_file but without the newlines.  Thanks to
   Carlos Velasco for the patch.
+- Modify output of hash dump to print Event: instead of hash:
+- Add dump of duplicate events for --dump option
 
 Oct 9th, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - Changed PostgreSQL INSERT statements to PREPARE / EXECUTE to 

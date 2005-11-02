@@ -929,7 +929,7 @@ sub processtrap
 		$event2[8]=$event{"$receivedtrap_entry"}[8+$l];	# 8: DESC array
 		$event2[9]=$event{"$receivedtrap_entry"}[9+$l];	# 9: PREEXEC array
 		
-		$l+=11;
+		$l+=11; # Also update in 'Printing out all the events in hash table'
 			
 		if ($event2[5] eq '')
 		{
@@ -2557,20 +2557,45 @@ sub loadsnmpttconf
 	}
 	
 	if ($DEBUGGING >= 2)
-	{
-		print "Printing out all the events in hash table:\n\n";
-		foreach $key (sort keys %event)
-		{		
-			$l=0;
-			while (defined($event{$key}[$l+1]))
-			{	
-				print  "hash: $key => $event{$key}[1+$l],$event{$key}[2+$l],$event{$key}[3+$l],$event{$key}[4+$l],$event{$key}[7+$l][0]\n";
-			$l+=9;
-			}
+        {
+          print "==========================================================\n";
+          print "Printing out all the events in hash table:\n\n";
+          foreach $key (sort keys %event)
+          {		
+            $l=0;
+            while (defined($event{$key}[$l+1]))
+            {	
+              print  "Event: $key => $event{$key}[1+$l],$event{$key}[2+$l],$event{$key}[3+$l],$event{$key}[4+$l],$event{$key}[7+$l][0]\n";
+              $l+=11;
+            }
+          }
+          print "\nFinished printing out all events in hash table\n";
+          print "==========================================================\n";
 
-		}
-		print "Finished printing out all events in hash table\n";
-	}
+          # Print out duplicates if asking for a dump (snmptt --dump)
+          if ($dump == 1) {
+            print "Printing out all duplicate events in hash table:\n\n";
+            my %temp = ();
+            foreach $key (sort keys %event)
+            {		            
+              $l=0;
+              while (defined($event{$key}[$l+1]))
+              {	
+                $temp{$key}++;
+                $l+=11;
+              }            
+            }
+            foreach $key (sort keys %temp)
+            {
+              if ($temp{$key} > 1) {
+                print "Duplicate event: $key\n";
+              }
+            }            
+            print "\nFinished printing out all duplicate events in hash table\n";
+            print "==========================================================\n";
+          }
+
+        }
 
 	close SNMPTTCONF;
 }
