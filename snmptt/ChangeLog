@@ -1,3 +1,16 @@
+Nov 2nd, 2005: Alex Burger <alex_b@users.sourceforge.net>
+- Added PREEXEC snmptt.conf file option to allow an external 
+  program to be run before processing the FORMAT and EXEC lines.
+  The output of the external program is stored in the $pn variable
+  where n is a number starting from 1.  Multiple PREEXEC lines
+  are permitted.  The first PREEXEC stores the result of the
+  command in $p1, the second in $p2 etc.  Any ending newlines
+  are removed.  snmptt.ini parameter pre_exec_enable can be used
+  to enable / disable it.
+- If the debug log file can not be opened, a message is logged
+  to syslog if syslog_system_enable is enabled, and to the 
+  Event Log if eventlog_system_enable is enabled.
+
 Oct 9th, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - Changed PostgreSQL INSERT statements to PREPARE / EXECUTE to 
   prevent issue with trap data being interpreted as placeholders

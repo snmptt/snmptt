@@ -457,6 +457,10 @@ sql_win32_odbc_password = password
 # want to temporarily disable all EXEC commands
 exec_enable = 1
 
+# Set to 1 to allow PREEXEC statements to execute.  Should normally be left on unless you
+# want to temporarily disable all PREEXEC commands
+pre_exec_enable = 1
+
 [Debugging]
 # 0 - do not output messages
 # 1 - output some basic messages
