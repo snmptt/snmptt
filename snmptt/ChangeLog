@@ -20,6 +20,7 @@ Nov 2nd, 2005: Alex Burger <alex_b@users.sourceforge.net>
   Carlos Velasco for the patch.
 - Modify output of hash dump to print Event: instead of hash:
 - Add dump of duplicate events for --dump option
+- Fix bug with --dump trying to open up syslog, eventlog etc
 
 Oct 9th, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - Changed PostgreSQL INSERT statements to PREPARE / EXECUTE to 
