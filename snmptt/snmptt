@@ -3057,11 +3057,37 @@ sub searchfortrap
 	{
 		if ($DEBUGGING >= 1)
 		{
-			print "\n\nTrap not defined.  Nothing to do...\n\n";
+			print "\n\nTrap not defined...\n\n";
 		}
 
                 # Statistics
                 $g_total_traps_unknown++;
+
+		if ($unknown_trap_exec ne "") {
+                  if ($DEBUGGING >= 1) {
+                    print "\n\nUnknown trap EXEC line:\n";
+                  }
+                  my $command = $unknown_trap_exec . " \"";
+                  $command .= scalar($trap_date_time) . ": Unknown trap ($var[3]) received from $var[0] at:";
+                  
+                  #print out all standard variables
+                  for ($i=0;$i <= $#var;$i++) {
+                    $command .= " Value $i: $var[$i]";
+                  }
+                  
+                  #print out all enterprise specific variables
+                  for ($i=0;$i <= $#entvar;$i++) {
+                    $command .= " Ent Value $i: $entvarname[$i]=$entvar[$i]";
+                  }
+                  
+                  $command .= "\"";
+                  if ($DEBUGGING >= 1) {
+                    print "Unknown trap EXEC command:$command\n";
+                  }
+                  
+                  # Execute command
+                  system $command;
+                }
 		
 		if ($unknown_trap_log_enable == 1)
 		{
@@ -3440,6 +3466,7 @@ sub loadsnmpttini {
 	$dynamic_nodes = $cfg->val('General', 'dynamic_nodes');
 	$description_mode = $cfg->val('General', 'description_mode');
 	$description_clean = $cfg->val('General', 'description_clean');
+	$unknown_trap_exec = $cfg->val('General', 'unknown_trap_exec');
         
 	# DaemonMode
 	$daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -3557,6 +3584,7 @@ sub loadsnmpttini {
 	if (! defined ($dynamic_nodes)) { $dynamic_nodes = 0} ;
 	if (! defined ($description_mode)) { $description_mode = 0} ;
 	if (! defined ($description_clean)) { $description_clean = 1} ;
+	if (! defined ($unknown_trap_exec)) { $unknown_trap_exec = ''} ;
 
         if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
 	if (! defined ($daemon_uid)) { $daemon_uid = ''} ;

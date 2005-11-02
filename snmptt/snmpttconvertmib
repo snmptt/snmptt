@@ -641,7 +641,9 @@ if (1)
           # Build description line based on the number of sentences requested.
           for (my $i=1 ; $i <= $format_desc; $i++)
           {
-            $descriptionline1 = $descriptionline1 . $description_temp2[$i-1] . " " ;
+            if ($description_temp2[$i-1] ne '') {
+              $descriptionline1 = $descriptionline1 . $description_temp2[$i-1] . " " ;
+            }
           }
           chop $descriptionline1;	# Remove last space
         }

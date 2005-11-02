@@ -10,6 +10,14 @@ Nov 2nd, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - If the debug log file can not be opened, a message is logged
   to syslog if syslog_system_enable is enabled, and to the 
   Event Log if eventlog_system_enable is enabled.
+- Fix a problem when --format_desc=n was used. It was adding a 
+  trailing whitespace for every non existant line in description.
+  Thanks to Carlos Velasco for the fix.
+- Added unknown_trap_exec snmptt.ini option.  If defined, the 
+  command will be executed for ALL unknown traps.  Passed to the
+  command will be all standard and enterprise variables, similar 
+  to unknown_trap_log_file but without the newlines.  Thanks to
+  Carlos Velasco for the patch.
 
 Oct 9th, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - Changed PostgreSQL INSERT statements to PREPARE / EXECUTE to 
