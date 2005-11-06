@@ -14,7 +14,7 @@
 </head>
 <body>
   
-<h1>SNMP Trap Translator v1.0.1</h1>
+  <h1>SNMP Trap Translator v1.1beta1</h1>
   
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
 This file was last updated on:&nbsp;November 5th, 2005
@@ -235,7 +235,7 @@ variable names translated into symbolic form, want to be able to have
 Although not required, using the Perl module is recommended.</blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
 
-<h3><b>1.0.1</b> <b>-  ??, 2005</b></h3>
+<h3><b>v1.1beta1</b> <b>- November 5th, 2005</b></h3>
 <ul>
   <li>Added <b>PREEXEC</b> <b>snmptt.conf</b> file option to allow an external 
   program to be run before processing the FORMAT and EXEC lines.
@@ -258,6 +258,7 @@ Although not required, using the Perl module is recommended.</blockquote>
   <li>Fixed bug with PostgreSQL where some trap data was interpreted as 'placeholders'
   in the INSERT statement which caused logging errors.  PostgreSQL now uses
   PREPARE / EXECUTE statements instead.
+  <li>MySQL now uses PREPARE / EXECUTE statements instead of a single INSERT statement.</li>
   <li>Fixed bug that prevented the wildcard <b>.*</b> from being accepted on the EVENT line.</li>
   <li>Added Windows Event Log forwarding documentation to integration section.
   <li>SNMPTTConvertMIB:</li>
@@ -649,11 +650,11 @@ load</li>
 </ul>
 <h2><a id="Upgrading" name="Upgrading"></a>Upgrading</h2>
 
-<h3><b>v1.0 to v1.0.1</b></h3>
-<p>To upgrade from v1.0 to v1.0.1, you should:</p>
+<h3><b>v1.0 to v1.1beta1</b></h3>
+<p>To upgrade from v1.0 to v1.1beta1, you should:</p>
 <ol>
   <li>Replace <b>snmptt</b> and <b>snmpttconvertmib</b> with the new versions
-  contained in the v1.0.1 package.&nbsp; Make sure the files are executable
+  contained in the v1.1beta1 package.&nbsp; Make sure the files are executable
   (<b>chmod +x <i>filename</i></b>).</li>
 </ol>
 
@@ -1141,11 +1142,15 @@ Loading <i>snmpttconfigfile</i> <b>(*)</b><br />
 Could not open configuration file: <i>snmpttconfigfile</i><b>(*)</b><br />
 Finished loading <i>x</i> lines from <i>snmpttconfigfile</i> <b>(*)</b><br />
 MySQL error: Unable to connect to database<br />
+SQL error: Unable to connect to DSN<br />
 Can not open log file <i>logfile</i><br />
-MySQL error: Unable to perform INSERT INTO<br />
+MySQL error: Unable to perform PREPARE<br />
+MySQL error: Unable to perform INSERT INTO (EXECUTE)<br />
 DBI DBD::ODBC error: Unable to perform INSERT INTO<br />
+Win32::ODBC error: Unable to perform INSERT INTO<br />
 PostgreSQL error: Unable to connect to database<br />
-PostgreSQL error: Unable to perform INSERT INTO<br />
+PostgreSQL error: Unable to perform PREPARE<br />
+PostgreSQL error: Unable to perform INSERT INTO (EXECUTE)<br />
 <p><b>* (daemon mode only)</b></p>
 </blockquote>
 <h3><a id="LoggingEventLog" name="LoggingEventLog"></a>Logging - EventLog</h3>
@@ -1183,7 +1188,8 @@ EventID 11: Finished loading <i>x</i> lines from
 EventID 12: MySQL error: Unable to connect to database<br />
 EventID 13: SQL error: Unable to connect to DSN <i>dsn</i><br />
 EventID 14: Can not open log file <i>logfile</i><br />
-EventID 15: MySQL error: Unable to perform INSERT INTO<br />
+EventID 23: MySQL error: Unable to perform PREPARE<br />
+EventID 15: MySQL error: Unable to perform INSERT INTO (EXECUTE)<br />
 EventID 16: DBI DBD::ODBC error: Unable to perform INSERT INTO<br />
 EventID 17: Win32::ODBC error: Unable to perform INSERT INTO<br />
 EventID 18: PostgreSQL error: Unable to connect to database<br />

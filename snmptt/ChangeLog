@@ -1,3 +1,9 @@
+Nov 5th, 2005: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.1beta1
+- Changed MySQL INSERT statements to PREPARE / EXECUTE as it is
+  safer than trying to escape all the fields manually.  This way
+  all escaping is done via the MySQL Perl module.
+
 Nov 2nd, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - Added PREEXEC snmptt.conf file option to allow an external 
   program to be run before processing the FORMAT and EXEC lines.

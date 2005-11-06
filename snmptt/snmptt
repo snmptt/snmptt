@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v1.0.1
+# SNMPTT v1.1beta1
 #
 # Copyright 2002-2005 Alex Burger
 # alex_b@users.sourceforge.net
@@ -46,7 +46,7 @@
 ##############################################################################
 #
 
-$snmptt_version = "v1.0.1";
+$snmptt_version = "v1.1beta1";
 
 sub showversion
 {
@@ -1380,16 +1380,16 @@ sub processtrap
                         $community =~ s(\')(\\\')g;   #'
                         $community =~ s(\")(\\\")g;   #"				
                           
-                        unless (defined ($dbh_mysql->do(
-                              "INSERT INTO $mysql_dbi_table (eventname, eventid, trapoid, enterprise, 
-                              community, hostname, agentip, category, severity, uptime, traptime, 
-                              formatline) VALUES (
-                              \'$event2[0]\',\'$receivedtrap_entry'\,\'$receivedtrap_trans'\,\'$db_enterprise\',
-                              \'$community\',\'$agent_dns_name\',\'$var[4]\',
-                              \'$event2[1]\',\'$event2[2]\',\'$var[2]\',\'".$trap_date_time."\',
-                              \'$message_short2\')" ) ) )
-                        {
-                          my $msg = "MySQL error " . $dbh_mysql->{'errno'} . ": Unable to perform INSERT INTO: ".$dbh_mysql->errstr;                             
+                        my $prepare_successful = 0;
+                        my $do_successful = 0;
+                        
+                        my $sql_statement = "INSERT INTO $mysql_dbi_table (eventname, eventid, 
+                        trapoid, enterprise, community, hostname, agentip, category, severity, 
+                        uptime, traptime, formatline) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+                        
+                        my $sth_mysql = $dbh_mysql->prepare($sql_statement);
+                        unless (defined ($sth_mysql)) {
+                          my $msg = "MySQL error " . $dbh_mysql->{'errno'} . ": Unable to perform PREPARE: ".$dbh_mysql->errstr;                             
                           warn $msg, "\n";
                           
                           if ($DEBUGGING >= 1)
@@ -1404,10 +1404,42 @@ sub processtrap
                           
                           if ($eventlog_system_enable == 1)
                           {
-                            eventlog_system($msg,15,$eventlog_error);
+                            eventlog_system($msg,23,$eventlog_error);
                           }
                         }
-                        else
+                        else {
+                          $prepare_successful = 1;
+                        }
+                        
+                        if ($prepare_successful == 1)
+                        {
+                          unless (defined ($sth_mysql->execute($event2[0],$receivedtrap_entry,
+                                $receivedtrap_trans,$db_enterprise,$community,$agent_dns_name,$var[4],$event2[1],
+                                $event2[2],$var[2],$trap_date_time,$message_short2))) {
+                            my $msg = "MySQL error " . $dbh_mysql->{'errno'} . ": Unable to perform INSERT INTO (EXECUTE): ".$dbh_mysql->errstr;
+                            warn $msg, "\n";
+                            
+                            if ($DEBUGGING >= 1)
+                            {
+                              print $msg, "\n";
+                            }
+                            
+                            if ($syslog_system_enable == 1)
+                            {
+                              syslog_system($msg);
+                            }
+                            
+                            if ($eventlog_system_enable == 1)
+                            {
+                              eventlog_system($msg,15,$eventlog_error);
+                            }
+                          }
+                          else {
+                            $do_successful = 1;
+                          }
+                        }
+                        
+                        if ($do_successful == 1)  
                         {
                           $trap_successfully_logged++;
                         }
@@ -3173,7 +3205,6 @@ sub searchfortrap
 			
 			if ($mysql_dbi_enable == 1 && defined ($dbh_mysql) && $mysql_dbi_table_unknown ne "")
 			{
-				
 				# Backslash any quotes
 				my $message_short2 = $message_short;
 				$message_short2 =~ s(\')(\\\')g;   #'
@@ -3183,28 +3214,62 @@ sub searchfortrap
 				$community =~ s(\')(\\\')g;   #'
 				$community =~ s(\")(\\\")g;   #"				
 				
-				unless (defined ($dbh_mysql->do(
-					"INSERT INTO $mysql_dbi_table_unknown (trapoid, enterprise, 
-					community, hostname, agentip, uptime, traptime, 
-					formatline) VALUES (
-					\'$receivedtrap_trans'\,\'$db_enterprise\',
-					\'$community\',\'$agent_dns_name\',\'$var[4]\',
-					\'$var[2]\',\'".$trap_date_time."\',
-					\'$message_short2\')" ) ) )
-					{
-					  warn "MySQL error: Unable to perform INSERT INTO: ".$dbh_mysql->errstr."\n";
+                                my $prepare_successful = 0;
+                                my $do_successful = 0;
 
-					  if ($syslog_system_enable == 1)
-					  {
-					    syslog_system("MySQL error: Unable to perform INSERT INTO: ".$dbh_mysql->errstr);
-					  }
-					  
-					  if ($eventlog_system_enable == 1)
-					  {
-					    eventlog_system("MySQL error: Unable to perform INSERT INTO: ".$dbh_mysql->errstr,
-					    		15,$eventlog_error);
-					  }
-				 }
+                                my $sql_statement = "INSERT INTO $mysql_dbi_table_unknown (trapoid, enterprise,
+                                      community, hostname, agentip, uptime, traptime,
+                                      formatline) VALUES (?,?,?,?,?,?,?,?)";
+                                my $sth_mysql = $dbh_mysql->prepare($sql_statement);
+                                unless (defined ($sth_mysql)) {
+                                  my $msg = "MySQL error " . $dbh_mysql->{'errno'} . ": Unable to perform PREPARE: ".$dbh_mysql->errstr;
+                                  warn $msg, "\n";
+
+                                  if ($DEBUGGING >= 1)
+                                  {
+                                    print $msg, "\n";                                  
+                                  }
+
+                                  if ($syslog_system_enable == 1)
+                                  {
+                                    syslog_system($msg);
+                                  }
+
+                                  if ($eventlog_system_enable == 1)
+                                  {
+                                    eventlog_system($msg,23,$eventlog_error);
+                                  }
+                                }
+                                else {
+                                  $prepare_successful = 1;
+                                }
+
+                                if ($prepare_successful == 1)
+                                {
+                                  unless (defined ($sth_mysql->execute($receivedtrap_trans,$db_enterprise,
+                                  $community,$agent_dns_name,$var[4],$var[2],$trap_date_time,$message_short2))) {
+                                    my $msg = "MySQL error " . $dbh_mysql->{'errno'} . ": Unable to perform INSERT INTO (EXECUTE): ".$dbh_mysql->errstr;      
+                                    warn $msg, "\n";
+
+                                    if ($DEBUGGING >= 1)
+                                    {
+                                      print $msg, "\n";
+                                    }
+
+                                    if ($syslog_system_enable == 1)
+                                    {
+                                      syslog_system($msg);
+                                    }
+
+                                    if ($eventlog_system_enable == 1)
+                                    {
+                                      eventlog_system($msg,15,$eventlog_error);
+                                    }
+                                  }
+                                  else {
+                                    $do_successful = 1;
+                                  }
+                                }
 			}
 
 			if ($postgresql_dbi_enable == 1 && defined ($dbh_postgresql) && $postgresql_dbi_table_unknown ne "")
