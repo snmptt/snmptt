@@ -17,7 +17,7 @@
 <h1>SNMP Trap Translator v1.0.1</h1>
   
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on:&nbsp; May 6th, 2005
+This file was last updated on:&nbsp;November 5th, 2005
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -54,6 +54,7 @@ file format</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href=
 "#Variable-substitutions">Variable-substitutions</a><br />
 &nbsp;&nbsp; <a href="#SNMPTT.CONF-EXEC">EXEC</a><br />
+&nbsp;&nbsp; <a href="#SNMPTT.CONF-PREEXEC">PREEXEC</a><br />
 &nbsp;&nbsp; <a href="#SNMPTT.CONF-NODES">NODES</a><br />
 &nbsp;&nbsp; <a href="#SNMPTT.CONF-MATCH">MATCH</a><br />
 &nbsp;&nbsp; <a href="#SNMPTT.CONF-REGEX">REGEX</a><br />
@@ -71,7 +72,8 @@ Notes</a><br />
 software</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#Nagios-Netsaint">Nagios / Netsaint</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#SEC">Simple Event Correlator (SEC)</a><br />
-<b>&nbsp;&nbsp;</b> <a href="#EventWin">Windows Event Log forwarding</a></blockquote>
+<b>&nbsp;&nbsp;</b> <a href="#EventWin">Windows Event Log forwarding</a><br />
+<b>&nbsp;&nbsp;</b> <a href="#Hobbit">Hobbit</a></blockquote>
 <br />
 <h2><a id="License" name="License"></a>License</h2>
 <p>Copyright 2002-2005 Alex Burger<br />
@@ -235,12 +237,40 @@ Although not required, using the Perl module is recommended.</blockquote>
 
 <h3><b>1.0.1</b> <b>-  ??, 2005</b></h3>
 <ul>
-  <li>Fixed bug that prevented the wildcard .* from being accepted on the EVENT line.</li>
-  <li>Fixed bug in snmpttconvertmib that prevented some MIBs from being accepted due to
-  spacing in the DEFINITIONS::= line.</li>
-  <li>Fixed bug in snmpttconvertmib that prevented --ARGUMENTS {} from being parsed 
-  due to spacing.</li>
+  <li>Added <b>PREEXEC</b> <b>snmptt.conf</b> file option to allow an external 
+  program to be run before processing the FORMAT and EXEC lines.
+  The output of the external program is stored in the <b>$p<i>n</i></b> variable
+  where <b><i>n</i></b> is a number starting from 1.  Multiple <b>PREEXEC</b> lines
+  are permitted.  The first <b>PREEXEC</b> stores the result of the
+  command in <b>$p1</b>, the second in <b>$p2</b> etc.  Any ending newlines
+  are removed.  The <b>snmptt.ini</b> parameter <b>pre_exec_enable</b> can be used
+  to enable / disable it.</li>
+  <li>Added <b>unknown_trap_exec</b> <b>snmptt.ini</b> option.  If defined, the 
+  command will be executed for ALL unknown traps.  Passed to the
+  command will be all standard and enterprise variables, similar 
+  to <b>unknown_trap_log_file</b> but without the newlines.</li>
+  <li><b>snmptt --dump</b> which dumps all the configured EVENTs, now displays duplicate 
+  EVENT entries to assist with troubleshooting duplicate entries trap logs.</li>
+  <li>If the debug log file can not be opened, a message is now logged
+  to syslog if <b>syslog_system_enable</b> is enabled, and to the 
+  Event Log if <b>eventlog_system_enable</b> is enabled</li>
+  <li>Fixed bug where <b>snmptt --dump</b> would attempt to log to syslog or the Event Log.
+  <li>Fixed bug with PostgreSQL where some trap data was interpreted as 'placeholders'
+  in the INSERT statement which caused logging errors.  PostgreSQL now uses
+  PREPARE / EXECUTE statements instead.
+  <li>Fixed bug that prevented the wildcard <b>.*</b> from being accepted on the EVENT line.</li>
   <li>Added Windows Event Log forwarding documentation to integration section.
+  <li>SNMPTTConvertMIB:</li>
+  <li style="list-style: none">
+  <ul>
+    <li>Fixed a bug when <b>--format_desc=n</b> was used that caused extra trailing whitespaces 
+    to be added for every non existant line in the description.</li>
+    <li>Fixed bug that prevented some MIBs from being accepted due to
+    spacing in the <b>DEFINITIONS::= line</b>.</li>
+    <li>Fixed bug in that prevented <b>--ARGUMENTS {}</b> from being parsed 
+    due to spacing.</li>
+  </ul>
+  </li>
 </ul>
 
 <h3><b>1.0</b> <b>- August 30, 2004</b></h3>
@@ -1714,7 +1744,7 @@ name:value</i> <b>(see Note 2,3</b><b>,5</b><b>)</b><br />
 $-*&nbsp; - Expand all variable-bindings in the format of <i>variable name
 (variable type):value</i> <b>(see Note 2,3</b><b>,5</b><b>)</b></blockquote>
 Example:
-<p>FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6</p>
+<blockquote>FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6</blockquote>
 <p>Note:</p>
 <blockquote>For the text log file, the output will be formatted as:
 <blockquote><b><i>date time trap-OID severity category hostname -
@@ -1807,10 +1837,11 @@ files. If set to 2, the description is pulled from the MIB file. If using the
 MIB file, you must have the UCD-SNMP / Net-SNMP Perl module installed and
 enabled.</blockquote>
 </blockquote>
+
 <h3><a id="SNMPTT.CONF-EXEC" name="SNMPTT.CONF-EXEC"></a><b>EXEC:</b></h3>
 <blockquote>[<b>EXEC</b> command_string]
 <p>There can be multiple EXEC lines per EVENT.</p>
-<p>Optional string containing command to execute when trap is received and
+<p>Optional string containing a command to execute when trap is received and
 arguments to pass to the program.&nbsp; The EXEC lines are executed in the
 order that they appear.</p>
 <p>EXEC uses the same variable substitution as the FORMAT line.</p>
@@ -1823,6 +1854,33 @@ port $4 from slot $5, port $6"</blockquote>
 Note: Unlike the FORMAT line, nothing is prepended to the message.&nbsp; If
 you would like to include the hostname and date in the page above, you must
 use the variables such as $r, $x and $X.</blockquote>
+
+
+<h3><a id="SNMPTT.CONF-PREEXEC" name="SNMPTT.CONF-PREEXEC"></a><b>PREEXEC:</b></h3>
+<blockquote>[<b>PREEXEC</b> command_string]
+<p>There can be multiple PREEXEC lines per EVENT.</p>
+<p>Optional string containing a command to execute after a trap is received but
+before the FORMAT and EXEC statements are processed.  The output of the external 
+program is stored in the <b>$p<i>n</i></b> variable where <b><i>n</i></b> is a 
+number starting from 1.  Multiple PREEXEC lines are permitted.  The first PREEXEC 
+stores the result of the command in <b>$p1</b>, the second in <b>$p2</b> etc.  
+Any ending newlines are removed.  The snmptt.ini parameter pre_exec_enable can be 
+used to enable / disable it.</p>
+
+<p>PREEXEC uses the same variable substitution as the FORMAT line.</p>
+<p>Example:</p>
+<blockquote>EVENT linkDown .1.3.6.1.6.3.1.1.5.3 "Status Events" Normal</br>
+FORMAT Link down on interface $1($p1).  Admin state: $2.  Operational state: $3<br />
+<b>PREEXEC /usr/local/bin/snmpget -v 1 -Ovq -c public $aA ifDescr.$1</b>
+</blockquote>
+
+<p>Sample output:</p>
+<blockquote>Link down on interface 69("100BaseTX Port 1/6 Name SERVER1").  Admin 
+  state up.  Operational state: down</blockquote>
+<p>In the above example the result is in quotes because that is what comes 
+back from snmpget (it is not added by SNMPTT).</p>
+</blockquote>
+
 <h3><a id="SNMPTT.CONF-NODES" name="SNMPTT.CONF-NODES"></a><b>NODES:</b></h3>
 <blockquote>[<b>NODES</b> sources_list]
 <p>Used to limit which devices can be mapped to this EVENT
@@ -2948,7 +3006,6 @@ print ".1.3.6.1.6.3.1.1.4.3.0 .1.3.6.1.4.1.9999\n";<br />
 <br />
 close TRAP;</div>
 <br />
-<h4>5. Test</h4>
 
 <h3><a id='EventWin' name='EventWin'</a><b>Windows Event Log forwarding</b></h3>
 
@@ -3174,6 +3231,10 @@ password%n %tUser Name:%t%1%n %tDomain:%t%t%2%n %tLogon Type:%t%3%n
   &quot;Regular&quot; Normal<br />
 FORMAT Logon Failure: Reason: Unknown user name or bad password.  User Name: $6, Domain: $7, Logon Type: $8,
 Logon Process: $9, Auth package: $10, Workstation name: $11</b></p>
+
+<h3><a id='Hobbit' name='Hobbit'</a><b>Hobbit</b></h3>
+
+Information on handling SNMP traps with <a href="http://hobbitmon.sourceforge.net/">Hobbit</a> can be found at <a href="http://cerebro.victoriacollege.edu/hobbit-trap.html">http://cerebro.victoriacollege.edu/hobbit-trap.html</a>.
 
 </blockquote>
 </body>

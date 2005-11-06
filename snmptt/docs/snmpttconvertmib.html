@@ -12,12 +12,12 @@
 <title>SNMP Trap Translator</title>
 </head>
 <body>
-<h1><b>SNMP Trap Translator Convert MIB v1.0</b></h1>
+<h1><b>SNMP Trap Translator Convert MIB v1.0.1</b></h1>
 <b>(</b><a href=
 "http://www.snmptt.org"><b>SNMPTTCONVERTMIB</b></a><b>)</b><br />
-This file was last updated on:&nbsp; August 30th, 2004
+This file was last updated on:&nbsp; November 5th, 2005
 <h2><b>License</b></h2>
-<p>Copyright 2002, 2003 Alex Burger<br />
+<p>Copyright 2002-2005 Alex Burger<br />
 alex_b@users.sourceforge.net<br />
 4/3/2002</p>
 <p>This program is free software; you can redistribute it and/or modify<br />
@@ -174,10 +174,30 @@ needed.<br /></li>
 <div style="margin-left: 40px;">Example:</div>
 <blockquote style="margin-left: 80px;"><b>snmpttconvertmib
 --in=/usr/share/snmp/mibs/CPQHOST.mib
---out=/etc/snmp/snmptt-compaqhost.conf<br /></b></blockquote>
+--out=/etc/snmp/snmptt.conf.compaqhost<br /></b></blockquote>
 <div style="margin-left: 40px;">If the Net-SNMP Perl module is installed and
 you want more descriptive variable descriptions, add <span style=
-"font-weight: bold;">--net_snmp_perl</span> to the command line.</div>
+  "font-weight: bold;">--net_snmp_perl</span> to the command line:</div>
+<blockquote style="margin-left: 80px;"><b>snmpttconvertmib
+--in=/usr/share/snmp/mibs/CPQHOST.mib
+--out=/etc/snmp/snmptt.cong.compaq --net_snmp_perl<br /></b></blockquote>
+<br />
+<div style="margin-left: 40px;">To convert all the CPQ* files in the current folder, you can use:</div>
+<br />
+<div style="margin-left: 40px;">Unix / Linux:</div>
+<blockquote style="margin-left: 80px;"><b>
+    for i in CPQ*<br />
+    > do<br />
+    > /usr/local/sbin/snmpttconvertmib --in=$i --out=snmptt.conf.compaq<br />
+    > done<br />
+<br /></b></blockquote>
+
+<div style="margin-left: 40px;">Windows:</div>
+<blockquote style="margin-left: 80px;"><b>
+    for %i in (CPQ*) do perl snmpttconvertmib --in=%i --out=snmptt.conf.compaq<br />
+<br /></b></blockquote>
+
+
 <blockquote style="margin-left: 80px;"></blockquote>
 <h3>How it works</h3>
 <p>&nbsp;<br />

@@ -53,7 +53,7 @@ $snmpttconvertmib_version = "v1.0";
 sub showversion
 {
   print "\nSNMPTTCONVERTMIB $snmpttconvertmib_version\n";
-  print "(c) 2002 Alex Burger\n";
+  print "(c) 2002-2005 Alex Burger\n";
   print "http://snmptt.sourceforge.net\n\n";
 }
 

@@ -191,7 +191,7 @@ while (defined($line = <>))
 sub showversion
 {
 	printf "\nSNMPTTHANDLER v1.0\n";
-	printf "(c) 2002 Alex Burger\n\n";
+	printf "(c) 2002-2005 Alex Burger\n\n";
 }
 
 ##############################################################################

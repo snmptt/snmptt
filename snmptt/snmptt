@@ -51,7 +51,7 @@ $snmptt_version = "v1.0.1";
 sub showversion
 {
 	print "\nSNMPTT $snmptt_version\n";
-	print "(c) 2002 Alex Burger\n";
+	print "(c) 2002-2005 Alex Burger\n";
 	print "http://snmptt.sourceforge.net\n\n";
 }
 

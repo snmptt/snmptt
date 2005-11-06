@@ -5,13 +5,13 @@ Nov 2nd, 2005: Alex Burger <alex_b@users.sourceforge.net>
   where n is a number starting from 1.  Multiple PREEXEC lines
   are permitted.  The first PREEXEC stores the result of the
   command in $p1, the second in $p2 etc.  Any ending newlines
-  are removed.  snmptt.ini parameter pre_exec_enable can be used
+  are removed.  The snmptt.ini parameter pre_exec_enable can be used
   to enable / disable it.
-- If the debug log file can not be opened, a message is logged
+- If the debug log file can not be opened, a message is now logged
   to syslog if syslog_system_enable is enabled, and to the 
   Event Log if eventlog_system_enable is enabled.
-- Fix a problem when --format_desc=n was used. It was adding a 
-  trailing whitespace for every non existant line in description.
+- Fixed a problem when --format_desc=n was used. It was adding a 
+  trailing whitespace for every non existant line in the description.
   Thanks to Carlos Velasco for the fix.
 - Added unknown_trap_exec snmptt.ini option.  If defined, the 
   command will be executed for ALL unknown traps.  Passed to the
@@ -20,7 +20,7 @@ Nov 2nd, 2005: Alex Burger <alex_b@users.sourceforge.net>
   Carlos Velasco for the patch.
 - Modify output of hash dump to print Event: instead of hash:
 - Add dump of duplicate events for --dump option
-- Fix bug with --dump trying to open up syslog, eventlog etc
+- Fixed bug with --dump trying to open up syslog, eventlog etc
 
 Oct 9th, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - Changed PostgreSQL INSERT statements to PREPARE / EXECUTE to 
