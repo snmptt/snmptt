@@ -1,6 +1,6 @@
 April 16th, 2005
 
-snmptt_1.0.1.tar.gz:
+snmptt_1.1beta1.tar.gz:
 
 -fresh cvs checkout
 
@@ -24,11 +24,12 @@ snmptt_1.0.1.tar.gz:
 -update ChangeLog with release info
 
 -commit changes to CVS
--tag with new version
+-check out fresh copy
+-tag with new version: cvs ... tag snmptt_1-1beta1
 
 cd snmptt
-find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.0.1
-cd ../snmptt_1.0.1
+find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.1beta1
+cd ../snmptt_1.1beta1
 su
 rm -f docs/build
 chmod -R 664 *
@@ -43,7 +44,7 @@ chmod +x snmptthandler
 chmod +x snmptt-net-snmp-test
 chown root.root * -R
 cd ..
-tar cvfz snmptt_1.0.1.tar.gz snmptt_1.0.1
+tar cvfz snmptt_1.1beta1.tgz snmptt_1.1beta1
 
 SourceForge:
 -upload file
