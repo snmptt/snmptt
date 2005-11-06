@@ -427,7 +427,7 @@ A:&nbsp; Set <span style="font-weight: bold;">remove_backslash_from_quotes =
 <br />
 <p><b><a name="Each_trap_received_is_being_logged_multiple"></a>
   Q:&nbsp; Each trap received is being logged multiple times.  Why?<br /></b><br />
-A:&nbsp; There are xxx possible reasons for this.</p>
+A:&nbsp; There are a few possible reasons for this.</p>
 <ul>
   <li>The device is sending the trap multiple times.  If the device is running Net-SNMP's agent (snmpd), make sure there is only ONE trapsink, trap2sink or informsink line in <b>snmpd.conf</b>.  If you are sending the trap using SNMP V1, use <b>trapsink</b>.  For SNMP V2, use <b>trap2sink</b>.  For SNMP V3, use <b>informsink</b>.  Having both a trapsink and a trap2sink for example will cause snmpd to send the trap <b>twice</b>.  Once using SNMP V1 and once using SNMP V2.  It is possible that snmpd is loading multiple <b>snmp.conf</b> files.  Start <b>snmpd</b> using <b>snmpd -f -Dread_config</b> to see what configuration files are being loaded.</li>
   <li>Snmptrapd is passing the trap to SNMPTT multiple times.  Ensure there is only one <b>traphandle</b> statement in <b>snmptrapd.conf</b>.  It is possible that snmpdtrapd is loading multiple <b>snmptrapd.conf</b> files.  Start <b>snmpdtrapd</b> using <b>snmpd -f -Dread_config</b> to see what configuration files are being loaded.</li>
