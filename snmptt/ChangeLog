@@ -1,4 +1,14 @@
 Nov 5th, 2005: Alex Burger <alex_b@users.sourceforge.net>
+- Added NODES MODE= snmptt.conf file option to allow you to 
+  select either POS (positive - the default) or NEG (negative)
+  for NODES matches.  If set to NEG, then the NODES is a 'match'
+  only if NONE of the NODES entries match.  POS = x | x | x etc.
+  NEG = !x & !x & !x etc.
+- Fixed bug in NODES where NODES entries from previous EVENTs
+  was not being purged correctly.
+- Changed version to snmptt_1.1beta2
+
+Nov 5th, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.1beta1
 - Changed MySQL INSERT statements to PREPARE / EXECUTE as it is
   safer than trying to escape all the fields manually.  This way

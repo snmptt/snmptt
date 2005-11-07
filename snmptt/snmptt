@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v1.1beta1
+# SNMPTT v1.1beta2
 #
 # Copyright 2002-2005 Alex Burger
 # alex_b@users.sourceforge.net
@@ -46,7 +46,7 @@
 ##############################################################################
 #
 
-$snmptt_version = "v1.1beta1";
+$snmptt_version = "v1.1beta2";
 
 sub showversion
 {
@@ -944,69 +944,89 @@ sub processtrap
 		}
 		else
 		{
-			if ($DEBUGGING >= 1)
-			{
-			  print "  Nodes defined for this entry...\n";
-			}	
-
-			@nodes2 = &process_nodes($event2[5]);
-			
-			if ($DEBUGGING >= 1)
-			{
-			  print "  NODES entries: @nodes2\n";
-			}
-
-			foreach my $a (@nodes2)
-			{	
-				if ($a =~ /^(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IP address / cidr / range
-				{
-				  #if ( $a eq $var[1])     # compare against agent ip
-				  if ( checkip($var[4], $a) == 1)
-				  {				  
-				    $nodesmatch = 1;
-				    #$hostmatch = 1;
-				    #$processed = 1;
-				  }
-				}
-				elsif ($dns_enable == 1)	# Resolve NODES entry to IP address, and compare
-				{
-				  my $temp = gethostbyname($a);
-				  if (defined($temp))
-				  {
-				    $temp = Socket::inet_ntoa(scalar($temp));
-				    if ($DEBUGGING => 1)
-				    {
-				      print "    NODES entry ($a) resolved to: $temp\n";
-				    }
-				    if ( checkip($var[4], $temp) == 1)
-				    {
-				      $nodesmatch = 1;
-				    }
-				  }
-				  else
-				  {
-				    print "    NODES entry ($a) could NOT be resolved.\n";
-				  }
-				}
-	                        elsif (lc $a eq lc $agent_dns_name)	# NODES entry is a host name.  Do lowercase compare
-				{
-				  $nodesmatch = 1;
-				  #$hostmatch = 1;
-				  #$processed = 1;
-				}
-			}
-			#if ($hostmatch == 1)
-			if ($DEBUGGING >= 1)
-			{			  
-			  if ($nodesmatch == 1)
- 			  {
-			    print "  Node found in list\n";
-			  }
-			  else
-			  {
-			    print "  Node NOT found in list\n";
-			  }
-			}
+                  if ($DEBUGGING >= 1)
+                  {
+                    print "  Nodes defined for this entry...\n";
+                  }	
+                  
+                  if ($dynamic_nodes == 0) {
+                    @nodes2 = split /\s/, $event2[5];
+                  }
+                  else {
+                    @nodes2 = &process_nodes($event2[5]);
+                  }
+                  
+                  if ($DEBUGGING >= 1)
+                  {
+                    print "  NODES entries: @nodes2\n";
+                  }
+                  
+                  my $nodes_mode = 'pos';     # 0 = POSitive match
+                  # nodes2 contains all the node entries after being 'extracted' from multiple
+                  # NODES lines, NODES files etc.
+                  foreach my $a (@nodes2)
+                  {
+                    # Check for MODE statement.  Default is POSitive.
+                    if ($a =~ /^mode=(.*)/i) {
+                      if ($1 =~ /^neg/i) {
+                        $nodes_mode = "neg";
+                      }
+		      next;
+                    }
+                    elsif ($a =~ /^(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IP address / cidr / range
+                    {
+                      #if ( $a eq $var[1])     # compare against agent ip
+                      if ( checkip($var[4], $a) == 1)
+                      {				  
+                        $nodesmatch = 1;
+                      }
+                    }
+                    elsif ($dns_enable == 1)	# Resolve NODES entry to IP address, and compare
+                    {
+                      my $temp = gethostbyname($a);
+                      if (defined($temp))
+                      {
+                        $temp = Socket::inet_ntoa(scalar($temp));
+                        if ($DEBUGGING => 1)
+                        {
+                          print "    NODES entry ($a) resolved to: $temp\n";
+                        }
+                        if ( checkip($var[4], $temp) == 1)
+                        {
+                          $nodesmatch = 1;
+                        }
+                      }
+                      else
+                      {
+                        print "    NODES entry ($a) could NOT be resolved.\n";
+                      }
+                    }
+                    elsif (lc $a eq lc $agent_dns_name)	# NODES entry is a host name.  Do lowercase compare
+                    {
+                      $nodesmatch = 1;
+                    }
+                  }
+                  
+                  # If NODES MODE=NEG, then reverse the result.
+                  if ($nodes_mode eq 'neg') {
+                    if ($nodesmatch == 0) {
+                      $nodesmatch = 1;
+                    }
+                    else {
+                      $nodesmatch = 0;
+                    }
+                  }
+                  if ($DEBUGGING >= 1)
+                  {			  
+                    if ($nodesmatch == 1)
+                    {
+                      print "  NODES has a positive match (node mode \'$nodes_mode\' and node found in list)\n";
+                    }
+                    else
+                    {
+                      print "  NODES has a negative match (node mode \'$nodes_mode\' and node NOT found in list)\n";
+                    }
+                  }
 		}
 
 		# Check for MATCH entries
@@ -4463,6 +4483,7 @@ sub process_nodes
   my $nodes_list = shift;
   my @nodes = ();
   my @nodes2 = ();
+  my %nodes_file_hash = ();
 
   # print "Processing NODES\n";
   
@@ -4476,65 +4497,27 @@ sub process_nodes
     # Contain a \ or /?  Must be a filename and not an IP address / network number
     if ( ($a =~ /\\|\//) && !($a =~ /\d+\.\d+\.\d+\.\d+/))
     {
-      if ($dynamic_nodes == 1)		# Dynamic enabled, always load the file
-      {	
-	#print "!Dynamic enabled\n";
-	if (open NODESFILE, $a)
-	{
-	  while (defined($line = <NODESFILE>))
-	  {
-	    chomp($line);
-	    # Allow comment lines starting with a #
-	    if (!($line =~ /((^#)|(\s+#)).*/))
-	    {
-	      my @temp2 = split /\s/, $line;
-	      foreach my $b (@temp2)
-	      {
-		push (@nodes2, $b);
-	      }
-	    }
-	  }
-	  close LOGFILE;
-	}
-	else
-	{
-	  warn "Can not open NODES file: $event2[5] $!";
-	}
-      }
-      else				# Not dynamic, so check nodes_file_hash first before loading
+      #print "!Dynamic enabled\n";
+      if (open NODESFILE, $a)
       {
-	#print "!Dynamic NOT enabled\n";
-	if ($nodes_file_hash{$a})
-	{
-	  push(@nodes2, $nodes_file_hash{$a});
-	  #print " !Found in hash\n";
-	}
-	else
-	{
-	  #print " !Not found in hash\n";
-	  if (open NODESFILE, $a)
-	  {
-	    while (defined($line = <NODESFILE>))
-	    {
-	      chomp($line);
-	      # Allow comment lines starting with a #
-	      if (!($line =~ /((^#)|(\s+#)).*/))
-	      {
-		my @temp2 = split /\s/, $line;
-		foreach my $b (@temp2)
-		{
-		  push (@nodes2, $b);
-		}
-	      }
-	    }
-	    close LOGFILE;
-	    $nodes_file_hash{$a} = "@nodes2";
-	  }
-	  else
-	  {
-	    warn "Can not open NODES file: $event2[5] $!";
-	  }
-	}
+        while (defined($line = <NODESFILE>))
+        {
+          chomp($line);
+          # Allow comment lines starting with a #
+          if (!($line =~ /((^#)|(\s+#)).*/))
+          {
+            my @temp2 = split /\s/, $line;
+            foreach my $b (@temp2)
+            {
+              push (@nodes2, $b);
+            }
+          }
+        }
+        close NODESFILE;
+      }
+      else
+      {
+        warn "Can not open NODES file: $a $!";
       }
     }
     else 	# Must be a single node
