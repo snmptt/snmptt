@@ -1,3 +1,7 @@
+Nov 22nd, 2005: Alex Burger <alex_b@users.sourceforge.net>
+- MATCH statement now accepts any variable name instead of only
+  enterprise variables.  Example: MATCH $s:(Normal)
+
 Nov 5th, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - Added NODES MODE= snmptt.conf file option to allow you to 
   select either POS (positive - the default) or NEG (negative)

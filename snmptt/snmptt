@@ -4138,10 +4138,15 @@ sub match
   my $not = 0;
   my $result = 0;
 
-  $match =~ /^\$(\d+):(.*)/;
-  $value = $entvar[$1-1];
+  $match =~ /^(\$.*?):(.*)/;
+  my $match_var = $1;
+  $_ = $match_var;
   $match = $2;
-
+  print "Performing substitution on MATCH variable: $match_var\n";
+  &substitute();
+  print "Done performing substitution on MATCH variable $match_var (converted to: $_)\n";
+  $value = $_;
+    
   if ($value eq '' || $match eq '')
   {
     return 0;
