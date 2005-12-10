@@ -1111,8 +1111,10 @@ traps</h3>
 mainly for troubleshooting purposes.</p>
 <p>To configure unknown trap logging, edit the snmptt.ini file and modify the
 following variables:</p>
-<blockquote><b>enable_unknown_trap_log</b><br />
-<b>unknown_trap_log_file<br /></b></blockquote>
+<blockquote>
+  <b>enable_unknown_trap_log</b><br />
+  <b>unknown_trap_log_file<br /></b>
+</blockquote>
 Unknown traps can also be logged to a SQL table as described in the <a href=
 "#LoggingDatabase">Database</a> section.<br />
 <h3><a id="LoggingSyslog" name="LoggingSyslog"></a>Logging - Syslog</h3>
@@ -1453,25 +1455,31 @@ above should be sufficient, but they may need to be increased depending on
 your environment.<br />
 &nbsp;<br />
 <h2><a id="Executing-an-external-program" name=
-"Executing-an-external-program"></a>Executing an external program</h2>
+    "Executing-an-external-program"></a>Executing an external program</h2>
 <p>An external program can be launched when a trap is received.&nbsp; The
 command line is defined in the configuration file.&nbsp; For example, to send
 a page using QPAGE (<a href="http://www.qpage.org">http://www.qpage.org</a>),
 the following command line could be used:</p>
-<blockquote><b>qpage -f TRAP notifygroup1 "$r $x $X Compaq Drive Array Spare
-Drive on controller $4, bus $5, bay $6 status is $3."</b></blockquote>
+<blockquote>
+  <b>qpage -f TRAP notifygroup1 "$r $x $X Compaq Drive Array Spare
+    Drive on controller $4, bus $5, bay $6 status is $3."</b>
+</blockquote>
 $r is translated to the hostname, and $x is the current date, and $X is the
 current time (described in detail below)
 <p>To enable or disable the execution of EXEC definitions, edit the snmptt.ini
 file and modify the following variable:</p>
 <blockquote><b>exec_enable</b></blockquote>
+It is also possible to launch an external program when an unknown trap is received.  This
+can be enabled by defining <b>unknown_trap_exec</b> in <b>snmptt.ini</b>.  Passed to the 
+command will be all standard and enterprise variables, similar to <b>unknown_trap_log_file</b> but 
+without the newlines.
 <h2><a id="Modes-of-Operation" name="Modes-of-Operation"></a>Modes of
-Operation</h2>
+  Operation</h2>
 <p>SNMPTT can be run in two modes:&nbsp; standalone mode and daemon mode.</p>
 <h3><b>Standalone mode</b></h3>
 <p>To use SNMPTT in standalone mode, the <span style=
-"font-weight: bold;">snmptrapd.conf</span> file would contain a <span style=
-"font-weight: bold;">traphandle</span> statement such as:</p>
+  "font-weight: bold;">snmptrapd.conf</span> file would contain a <span style=
+  "font-weight: bold;">traphandle</span> statement such as:</p>
 <blockquote><b>traphandle default /usr/sbin/snmptt</b></blockquote>
 When a trap is received by SNMPTRAPD, the trap is passed to the
 <b>/usr/sbin/snmptt</b> script.&nbsp; SNMPTT performs the following tasks:
@@ -1876,14 +1884,14 @@ use the variables such as $r, $x and $X.</blockquote>
 <blockquote>[<b>PREEXEC</b> command_string]
 <p>There can be multiple PREEXEC lines per EVENT.</p>
 <p>Optional string containing a command to execute after a trap is received but
-before the FORMAT and EXEC statements are processed.  The output of the external 
+<b><i>before</i></b> the FORMAT and EXEC statements are processed.  The output of the external 
 program is stored in the <b>$p<i>n</i></b> variable where <b><i>n</i></b> is a 
 number starting from 1.  Multiple PREEXEC lines are permitted.  The first PREEXEC 
 stores the result of the command in <b>$p1</b>, the second in <b>$p2</b> etc.  
-Any ending newlines are removed.  The snmptt.ini parameter pre_exec_enable can be 
-used to enable / disable it.</p>
+Any ending newlines are removed.  The <b>snmptt.ini</b> parameter <b>pre_exec_enable</b> can be 
+used to enable / disable <b>PREEXEC</b> statements.</p>
 
-<p>PREEXEC uses the same variable substitution as the FORMAT line.</p>
+<p><b>PREEXEC</b> uses the same variable substitution as the FORMAT line.</p>
 <p>Example:</p>
 <blockquote>EVENT linkDown .1.3.6.1.6.3.1.1.5.3 "Status Events" Normal</br>
 FORMAT Link down on interface $1($p1).  Admin state: $2.  Operational state: $3<br />
@@ -1901,27 +1909,44 @@ back from snmpget (it is not added by SNMPTT).</p>
 <blockquote>[<b>NODES</b> sources_list]
 <p>Used to limit which devices can be mapped to this EVENT
 definition.&nbsp;</p>
-There can be multiple NODES lines per EVENT.
+<p>There can be multiple NODES lines per EVENT.</p>
 <p>Optional string containing any combination of host names, IP addresses,
 CIDR network address, network IP address ranges, or a filename.&nbsp; If this
 keyword omitted then ALL sources will be accepted.&nbsp; Each entry is checked
 for a match.&nbsp; As soon as one match occurs, searching stops.</p>
+
 <p>For example, if you only wanted devices on the subnet 192.168.1.0/24 to
 trigger this EVENT, you could use a NODES entry of:</p>
 <p style="margin-left: 40px;"><span style="font-weight: bold;">NODES
 192.168.1.0/24</span></p>
 <p>If a filename is specified, it must be specified with a full
 path.&nbsp;</p>
+
+<p>There are two modes of operation:  <b>POS</b> (positive - the default) and <b>NEG</b> (negative).  If set to <b>POS</b>, then <b>NODES</b> is a 'match' if <i>any</i> of the <b>NODES</b> entries match.</li>  If set to <b>NEG</b>, then <b>NODES</b> is a 'match' only if <i>none</i> of the <b>NODES</b> entries match.  To change the mode of operation, use one of the following statements:</li>
+<p style="margin-left: 40px;">
+<b>NODES MODE=POS</b><br />
+<b>NODES MODE=NEG</b><br />
+</p>
+
+<p>A common use for this feature is when you have devices that implement a trap in a non-standard way (added additional variables for example) such as the linkDown and linkUp traps. By defining two EVENT statements and using NODES statements with NODES MODE, you can have one EVENT statement handle the standard devices, and the other handle the other devices with the extended linkDown / linkUp traps.</p>
+
 Example 1:<br />
-<blockquote>This example will match any hosts called <span style=
-"font-weight: bold;">fred</span>, <span style=
-"font-weight: bold;">barney</span>, <span style=
-"font-weight: bold;">betty</span> or <span style=
-"font-weight: bold;">wilma</span>:<br />
-<br />
-<span style="font-weight: bold;">NODES fred barney betty
-wilma&nbsp;</span></blockquote>
+<blockquote>This example will match any hosts called 
+  <b>fred</b>, <b>barney</b>, <b>betty</b> or <b>wilma</b>:<br />  
+  <br />
+  <b>NODES fred barney betty wilma</b>
+</blockquote>
+
 Example 2:<br />
+<blockquote>This example will match any hosts <b>not</b> called
+  <b>fred</b>, <b>barney</b>, <b>betty</b> or <b>wilma</b>:<br />  
+  <br />
+  <b>NODES fred barney betty wilma</b><br />
+  <b>NODES MODE=NEG</b>
+</blockquote>
+
+
+Example 3:<br />
 <blockquote>This example will load the file /etc/snmptt-nodes (see below), and
 match any hosts called <span style="font-weight: bold;">fred</span>,
 <span style="font-weight: bold;">barney</span>, <span style=
@@ -1932,17 +1957,17 @@ match any hosts called <span style="font-weight: bold;">fred</span>,
 "font-weight: bold;">192.168.60.0-192.168.61.255</span>:<br />
 <br />
 <span style="font-weight: bold;">NODES /etc/snmptt-nodes</span></blockquote>
-Example 3:<br />
+Example 4:<br />
 <blockquote>This example will load both files <span style=
 "font-weight: bold;">/etc/snmptt-nodes</span> and <span style=
 "font-weight: bold;">/etc/snmptt-nodes2</span> (see above example):<br />
 <br />
 <span style="font-weight: bold;">NODES /etc/snmptt-nodes
 /etc/snmptt-nodes2</span></blockquote>
-Example 4:<br />
+Example 5:<br />
 <blockquote><span style="font-weight: bold;">NODES 192.168.4.0/22
 192.168.60.0-192.168.61.255 /etc/snmptt-nodes2</span></blockquote>
-Example 5:<br />
+Example 6:<br />
 <blockquote>NODES <span style="font-weight: bold;">fred /etc/snmptt-nodes
 pebbles /etc/snmptt-nodes2 barney</span></blockquote>
 where snmptt-nodes contains:
@@ -1980,6 +2005,7 @@ SNMPTT).&nbsp; The <span style="font-weight: bold;">snmptt.ini</span> option
 <span style="font-weight: bold;">dynamic_nodes</span> can be set to
 <span style="font-weight: bold;">1</span> to have the nodes files loaded each
 time an EVENT is processed.<br />
+<br />
 <p>See the section '<a href="#DNS">Name Resolution / DNS</a>' for important
 DNS information.</p>
 </blockquote>
@@ -1999,77 +2025,33 @@ definition.</p>
 are supported:</p>
 <div style="margin-left: 80px;"><span style="font-weight: bold;">i</span> -
 ignore case when trying to match</div>
+<br />
 <p style="margin-left: 40px;">The following command formats are available:</p>
-<div style="margin-left: 80px;"><span style="font-weight: bold;">MATCH
-MODE=[or | and]</span><br style="font-weight: bold;" />
-<span style="font-weight: bold;">MATCH $</span><span style=
-"font-style: italic; font-weight: bold;">n</span><span style=
-"font-weight: bold;">: [!] (</span><span style=
-"font-style: italic; font-weight: bold;">reg</span><span style=
-"font-weight: bold;">) [i]</span><br style="font-weight: bold;" />
-<span style="font-weight: bold;">MATCH $</span><span style=
-"font-style: italic; font-weight: bold;">n</span><span style=
-"font-weight: bold;">: [!]</span> <span style=
-"font-style: italic; font-weight: bold;">n</span><br style=
-"font-weight: bold;" />
-<span style="font-weight: bold;">MATCH $</span><span style=
-"font-style: italic; font-weight: bold;">n</span><span style=
-"font-weight: bold;">: [!]</span> <span style=
-"font-style: italic; font-weight: bold;">n</span><span style=
-"font-weight: bold;">-</span><span style=
-"font-style: italic; font-weight: bold;">n</span><br style=
-"font-weight: bold;" />
-<span style="font-weight: bold;">MATCH $</span><span style=
-"font-style: italic; font-weight: bold;">n</span><span style=
-"font-weight: bold;">: [!] &lt;</span> <span style=
-"font-style: italic; font-weight: bold;">n</span><br style=
-"font-weight: bold;" />
-<span style="font-weight: bold;">MATCH $</span><span style=
-"font-style: italic; font-weight: bold;">n</span><span style=
-"font-weight: bold;">: [!] &gt;</span> <span style=
-"font-style: italic; font-weight: bold;">n</span><br style=
-"font-weight: bold;" />
-<span style="font-weight: bold;">MATCH $</span><span style=
-"font-style: italic; font-weight: bold;">n</span><span style=
-"font-weight: bold;">: [!]</span> <span style=
-"font-style: italic; font-weight: bold;">x.x.x.x</span><br style=
-"font-weight: bold;" />
-<span style="font-weight: bold;">MATCH $</span><span style=
-"font-style: italic; font-weight: bold;">n</span><span style=
-"font-weight: bold;">: [!]</span> <span style=
-"font-style: italic; font-weight: bold;">x.x.x.x</span><span style=
-"font-weight: bold;">-</span><span style=
-"font-style: italic; font-weight: bold;">x.x.x.x</span><br style=
-"font-weight: bold;" />
-<span style="font-weight: bold;">MATCH $</span><span style=
-"font-style: italic; font-weight: bold;">n</span><span style=
-"font-weight: bold;">: [!]</span> <span style=
-"font-style: italic; font-weight: bold;">x.x.x.x</span><span style=
-"font-weight: bold;">/</span><span style=
-"font-style: italic; font-weight: bold;">x</span><br />
+<div style="margin-left: 80px;">
+  
+  <b>
+    MATCH MODE=[or | and]<br />
+    MATCH <i>$x:</i> [!] <i>(reg) [i]</i><br />
+    MATCH <i>$x:</i> [!] <i>n</i><br />
+    MATCH <i>$x:</i> [!] <i>n-n</i><br />
+    MATCH <i>$x:</i> [!] <i>< n</i><br />
+    MATCH <i>$x:</i> [!] <i>> n</i><br />
+    MATCH <i>$x:</i> [!] <i>x.x.x.x</i><br />
+    MATCH <i>$x:</i> [!] <i>x.x.x.x-x.x.x.x</i><br />
+    MATCH <i>$x:</i> [!] <i>x.x.x.x/x</i><br />
+  </b>
+
 <br />
 where:<br />
-<div style="margin-left: 40px;"><span style="font-weight: bold;">or</span> or
-<span style="font-weight: bold;">and</span> set the default evaluation mode
-for ALL matches<br />
-<span style="font-weight: bold;">$<span style=
-"font-style: italic;">n</span></span> is the enterprise variable starting with
-$1<br />
-<span style="font-weight: bold;"><span style=
-"font-style: italic;">reg</span></span> is a regular expression<br />
-<span style="font-weight: bold;">!</span> is used to negate the result
-(not)<br />
-<span style="font-weight: bold;"><span style=
-"font-style: italic;">n</span></span> is a number<br />
-<span style="font-weight: bold; font-style: italic;">x.x.x.x</span> is an IP
-address<br />
-<span style="font-weight: bold;"><span style=
-"font-style: italic;">x.x.x.x</span>-<span style=
-"font-style: italic;">x.x.x.x</span></span> is an IP network address
-range<br />
-<span style="font-weight: bold;"><span style=
-"font-style: italic;">x.x.x.x</span>/<span style=
-"font-style: italic;">x</span></span> is an IP CIDR network addresss</div>
+<div style="margin-left: 40px;">
+  <b>or</b> or <b>and</b> set the default evaluation mode for ALL matches<br />
+  <b>$x</b> is any variable (example: $3, $A etc)<br />
+  <b>reg</b> is a regular expression<br />
+  <b>!</b> is used to negate the result (not)<br />
+  <b>n</b> is a number<br />
+  <b>x.x.x.x</b> is an IP address<br />
+  <b>x.x.x.x-x.x.x.x</b> is an IP network address range<br />
+  <b>x.x.x.x/x</b> is an IP CIDR network addresss<br />
 </div>
 </blockquote>
 <div style="margin-left: 40px;">
@@ -2077,9 +2059,7 @@ range<br />
 <br />
 <div style="margin-left: 40px;">To limit which devices can be mapped to this
 EVENT definition based on the IP address / hostname of the device / agent that
-sent the trap, the <span style="font-weight: bold;">NODES</span> keyword
-should be used.&nbsp; The MATCH keyword only operates on Enterprise variables
-($<span style="font-style: italic;">n</span>),<br />
+sent the trap, the <b>NODES</b> keyword is recommended.<br />
 <br />
 If the match mode is 'or', once a match occurs no other matches are performed
 and the end result is true.<br />
@@ -2106,12 +2086,13 @@ used.</div>
 1000-2000</span></div>
 <br />
 Any one must match (or): $3 must be 52, or $4 must be an IP address between
-192.168.1.10 and 192.168.1.20:<br />
+192.168.1.10 and 192.168.1.20, or the severity must be 'Major':<br />
 <br />
-<div style="margin-left: 40px;"><span style="font-weight: bold;">MATCH $3:
-52</span><br style="font-weight: bold;" />
-<span style="font-weight: bold;">MATCH $4:
-192.168.1.10-192.168.1.20</span></div>
+<div style="margin-left: 40px;">
+  <b>MATCH $3: 52</b><br />
+  <b>MATCH $4: 192.168.1.10-192.168.1.20</b><br />
+  <b>MATCH $s: (Major)</b><br />
+</div>
 </div>
 </div>
 </div>
