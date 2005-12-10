@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v1.1beta1
+# SNMPTTCONVERTMIB v1.1beta2
 #
 # Copyright 2002-2005 Alex Burger
 # alex_b@users.sourceforge.net
@@ -48,7 +48,7 @@ $prepend_type = 1;
 #############################################################################
 #
 
-$snmpttconvertmib_version = "v1.1beta1";
+$snmpttconvertmib_version = "v1.1beta2";
 
 sub showversion
 {

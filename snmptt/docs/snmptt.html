@@ -14,10 +14,10 @@
 </head>
 <body>
   
-  <h1>SNMP Trap Translator v1.1beta1</h1>
+  <h1>SNMP Trap Translator v1.1beta2</h1>
   
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on:&nbsp;November 5th, 2005
+This file was last updated on:&nbsp;December 10th, 2005
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -234,6 +234,13 @@ variable names translated into symbolic form, want to be able to have
 <b>translate_integers</b>, <b>translate_trap_oid</b> or <b>translate_oids</b>.
 Although not required, using the Perl module is recommended.</blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
+
+<h3><b>v1.1beta2</b> <b>- November 5th, 2005</b></h3>
+<ul>
+  <li><b>MATCH</b> statement now accepts any variable name instead of only enterprise variables.  Example: MATCH $s:(Normal)</li>
+  <li>Added <b>NODES MODE=</b> snmptt.conf file option to allow you to select either <b>POS</b> (positive - the default) or <b>NEG</b> (negative) for <b>NODES</b> matches.  If set to <b>NEG</b>, then <b>NODES</b> is a 'match' only if <i>none</i> of the <b>NODES</b> entries match.</li>
+  <li>Fixed bug in <b>NODES</b> where <b>NODES</b> entries from previous EVENTs were not being purged correctly.</li>
+</ul>  
 
 <h3><b>v1.1beta1</b> <b>- November 5th, 2005</b></h3>
 <ul>
@@ -650,7 +657,7 @@ load</li>
 </ul>
 <h2><a id="Upgrading" name="Upgrading"></a>Upgrading</h2>
 
-<h3><b>v1.0 to v1.1beta1</b></h3>
+<h3><b>v1.0 to v1.1beta1 or v1.1beta2</b></h3>
 <p>To upgrade from v1.0 to v1.1beta1, you should:</p>
 <ol>
   <li>Replace <b>snmptt</b> and <b>snmpttconvertmib</b> with the new versions

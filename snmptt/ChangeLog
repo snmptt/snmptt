@@ -1,4 +1,5 @@
 Dec 10th, 2005: Alex Burger <alex_b@users.sourceforge.net>
+- Update version stamp in all files
 - Changed 'sub match' to only do variable substitution if needed.
 
 Nov 22nd, 2005: Alex Burger <alex_b@users.sourceforge.net>
@@ -12,7 +13,7 @@ Nov 5th, 2005: Alex Burger <alex_b@users.sourceforge.net>
   only if NONE of the NODES entries match.  POS = x | x | x etc.
   NEG = !x & !x & !x etc.
 - Fixed bug in NODES where NODES entries from previous EVENTs
-  was not being purged correctly.
+  were not being purged correctly.
 - Changed version to snmptt_1.1beta2
 
 Nov 5th, 2005: Alex Burger <alex_b@users.sourceforge.net>
