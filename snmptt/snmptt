@@ -4138,14 +4138,24 @@ sub match
   my $not = 0;
   my $result = 0;
 
-  $match =~ /^(\$.*?):(.*)/;
-  my $match_var = $1;
-  $_ = $match_var;
-  $match = $2;
-  print "Performing substitution on MATCH variable: $match_var\n";
-  &substitute();
-  print "Done performing substitution on MATCH variable $match_var (converted to: $_)\n";
-  $value = $_;
+  if ($DEBUGGING >= 1) {  print "    MATCH statement: $match\n"; }
+  
+  if ($match =~ /^\$(\d+):(.*)/) {
+    my $match_var = "\$$1";
+    $value = $entvar[$1-1];
+    $match = $2;
+    if ($DEBUGGING >= 1) {  print "     MATCH variable ($match_var) is an enterprise variable.  No substitution needed\n"; }
+  }
+  else {
+    $match =~ /^(\$.*?):(.*)/;
+    my $match_var = $1;
+    $_ = $match_var;
+    $match = $2;
+    if ($DEBUGGING >= 1) {  print "     Performing substitution on MATCH variable: $match_var\n"; }
+    &substitute();
+    if ($DEBUGGING >= 1) {  print "     Done performing substitution on MATCH variable $match_var (converted to: $_)\n"; }
+    $value = $_;
+  }
     
   if ($value eq '' || $match eq '')
   {

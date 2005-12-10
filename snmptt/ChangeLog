@@ -1,3 +1,6 @@
+Dec 10th, 2005: Alex Burger <alex_b@users.sourceforge.net>
+- Changed 'sub match' to only do variable substitution if needed.
+
 Nov 22nd, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - MATCH statement now accepts any variable name instead of only
   enterprise variables.  Example: MATCH $s:(Normal)
