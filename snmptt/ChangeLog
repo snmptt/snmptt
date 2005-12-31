@@ -1,3 +1,6 @@
+Dec 31st, 2005: Alex Burger <alex_b@users.sourceforge.net>
+- Clean up white space formatting of code.
+
 Dec 10th, 2005: Alex Burger <alex_b@users.sourceforge.net>
 - Update version stamp in all files
 - Changed 'sub match' to only do variable substitution if needed.
