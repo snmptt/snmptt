@@ -38,7 +38,7 @@ Nov 2nd, 2005: Alex Burger <alex_b@users.sourceforge.net>
   to syslog if syslog_system_enable is enabled, and to the 
   Event Log if eventlog_system_enable is enabled.
 - Fixed a problem when --format_desc=n was used. It was adding a 
-  trailing whitespace for every non existant line in the description.
+  trailing whitespace for every non existent line in the description.
   Thanks to Carlos Velasco for the fix.
 - Added unknown_trap_exec snmptt.ini option.  If defined, the 
   command will be executed for ALL unknown traps.  Passed to the
