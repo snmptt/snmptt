@@ -3,6 +3,50 @@
 
 <p class="SectionTitle">Change Log</p>
 
+<u>v1.1 - January 17th, 2006</u>
+<ul class="SectionBody">
+  <li>Added <b>PREEXEC</b> <b>snmptt.conf</b> file option to allow an external 
+  program to be run before processing the FORMAT and EXEC lines.
+  The output of the external program is stored in the <b>$p<i>n</i></b> variable
+  where <b><i>n</i></b> is a number starting from 1.  Multiple <b>PREEXEC</b> lines
+  are permitted.  The first <b>PREEXEC</b> stores the result of the
+  command in <b>$p1</b>, the second in <b>$p2</b> etc.  Any ending newlines
+  are removed.  The <b>snmptt.ini</b> parameter <b>pre_exec_enable</b> can be used
+  to enable / disable it.</li>
+  <li><b>MATCH</b> statement now accepts any variable name instead of only enterprise variables.  Example: MATCH $s:(Normal)</li>
+  <li>Added <b>NODES MODE=</b> snmptt.conf file option to allow you to select either <b>POS</b> (positive - the default) or <b>NEG</b> (negative) for <b>NODES</b> matches.  If set to <b>NEG</b>, then <b>NODES</b> is a 'match' only if <i>none</i> of the <b>NODES</b> entries match.</li>
+  <li>Added <b>unknown_trap_exec</b> <b>snmptt.ini</b> option.  If defined, the 
+  command will be executed for ALL unknown traps.  Passed to the
+  command will be all standard and enterprise variables, similar 
+  to <b>unknown_trap_log_file</b> but without the newlines.</li>
+  <li><b>snmptt --dump</b> which dumps all the configured EVENTs, now displays duplicate 
+  EVENT entries to assist with troubleshooting duplicate entries trap logs.</li>
+  <li>If the debug log file can not be opened, a message is now logged
+  to syslog if <b>syslog_system_enable</b> is enabled, and to the 
+  Event Log if <b>eventlog_system_enable</b> is enabled</li>
+  <li>Fixed bug with PostgreSQL where some trap data was interpreted as 'placeholders'
+  in the INSERT statement which caused logging errors.  PostgreSQL now uses
+  PREPARE / EXECUTE statements instead.
+  <li>MySQL now uses PREPARE / EXECUTE statements instead of a single INSERT statement.</li>
+  <li>Fixed bug in <b>NODES</b> where <b>NODES</b> entries from previous EVENTs were not being purged correctly.</li>
+  <li>Fixed bug where <b>snmptt --dump</b> would attempt to log to syslog or the Event Log.
+  <li>Fixed bug that prevented the wildcard <b>.*</b> from being accepted on the EVENT line.</li>
+  <li>Added Windows Event Log forwarding documentation to integration section.
+  <li>SNMPTTConvertMIB:</li>
+  <li style="list-style: none">
+  <ul>
+    <li>Fixed a bug when <b>--format_desc=n</b> was used that caused extra trailing whitespaces 
+    to be added for every non existent line in the description.</li>
+    <li>Fixed bug that prevented some MIBs from being accepted due to
+    spacing in the <b>DEFINITIONS::= line</b>.</li>
+    <li>Fixed bug in that prevented <b>--ARGUMENTS {}</b> from being parsed 
+    due to spacing.</li>
+  </ul>
+  </li>
+</ul>
+
+<br />
+
 <u>v1.0 - September 1st, 2004</u>
 <ul class="SectionBody">
   <li>SQL database connections are now opened after forking to the background when running in daemon mode, and after changing users when running SNMPTT as a non-root user. This should prevent 'gone away' and other connection problems with SQL databases due to lost handles.</li>
