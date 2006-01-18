@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v1.1beta2
+# SNMPTTCONVERTMIB v1.1
 #
-# Copyright 2002-2005 Alex Burger
+# Copyright 2002-2006 Alex Burger
 # alex_b@users.sourceforge.net
 #
 # 8/14/2002
@@ -48,12 +48,12 @@ $prepend_type = 1;
 #############################################################################
 #
 
-$snmpttconvertmib_version = "v1.1beta2";
+$snmpttconvertmib_version = "v1.1";
 
 sub showversion
 {
   print "\nSNMPTTCONVERTMIB $snmpttconvertmib_version\n";
-  print "(c) 2002-2005 Alex Burger\n";
+  print "(c) 2002-2006 Alex Burger\n";
   print "http://snmptt.sourceforge.net\n\n";
 }
 
