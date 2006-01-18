@@ -1,0 +1,82 @@
+<!--#include virtual="page-top.html" -->
+<!-- CONTENT START -->
+
+<p class="SectionTitle">
+About
+</p>
+
+<p>SNMPTT (SNMP Trap Translator) is an SNMP trap handler written in Perl for use with the Net-SNMP / UCD-SNMP <a target="net-snmp" href="http://www.net-snmp.org/man/snmptrapd.html">snmptrapd</a> program (<a target="net-snmp" href="http://www.net-snmp.org">www.net-snmp.org</a>).  SNMPTT supports Linux, Unix and Windows.</p>
+<p>
+Many network devices including but not limited to network switches, routers, remote access servers, UPSs, printers and operating systems such as Unix and Windows NT have the ability to send notifications to an SNMP manager running on a network management station.  The notifications can be either SNMP Traps, or SNMP Inform messages.
+</p>
+<p>
+The notification can contain a wide array of information such as port failures, link failures, access violations, power outages, paper jams, hard drive failures etc.  The MIB (Management Information Base) available from the vendor determines the notifications supported by each device.
+</p>
+<p>
+The MIB file contains TRAP-TYPE (SMIv1) or NOTIFICATION-TYPE (SMIv2) definitions, which define the variables that are passed to the management station when a particular event occurs.
+</p>
+<p>
+The Net-SNMP program <b>snmptrapd</b> is an application that receives and logs SNMP trap and inform messages via TCP/IP.  Following is a sample syslog entry for a Compaq cpqDa3LogDrvStatusChange trap that notifies that the drive array is rebuilding:
+</p>
+<p style="margin-left: 30px">
+Feb 12 13:37:10 server11 snmptrapd[25409]: 192.168.110.192: Enterprise Specific Trap (3008) Uptime: 306 days, 23:13:24.29, .1.3.6.1.2.1.1.5.0 = SERVER08, .1.3.6.1.4.1.232.11.2.11.1.0 = 0, .1.3.6.1.4.1.232.3.2.3.1.1.4.8.1 = rebuilding(7)
+</p>
+<p style="margin-left: 30px">
+or
+</p>
+<p style="margin-left: 30px">
+Feb 12 13:37:10 server11 snmptrapd[25409]: 192.168.110.192: Enterprise Specific Trap (3008) Uptime: 306 days, 23:13:24.29, sysName.0 = SERVER08, cpqHoTrapFlags.0 = 0, cpqDaLogDrvStatus.8.1 = rebuilding(7)
+</p>
+<p>
+The output from snmptrapd can be changed via the -O option to display numeric or symbolic OIDs and other display options, but it generally follows the format of variable name = value, variable name = value etc.
+</p>
+<p>
+A more descriptive / friendly trap message can be created using SNMPTT's variable substitution.  Following is the same trap, logged with SNMPTT:
+</p>
+<p style="margin-left: 30px">
+Feb 12 13:37:13 server11 TRAPD: .1.3.6.1.4.1.232.0.3008 Normal "XLOGONLY" server08 - Logical Drive Status Change: Status is now rebuilding
+</p>
+<p>
+The definition for the cpqDa3LogDrvStatusChange trap in the SNMPTT configuration file would be defined as follows:
+</p>
+<p style="margin-left: 30px"
+>FORMAT Logical Drive Status Change: Status is now $3.
+</p>
+<p>
+The $3 represents the third variable as defined in the MIB file, which for this particular trap, is the cpqDaLogDrvStatus variable.
+</p>
+<p>
+Another example of an SNMPTT configuration entry is:
+</p>
+<p style="margin-left: 30px">
+FORMAT Compaq Drive Array Spare Drive on controller $4, bus $5, bay $6 status is $3.
+</p>
+<p>
+Which could result in the following output:
+</p>
+<p style="margin-left: 30px">
+"Compaq Drive Array Spare Drive on controller 3, bus 0, bay 3 status is Failed."
+</p>
+<p>
+Snmptt can log to any of the following destinations:  text log, syslog, NT Event log or a SQL database.  External programs can also be run to pass the translated trap to an email client, paging software etc.
+</p>
+<p>
+In addition to variable substitution, SNMPTT allows complex configurations allowing:
+</p>
+<ul class="SectionBody">
+  <li class="SectionBody">the ability to accept or reject a trap based on the host name, ip address, network range, or variable values inside of the trap enterprise variables</li>
+  <li class="SectionBody">execute external programs to send pages, emails etc</li>
+  <li class="SectionBody">perform regular expression search and replace on the translated message such as translating the variable value &quot;Building alarm 4&quot; to &quot;Moisture detection alarm&quot;</li>
+</ul>
+<p>
+The following picture illustrates how the network device, Net-SNMP and SNMPTT are integrated to process a trap.
+</p>
+<p>
+<img
+ src="images/snmptt-flow.jpg"
+ title="SNMPTT Flow diagram" alt="SNMPTT Flow diagram" style="width: 629px; height: 663px;" />
+</p>
+
+<!-- CONTENT END -->
+<!--#include virtual="page-bottom.shtml" -->
+

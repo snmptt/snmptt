@@ -1,0 +1,73 @@
+<!--#include virtual="page-top.html" -->
+<!-- CONTENT START -->
+
+<p class="SectionTitle">
+Resources
+</p>
+
+<p>
+The following web sites are in no way affiliated with SNMPTT, and are only listed to assist SNMP users with learning, configuring and using SNMP and SNMPTT and to list other software that can be integrated with SNMPTT.</p>
+
+<p><b><u>SNMP links</u></b></p>
+<p>
+  Essential SNMP book published by O'Reilly<br />
+  <a href="http://www.oreilly.com/catalog/esnmp/" target="_blank">http://www.oreilly.com/catalog/esnmp/</a>
+  <br />
+  <br />
+</p>
+
+<p><b><u>Software links</u></b></p>
+<p>
+  Net-SNMP<br />
+  <a href="http://www.net-snmp.org" target="_blank">http://www.net-snmp.org</a>
+  <br />
+  <br />
+
+  SNMPTT-Gui:  A web based database driven SNMP trap monitor for SNMPTT<br />
+  <a href="http://snmptt-gui.sourceforge.net" target="_blank">http://snmptt-gui.sourceforge.net</a>
+  <br />
+  <br />
+
+  Nagios network monitoring<br />
+  <a href="http://www.nagios.org" target="_blank">http://www.nagios.org</a>
+  <br />
+  <br />
+
+  Simple Event Correlator (SEC)<br />
+  <a href="http://kodu.neti.ee/~risto/sec/" target="_blank">http://kodu.neti.ee/~risto/sec/</a>
+  <br />
+  <br />
+
+  QPage paging<br />
+  <a href="http://www.qpage.org" target="_blank">http://www.qpage.org</a>
+  <br />
+  <br />
+
+  Perl modules on cpan<br />
+  <a href="http://www.cpan.org" target="_blank">http://www.cpan.org</a>
+  <br />
+  <br />
+
+  ActivePerl from ActiveState (Windows)<br />
+  <a href="http://www.activestate.com/Products/ActivePerl/" target="_blank">http://www.activestate.com/Products/ActivePerl/</a>
+  <br />
+  <br />
+</p>
+
+<p><b><u>Articles etc</u></b></p>
+<p>
+  SNMP Trap Handling with Nagios<br />
+  <a href="http://www.samag.com/documents/s=9559/sam0503g/" target="_blank">Sys Admin March 2005 issue</a>
+  <br />
+  <br />
+  Build a Custom Cisco Configuration Repository<br />
+  <a href="http://www.devx.com/enterprise/Article/21647/0/page/1" target="_blank">DevX.com</a>
+  <br />
+  <br />
+</p>
+
+
+<br />
+<!-- CONTENT END -->
+<!--#include virtual="page-bottom.shtml" -->
+

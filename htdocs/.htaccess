@@ -1,0 +1,4 @@
+DirectoryIndex index.shtml index.html index.htm index.php
+AddType application/x-httpd-php .html .htm
+Options -Indexes
+

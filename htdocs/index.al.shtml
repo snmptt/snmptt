@@ -1,0 +1,91 @@
+<!--#include virtual="page-top.html" -->
+<!-- CONTENT START -->
+
+<p>SNMPTT (SNMP Trap Translator) is an SNMP trap handler written in Perl for use with the Net-SNMP / UCD-SNMP snmptrapd program (<a target="net-snmp" href="http://www.net-snmp.org">www.net-snmp.org</a>).</p>
+
+<p class="SectionTitle">
+News
+</p>
+
+<p></p>
+<table border="1" cellspacing="0" cellpadding="0">
+  <tr>
+    <td>
+      <table border="0" cellspacing="0" cellpadding="4">
+
+<tr>
+  <td valign="top" class="NewsItemDate">8/11/2004</td>
+  <td class="NewsItem">
+    <p><b>Net-SNMP 5.1.2 released</b></p>
+    <p>Net-SNMP 5.1.2 has been released.  Source and binaries for Linux and Windows (others are sure to follow) are currently available from the <a href="http://www.net-snmp.org/download/">Net-SNMP download page</a>.</p>
+  </td>
+</tr>
+
+
+<tr>
+  <td valign="top" class="NewsItemDate">4/5/2004</td>
+  <td class="NewsItem">
+    <p><b>Net-SNMP 5.1.1 released</b></p>
+    <p>Net-SNMP 5.1.1 has been released and is now the recommended version to use with SNMPTT.  V5.1.1 contains all the recommended Perl patches and the problems reported in 5.1 have been fixed.  Net-SNMP source and binaries are available from the <a href="http://www.net-snmp.org/download/">Net-SNMP download page</a>.</p>
+  </td>
+</tr>
+
+        
+<tr>
+  <td valign="top" class="NewsItemDate">12/5/2003</td>
+  <td class="NewsItem">
+    <p><b>Net-SNMP 5.1 problems</b></p>
+    <p>There seems to be a problem with the trap handler in Net-SNMP 5.1.  Until it is fixed, please use Net-SNMP 5.0.9 or lower with SNMPTT.</p>
+  </td>
+</tr>
+
+<tr>
+  <td valign="top" class="NewsItemDate">11/3/2003</td>
+  <td class="NewsItem">
+    <p><b>SNMPTT v0.9 has been released</b></p>
+    <p>The process name for syslog output has been changed to 'snmptt[PID]' for traps and 'snmptt-sys[PID]' for system messages. The UID used by snmptt can now be changed after startup, and some bugs have been fixed.</p>
+    <p>See the <a href="changelog.shtml" target="main">Change Log</a> for a complete listing of changes.</p>
+  </td>
+</tr>
+
+<tr>
+  <td valign="top" class="NewsItemDate">10/23/2003</td>
+  <td class="NewsItem">
+    <p><b>Web site changes</b></p>
+    <p>This site has been redesigned once again using a combination of the 2 column CSS from <a target="TheLayoutReservoir" href="http://www.bluerobot.com/web/layouts/">The Layout Reservoir</a> and some parts of the <a target="Nagios" href="http://www.nagios.org">Nagios</a> web site CSS.</p>
+    <p>All pages are now valid XHTML 1.0 Transitional which means the site should work in all browsers including wireless devices and screen readers.  Some older browsers may not show the correct layout, but the contents of the site should be accessible.</p>
+  </td>
+</tr>
+	
+	
+<tr>
+  <td valign="top" class="NewsItemDate">10/16/2003</td>
+  <td class="NewsItem">
+    <p><b>Web site launch</b></p>
+    <p>Although long overdue, the domain <a target="snmptt" href="http://www.snmptt.org">snmptt</a> has been registered, and this new web site has been created.  The layout and look of the site is based on the <a target="Nagios" href="http://www.nagios.org">Nagios</a> web site, so special thanks to Ethan!</p>
+    <p>The old web page was the readme.html file included in the package, and is available from the <a href="docs.html">Documentation</a> menu item on the left.</p>
+  
+    <p>Over time the documentation will be cleaned up with hopefully a multi-page format and a tutorial section to help new users as the size of current documentation can be a bit intimidating at first.  The basic use of SNMPTT is actually quite simple, but things can get complex when using new features such as REGEX.</p>
+  </td>
+</tr>
+
+
+<tr>
+  <td valign="top" class="NewsItemDate">09/16/2003</td>
+  <td class="NewsItem">
+    <p><b>SNMPTT v0.8 has been released</b></p>
+    <p>New features have been added such as the MATCH keyword to match events based on enterprise variables, the REGEX keyword now supports captures and the i, g, and e modifiers for complex regular expressions, improved PostgreSQL support, DNS lookups, and remote MySQL and PostgreSQL support. Some variable substitutions have been added or changed, and Nagios/ Netsaint integration documentation has been added along with various bug fixes.</p>
+    <p>See the <a href="changelog.shtml" target="main">Change Log</a> for a complete listing of changes.</p>
+  </td>
+</tr>
+
+
+
+      </table>
+    </td>
+  </tr>
+</table>
+	  
+<!-- CONTENT END -->
+<!--#include virtual="page-bottom.shtml" -->
+

@@ -1,0 +1,24 @@
+<!--#include virtual="page-top.html" -->
+<!-- CONTENT START -->
+
+<p class="SectionTitle">
+Mailing Lists
+</p>
+
+<p>The follow mailing lists are available:</p>
+
+<p><b><u>SNMPTT-Users</u></b></p>
+<ul class="SectionBody">
+  <li class="SectionBody"><a target="snmptt-users" href="http://lists.sourceforge.net/mailman/listinfo/snmptt-users">Subscribe/Unsubscribe to list</a></li>
+  <li class="SectionBody"><a target="snmptt-users" href="http://sourceforge.net/mailarchive/forum.php?forum_id=11889">Browse and search archive</a></li>
+</ul>
+
+<p><b><u>SNMPTT-Developer</u></b></p>
+<ul class="SectionBody">
+  <li class="SectionBody"><a target="snmptt-developer" href="http://lists.sourceforge.net/mailman/listinfo/snmptt-developer">Subscribe/Unsubscribe to list</a></li>
+  <li class="SectionBody"><a target="snmptt-developer" href="http://sourceforge.net/mailarchive/forum.php?forum_id=11888">Browse and search archive</a></li>
+</ul>
+
+<!-- CONTENT END -->
+<!--#include virtual="page-bottom.shtml" -->
+
