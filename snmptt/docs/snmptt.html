@@ -3032,7 +3032,7 @@ sending traps to management stations when an event occurs.</p>
 is similar to the Net-SNMP <b>snmptrapd.exe</b> daemon.  The Microsoft SNMP Trap Service is NOT used to send
 traps and is not required.</p>
 
-<h4><Configuring the trap destination</h4>
+<h4>Configuring the trap destination</h4>
 
 <p>The Windows SNMP agent needs to be configured to forward traps to your
 Net-SNMP / SNMPTT management station.  
@@ -3204,12 +3204,12 @@ Package:.Negotiate.....Workstation Name:.SERVER1.</b></p>
 
 <p>By reviewing the Description field
 as defined in the <b>evntwin.exe</b> utility, a new cleaned up FORMAT line can
-be used that doesnt contain all the dots.</p>
+be used that does not contain all the dots.</p>
 
 <p>Following is the text from the
 Description field in <b>evntwin.exe</b> which will be used as a
 reference.  Notice the use of %<i>n</i>
-variables which are equivalent to the SNMPTT $n variables +5 (%1 = SNMPTTs
+variables which are equivalent to the SNMPTT $n variables +5 (%1 = SNMPTT's
 $6).  Note:  In the example below, %n is a newline and %t is a tab while %<i>n</i> is a variable number.</p>
 
 <p>Logon Failure:%n %tReason:%t%tUnknown user name or bad

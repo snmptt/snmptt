@@ -166,7 +166,7 @@ unless (open SPOOL, ">$spoolfile")
 {
 	if ($DEBUGGING >= 1)
 	{
-		print "Could write to file file $spoolfile!  Trap will be lost!\n";
+		print "Could not write to file file $spoolfile!  Trap will be lost!\n";
 	}
 	die "Could not write to file $spoolfile!  Trap will be lost!\n";
 }
