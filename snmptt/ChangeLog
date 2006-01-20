@@ -1,3 +1,11 @@
+Jan 20th, 2006: Alex Burger <alex_b@users.sourceforge.net>
+- Fix bug in process trap for $match_temp 'remove any white space from before and after i modifier'
+- Added 'use strict' to snmptt
+- Added 'use strict' to snmpttconvertmib
+- Added 'use strict' to snmpttconvert
+- Added 'use strict' to snmptthandler and improved debugging
+- Changed version to snmptt_1.2beta
+
 Jan 17th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.1
 

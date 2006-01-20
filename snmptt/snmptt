@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v1.1
+# SNMPTT v1.2beta
 #
 # Copyright 2002-2006 Alex Burger
 # alex_b@users.sourceforge.net
@@ -45,8 +45,9 @@
 #
 ##############################################################################
 #
+use strict;
 
-$snmptt_version = "v1.1";
+my $snmptt_version = "v1.2beta";
 
 sub showversion
 {
@@ -60,14 +61,14 @@ sub showversion
 
 use Getopt::Long;
 
-$version = 0;
-$daemon = 0;
-$debug = 0;
-$debugfile = '';
-$dump = 0;
-$help = 0;
-$time = 0;
-$ini = '';
+my $version = 0;
+my $daemon = 0;
+my $debug = 0;
+my $debugfile = '';
+my $dump = 0;
+my $help = 0;
+my $time = 0;
+my $ini = '';
 
 GetOptions 	('version' => \$version, 
     'daemon' => \$daemon,
@@ -86,7 +87,7 @@ if ($version == 1)
 
 if ($help == 1)
 {
-$USAGE = qq/Usage:
+my $USAGE = qq/Usage:
     snmptt [<options>] 
 Options:
     --daemon                             Run as a daemon
@@ -105,6 +106,12 @@ Options:
 
   exit(0);
 }
+
+my $DEBUGGING;
+my $debugcmdline;
+my $daemoncmdline;
+my $DEBUGGING_FILE;
+my $debugfilecmdline;
 
 if ($debug >= 1)
 {
@@ -156,6 +163,115 @@ else
   $debugfilecmdline = 0;
 }
 
+# Global config file variables
+my $daemon;
+my $multiple_event;
+my $dns_enable;
+my $strip_domain;
+my @strip_domain_list;
+my $net_snmp_perl_enable;
+my $net_snmp_perl_best_guess;
+my $translate_log_trap_oid;
+my $translate_value_oids;
+my $resolve_value_ip_addresses;
+my $translate_enterprise_oid_format;
+my $translate_trap_oid_format;
+my $translate_varname_oid_format;
+my $translate_integers;
+my $wildcard_expansion_separator;
+my $mibs_environment;
+my $allow_unsafe_regex;
+my $remove_backslash_from_quotes;
+my $dynamic_nodes;
+my $description_mode;
+my $description_clean;
+my $unknown_trap_exec;
+
+# DaemonMode
+my $daemon_fork;
+my $daemon_uid;
+my $spool_directory;
+my $sleep;
+my $use_trap_time;
+my $keep_unlogged_traps;
+
+# Logging
+my $stdout_enable;
+my $log_enable;
+my $log_file;
+my $unknown_trap_log_enable;
+my $unknown_trap_log_file;
+my $statistics_interval;
+my $syslog_enable;
+my $syslog_facility;
+my @syslog_level_alert;
+my @syslog_level_crit;
+my @syslog_level_err;
+my @syslog_level_warning;
+my @syslog_level_notice;
+my @syslog_level_info;
+my @syslog_level_debug;
+my $syslog_level;
+my $syslog_system_enable;
+my $syslog_system_facility;
+my $syslog_system_level;
+my $eventlog_enable;
+my @eventlog_type_information;
+my @eventlog_type_warning;
+my @eventlog_type_error;
+my $eventlog_type;
+my $eventlog_system_enable;
+
+# Exec
+my $exec_enable;
+my $pre_exec_enable;
+
+# SQL
+my $db_translate_enterprise;
+my $db_unknown_trap_format;
+my $mysql_dbi_enable;
+my $mysql_dbi_host;
+my $mysql_dbi_port;
+my $mysql_dbi_database;
+my $mysql_dbi_table;
+my $mysql_dbi_table_unknown;
+my $mysql_dbi_username;
+my $mysql_dbi_password;
+my $mysql_ping_on_insert;
+my $mysql_ping_interval;
+
+my $postgresql_dbi_enable;
+my $postgresql_dbi_module;
+my $postgresql_dbi_hostport_enable;
+my $postgresql_dbi_host;
+my $postgresql_dbi_port;
+my $postgresql_dbi_database;
+my $postgresql_dbi_table;
+my $postgresql_dbi_table_unknown;
+my $postgresql_dbi_username;
+my $postgresql_dbi_password;
+my $postgresql_ping_on_insert;
+my $postgresql_ping_interval;
+
+my $dbd_odbc_enable;
+my $dbd_odbc_dsn;
+my $dbd_odbc_table;
+my $dbd_odbc_table_unknown;
+my $dbd_odbc_username;
+my $dbd_odbc_password;
+my $dbd_odbc_ping_on_insert;
+my $dbd_odbc_ping_interval;
+
+my $sql_win32_odbc_enable;
+my $sql_win32_odbc_dsn;
+my $sql_win32_odbc_table;
+my $sql_win32_odbc_table_unknown;
+my $sql_win32_odbc_username;
+my $sql_win32_odbc_password;
+
+# TrapFiles
+my @snmptt_conf_files;
+
 ##############################################################################
 #
 # Load config file 
@@ -169,7 +285,7 @@ else
 use Text::ParseWords;
 use POSIX qw(strftime);
 
-$debug_file_used = 0;
+my $debug_file_used = 0;
 
 my $g_start_time = time();
 
@@ -207,6 +323,12 @@ if ($syslog_enable == 1 || $syslog_system_enable == 1)
   require Sys::Syslog;
 }
 
+
+# Win32 constants not available when using 'require' (!)
+my $eventlog_error = 1;		# EVENTLOG_ERROR_TYPE
+my $eventlog_warning = 2;		# EVENTLOG_WARNING_TYPE
+my $eventlog_information = 4;	# EVENTLOG_INFORMATION_TYPE
+
 if ($eventlog_system_enable == 1 || $eventlog_enable == 1)
 {
   eval 'require Win32::EventLog;';
@@ -218,11 +340,6 @@ if ($eventlog_system_enable == 1 || $eventlog_enable == 1)
     die "died";
   }
   require Win32::EventLog;
-
-  # Constants not available when using 'require' (!)
-  $eventlog_error = 1;		# EVENTLOG_ERROR_TYPE
-  $eventlog_warning = 2;		# EVENTLOG_WARNING_TYPE
-  $eventlog_information = 4;	# EVENTLOG_INFORMATION_TYPE
 }
 
 
@@ -398,7 +515,30 @@ if ($sql_win32_odbc_enable == 1)
 ##############################################################################
 ####  MAIN SECTION START
 
-# Pull in passed SNMP info from snmptrapd via STDIN and place in the array @tempvar
+# Global variables
+my %event;                    # Holds EVENT entries from all .conf files        
+my $receivedtrap_entry;       # Trap received - stored by readtrap()
+my $input;                    # For reading in trap from spool folder or STDIN
+my @event2;                   # Copy of the matched event
+my @var;                      # Variables of trap received by SNMPTRAPD
+my @entvar;                   # Enterprise variable values of trap received by SNMPTRAPD
+my @entvarname;               # Enterprise variable names of trap received by SNMPTRAPD
+my @preexec_var;              # PREXEC results
+my $receivedtrap;             # Received trap
+my $receivedtrap_trans;       # Translated version of received trap
+my $enterprise_trans;         # Translated enterprise of received trap
+my $agent_dns_name;           # DNS name of trap received
+my $processed;                # Whether or not the trap was processed (found) to determine
+                              # if it should search using wildcards and log to unknown
+my $trap_attempted_to_log;    # To keep track of whether or not we attempted to log the trap
+my $trap_date_time;           # Date and time of the trap
+my $trap_successfully_logged; # To keep track of whether or not we successfully logged the trap
+                              # so we know if we should delete the trap file
+my $db_enterprise;
+my $trap_date;                # Date of trap
+my $trap_time;                # Time of trap
+my $trap_date_time_epoch;     # Date / time of trap
+my $configfile;               # .ini file to use
 
 # Global variables for statistics
 my $g_total_traps_received = 0;
@@ -407,10 +547,21 @@ my $g_total_traps_ignored = 0;
 my $g_total_traps_unknown = 0;
 my $g_last_statistics_logged = $g_start_time;
 
+# Global variables for SQL
+my $dbh_mysql;
+my $dbh_postgresql;
+my $dbh_odbc;
+my $dbh_win32_odbc;
+
 # Global variables for SQL ping
 my $g_last_mysql_ping = $g_start_time;
 my $g_last_postgresql_ping = $g_start_time;
 my $g_last_dbd_odbc_ping = $g_start_time;
+
+# Global variables for daemon mode
+my $timetoreload;
+my $timetodie;
+my $timetologstatistics;
 
 if ($daemon == 1)
 {
@@ -422,7 +573,7 @@ if ($daemon == 1)
 
   $timetoreload = 0;
   $timetodie = 0;
-        $timetologstatistics = 0;
+  $timetologstatistics = 0;
 
   &loadsnmpttconf;	# Load SNMPTT.CONF file
 
@@ -450,14 +601,13 @@ if ($daemon == 1)
     {
       if ( ! (open(PID, ">/var/run/snmptt.pid") ))
       {
-        open(PID, ">$working_dir/snmptt.pid");
+        if (open(PID, ">$working_dir/snmptt.pid"))
+        {
+          print(PID "$pid\n");
+          close(PID);
+        }
       }
 
-      if (defined (PID))
-      {
-        print(PID "$pid\n");
-        close(PID);
-      }
       exit;
     }
 
@@ -504,11 +654,8 @@ if ($daemon == 1)
         }
       }
 
-      # Close debug file before changing users and re-open after
-      if (defined (DEBUGFILE))
-      {
-        close(DEBUGFILE);
-      }
+      # Close debug file (if it is open) before changing users and re-open after
+      close(DEBUGFILE);
 
       $> = $daemon_uid;
 
@@ -585,7 +732,7 @@ if ($daemon == 1)
         eventlog_system("Unable to open spool dir $spool_directory",4,$eventlog_error);
       }
     }
-    elsif (! (@filenames = readdir(DIR)))
+    elsif (! (my @filenames = readdir(DIR)))
     {
       if ($DEBUGGING >= 1)
       {
@@ -666,7 +813,7 @@ if ($daemon == 1)
           print "Processing file: $file\n";
         }
 
-        $filesuccess = 1;
+        my $filesuccess = 1;
         unless (open FILE, $spool_directory.$file)
         {
           if ($DEBUGGING >= 1)
@@ -872,9 +1019,10 @@ sub processtrap
   ###############################################################################
   # if no nodes list, then $hostmatch = 1 so trap is logged etc, otherwise it is not
 
-  $l = 1;	# Start with first event entry
+  my $l = 1;	# Start with first event entry
 
-  $multiple_event_passes = 0;	# Below, if =1, then abort because we already found a match for
+  my $multiple_event_passes = 0; # This variable increases each time we match an EVENT.
+                              # Below, if =1, then abort because we already found a match for
                               # this trap.  This would only happen if you have a trap
                               # defined multiple times in the config file to allow 
                               # different machines to have different actions based on 
@@ -896,8 +1044,8 @@ sub processtrap
       print  "Working with EVENT entry: $receivedtrap_entry => $event{$receivedtrap_entry}[0+$l],$event{$receivedtrap_entry}[1+$l],$event{$receivedtrap_entry}[2+$l],$event{$receivedtrap_entry}[5+$l]\n";
     }
 
-    $hostmatch = 0;
-    $nodesmatch = 0;	# Match from NODES
+    my $hostmatch = 0;
+    my $nodesmatch = 0;	# Match from NODES
     my $match_found = 0;	# Match from MATCH
 
     # $event is the hash of events defined in the config file
@@ -908,7 +1056,7 @@ sub processtrap
 
     # Flush out @nodes
     #@nodes = ();
-    @nodes2 = ();
+    my @nodes2 = ();
 
     # $event2[0]=$event{"$receivedtrap_entry"}[0];	# 0: name of trap	
     # $event2[1]=$event{"$receivedtrap_entry"}[1];	# 1: category
@@ -1065,7 +1213,7 @@ sub processtrap
         {
           $match_temp =~ s/\s*(\(.*\))\s*/$1/g;  # Remove any white space from before and after ()'s
 
-          $match_temp =~ s/\)\s*(\i)\s*/\)$1/g;  # Remove any white space from before and after i modifier
+          $match_temp =~ s/\)\s*(i)\s*/\)$1/g;  # Remove any white space from before and after i modifier
                                                   # if there is one
 
           $match_temp =~ s/\s*(\!.*)/$1/g;       # Remvoe any white space in front of the ! if there is one
@@ -1127,6 +1275,8 @@ sub processtrap
       $processed = 1;
     }
 
+    my $message_short;
+    my $message;
     if ($hostmatch == 1 && $event2[1] ne "IGNORE")
     {
       $message_short = "";
@@ -1734,7 +1884,7 @@ sub substitute
   my $temp_wildcard1 = ();
   my $temp_wildcard2 = ();
   my $temp_wildcard3 = ();
-  for($i=1;$i <= $#entvar+1; $i++)
+  for(my $i=1;$i <= $#entvar+1; $i++)
   {
     $temp_wildcard1 = $temp_wildcard1 . "\$$i" . $wildcard_expansion_separator;
     $temp_wildcard2 = $temp_wildcard2 . "\$\+$i" . $wildcard_expansion_separator;
@@ -1760,7 +1910,7 @@ sub substitute
 
  # $v - Names of variable-bindings 
  # Count down backwards to make sure 10 is not mistaken for $1
-  for($i=$#entvarname+1;$i > 0; $i--)
+  for(my $i=$#entvarname+1;$i > 0; $i--)
   {
     if ($net_snmp_perl_enable == 1)
     {
@@ -1781,7 +1931,7 @@ sub substitute
 
   # $n - Variable-bindings
   # Count down backwards to make sure 10 is not mistaken for $1
-  for($i=$#entvar+1;$i > 0; $i--)
+  for(my $i=$#entvar+1;$i > 0; $i--)
   {
     my $val = $entvar[$i-1];
 
@@ -2036,6 +2186,7 @@ sub substitute
     &substitute2 ("\$D", $description_temp);
   }
   elsif ($description_mode == 1) {
+    my $description_temp;
     for (my $i=0; defined($event2[8][$i]); $i++)
     {
       $description_temp = $description_temp . $event2[8][$i] . "\n";
@@ -2267,13 +2418,13 @@ sub substitute2 {
   my $left = shift;
   my $right = shift;
 
-  $string_r = reverse $_;
-  $left_r = reverse $left;
+  my $string_r = reverse $_;
+  my $left_r = reverse $left;
   $left_r =~ s/\\/\\\\/g;               # escape \
   $left_r =~ s/\$/\\\$/g;               # escape $
   $left_r =~ s/\*/\\\*/g;               # escape *
   $left_r =~ s/\+/\\\+/g;               # escape +
-  $right_r = reverse $right;
+  my $right_r = reverse $right;
 
   # The format is:
   # s/a\$((?=(\$\$)*(?!\$)))/b/g;
@@ -2293,12 +2444,11 @@ sub loadsnmpttconf
   # that will be used for variable substitution
 
   # Flush variables in case this is a re-load during run
-  @snmpttconf = ();
+  my @snmpttconf = ();
   # @snmptt_conf_files = ();
   undef %event;
-  undef %nodes_file_hash;		# NODES entries from NODES files
-
-  foreach $snmpttconffile (@snmptt_conf_files)
+  
+  foreach my $snmpttconffile (@snmptt_conf_files)
   {
     if ($DEBUGGING >= 1)
     {
@@ -2333,7 +2483,7 @@ sub loadsnmpttconf
 
       next;
     }
-    $tempcount = 0;
+    my $tempcount = 0;
     while (<SNMPTTCONF>)
     {
       chomp;				#remove <cr> at end of line	
@@ -2369,13 +2519,13 @@ sub loadsnmpttconf
     print "\nProcessing memory copy of configuration files\n";
   }
 
-  $currentline=0;
-  $tempcount=0;
-  $tempcount2=0;
+  my $currentline=0;
+  my $tempcount=0;
+  my $tempcount2=0;
 
   while ($currentline <= $#snmpttconf)
   {
-    $line = $snmpttconf[$currentline];
+    my $line = $snmpttconf[$currentline];
 
     if ($line =~ /^EVENT/)
     {
@@ -2400,12 +2550,12 @@ sub loadsnmpttconf
       $tempcount++;		# Temporary counter of the number of EVENTS found
 
       # Divide up line taking into consideration strings in quotes
-      $temp = join "::::", shellwords($line);                
+      my $temp = join "::::", shellwords($line);                
 
       #print "line is: $temp\n";
 
       # Split line up into multiple elements of an array using the new delimiter
-      @temp = split ("::::",$temp);
+      my @temp = split ("::::",$temp);
 
       if (! ($temp[2] =~ /^(\.\d+)+$/) && ! ($temp[2] =~ /^(\.\d+)+\.\*$/) && ! 
                             ($temp[2] =~ /^(\.\*)$/) )
@@ -2452,18 +2602,18 @@ sub loadsnmpttconf
 
       # Clear out the FORMAT, EXEC and NODES lines in case they are not found.  Don't want old
       # data in them..
-      $lineformat = '';
-      $lineexec = '';
-      $linenodes = '';
-      $lineregex = '';
-      @exec = ();
-      @regex = ();
-      @match = ();
-                        @desc = ();
-      @preexec = ();
+      my $lineformat = '';
+      my $lineexec = '';
+      my $linenodes = '';
+      my $lineregex = '';
+      my @exec = ();
+      my @regex = ();
+      my @match = ();
+      my @desc = ();
+      my @preexec = ();
 
       $currentline++; # Increment to the next line which should be a FORMAT, EXEC or NODES
-      $line2 = $snmpttconf[$currentline];
+      my $line2 = $snmpttconf[$currentline];
 
       while ( ($currentline <= $#snmpttconf) && !($line2 =~ /^EVENT/) )
       {
@@ -2489,7 +2639,7 @@ sub loadsnmpttconf
         {
           # It's a PREEXEC line
 
-          $linematch = substr($line2,8);
+          my $linematch = substr($line2,8);
 
           push (@preexec,$linematch);
         }
@@ -2520,7 +2670,7 @@ sub loadsnmpttconf
         {
           # It's a MATCH line
 
-          $linematch = substr($line2,6);
+          my $linematch = substr($line2,6);
 
           push (@match,$linematch);
         }
@@ -2556,7 +2706,7 @@ sub loadsnmpttconf
 
         #@regex = qw/one two/;
 
-        $countx = @{ $event{$temp[2]} }[0];
+        my $countx = @{ $event{$temp[2]} }[0];
         #print "countx $countx\n";
         @{ $event{$temp[2]} }[1+$countx]= $temp[1];
         @{ $event{$temp[2]} }[2+$countx]= $temp[3];
@@ -2609,9 +2759,9 @@ sub loadsnmpttconf
   {
     print "==========================================================\n";
     print "Printing out all the events in hash table:\n\n";
-    foreach $key (sort keys %event)
+    foreach my $key (sort keys %event)
     {
-      $l=0;
+      my $l=0;
       while (defined($event{$key}[$l+1]))
       {
         print  "Event: $key => $event{$key}[1+$l],$event{$key}[2+$l],$event{$key}[3+$l],$event{$key}[4+$l],$event{$key}[7+$l][0]\n";
@@ -2625,16 +2775,16 @@ sub loadsnmpttconf
     if ($dump == 1) {
       print "Printing out all duplicate events in hash table:\n\n";
       my %temp = ();
-      foreach $key (sort keys %event)
+      foreach my $key (sort keys %event)
       {
-        $l=0;
+        my $l=0;
         while (defined($event{$key}[$l+1]))
         {
           $temp{$key}++;
           $l+=11;
         }
       }
-      foreach $key (sort keys %temp)
+      foreach my $key (sort keys %temp)
       {
         if ($temp{$key} > 1) {
           print "Duplicate event: $key\n";
@@ -2651,7 +2801,7 @@ sub loadsnmpttconf
 sub readtrap
 {
   # Flush out @tempvar, @var and @entvar
-  @tempvar = ();
+  my @tempvar = ();
   @var = ();
   @entvar = ();
   @entvarname = ();
@@ -2688,6 +2838,8 @@ sub readtrap
     $trap_time = strftime "%H:%M:%S", localtime();
   }
 
+  # Pull in passed SNMP info from snmptrapd via STDIN and place in the array @tempvar
+
   chomp($tempvar[0]=<$input>);	# hostname
   $tempvar[0] =~ s(`)(')g;	#` Replace any back ticks with regular single quote
 
@@ -2701,8 +2853,8 @@ sub readtrap
 
   #Process varbinds
   #Separate everything out, keeping both the variable name and the value
-  $linenum = 1;
-  while (defined($line = <$input>))
+  my $linenum = 1;
+  while (defined(my $line = <$input>))
   {
     $line =~ s(`)(')g;	#` Replace any back ticks with regular single quote
 
@@ -2720,6 +2872,7 @@ sub readtrap
     chomp ($temp2);       # Variable VALUE
     chomp ($line);
 
+    my $variable_fix;
     if ($linenum == 1)
     {
       if (defined($temp2) )	# Check if line 1 contains 'variable value' or just 'value'  
@@ -2746,7 +2899,7 @@ sub readtrap
           print "  Multi-line value detected - merging onto one line...\n";
         }
         chomp $temp2;				# Remove the newline character
-        while (defined($line2 = <$input>))
+        while (defined(my $line2 = <$input>))
         {
           chomp $line2;
           $temp2.=" ".$line2;
@@ -2805,7 +2958,7 @@ sub readtrap
           print "  Multi-line value detected - merging onto one line...\n";
         }
         chomp $line;				# Remove the newline character
-        while (defined($line2 = <$input>))
+        while (defined(my $line2 = <$input>))
         {
           chomp $line2;
           $line.=" ".$line2;
@@ -2842,7 +2995,7 @@ sub readtrap
   {
     # Print out all items passed from snmptrapd
     print "\nItems passed from snmptrapd:\n";
-    for ($i=0;$i <= $#tempvar;$i++)
+    for (my $i=0;$i <= $#tempvar;$i++)
     {
       print "value $i: $tempvar[$i]\n\n";
     }
@@ -2867,8 +3020,8 @@ sub readtrap
   # Cycle through remaining variables searching for for agent IP (.1.3.6.1.6.3.18.1.3.0),
   # community name (.1.3.6.1.6.3.18.1.4.0) and enterpise (.1.3.6.1.6.3.1.1.4.3.0)
   # All others found are regular passed variables
-  $j=0;
-  for ($i=6;$i <= $#tempvar; $i+=2)
+  my $j=0;
+  for (my $i=6;$i <= $#tempvar; $i+=2)
   {
     if ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.3.0$/)		# ip address from trap agent
     {
@@ -2981,7 +3134,7 @@ sub readtrap
     print "0+:		passed variables\n\n";	
 
     #print out all standard variables
-    for ($i=0;$i <= $#var;$i++)
+    for (my $i=0;$i <= $#var;$i++)
     {
       print "Value $i: $var[$i]\n\n";
     }
@@ -2989,7 +3142,7 @@ sub readtrap
     print "Agent dns name: $agent_dns_name\n\n";
 
     #print out all enterprise specific variables
-    for ($i=0;$i <= $#entvar;$i++)
+    for (my $i=0;$i <= $#entvar;$i++)
     {
       print "Ent Value $i (\$" . ($i+1) . "): $entvarname[$i]=$entvar[$i]\n\n";
     }
@@ -3093,11 +3246,11 @@ sub searchfortrap
   # Check for wildcard match in hash table if not already processed
   if ($processed == 0)
   {
-    $receivedtraptemp = $receivedtrap;
+    my $receivedtraptemp = $receivedtrap;
 
-    $counter = 0;  # Drill down only 40 times.  Should never need this, but
-                   # it's here to prevent an infinite loop in this while statement
-                   # just in case
+    my $counter = 0;  # Drill down only 40 times.  Should never need this, but
+                      # it's here to prevent an infinite loop in this while statement
+                      # just in case
 
     if ($DEBUGGING >= 1)
     {
@@ -3144,12 +3297,12 @@ sub searchfortrap
       $command .= scalar($trap_date_time) . ": Unknown trap ($var[3]) received from $var[0] at:";
 
       #print out all standard variables
-      for ($i=0;$i <= $#var;$i++) {
+      for (my $i=0;$i <= $#var;$i++) {
         $command .= " Value $i: $var[$i]";
       }
 
       #print out all enterprise specific variables
-      for ($i=0;$i <= $#entvar;$i++) {
+      for (my $i=0;$i <= $#entvar;$i++) {
         $command .= " Ent Value $i: $entvarname[$i]=$entvar[$i]";
       }
 
@@ -3169,12 +3322,12 @@ sub searchfortrap
         {
           print LOGFILE scalar($trap_date_time),": Unknown trap ($var[3]) received from $var[0] at: \n";
           #print out all standard variables
-          for ($i=0;$i <= $#var;$i++)
+          for (my $i=0;$i <= $#var;$i++)
           {
             print 	LOGFILE "Value $i: $var[$i]\n";
           }
           #print out all enterprise specific variables
-          for ($i=0;$i <= $#entvar;$i++)
+          for (my $i=0;$i <= $#entvar;$i++)
           {
             print LOGFILE "Ent Value $i: $entvarname[$i]=$entvar[$i]\n";
           }
@@ -3187,6 +3340,7 @@ sub searchfortrap
         }
       }
 
+      my $message_short;
       if ( ($mysql_dbi_enable == 1) ||
         ($postgresql_dbi_enable == 1) ||
         ($dbd_odbc_enable == 1) ||
@@ -3202,7 +3356,6 @@ sub searchfortrap
 
         $enterprise_trans = &translate_enterprise_oid_format_sub($var[6]);
 
-        $db_enterprise;
         if ($net_snmp_perl_enable == 1 && $db_translate_enterprise == 1)
         {
           $db_enterprise = $enterprise_trans;
@@ -3810,7 +3963,7 @@ sub eventlog_system {
 
   my %event_entry = ('Source' => "SNMPTT",
            'EventType' => $type,
-         'Category' => NULL,
+         'Category' => '\0',
          'EventID' => $eventid,
          'Strings' => $message);
 
@@ -3935,6 +4088,7 @@ sub translate_value_oids_sub
     $noinf = 0;
     while ($done)
     {
+      my $found;
       if ($string_temp =~ /(?<!\.)(?<!\d)(\d+\.\d+\.\d+\.\d+)(?!\.\d)(?!\d)/ ) { $found = 1; }
       #if ($string_temp =~ /(?<!\.)(\d+\.\d+\.\d+\.\d+)(?!\.)/ ) { $found = 1; }
       else { $found = 0; }
@@ -3966,6 +4120,7 @@ sub translate_value_oids_sub
     $noinf = 0;
     while ($done)
     {
+      my $found;
       if ($string_temp =~ /(?<!\d)(\.\d+)+/) {	$found = 1; }  # don't match n.n.n but do match .n.n.n
       else { $found = 0; }
 
@@ -4053,6 +4208,7 @@ sub resolve_value_ip_addresses_sub
     $noinf = 0;
     while ($done)
     {
+      my $found;
       if ($string_temp =~ /(?<!\.)(?<!\d)(\d+\.\d+\.\d+\.\d+)(?!\.\d)(?!\d)/ ) { $found = 1; }
       #if ($string_temp =~ /(?<!\.)(\d+\.\d+\.\d+\.\d+)(?!\.)/ ) { $found = 1; }
       else { $found = 0; }
@@ -4400,9 +4556,9 @@ sub strip_domain_name
   # If mode = 2, strip off the domains as listed in strip_domain_list in .ini file
   elsif ($mode == 2 && !($name =~ /^\d+\.\d+\.\d+\.\d+$/))
   {
-    if (defined (@strip_domain_list))
+    if (@strip_domain_list)
     {
-      foreach $strip_domain_list_temp (@strip_domain_list)
+      foreach my $strip_domain_list_temp (@strip_domain_list)
       {
         if ($strip_domain_list_temp =~ /^\..*/) # If domain from list starts with a '.' then remove it first
         {
@@ -4491,8 +4647,7 @@ sub process_nodes
   my $nodes_list = shift;
   my @nodes = ();
   my @nodes2 = ();
-  my %nodes_file_hash = ();
-
+  
   # print "Processing NODES\n";
 
   # Put all the NODES entries into @nodes, and then go through them all and put
@@ -4508,7 +4663,7 @@ sub process_nodes
       #print "!Dynamic enabled\n";
       if (open NODESFILE, $a)
       {
-        while (defined($line = <NODESFILE>))
+        while (defined(my $line = <NODESFILE>))
         {
           chomp($line);
           # Allow comment lines starting with a #

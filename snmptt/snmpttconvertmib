@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v1.1
+# SNMPTTCONVERTMIB v1.2beta
 #
 # Copyright 2002-2006 Alex Burger
 # alex_b@users.sourceforge.net
@@ -26,21 +26,23 @@
 # http://www.sourceforge.net/projects/snmptt
 #
 ###############################################################################
+use strict;
+
 #
 # OPTIONS START
 #
 # Set this to '' to have no default EXEC line added, or modify as needed.
 # Can also set on the command line with --exec='string'
-$defaultexec = '';
+my $defaultexec = '';
 
 # Choose what type of quotes (if any) you want around the SUMMARY text pulled from the MIB.
 #$defaultexecquote = '';		# no quotes
 #$defaultexecquote = "\'";		# single (') quotes
-$defaultexecquote = "\"";		# double (") quotes
+my $defaultexecquote = "\"";		# double (") quotes
 
 # Set this to 1 to have the --TYPE string prepended to the --SUMMARY string.
 # Set to 0 to disable
-$prepend_type = 1;
+my $prepend_type = 1;
 
 #
 # OPTIONS END
@@ -48,7 +50,7 @@ $prepend_type = 1;
 #############################################################################
 #
 
-$snmpttconvertmib_version = "v1.1";
+my $snmpttconvertmib_version = "v1.2beta";
 
 sub showversion
 {
@@ -66,25 +68,25 @@ use Getopt::Long;
 use File::Basename;
 use File::Spec;
 
-$DEBUGGING = 0;
+my $DEBUGGING = 0;
 
-$version = 0;
-$debug = 0;
-$help = 0;
-$net_snmp_perl = 0;
-$in = '';
-$out = '';
-$nodes = '';
-$no_description = 0;
-$no_variables = 0;
-$no_format_summary = 0;
-$no_format_desc = 0;
-$format = 0;
-$format_desc = 0;
-$no_desc_wildcard = 0;
-$no_severity = 0;
-$severity = 'Normal';
-$exec = '';
+my $version = 0;
+my $debug = 0;
+my $help = 0;
+my $net_snmp_perl = 0;
+my $in = '';
+my $out = '';
+my $nodes = '';
+my $no_description = 0;
+my $no_variables = 0;
+my $no_format_summary = 0;
+my $no_format_desc = 0;
+my $format = 0;
+my $format_desc = 0;
+my $no_desc_wildcard = 0;
+my $no_severity = 0;
+my $severity = 'Normal';
+my $exec = '';
 
 
 GetOptions 	('version' => \$version,
@@ -137,14 +139,14 @@ if (($in eq "") || ($out eq ""))
 }
 
 # Get complete path of input file (MIB) in a portable way (needed for -m switch for snmptranslate)
-$dirname = dirname $in;
-$basename = basename $in;
-$input = File::Spec->catfile($dirname, $basename);
+my $dirname = dirname $in;
+my $basename = basename $in;
+my $input = File::Spec->catfile($dirname, $basename);
 
 # Get complete path of output file (.conf) in a portable way 
 $dirname = dirname $out;
 $basename = basename $out;
-$output = File::Spec->catfile($dirname, $basename);
+my $output = File::Spec->catfile($dirname, $basename);
 
 if ($exec ne '')
 {
@@ -160,6 +162,7 @@ if ($net_snmp_perl == 1)
 }
 
 print "\n\n*****  Processing MIB file *****\n\n";
+my $snmptranslate_use_On;
 check_snmptranslate_version();
 
 
@@ -182,6 +185,8 @@ unless (open INPUTFILE, "<$input")
   die "Cannot open input file: $!";
 }
 
+my @mibfile;
+
 while (<INPUTFILE>)
 {
   chomp;			# remove <cr> at end of line
@@ -194,7 +199,7 @@ if ($DEBUGGING >= 1)
   print "Finished loading $input\n\n";
 }
 
-$currentline=0;
+my $currentline=0;
 
 unless (open OUTPUTFILE, ">>$output")
 {
@@ -204,10 +209,10 @@ unless (open OUTPUTFILE, ">>$output")
 # A mib file can contain multiple BEGIN definitions.  This finds the first on
 # to make sure we have at least one definition.
 # Determine name of MIB file
-$mib_name = '';
+my $mib_name = '';
 while ($currentline <= $#mibfile)
 {
-  $line = $mibfile[$currentline];
+  my $line = $mibfile[$currentline];
   if ($line =~ /(.*)DEFINITIONS\s*::=\s*BEGIN/)
   {
     $mib_name = $1;
@@ -247,7 +252,7 @@ if (1)
   
   while ($currentline <= $#mibfile)
   {
-    $line = $mibfile[$currentline];
+    my $line = $mibfile[$currentline];
     
     if ($line =~ /(.*)DEFINITIONS\s*::=\s*BEGIN/)
     {
@@ -267,7 +272,8 @@ if (1)
     # eg: 'mngmtAgentTrap-23003 TRAP-TYPE';
     # eg: 'ciscoSystemClockChanged NOTIFICATION-TYPE';
     if ( $line =~ /(.*)\s+TRAP-TYPE.*/ || $line =~ /(.*)\s+(?<!--)NOTIFICATION-TYPE.*/ )
-    {
+    {     
+      my $trapversion;
       if ( $line =~ /(.*)\s+TRAP-TYPE.*/ )
       {
         $trapversion = 'TRAP';
@@ -286,9 +292,9 @@ if (1)
 	next;
       }
 
-      $enterprisefound = 0;
+      my $enterprisefound = 0;
       
-      @variables = ();
+      my @variables = ();
       
       # If the TRAP-TYPE / NOTIFICATION-TYPE line starts with white space, it's probably a import line, so ignore
       if ( $line =~ /^\s+TRAP-TYPE.*/ || $line =~ /^\s+NOTIFICATION-TYPE.*/  ||
@@ -300,7 +306,7 @@ if (1)
         next;
       }
       
-      $trapname = $1;
+      my $trapname = $1;
       
       # Remove beginning and trailing white space
       $trapname =~ /\s*([A-Za-z0-9_-]+)\s*/;
@@ -319,9 +325,17 @@ if (1)
       }
       
       $currentline++; # Increment to the next line
-      $line3 = $mibfile[$currentline];
+      my $line3 = $mibfile[$currentline];
       
-      $end_of_definition = 0;
+      my $end_of_definition = 0;
+      
+      my $traptype = "";
+      my $trapsummary = "";
+      my @description = ();
+      my $trap_severity = $severity;
+      my $enterprise;
+      my @arguments;
+      my $formatexec;
       
       while ( ($currentline <= $#mibfile) && !($line3 =~ /\s+END\s+/) && !($line3 =~ /(.*)\s+TRAP-TYPE.*/ )
       && !($line3 =~ /(.*)\s+NOTIFICATION-TYPE.*/) && ($end_of_definition == 0) )
@@ -391,7 +405,7 @@ if (1)
 	
         if ($line3 =~ /DESCRIPTION(.*)/s)
         {
-          $temp1 = 0;
+          my $temp1 = 0;
          
           # Start of DESCRIPTION
           
@@ -414,7 +428,7 @@ if (1)
           }
           
           $currentline++; # Increment to the next line
-          $line4 = $mibfile[$currentline];
+          my $line4 = $mibfile[$currentline];
           
           # Assume the rest is the description up until a ::= or end of the file
           while (! ($line4 =~ /::=/))
@@ -469,10 +483,10 @@ if (1)
             {
               @arguments = split /,/, $1;
               
-              for($i=0;$i <= $#arguments;$i++)
-              {
+              #for(my $i=0;$i <= $#arguments;$i++)
+              #{
                 #print "argument $i: $arguments[$i]\n";
-              }
+              #}
               
               # Increment to next line and continue with the loop
               $currentline++; # Increment to the next line
@@ -565,6 +579,7 @@ if (1)
         $trapsummary = $traptype . ": " . $trapsummary;
       }
       
+      my $trap_lookup;
       if ($mib_name eq '')
       {
 	$trap_lookup = $trapname;
@@ -575,6 +590,7 @@ if (1)
       }
       print "Looking up via snmptranslate: $trap_lookup\n";
       
+      my $trapoid;
       if ($snmptranslate_use_On == 1)
       {
 	$trapoid = `snmptranslate -IR -Ts -On $trap_lookup`;
@@ -592,15 +608,14 @@ if (1)
         
         # Loop through trapsummary and replace the %s and %d etc with %1 to %n
         
-        $j = $#arguments; # j is last element number
-        
+        #$j = $#arguments; # j is last element number
         #print "j is $j\n";
         
         # Change the %s or %d etc into $1 etc (starts at $1)
         $_ = $trapsummary;
-        for ($j=0; $j<= $#arguments; $j++)
+        for (my $j=0; $j<= $#arguments; $j++)
         {
-          $variable = ($arguments[$j])+1;
+          my $variable = ($arguments[$j])+1;
           s(%[a-zA-Z])(\$$variable);
         }
         
@@ -608,7 +623,7 @@ if (1)
         
         $trapsummary = $_;
         
-        $descriptionline1 = '';
+        my $descriptionline1 = '';
         
         # Build description line for FORMAT / EXEC
         if ($format_desc == 0)		# First line of description
@@ -657,12 +672,12 @@ if (1)
             # There is no list of variables, so just put them in order starting at 1 and
             # going up to 20
             $_ = $descriptionline1;
-            for ($j=1; $j<= 20; $j++)
+            for (my $j=1; $j<= 20; $j++)
             {
               s(%[a-zA-Z])(\$$j);
             }
             $descriptionline1 = $_;
-            $descriptionlinehadvariables = 1;
+            #$descriptionlinehadvariables = 1;
           }
           else
           {
@@ -754,7 +769,7 @@ if (1)
         {
           print OUTPUTFILE "SDESC\n";
           #print OUTPUTFILE "$descriptionline1\n";
-          for ($i=0; $i <= $#description; $i++)
+          for (my $i=0; $i <= $#description; $i++)
           {
             print OUTPUTFILE "$description[$i]";
           }
@@ -763,7 +778,7 @@ if (1)
 	  if (@variables && $no_variables == 0 && $net_snmp_perl == 1)
 	  {
 	    print OUTPUTFILE "Variables:\n";
-	    for ($i=0; $i <= $#variables; $i++)
+	    for (my $i=0; $i <= $#variables; $i++)
 	    {
 	      printf OUTPUTFILE "%3d: %s\n",$i+1,$variables[$i];
 	      printf OUTPUTFILE "     Syntax=\"" . $SNMP::MIB{$variables[$i]}{type} . "\"\n";
@@ -780,7 +795,7 @@ if (1)
 		  $temphash{$value} = $key;
 		}
 		# Print out the entries in the hash
-		foreach $c (sort keys %temphash)
+		foreach my $c (sort keys %temphash)
 		{
 		  print OUTPUTFILE "       " . $c . ": $temphash{$c}\n";
 		}
@@ -795,7 +810,7 @@ if (1)
 	  elsif (@variables ne "" && $no_variables == 0  && $net_snmp_perl == 0)
 	  {
 	    print OUTPUTFILE "Variables:\n";
-	    for ($i=0; $i <= $#variables; $i++)
+	    for (my $i=0; $i <= $#variables; $i++)
 	    {
 	      print OUTPUTFILE "  " . ($i+1) . ": " . $variables[$i] . "\n";
 	    }
@@ -832,7 +847,7 @@ if (1)
     
     if (open SNMPTRANSLATE, "snmptranslate -V 2>&1|")
     {
-      $snmptranslatever = <SNMPTRANSLATE>;
+      my $snmptranslatever = <SNMPTRANSLATE>;
       close SNMPTRANSLATE;
       
       chomp ($snmptranslatever);
@@ -860,7 +875,7 @@ if (1)
 
 sub show_help
 {
-  $USAGE = qq/Usage:
+  my $USAGE = qq/Usage:
   snmpttconvertmib --in= --out= [<options>]
 Options:
   --debug=n              Set debug level (1 or 2)

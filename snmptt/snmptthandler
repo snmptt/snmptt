@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTHANDLER v1.1
+# SNMPTTHANDLER v1.2beta
 #
 # Copyright 2002-2006 Alex Burger
 # alex_b@users.sourceforge.net
@@ -45,51 +45,58 @@
 # by the SNMPTT daemon.
 # 
 ##############################################################################
+use strict;
+
 # Process command line arguments
 
 use Getopt::Long;
 use Time::HiRes qw(gettimeofday);
 
-$version = '';
-$debug = '';
-$help = '';
-$ini = '';
+my $version = '';
+my $debug = '';
+my $help = '';
+my $ini = '';
+my $debugfile = '';
 
 GetOptions 	('version' => \$version, 
 		'debug:i' => \$debug,
 		'debugfile=s' => \$debugfile,
 		'help' => \$help,
 		'ini=s' => \$ini);
-if ($version == 1)
+if ($version)
 {
 	&showversion;
 	exit(0);
 }
 
-if ($help == 1)
+if ($help)
 {
-$USAGE = qq/Usage:
+my $USAGE = qq/Usage:
     snmptthandler [<options>] 
 Options:
-    --debug                              Enable debug mode
+    --debug=n                            Set debug level (1 or 2)
     --debugfile=filename                 Set debug output file
     --help                               Display this message
     --ini=filename                       Set configuration file to load
     --version                            Display author and version information
 /;
-		
+
 	&showversion;
 	print $USAGE;
 
 	exit(0);
 }
 
-if ($debug == 1)
+my $DEBUGGING;
+my $DEBUGGING_FILE;
+my $debugcmdline;
+my $debugfilecmdline;
+
+if ($debug >= 1)
 {
 	$DEBUGGING = 1;
 	$debugcmdline = 1
 }
-
 
 if ($debugfile ne '') 
 {
@@ -104,7 +111,9 @@ if ($debugfile ne '')
 # For Linux / Unix, try /etc/snmp/snmptt.ini first, /etc/snmptt.ini second.
 #
 # For Windows, try %SystemRoot%\snmptt.ini only.
-# 
+#
+my $configfile;
+
 if ($ini ne '')
 {
   $configfile = $ini;
@@ -130,18 +139,19 @@ else
 	}
 }
 
+my $spool_directory;
 &loadsnmpttini;
 
 ##############################################################################
 # Pull in passed SNMP info from snmptrapd via STDIN and place in the array @tempvar
 
 # Create file in spool directory based on current time
-($s, $usec) = gettimeofday;
+my ($s, $usec) = gettimeofday;
 
 # Pad the numbers with 0's to make sure they are all the same length.  Sometimes the
 # usec is shorter than 6.
-$s_pad = sprintf("%09d",$s);
-$usec_pad = sprintf("%06d",$usec);
+my $s_pad = sprintf("%09d",$s);
+my $usec_pad = sprintf("%06d",$usec);
 
 if ($DEBUGGING >= 1)
 {
@@ -160,7 +170,7 @@ if ($DEBUGGING >= 1)
 	print "Data received:\n\n";
 }
 
-$spoolfile = $spool_directory.'#snmptt-trap-'.$s_pad.$usec_pad;
+my $spoolfile = $spool_directory.'#snmptt-trap-'.$s_pad.$usec_pad;
 
 unless (open SPOOL, ">$spoolfile")
 {
@@ -174,7 +184,7 @@ unless (open SPOOL, ">$spoolfile")
 
 print SPOOL time()."\n";
 
-while (defined($line = <>))
+while (defined(my $line = <>))
 {
 	print SPOOL $line;
 	
@@ -190,7 +200,7 @@ while (defined($line = <>))
 
 sub showversion
 {
-	printf "\nSNMPTTHANDLER v1.1\n";
+	printf "\nSNMPTTHANDLER v1.2beta\n";
 	printf "(c) 2002-2006 Alex Burger\n\n";
 }
 
@@ -215,8 +225,9 @@ sub loadsnmpttini {
 	else
 	{
 	  if ($DEBUGGING >= 1) {
-	  	print "Config file could not be loaded\n";
+	  	print "Config file ($configfile) could not be loaded\n";
 	  }
+	  warn "Config file ($configfile) could not be loaded\n";
 	  exit(1);
 	}
 	
