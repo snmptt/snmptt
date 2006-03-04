@@ -1,5 +1,11 @@
+Mar 4th, 2006: Alex Burger <alex_b@users.sourceforge.net>
+- Fix bug where snmpttconvertmib would not translate a TRAP-TYPE / 
+  NOTIFICATION-TYPE line if it was split across two lines.  Thanks
+  to Todd A. Green.  Bug 1438794.
+
 Jan 20th, 2006: Alex Burger <alex_b@users.sourceforge.net>
-- Fix bug in process trap for $match_temp 'remove any white space from before and after i modifier'
+- Fix bug in process trap for $match_temp 'remove any white space from before 
+  and after i modifier'
 - Added 'use strict' to snmptt
 - Added 'use strict' to snmpttconvertmib
 - Added 'use strict' to snmpttconvert

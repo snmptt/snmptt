@@ -271,10 +271,13 @@ if (1)
     #
     # eg: 'mngmtAgentTrap-23003 TRAP-TYPE';
     # eg: 'ciscoSystemClockChanged NOTIFICATION-TYPE';
-    if ( $line =~ /(.*)\s+TRAP-TYPE.*/ || $line =~ /(.*)\s+(?<!--)NOTIFICATION-TYPE.*/ )
+    if ( $line =~ /(.*)\s*TRAP-TYPE.*/ || 
+         $line =~ /(.*)\s*(?<!--)NOTIFICATION-TYPE.*/ )
     {     
+      my $trapname = $1;
+
       my $trapversion;
-      if ( $line =~ /(.*)\s+TRAP-TYPE.*/ )
+      if ( $line =~ /TRAP-TYPE/ )
       {
         $trapversion = 'TRAP';
       }
@@ -287,6 +290,7 @@ if (1)
       if ($line =~/.*--.*TRAP-TYPE/ || $line =~/.*--.*NOTIFICATION-TYPE/)
       {
 	# Comment line
+
 	$currentline++; # Increment to the next line
 	$line = $mibfile[$currentline]; # Get next line
 	next;
@@ -295,18 +299,27 @@ if (1)
       my $enterprisefound = 0;
       
       my @variables = ();
+
+      # Sometimes the TRAP-TYPE / NOTIFICATION-TYPE will appear on the line following the trap name
+      # Look for xxx-TYPE with nothing (white space allowed) around it and a previous line with only a single word
+      # with whitespace around it.
+      if ( ($currentline > 0 && $line =~ /^\s*TRAP-TYPE\s*$/ && $mibfile[$currentline-1] =~ /^\s*(\w+)\s*$/) ||
+           ($currentline > 0 && $line =~ /^\s*NOTIFICATION-TYPE\s*$/ && $mibfile[$currentline-1] =~ /^\s*(\w+)\s*$/) ) {
+        # We should have found the trap name
+        $trapname = $1;
+        print "split line TRAP-TYPE / NOTIFICATION-TYPE found ($1).\n";
+      }
       
       # If the TRAP-TYPE / NOTIFICATION-TYPE line starts with white space, it's probably a import line, so ignore
-      if ( $line =~ /^\s+TRAP-TYPE.*/ || $line =~ /^\s+NOTIFICATION-TYPE.*/  ||
-      $line =~ /^.*,.*NOTIFICATION-TYPE.*/ )
+      elsif ( $line =~ /^\s+TRAP-TYPE.*/ ||
+           $line =~ /^\s+NOTIFICATION-TYPE.*/  ||
+           $line =~ /^.*,.*NOTIFICATION-TYPE.*/ )
       {
         print "skipping a TRAP-TYPE / NOTIFICATION-TYPE line - probably an import line.\n";
         $currentline++; # Increment to the next line
         $line = $mibfile[$currentline]; # Get next line
         next;
       }
-      
-      my $trapname = $1;
       
       # Remove beginning and trailing white space
       $trapname =~ /\s*([A-Za-z0-9_-]+)\s*/;
