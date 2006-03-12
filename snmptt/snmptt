@@ -273,6 +273,9 @@ my $sql_win32_odbc_table_statistics;
 my $sql_win32_odbc_username;
 my $sql_win32_odbc_password;
 
+my @sql_custom_columns;
+my @sql_custom_columns_unknown;
+
 # TrapFiles
 my @snmptt_conf_files;
 
@@ -1547,6 +1550,20 @@ sub processtrap
           $community =~ s(\')(\\\')g;   #'
           $community =~ s(\")(\\\")g;   #"
 
+          my @t_sql_custom_columns = ();
+          
+          if (@sql_custom_columns) {
+            @t_sql_custom_columns = @sql_custom_columns;
+            
+            for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
+              $_ = $t_sql_custom_columns[$i];
+              print "Performing substitution on custom column: $_\n";
+              &substitute();
+              print "Done performing substitution on custom column: $_\n";
+              $t_sql_custom_columns[$i] = $_;
+            }
+          }
+
           if (&mysql_insert($mysql_dbi_table,
             "eventname", $event2[0],                # $N
             "eventid", $receivedtrap_entry,         # $i
@@ -1559,7 +1576,8 @@ sub processtrap
             "severity", $event2[2],                 # $s
             "uptime", $var[2],                      # $T
             "traptime", $trap_date_time,            # $X/$x
-            "formatline", $message_short2) == 1 ) { # 
+            "formatline", $message_short2,
+            @t_sql_custom_columns) == 1 ) { # 
             $trap_successfully_logged++;
           }
         }
@@ -1577,6 +1595,20 @@ sub processtrap
           $community =~ s(\')(\\\')g;   #'
           $community =~ s(\")(\\\")g;   #"
 
+          my @t_sql_custom_columns = ();
+          
+          if (@sql_custom_columns) {
+            @t_sql_custom_columns = @sql_custom_columns;
+            
+            for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
+              $_ = $t_sql_custom_columns[$i];
+              print "Performing substitution on custom column: $_\n";
+              &substitute();
+              print "Done performing substitution on custom column: $_\n";
+              $t_sql_custom_columns[$i] = $_;
+            }
+          }
+
           if (&postgresql_insert($postgresql_dbi_table,
             "eventname", $event2[0],                # $N
             "eventid", $receivedtrap_entry,         # $i
@@ -1589,7 +1621,8 @@ sub processtrap
             "severity", $event2[2],                 # $s
             "uptime", $var[2],                      # $T
             "traptime", $trap_date_time,            # $X/$x
-            "formatline", $message_short2) == 1 ) { # 
+            "formatline", $message_short2,
+            @t_sql_custom_columns) == 1 ) { # 
             $trap_successfully_logged++;
           }
         }
@@ -1605,6 +1638,20 @@ sub processtrap
           my $community = $var[5];
           $community =~ s(\')('')g;   #'
 
+          my @t_sql_custom_columns = ();
+          
+          if (@sql_custom_columns) {
+            @t_sql_custom_columns = @sql_custom_columns;
+            
+            for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
+              $_ = $t_sql_custom_columns[$i];
+              print "Performing substitution on custom column: $_\n";
+              &substitute();
+              print "Done performing substitution on custom column: $_\n";
+              $t_sql_custom_columns[$i] = $_;
+            }
+          }
+
           if (&odbc_insert($dbd_odbc_table,
             "eventname", $event2[0],                # $N
             "eventid", $receivedtrap_entry,         # $i
@@ -1617,7 +1664,8 @@ sub processtrap
             "severity", $event2[2],                 # $s
             "uptime", $var[2],                      # $T
             "traptime", $trap_date_time,            # $X/$x
-            "formatline", $message_short2) == 1 ) { # 
+            "formatline", $message_short2,
+            @t_sql_custom_columns) == 1 ) { # 
             $trap_successfully_logged++;
           }
         }
@@ -1633,6 +1681,20 @@ sub processtrap
           my $community = $var[5];
           $community =~ s(\')('')g;   #'
 
+          my @t_sql_custom_columns = ();
+          
+          if (@sql_custom_columns) {
+            @t_sql_custom_columns = @sql_custom_columns;
+            
+            for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
+              $_ = $t_sql_custom_columns[$i];
+              print "Performing substitution on custom column: $_\n";
+              &substitute();
+              print "Done performing substitution on custom column: $_\n";
+              $t_sql_custom_columns[$i] = $_;
+            }
+          }
+
           if (&sql_win32_odbc_insert($sql_win32_odbc_table,
             "eventname", $event2[0],                # $N
             "eventid", $receivedtrap_entry,         # $i
@@ -1645,7 +1707,8 @@ sub processtrap
             "severity", $event2[2],                 # $s
             "uptime", $var[2],                      # $T
             "traptime", $trap_date_time,            # $X/$x
-            "formatline", $message_short2) == 1 ) { # 
+            "formatline", $message_short2,
+            @t_sql_custom_columns) == 1 ) { # 
             $trap_successfully_logged++;
           }
         }
@@ -1658,7 +1721,6 @@ sub processtrap
           print "  FORMAT line not defined\n";
         }
       }
-
 
       #
       # Variable substitution for EXEC string
@@ -3241,6 +3303,20 @@ sub searchfortrap
         $community =~ s(\')(\\\')g;   #'
         $community =~ s(\")(\\\")g;   #"
 
+        my @t_sql_custom_columns_unknown = ();
+          
+        if (@sql_custom_columns_unknown) {
+          @t_sql_custom_columns_unknown = @sql_custom_columns_unknown;
+            
+          for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
+            $_ = $t_sql_custom_columns_unknown[$i];
+            print "Performing substitution on custom column: $_\n";
+            &substitute();
+            print "Done performing substitution on custom column: $_\n";
+            $t_sql_custom_columns_unknown[$i] = $_;
+          }
+        }
+
         &mysql_insert($mysql_dbi_table_unknown,
           "trapoid", $receivedtrap_trans,
           "enterprise", $db_enterprise,
@@ -3249,7 +3325,8 @@ sub searchfortrap
           "agentip", $var[4],
           "uptime", $var[2],
           "traptime", $trap_date_time,
-          "formatline", $message_short2);
+          "formatline", $message_short2,
+          @t_sql_custom_columns_unknown);
       }
 
       if ($postgresql_dbi_enable == 1 && defined ($dbh_postgresql) && $postgresql_dbi_table_unknown ne "")
@@ -3263,6 +3340,20 @@ sub searchfortrap
         $community =~ s(\')(\\\')g;   #'
         $community =~ s(\")(\\\")g;   #"
 
+        my @t_sql_custom_columns_unknown = ();
+          
+        if (@sql_custom_columns_unknown) {
+          @t_sql_custom_columns_unknown = @sql_custom_columns_unknown;
+            
+          for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
+            $_ = $t_sql_custom_columns_unknown[$i];
+            print "Performing substitution on custom column: $_\n";
+            &substitute();
+            print "Done performing substitution on custom column: $_\n";
+            $t_sql_custom_columns_unknown[$i] = $_;
+          }
+        }
+
         &postgresql_insert($postgresql_dbi_table_unknown,
           "trapoid", $receivedtrap_trans,
           "enterprise", $db_enterprise,
@@ -3271,7 +3362,9 @@ sub searchfortrap
           "agentip", $var[4],
           "uptime", $var[2],
           "traptime", $trap_date_time,
-          "formatline", $message_short2);
+          "formatline", $message_short2,
+          @t_sql_custom_columns_unknown);
+
       }
 
       if ($dbd_odbc_enable == 1 && defined ($dbh_odbc) && $dbd_odbc_table_unknown ne "")
@@ -3283,6 +3376,20 @@ sub searchfortrap
         my $community = $var[5];
         $community =~ s(\')('')g;   #'
 
+        my @t_sql_custom_columns_unknown = ();
+          
+        if (@sql_custom_columns_unknown) {
+          @t_sql_custom_columns_unknown = @sql_custom_columns_unknown;
+            
+          for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
+            $_ = $t_sql_custom_columns_unknown[$i];
+            print "Performing substitution on custom column: $_\n";
+            &substitute();
+            print "Done performing substitution on custom column: $_\n";
+            $t_sql_custom_columns_unknown[$i] = $_;
+          }
+        }
+
         &odbc_insert($dbd_odbc_table_unknown,
           "trapoid", $receivedtrap_trans,
           "enterprise", $db_enterprise,
@@ -3291,7 +3398,9 @@ sub searchfortrap
           "agentip", $var[4],
           "uptime", $var[2],
           "traptime", $trap_date_time,
-          "formatline", $message_short2);
+          "formatline", $message_short2,
+          @t_sql_custom_columns_unknown);
+
       }
 
       if ($sql_win32_odbc_enable == 1 && defined ($dbh_win32_odbc) && $sql_win32_odbc_table_unknown ne "")
@@ -3303,6 +3412,20 @@ sub searchfortrap
         my $community = $var[5];
         $community =~ s(\')('')g;   #'
 
+        my @t_sql_custom_columns_unknown = ();
+          
+        if (@sql_custom_columns_unknown) {
+          @t_sql_custom_columns_unknown = @sql_custom_columns_unknown;
+            
+          for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
+            $_ = $t_sql_custom_columns_unknown[$i];
+            print "Performing substitution on custom column: $_\n";
+            &substitute();
+            print "Done performing substitution on custom column: $_\n";
+            $t_sql_custom_columns_unknown[$i] = $_;
+          }
+        }
+
         &sql_win32_odbc_insert($sql_win32_odbc_table_unknown,
           "trapoid", $receivedtrap_trans,
           "enterprise", $db_enterprise,
@@ -3311,7 +3434,9 @@ sub searchfortrap
           "agentip", $var[4],
           "uptime", $var[2],
           "traptime", $trap_date_time,
-          "formatline", $message_short2);
+          "formatline", $message_short2,
+          @t_sql_custom_columns_unknown);
+
       }
     }
   }
@@ -3550,6 +3675,9 @@ sub loadsnmpttini {
   $sql_win32_odbc_username = $cfg->val('SQL', 'sql_win32_odbc_username');
   $sql_win32_odbc_password = $cfg->val('SQL', 'sql_win32_odbc_password');
 
+  @sql_custom_columns = $cfg->val('SQL', 'sql_custom_columns');
+  @sql_custom_columns_unknown = $cfg->val('SQL', 'sql_custom_columns_unknown');
+
   # Debugging
   if ($debugcmdline == 0) {
     $DEBUGGING = $cfg->val('Debugging', 'DEBUGGING');
@@ -3652,6 +3780,8 @@ sub loadsnmpttini {
   if (! defined ($sql_win32_odbc_table_statistics)) { $sql_win32_odbc_table_statistics = ''} ;
   if (! defined ($sql_win32_odbc_username)) { $sql_win32_odbc_username = ''} ;
   if (! defined ($sql_win32_odbc_password)) { $sql_win32_odbc_password = ''} ;
+  if (! (@sql_custom_columns)) { @sql_custom_columns = ()} ;
+  if (! (@sql_custom_columns_unknown)) { @sql_custom_columns_unknown = ()} ;
   if (! defined ($DEBUGGING)) { $DEBUGGING = 0} ;
   if (! defined ($DEBUGGING_FILE)) { $DEBUGGING_FILE = ''} ;
 
@@ -4843,20 +4973,28 @@ sub mysql_insert {
   my $table = shift;
   my @data = @_;
 
+  # If the number of elements in @data is odd, remove the last element
+  # Note:  $# returns the last element # so it's reall #$data + 1
+  #print "mod :" . $#data % 2 . "\n";
+  if ($#data % 2 == 0) {
+    pop @data;
+  }
+  
   #print "------------------ mysql_insert ---------------\n";
     
   my $sql_prepare = "INSERT INTO $table (";
   my @sql_execute;
   
   for (my $i = 0; $i < $#data;) {
+    #print $data[$i]. "\n";
     $sql_prepare .= $data[$i];
     push (@sql_execute, $data[$i+1]);
     
     $i+=2;
-    
+        
     if ($i < ($#data)) {
       $sql_prepare .= ",";
-      }    
+      }
   }
   $sql_prepare .= ") VALUES (?";
   $sql_prepare .= ",?" x ($#data / 2);
@@ -4943,6 +5081,13 @@ sub mysql_insert {
 sub postgresql_insert {
   my $table = shift;
   my @data = @_;
+
+  # If the number of elements in @data is odd, remove the last element
+  # Note:  $# returns the last element # so it's reall #$data + 1
+  #print "mod :" . $#data % 2 . "\n";
+  if ($#data % 2 == 0) {
+    pop @data;
+  }
     
   #print "------------------ postgresql_insert ---------------\n";
   
@@ -5044,6 +5189,13 @@ sub postgresql_insert {
 sub odbc_insert {
   my $table = shift;
   my @data = @_;
+
+  # If the number of elements in @data is odd, remove the last element
+  # Note:  $# returns the last element # so it's reall #$data + 1
+  #print "mod :" . $#data % 2 . "\n";
+  if ($#data % 2 == 0) {
+    pop @data;
+  }
     
   #print "------------------ odbc_insert ---------------\n";
   
@@ -5073,7 +5225,7 @@ sub odbc_insert {
 
   $sql_statement .= ")";
   
-  print "sql_statement: $sql_statement\n";
+  #print "sql_statement: $sql_statement\n";
   
   # Make sure the connection is up
    if ($dbd_odbc_ping_on_insert == 1) {
@@ -5112,6 +5264,13 @@ sub odbc_insert {
 sub sql_win32_odbc_insert {
   my $table = shift;
   my @data = @_;
+
+  # If the number of elements in @data is odd, remove the last element
+  # Note:  $# returns the last element # so it's reall #$data + 1
+  #print "mod :" . $#data % 2 . "\n";
+  if ($#data % 2 == 0) {
+    pop @data;
+  }
     
   #print "------------------ sql_win32_odbc_insert ---------------\n";
   

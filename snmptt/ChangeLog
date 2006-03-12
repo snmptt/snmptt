@@ -1,7 +1,10 @@
 Mar 13th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Move all SQL update code to subroutines (mysql_update etc).
-- Add logging of trap statistics to SQL table.  Added *table_statistics
+- Added logging of trap statistics to SQL table.  Added *table_statistics
   snmptt.ini variables to define the table to be used.
+- Added ability to add custom columns to *_table and *_table_uknown
+  tables.  Added sql_custom_columns and sql_custom_columns_unknown
+  snmptt.ini options.
 
 Mar 4th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Fix bug where snmpttconvertmib would not translate a TRAP-TYPE / 
@@ -9,13 +12,13 @@ Mar 4th, 2006: Alex Burger <alex_b@users.sourceforge.net>
   to Todd A. Green.  Bug 1438794.
 
 Jan 20th, 2006: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.2beta
 - Fix bug in process trap for $match_temp 'remove any white space from before 
   and after i modifier'
 - Added 'use strict' to snmptt
 - Added 'use strict' to snmpttconvertmib
 - Added 'use strict' to snmpttconvert
 - Added 'use strict' to snmptthandler and improved debugging
-- Changed version to snmptt_1.2beta
 
 Jan 17th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.1
