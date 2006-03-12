@@ -2,7 +2,7 @@ Mar 13th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Move all SQL update code to subroutines (mysql_update etc).
 - Added logging of trap statistics to SQL table.  Added *table_statistics
   snmptt.ini variables to define the table to be used.
-- Added ability to add custom columns to *_table and *_table_uknown
+- Added ability to add custom columns to *_table and *_table_unknown
   tables.  Added sql_custom_columns and sql_custom_columns_unknown
   snmptt.ini options.
 - Added variable substitution $H.  This variable will default to the 
