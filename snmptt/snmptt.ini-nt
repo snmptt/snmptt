@@ -304,6 +304,11 @@ mysql_dbi_table = snmptt
 # Note: unknown_trap_log_enable must be enabled.
 mysql_dbi_table_unknown = snmptt_unknown
 
+# MySQL: Table to use for statistics
+# Note: statistics_interval must be set.
+#mysql_dbi_table_statistics = snmptt_statistics
+mysql_dbi_table_statistics = 
+
 # MySQL: Username to use
 mysql_dbi_username = snmpttuser
 
@@ -363,6 +368,11 @@ postgresql_dbi_table = snmptt
 # Note: unknown_trap_log_enable must be enabled.
 postgresql_dbi_table_unknown = snmptt_unknown
 
+# PostgreSQL: Table to use for statistics
+# Note: statistics_interval must be set.
+#postgresql_dbi_table_statistics = snmptt_statistics
+postgresql_dbi_table_statistics = 
+
 # PostgreSQL: Username to use
 postgresql_dbi_username = snmpttuser
 
@@ -404,6 +414,11 @@ dbd_odbc_table = snmptt
 # Note: unknown_trap_log_enable must be enabled.
 dbd_odbc_table_unknown = snmptt_unknown
 
+# DBD:ODBC: Table to use for statistics
+# Note: statistics_interval must be set.
+#dbd_odbc_table_statistics = snmptt_statistics
+dbd_odbc_table_statistics = 
+
 # DBD:ODBC: Username to use
 dbd_odbc_username = snmptt
 
@@ -437,13 +452,18 @@ sql_win32_odbc_enable = 0
 # WinODBC: Database to use
 sql_win32_odbc_dsn = snmptt
 
-# WinWinODBC: Table to use
+# WinODBC: Table to use
 sql_win32_odbc_table = snmptt
 
-# DBD:ODBC: Table to use for unknown traps
+# WinODBC: Table to use for unknown traps
 # Leave blank to disable logging of unknown traps to DBD:ODBC
 # Note: unknown_trap_log_enable must be enabled.
 sql_win32_odbc_table_unknown = snmptt_unknown
+
+# WinODBC: Table to use for statistics
+# Note: statistics_interval must be set.
+#sql_win32_odbc_table_statistics = snmptt_statistics
+sql_win32_odbc_table_statistics = 
 
 # WinODBC: Username to use
 sql_win32_odbc_username = snmptt

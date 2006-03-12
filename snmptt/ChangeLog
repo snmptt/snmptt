@@ -1,5 +1,7 @@
 Mar 13th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Move all SQL update code to subroutines (mysql_update etc).
+- Add logging of trap statistics to SQL table.  Added *table_statistics
+  snmptt.ini variables to define the table to be used.
 
 Mar 4th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Fix bug where snmpttconvertmib would not translate a TRAP-TYPE / 

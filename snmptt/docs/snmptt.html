@@ -14,10 +14,10 @@
 </head>
 <body>
   
-  <h1>SNMP Trap Translator v1.1</h1>
+  <h1>SNMP Trap Translator v1.2beta</h1>
   
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on:&nbsp;January 17th, 2006
+This file was last updated on:&nbsp;March 13th, 2006
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -1236,7 +1236,7 @@ optional.</p>
 etc should also be defined. Run '<b>mysql</b>' as root and enter:</p>
 <blockquote><b>CREATE DATABASE snmptt;</b><br />
 <b>USE snmptt;</b>
-<p><b>DROP TABLE snmptt;;</b><br />
+<p><b>DROP TABLE snmptt;</b><br />
 <b>CREATE TABLE snmptt (</b><br />
 <b>id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,</b><br />
 <b>eventname VARCHAR(50),</b><br />
@@ -1254,10 +1254,11 @@ enterprise VARCHAR(100),</b><br />
 </blockquote>
 <p>If you do not want the auto-incrementing id column, remove the 'id INT...'
 line.</p>
+
 <p>If logging of unknown traps to a SQL table is required, create the
 <b>snmptt_unknown</b> table using:</p>
 <blockquote><b>USE snmptt;</b>
-<p><b>DROP TABLE snmptt_unknown;;</b><br />
+<p><b>DROP TABLE snmptt_unknown;</b><br />
 <b>CREATE TABLE snmptt_unknown (</b><br />
 <b>trapoid VARCHAR(100),<br />
 enterprise VARCHAR(100),</b><br />
@@ -1267,6 +1268,20 @@ enterprise VARCHAR(100),</b><br />
 <b>uptime&nbsp; VARCHAR(20),</b><br />
 <b>traptime VARCHAR(30),</b><br />
 <b>formatline VARCHAR(255));</b></p>
+</blockquote>
+
+<p>If logging of statistics to a SQL table is required, create the
+<b>snmptt_statistics</b> table using:</p>
+<blockquote><b>USE snmptt;</b>
+<p><b>DROP TABLE snmptt_statistics;</b><br />
+<b>CREATE TABLE snmptt_statistics (</b><br />
+<b>stat_time VARCHAR(30),</b><br />
+<b>total_received BIGINT,</b><br />
+<b>total_translated BIGINT,</b><br />
+<b>total_ignored BIGINT,</b><br />
+<b>total_unknown BIGINT);</b><br />
+</p>
+
 </blockquote>
 <p>All variables are INSERTted into the database as standard text including
 the date and time.&nbsp; The variable lengths I have chosen above should be
@@ -1300,46 +1315,63 @@ if it exists and then delete the existing snmptt user. It will then create a
 new snmptt database, a new snmptt user (prompting for a password) and then
 create the table. Run these commands as root.</p>
 <blockquote>
-<p><b>su - postgres<br />
-dropdb snmptt<br />
-dropuser snmptt<br /></p>
-<p>createuser -P snmptt<br />
-createdb -O snmptt snmptt<br />
-psql snmptt</p>
-<p>DROP TABLE snmptt;<br />
-CREATE TABLE snmptt (<br />
-eventname VARCHAR(50),<br />
-eventid VARCHAR(50),<br />
-trapoid VARCHAR(100),<br />
-enterprise VARCHAR(100),<br />
-community VARCHAR(20),<br />
-hostname VARCHAR(100),<br />
-agentip&nbsp; VARCHAR(16),<br />
-category VARCHAR(20),<br />
-severity VARCHAR(20),<br />
-uptime&nbsp; VARCHAR(20),<br />
-traptime VARCHAR(30),<br />
-formatline VARCHAR(255));</p>
-<p>GRANT ALL ON snmptt TO snmptt;<br />
-\q</b></p>
+  <p><b>su - postgres<br />
+    dropdb snmptt<br />
+    dropuser snmptt<br /></p>
+    <p>createuser -P snmptt<br />
+    createdb -O snmptt snmptt<br />
+    psql snmptt</p>
+    <p>DROP TABLE snmptt;<br />
+    CREATE TABLE snmptt (<br />
+    eventname VARCHAR(50),<br />
+    eventid VARCHAR(50),<br />
+    trapoid VARCHAR(100),<br />
+    enterprise VARCHAR(100),<br />
+    community VARCHAR(20),<br />
+    hostname VARCHAR(100),<br />
+    agentip&nbsp; VARCHAR(16),<br />
+    category VARCHAR(20),<br />
+    severity VARCHAR(20),<br />
+    uptime&nbsp; VARCHAR(20),<br />
+    traptime VARCHAR(30),<br />
+    formatline VARCHAR(255));</p>
+    <p>GRANT ALL ON snmptt TO snmptt;<br />
+    \q</b></p>
 </blockquote>
+
 If logging of unknown traps to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_unknown</span> table using:<br />
 <blockquote><b>su - postgres<br />
-psql snmptt<br /></b>
-<p><b>DROP TABLE snmptt_unknown;</b><br />
-<b>CREATE TABLE snmptt_unknown (</b><br />
-<b>trapoid VARCHAR(100),<br />
-enterprise VARCHAR(100),</b><br />
-<b>community VARCHAR(20),</b><br />
-<b>hostname VARCHAR(100),</b><br />
-<b>agentip&nbsp; VARCHAR(16),</b><br />
-<b>uptime&nbsp; VARCHAR(20),</b><br />
-<b>traptime VARCHAR(30),</b><br />
-<b>formatline VARCHAR(255));<br /></b></p>
-<p>GRANT ALL ON snmptt_unknown TO snmptt;<br />
-\q</p>
+    psql snmptt<br /></b>
+  <p><b>DROP TABLE snmptt_unknown;</b><br />
+  <b>CREATE TABLE snmptt_unknown (</b><br />
+  <b>trapoid VARCHAR(100),<br />
+    enterprise VARCHAR(100),</b><br />
+  <b>community VARCHAR(20),</b><br />
+  <b>hostname VARCHAR(100),</b><br />
+  <b>agentip&nbsp; VARCHAR(16),</b><br />
+  <b>uptime&nbsp; VARCHAR(20),</b><br />
+  <b>traptime VARCHAR(30),</b><br />
+  <b>formatline VARCHAR(255));<br /></b></p>
+  <p><b>GRANT ALL ON snmptt_unknown TO snmptt;</b><br />
+  <b>\q</b></p>
 </blockquote>
+
+If logging of statistics to a SQL table is required, create the
+<span style="font-weight: bold;">snmptt_statistics </span> table using:<br />
+<blockquote><b>su - postgres<br />
+    psql snmptt<br />
+    <p><b>DROP TABLE snmptt_statistics;<br />
+      CREATE TABLE snmptt_statistics (<br />
+      stat_time VARCHAR(30),<br />
+      total_received BIGINT,<br />
+      total_translated BIGINT,<br />
+      total_ignored BIGINT,<br />
+      total_unknown BIGINT);<br /></p>
+      GRANT ALL ON snmptt_unknown TO snmptt;</b><br />
+    \q</b></p>
+</blockquote>
+
 All variables are INSERTted into the database as standard text including the
 date and time.&nbsp; The variable lengths I have chosen above should be
 sufficient, but they may need to be increased depending on your
@@ -1367,32 +1399,45 @@ Defining <span style="font-weight: bold;"><b>dbd_odbc</b></span><span style=
 <br />
 Sample values are defined in the default ini file.</div>
 <br />
+
 <p>The following MS SQL Server / Access script can create the table inside an
 existing database.&nbsp; Permissions etc should also be defined.</p>
 <blockquote><b>CREATE TABLE snmptt (</b><br />
-<b>eventname character(50) NULL,</b><br />
-<b>eventid&nbsp; character(50) NULL,</b><br />
-<b>trapoid</b><b>&nbsp; character(100) NULL,</b><br />
-<b>enterprise character(100) NULL,</b><br />
-<b>community character(20) NULL,</b><br />
-<b>hostname character(100) NULL,</b><br />
-<b>agentip&nbsp; character(16) NULL,</b><br />
-<b>category character(20) NULL,</b><br />
-<b>severity character(20) NULL,</b><br />
-<b>uptime&nbsp; character(20) NULL,</b><br />
-<b>traptime character(30) NULL,</b><br />
-<b>formatline character(255) NULL)</b></blockquote>
+  <b>eventname character(50) NULL,</b><br />
+  <b>eventid&nbsp; character(50) NULL,</b><br />
+  <b>trapoid</b><b>&nbsp; character(100) NULL,</b><br />
+  <b>enterprise character(100) NULL,</b><br />
+  <b>community character(20) NULL,</b><br />
+  <b>hostname character(100) NULL,</b><br />
+  <b>agentip&nbsp; character(16) NULL,</b><br />
+  <b>category character(20) NULL,</b><br />
+  <b>severity character(20) NULL,</b><br />
+  <b>uptime&nbsp; character(20) NULL,</b><br />
+  <b>traptime character(30) NULL,</b><br />
+  <b>formatline character(255) NULL)</b></blockquote>
+
 If logging of unknown traps to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_unknown</span> table using:<br />
 <blockquote><b>CREATE TABLE snmptt_unknown (</b><br />
-<b>trapoid</b><b>&nbsp; character(100) NULL,</b><br />
-<b>enterprise character(100) NULL,</b><br />
-<b>community character(20) NULL,</b><br />
-<b>hostname character(100) NULL,</b><br />
-<b>agentip&nbsp; character(16) NULL,</b><br />
-<b>uptime&nbsp; character(20) NULL,</b><br />
-<b>traptime character(30) NULL,</b><br />
-<b>formatline character(255) NULL)</b></blockquote>
+  <b>trapoid</b><b>&nbsp; character(100) NULL,</b><br />
+  <b>enterprise character(100) NULL,</b><br />
+  <b>community character(20) NULL,</b><br />
+  <b>hostname character(100) NULL,</b><br />
+  <b>agentip&nbsp; character(16) NULL,</b><br />
+  <b>uptime&nbsp; character(20) NULL,</b><br />
+  <b>traptime character(30) NULL,</b><br />
+  <b>formatline character(255) NULL)</b></blockquote>
+
+If logging of statistics to a SQL table is required, create the
+<span style="font-weight: bold;">snmptt_statistics  </span> table using:<br />
+<blockquote><b>CREATE TABLE snmptt_statistics   (<br />
+  stat_time character(30) NULL,<br />
+  total_received BIGINT NULL,<br />
+  total_translated BIGINT NULL,<br />
+  total_ignored BIGINT NULL,<br />
+  total_unknown BIGINT NULL)<br />
+</b></blockquote>
+
 All variables are inserted into the database using '<b>INSERT INTO</b>' as
 text including the date and time.&nbsp; The variable lengths I have chosen
 above should be sufficient, but they may need to be increased depending on
@@ -1445,6 +1490,18 @@ If logging of unknown traps to a SQL table is required, create the
 <b>uptime&nbsp; character(20) NULL,</b><br />
 <b>traptime character(30) NULL,</b><br />
 <b>formatline character(255) NULL)</b></blockquote>
+
+If logging of statistics to a SQL table is required, create the
+<span style="font-weight: bold;">snmptt_statistics  </span> table using:<br />
+<blockquote><b>CREATE TABLE snmptt_statistics   (<br />
+  stat_time character(30) NULL,<br />
+  total_received BIGINT NULL,<br />
+  total_translated BIGINT NULL,<br />
+  total_ignored BIGINT NULL,<br />
+  total_unknown BIGINT NULL)<br />
+</b></blockquote>
+
+
 All variables are inserted into the database using '<b>INSERT INTO</b>' as
 text including the date and time.&nbsp; The variable lengths I have chosen
 above should be sufficient, but they may need to be increased depending on

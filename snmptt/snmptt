@@ -235,6 +235,7 @@ my $mysql_dbi_port;
 my $mysql_dbi_database;
 my $mysql_dbi_table;
 my $mysql_dbi_table_unknown;
+my $mysql_dbi_table_statistics;
 my $mysql_dbi_username;
 my $mysql_dbi_password;
 my $mysql_ping_on_insert;
@@ -248,6 +249,7 @@ my $postgresql_dbi_port;
 my $postgresql_dbi_database;
 my $postgresql_dbi_table;
 my $postgresql_dbi_table_unknown;
+my $postgresql_dbi_table_statistics;
 my $postgresql_dbi_username;
 my $postgresql_dbi_password;
 my $postgresql_ping_on_insert;
@@ -257,6 +259,7 @@ my $dbd_odbc_enable;
 my $dbd_odbc_dsn;
 my $dbd_odbc_table;
 my $dbd_odbc_table_unknown;
+my $dbd_odbc_table_statistics;
 my $dbd_odbc_username;
 my $dbd_odbc_password;
 my $dbd_odbc_ping_on_insert;
@@ -266,6 +269,7 @@ my $sql_win32_odbc_enable;
 my $sql_win32_odbc_dsn;
 my $sql_win32_odbc_table;
 my $sql_win32_odbc_table_unknown;
+my $sql_win32_odbc_table_statistics;
 my $sql_win32_odbc_username;
 my $sql_win32_odbc_password;
 
@@ -1545,7 +1549,7 @@ sub processtrap
 
           if (&mysql_insert($mysql_dbi_table,
             "eventname", $event2[0],                # $N
-            "eventid", $receivedtrap_entry,         # #i
+            "eventid", $receivedtrap_entry,         # $i
             "trapoid", $receivedtrap_trans,         # $O
             "enterprise", $db_enterprise,           # $E or $e depending on $db_translate_enterprise
             "community", $community,                # $C
@@ -1575,7 +1579,7 @@ sub processtrap
 
           if (&postgresql_insert($postgresql_dbi_table,
             "eventname", $event2[0],                # $N
-            "eventid", $receivedtrap_entry,         # #i
+            "eventid", $receivedtrap_entry,         # $i
             "trapoid", $receivedtrap_trans,         # $O
             "enterprise", $db_enterprise,           # $E or $e depending on $db_translate_enterprise
             "community", $community,                # $C
@@ -1603,7 +1607,7 @@ sub processtrap
 
           if (&odbc_insert($dbd_odbc_table,
             "eventname", $event2[0],                # $N
-            "eventid", $receivedtrap_entry,         # #i
+            "eventid", $receivedtrap_entry,         # $i
             "trapoid", $receivedtrap_trans,         # $O
             "enterprise", $db_enterprise,           # $E or $e depending on $db_translate_enterprise
             "community", $community,                # $C
@@ -1631,7 +1635,7 @@ sub processtrap
 
           if (&sql_win32_odbc_insert($sql_win32_odbc_table,
             "eventname", $event2[0],                # $N
-            "eventid", $receivedtrap_entry,         # #i
+            "eventid", $receivedtrap_entry,         # $i
             "trapoid", $receivedtrap_trans,         # $O
             "enterprise", $db_enterprise,           # $E or $e depending on $db_translate_enterprise
             "community", $community,                # $C
@@ -3508,6 +3512,7 @@ sub loadsnmpttini {
   $mysql_dbi_database = $cfg->val('SQL', 'mysql_dbi_database');
   $mysql_dbi_table = $cfg->val('SQL', 'mysql_dbi_table');
   $mysql_dbi_table_unknown = $cfg->val('SQL', 'mysql_dbi_table_unknown');
+  $mysql_dbi_table_statistics = $cfg->val('SQL', 'mysql_dbi_table_statistics');
   $mysql_dbi_username = $cfg->val('SQL', 'mysql_dbi_username');
   $mysql_dbi_password = $cfg->val('SQL', 'mysql_dbi_password');
   $mysql_ping_on_insert = $cfg->val('SQL', 'mysql_ping_on_insert');
@@ -3521,6 +3526,7 @@ sub loadsnmpttini {
   $postgresql_dbi_database = $cfg->val('SQL', 'postgresql_dbi_database');
   $postgresql_dbi_table = $cfg->val('SQL', 'postgresql_dbi_table');
   $postgresql_dbi_table_unknown = $cfg->val('SQL', 'postgresql_dbi_table_unknown');
+  $postgresql_dbi_table_statistics = $cfg->val('SQL', 'postgresql_dbi_table_statistics');
   $postgresql_dbi_username = $cfg->val('SQL', 'postgresql_dbi_username');
   $postgresql_dbi_password = $cfg->val('SQL', 'postgresql_dbi_password');
   $postgresql_ping_on_insert = $cfg->val('SQL', 'postgresql_ping_on_insert');
@@ -3530,6 +3536,7 @@ sub loadsnmpttini {
   $dbd_odbc_dsn = $cfg->val('SQL', 'dbd_odbc_dsn');
   $dbd_odbc_table = $cfg->val('SQL', 'dbd_odbc_table');
   $dbd_odbc_table_unknown = $cfg->val('SQL', 'dbd_odbc_table_unknown');
+  $dbd_odbc_table_statistics = $cfg->val('SQL', 'dbd_odbc_table_statistics');
   $dbd_odbc_username = $cfg->val('SQL', 'dbd_odbc_username');
   $dbd_odbc_password = $cfg->val('SQL', 'dbd_odbc_password');
   $dbd_odbc_ping_on_insert = $cfg->val('SQL', 'dbd_odbc_ping_on_insert');
@@ -3539,6 +3546,7 @@ sub loadsnmpttini {
   $sql_win32_odbc_dsn = $cfg->val('SQL', 'sql_win32_odbc_dsn');
   $sql_win32_odbc_table = $cfg->val('SQL', 'sql_win32_odbc_table');
   $sql_win32_odbc_table_unknown = $cfg->val('SQL', 'sql_win32_odbc_table_unknown');
+  $sql_win32_odbc_table_statistics = $cfg->val('SQL', 'sql_win32_odbc_table_statistics');
   $sql_win32_odbc_username = $cfg->val('SQL', 'sql_win32_odbc_username');
   $sql_win32_odbc_password = $cfg->val('SQL', 'sql_win32_odbc_password');
 
@@ -3610,6 +3618,7 @@ sub loadsnmpttini {
   if (! defined ($mysql_dbi_database)) { $mysql_dbi_database = ''} ;
   if (! defined ($mysql_dbi_table)) { $mysql_dbi_table = ''} ;
   if (! defined ($mysql_dbi_table_unknown)) { $mysql_dbi_table_unknown = ''} ;
+  if (! defined ($mysql_dbi_table_statistics)) { $mysql_dbi_table_statistics = ''} ;
   if (! defined ($mysql_dbi_username)) { $mysql_dbi_username = ''} ;
   if (! defined ($mysql_dbi_password)) { $mysql_dbi_password = ''} ;
   if (! defined ($mysql_ping_on_insert)) { $mysql_ping_on_insert = 1} ;
@@ -3622,6 +3631,7 @@ sub loadsnmpttini {
   if (! defined ($postgresql_dbi_database)) { $postgresql_dbi_database = ''} ;
   if (! defined ($postgresql_dbi_table)) { $postgresql_dbi_table = ''} ;
   if (! defined ($postgresql_dbi_table_unknown)) { $postgresql_dbi_table_unknown = ''} ;
+  if (! defined ($postgresql_dbi_table_statistics)) { $postgresql_dbi_table_statistics = ''} ;
   if (! defined ($postgresql_dbi_username)) { $postgresql_dbi_username = ''} ;
   if (! defined ($postgresql_dbi_password)) { $postgresql_dbi_password = ''} ;
   if (! defined ($postgresql_ping_on_insert)) { $postgresql_ping_on_insert = 1} ;
@@ -3630,6 +3640,7 @@ sub loadsnmpttini {
   if (! defined ($dbd_odbc_dsn)) { $dbd_odbc_dsn = ''} ;
   if (! defined ($dbd_odbc_table)) { $dbd_odbc_table = ''} ;
   if (! defined ($dbd_odbc_table_unknown)) { $dbd_odbc_table_unknown = ''} ;
+  if (! defined ($dbd_odbc_table_statistics)) { $dbd_odbc_table_statistics = ''} ;
   if (! defined ($dbd_odbc_username)) { $dbd_odbc_username = ''} ;
   if (! defined ($dbd_odbc_password)) { $dbd_odbc_password = ''} ;
   if (! defined ($dbd_odbc_ping_on_insert)) { $dbd_odbc_ping_on_insert = 1} ;
@@ -3638,6 +3649,7 @@ sub loadsnmpttini {
   if (! defined ($sql_win32_odbc_dsn)) { $sql_win32_odbc_dsn = ''} ;
   if (! defined ($sql_win32_odbc_table)) { $sql_win32_odbc_table = ''} ;
   if (! defined ($sql_win32_odbc_table_unknown)) { $sql_win32_odbc_table_unknown = ''} ;
+  if (! defined ($sql_win32_odbc_table_statistics)) { $sql_win32_odbc_table_statistics = ''} ;
   if (! defined ($sql_win32_odbc_username)) { $sql_win32_odbc_username = ''} ;
   if (! defined ($sql_win32_odbc_password)) { $sql_win32_odbc_password = ''} ;
   if (! defined ($DEBUGGING)) { $DEBUGGING = 0} ;
@@ -4547,6 +4559,46 @@ sub log_statistics {
     eventlog_system($message,1,$eventlog_information);
   }
 
+  if ($mysql_dbi_enable == 1 && defined ($dbh_mysql) && $mysql_dbi_table_statistics ne "")
+  {
+    &mysql_insert($mysql_dbi_table_statistics,
+      "stat_time", scalar(localtime(time())),
+      "total_received", $g_total_traps_received,
+      "total_translated", $g_total_traps_translated,
+      "total_ignored", $g_total_traps_ignored,
+      "total_unknown", $g_total_traps_unknown);
+  }
+
+  if ($postgresql_dbi_enable == 1 && defined ($dbh_postgresql) && $postgresql_dbi_table_statistics ne "")
+  {
+    &postgresql_insert($postgresql_dbi_table_statistics,
+      "stat_time", scalar(localtime(time())),
+      "total_received", $g_total_traps_received,
+      "total_translated", $g_total_traps_translated,
+      "total_ignored", $g_total_traps_ignored,
+      "total_unknown", $g_total_traps_unknown);
+  }
+
+  if ($dbd_odbc_enable == 1 && defined ($dbh_odbc) && $dbd_odbc_table_statistics ne "")
+  {
+    &odbc_insert($dbd_odbc_table_statistics,
+      "stat_time", scalar(localtime(time())),
+      "total_received", $g_total_traps_received,
+      "total_translated", $g_total_traps_translated,
+      "total_ignored", $g_total_traps_ignored,
+      "total_unknown", $g_total_traps_unknown);
+  }
+
+  if ($sql_win32_odbc_enable == 1 && defined ($dbh_win32_odbc) && $sql_win32_odbc_table_statistics ne "")
+  {
+    &sql_win32_odbc_insert($sql_win32_odbc_table_statistics,
+      "stat_time", scalar(localtime(time())),
+      "total_received", $g_total_traps_received,
+      "total_translated", $g_total_traps_translated,
+      "total_ignored", $g_total_traps_ignored,
+      "total_unknown", $g_total_traps_unknown);
+  }
+
   $g_last_statistics_logged = time();
 }
 
@@ -5021,7 +5073,7 @@ sub odbc_insert {
 
   $sql_statement .= ")";
   
-  #print "sql_statement: $sql_statement\n";
+  print "sql_statement: $sql_statement\n";
   
   # Make sure the connection is up
    if ($dbd_odbc_ping_on_insert == 1) {
