@@ -1,3 +1,6 @@
+Mar 13th, 2006: Alex Burger <alex_b@users.sourceforge.net>
+- Move all SQL update code to subroutines (mysql_update etc).
+
 Mar 4th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Fix bug where snmpttconvertmib would not translate a TRAP-TYPE / 
   NOTIFICATION-TYPE line if it was split across two lines.  Thanks
