@@ -1302,7 +1302,7 @@ create the table. Run these commands as root.</p>
 <blockquote>
 <p><b>su - postgres<br />
 dropdb snmptt<br />
-dropuser snmptt<br /></b></p>
+dropuser snmptt<br /></p>
 <p>createuser -P snmptt<br />
 createdb -O snmptt snmptt<br />
 psql snmptt</p>
@@ -1321,7 +1321,7 @@ uptime&nbsp; VARCHAR(20),<br />
 traptime VARCHAR(30),<br />
 formatline VARCHAR(255));</p>
 <p>GRANT ALL ON snmptt TO snmptt;<br />
-\q</p>
+\q</b></p>
 </blockquote>
 If logging of unknown traps to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_unknown</span> table using:<br />
@@ -1399,7 +1399,7 @@ above should be sufficient, but they may need to be increased depending on
 your environment.<br />
 &nbsp;
 <h4><a id="LoggingDatabase-Windows_ODBC" name=
-"LoggingDatabase-Windows_ODBC"></a>Win32::ODB</h4>
+"LoggingDatabase-Windows_ODBC"></a>Win32::ODBC</h4>
 <p>SNMPTT can access ODBC data sources using either the DBD::ODBC module on
 Linux and Windows, or the WIN32::ODBC module on Windows.</p>
 <p>To configure SNMPTT for MS SQL via ODBC on Windows, modify the following
