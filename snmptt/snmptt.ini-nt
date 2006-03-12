@@ -5,6 +5,10 @@
 #
 
 [General]
+# Name of this system for $H variable.  If blank, system name will be the computer's
+# hostname via Sys::Hostname.
+snmptt_system_name = 
+
 # Set to either 'standalone' or 'daemon'
 # standalone: snmptt called from snmptrapd.conf
 # daemon: snmptrapd.conf calls snmptthandler

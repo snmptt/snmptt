@@ -5,6 +5,10 @@ Mar 13th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Added ability to add custom columns to *_table and *_table_uknown
   tables.  Added sql_custom_columns and sql_custom_columns_unknown
   snmptt.ini options.
+- Added variable substitution $H.  This variable will default to the 
+  host name of the computer that is running SNMPTT, unless the 
+  snmptt_system_name snmptt.ini option is defined.
+- Sys::Hostname is now required.
 
 Mar 4th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Fix bug where snmpttconvertmib would not translate a TRAP-TYPE / 

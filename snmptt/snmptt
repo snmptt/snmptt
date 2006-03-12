@@ -164,6 +164,7 @@ else
 }
 
 # Global config file variables
+my $snmptt_system_name;
 my $daemon;
 my $multiple_event;
 my $dns_enable;
@@ -291,6 +292,7 @@ my @snmptt_conf_files;
 
 use Text::ParseWords;
 use POSIX qw(strftime);
+use Sys::Hostname;
 
 my $debug_file_used = 0;
 
@@ -2029,9 +2031,12 @@ sub substitute
   #s(\$ar)($var[1])g;
   &substitute2 ("\$ar", $var[1]);
 
-  # $R, $r - Hostname
+  # $R, $r - Trap hostname
   #s(\$R)($var[0])g;
   &substitute2 ("\$R", $var[0]);
+
+  # $H - Host name of the system running SNMPTT
+  &substitute2 ("\$H", $snmptt_system_name);
 
   #s(\$r)($var[0])g;
   &substitute2 ("\$r", $var[0]);
@@ -2594,7 +2599,7 @@ sub loadsnmpttconf
 
           push (@match,$linematch);
         }
-        elsif ( ($line2 =~ /^SDESC/) && ($description_mode == 1) )
+        elsif ( ($line2 =~ /^SDESC/) && ($description_mode== 1) )
         {
           # It's a DESC line
 
@@ -3567,6 +3572,7 @@ sub loadsnmpttini {
     $daemon = 0;
   }
 
+  $snmptt_system_name = $cfg->val('General', 'snmptt_system_name');
   $multiple_event = $cfg->val('General', 'multiple_event');
   $dns_enable = $cfg->val('General', 'dns_enable');
   $strip_domain = $cfg->val('General', 'strip_domain');
@@ -3694,6 +3700,11 @@ sub loadsnmpttini {
   #
   # Defaults Start
   #
+  if ($snmptt_system_name eq "") {
+    if (hostname ne "") {
+      $snmptt_system_name = hostname;
+    }
+  }
   if (! defined ($multiple_event)) { $multiple_event = 0} ;
   if (! defined ($dns_enable)) { $dns_enable = 0} ;
   if (! defined ($strip_domain)) { $strip_domain = 0} ;
