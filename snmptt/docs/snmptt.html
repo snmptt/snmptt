@@ -183,6 +183,9 @@ module</li>
 "http://search.cpan.org/search?module=Time::HiRes">Time::HiRes</a> module
 (only required when using SNMPTT in daemon mode - required by
 <b>snmptthandler</b>)</li>
+<li>Required: <a href=
+  "http://search.cpan.org/search?module=Sys::Hostname">Sys::Hostname</a> module.
+</li>
 <li>Optional: <a href="http://search.cpan.org/search?module=Socket">Socket</a>
 module (included with most if not all distributions including ActivePerl).
 Required for DNS translations.</li>
@@ -234,6 +237,20 @@ variable names translated into symbolic form, want to be able to have
 <b>translate_integers</b>, <b>translate_trap_oid</b> or <b>translate_oids</b>.
 Although not required, using the Perl module is recommended.</blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
+
+<h3><b>v1.2beta</b> <b>- ?? ??, 2006</b></h3>
+<ul>
+  <li>Added logging of trap statistics to a SQL table.  Added <b>*table_statistics</b>
+  <b>snmptt.ini</b> variables to define the table to be used.</li>
+  <li>Added ability to add custom columns to <b>*_table</b> and <b>*_table_uknown</b>
+  tables.  Added <b>sql_custom_columns</b> and <b>sql_custom_columns_unknown</b> <b>snmptt.ini</b> options.</li>
+  <li>Added a <b>$H</b> variable substitution to give the host name of the computer that is running 
+  SNMPTT, or a user defined value specified in the new <b>snmptt_system_name</b> <b>snmptt.ini</b> option.</li>
+  <li>Fixed a bug (1438794) where snmpttconvertmib would not translate a TRAP-TYPE / NOTIFICATION-TYPE line if 
+  it was split across two lines.</li>
+  <li>Fixed a bug in MATCH where the i modifier was not handled correctly.</li>
+</ul>
+
 
 <h3><b>v1.1</b> <b>- January 17th, 2006</b></h3>
 <ul>
@@ -652,6 +669,17 @@ load</li>
 <li>Initial release</li>
 </ul>
 <h2><a id="Upgrading" name="Upgrading"></a>Upgrading</h2>
+
+<h3><b>v1.1 to v1.2beta</b></h3>
+<p>To upgrade from v1.1 to v1.2beta, you should:</p>
+<ol>
+  <li>Replace <b>snmptt</b>,  <b>snmptthandler</b>, <b>snmpttconvertmib</b> and <b>snmpttconvert</b>
+  with the new versions contained in the v1.2beta package.&nbsp; Make sure the files are executable
+  (<b>chmod +x <i>filename</i></b>).</li>
+  <li>Backup your <b>snmptt.ini</b> file, replace it with the new version, and
+  make any necessary configuration changes to it.</li>
+  <li>Enable any new features in <b>snmptt.ini</b> as required.</li>
+</ol>
 
 <h3><b>v1.0 to v1.1</b></h3>
 <p>To upgrade from v1.0 to v1.1, you should:</p>
