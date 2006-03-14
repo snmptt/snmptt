@@ -495,6 +495,21 @@ if (1)
             if ($line4 =~ /--#ARGUMENTS\s*{(.*)}/)
             {
               @arguments = split /,/, $1;
+
+              for(my $i=0;$i <= $#arguments;$i++)
+              {
+                # Most ARGUMENTS lines have %n where n is a number starting 
+                # at 0, but some MIBS have an ARGUMENTS line that have $1, $2,
+                # etc and start at 1.  These need to have the $ removed and 
+                # the number downshifted so the FORMAT will be generated 
+                # properly.
+                if ($arguments[$i] =~ /^\s*\$\d+/) {
+                  $arguments[$i] =~ s/^\s*\$(\d+)/$1/;
+                  $arguments[$i]--;
+                }
+                #print "argument $i: $arguments[$i]\n";
+              }
+
               
               #for(my $i=0;$i <= $#arguments;$i++)
               #{
