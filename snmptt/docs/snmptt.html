@@ -246,6 +246,7 @@ Although not required, using the Perl module is recommended.</blockquote>
   tables.  Added <b>sql_custom_columns</b> and <b>sql_custom_columns_unknown</b> <b>snmptt.ini</b> options.</li>
   <li>Added a <b>$H</b> variable substitution to give the host name of the computer that is running 
   SNMPTT, or a user defined value specified in the new <b>snmptt_system_name</b> <b>snmptt.ini</b> option.</li>
+  <li>Added MATCH support for bitwise AND</li>
   <li>Fixed a bug in MATCH where the i modifier was not handled correctly.</li>
   <li>SNMPTTConvertMIB:</li>
   <li style="list-style: none">
@@ -2125,6 +2126,7 @@ ignore case when trying to match</div>
     MATCH <i>$x:</i> [!] <i>n-n</i><br />
     MATCH <i>$x:</i> [!] <i>< n</i><br />
     MATCH <i>$x:</i> [!] <i>> n</i><br />
+    MATCH <i>$x:</i> [!] & <i>n</i><br />
     MATCH <i>$x:</i> [!] <i>x.x.x.x</i><br />
     MATCH <i>$x:</i> [!] <i>x.x.x.x-x.x.x.x</i><br />
     MATCH <i>$x:</i> [!] <i>x.x.x.x/x</i><br />
@@ -2137,6 +2139,7 @@ where:<br />
   <b>$x</b> is any variable (example: $3, $A etc)<br />
   <b>reg</b> is a regular expression<br />
   <b>!</b> is used to negate the result (not)<br />
+  <b>&</b> is used to perform a bitwise AND<br />
   <b>n</b> is a number<br />
   <b>x.x.x.x</b> is an IP address<br />
   <b>x.x.x.x-x.x.x.x</b> is an IP network address range<br />
@@ -2200,6 +2203,12 @@ remaining)<br /></span><span style="font-weight: bold;">MATCH $7:
 (power)i</span><br style="font-weight: bold;" />
 <span style="font-weight: bold;">MATCH MODE=and</span></div>
 </div>
+<br />
+<div style="margin-left: 40px;">The integer $1 must have bit 4 set:<br />
+<br />
+<div style="margin-left: 40px;"><span style="font-weight: bold;">MATCH $1:
+&8</span></div>
+<br />
 </div>
 <blockquote>
 <h3><a id="SNMPTT.CONF-REGEX" name="SNMPTT.CONF-REGEX"></a><b>REGEX:</b></h3>

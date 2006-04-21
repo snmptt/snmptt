@@ -4234,6 +4234,18 @@ sub match
              ($result == 1 ? "true" : "false") . "\n";
     }
   }
+  # Match is a bitwise and
+  elsif ($match =~ /&\d+/)
+  {
+    #print "Bitwise and detected\n";
+    $result = match_bitwise_and($value, $match);
+    $result = match_result($result, $not);
+    if ($DEBUGGING >= 1)
+    {
+      print "    BITWISE AND: value=$value, match=" . ($not == 1 ? "!$match" : "$match") . " Result=" . 
+             ($result == 1 ? "true" : "false") . "\n";
+    }
+  }
   # Match is a number
   elsif ($match =~ /\d+/)
   {
@@ -4381,6 +4393,31 @@ sub match_regex
         return 1;
       }
     }
+  }
+  return 0;
+}
+
+sub match_bitwise_and
+{
+  my $value = shift;
+  my $match = shift;
+
+  # Return if value is not a number
+  if (! ($value =~ /\d+/)) {
+    return 0;
+  }   
+  
+  # Remove & from value
+  $match =~ s/^&//;
+  
+  my $result;
+
+  # Make sure values are passed as numbers by adding 0 to each
+  my $temp = 0+$value & 0+$match;
+
+  if ($temp > 0)
+  {  
+    return 1;    
   }
   return 0;
 }

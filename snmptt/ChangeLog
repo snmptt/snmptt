@@ -1,3 +1,6 @@
+Mar 23rd, 2006: Alex Burger <alex_b@users.sourceforge.net>
+- Added MATCH support for bitwise AND
+
 Mar 13th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Fix a bug where snmpttconvertmib does not handle ARGUMENTS lines
   that have $1, $2 etc instead of %0, %1.  Thanks to Todd A. Green.
