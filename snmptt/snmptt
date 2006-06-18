@@ -364,7 +364,7 @@ if ($eventlog_system_enable == 1 && $daemon == 1)
 {
   eventlog_system("SNMPTT $snmptt_version started",0,$eventlog_information);
   if ($debug_file_open_error == 1) {
-    syslog_system("Could not open debug output file!");
+    eventlog_system("Could not open debug output file!",14,$eventlog_warning);
   }
 }
 
@@ -694,7 +694,7 @@ if ($daemon == 1)
 
         if ($eventlog_system_enable == 1 && $daemon == 1){
           if ($debug_file_open_error == 1) {
-            syslog_system("Could not re-open debug output file!");
+            eventlog_system("Could not re-open debug output file!",14,$eventlog_error);
           }
         }
       }
@@ -1415,7 +1415,7 @@ sub processtrap
 
             if ($eventlog_system_enable == 1)
             {
-              eventlog_system("Can not open log file $log_file",14,$eventlog_information);
+              eventlog_system("Can not open log file $log_file",14,$eventlog_error);
             }
           }
         }
@@ -2380,11 +2380,11 @@ sub loadsnmpttconf
       print "\n\tLoading $snmpttconffile\n";
     }
 
-    if ($syslog_system_enable == 1 && $daemon == 1 && $dump == 0)
+    if ($syslog_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
     {
       syslog_system("Loading $snmpttconffile");
     }
-    if ($eventlog_system_enable == 1 && $daemon == 1 && $dump == 0)
+    if ($eventlog_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
     {
       eventlog_system("Loading $snmpttconffile",9,$eventlog_information);
     }
@@ -2397,11 +2397,11 @@ sub loadsnmpttconf
         print "\n\tCould not open configuration file: $snmpttconffile\n";
       }
 
-      if ($syslog_system_enable == 1 && $daemon == 1 && $dump == 0)
+      if ($syslog_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
       {
         syslog_system("Could not open configuration file: $snmpttconffile");
       }
-      if ($eventlog_system_enable == 1 && $daemon == 1 && $dump == 0)
+      if ($eventlog_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
       {
         eventlog_system("Could not open configuration file: $snmpttconffile",10,$eventlog_error);
       }
@@ -2421,11 +2421,11 @@ sub loadsnmpttconf
     {
       print "\tFinished loading $tempcount lines from $snmpttconffile\n";
     }
-    if ($syslog_system_enable == 1 && $daemon == 1 && $dump == 0)
+    if ($syslog_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
     {
       syslog_system("Finished loading $tempcount lines from $snmpttconffile");
     }
-    if ($eventlog_system_enable == 1 && $daemon == 1 && $dump == 0)
+    if ($eventlog_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
     {
       eventlog_system("Finished loading $tempcount lines from $snmpttconffile",11,$eventlog_information);
     }
@@ -3593,7 +3593,6 @@ sub loadsnmpttini {
   $dynamic_nodes = $cfg->val('General', 'dynamic_nodes');
   $description_mode = $cfg->val('General', 'description_mode');
   $description_clean = $cfg->val('General', 'description_clean');
-  $unknown_trap_exec = $cfg->val('General', 'unknown_trap_exec');
 
   # DaemonMode
   $daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -3633,6 +3632,7 @@ sub loadsnmpttini {
   # Exec
   $exec_enable = $cfg->val('Exec', 'exec_enable');
   $pre_exec_enable = $cfg->val('Exec', 'pre_exec_enable');
+  $unknown_trap_exec = $cfg->val('Exec', 'unknown_trap_exec');
 
   # SQL
   $db_translate_enterprise = $cfg->val('SQL', 'db_translate_enterprise');

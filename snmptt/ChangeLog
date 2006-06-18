@@ -1,3 +1,13 @@
+June 18th, 2006: Alex Burger <alex_b@users.sourceforge.net>
+- Prevent logging to syslog and event log when running SNMPTT with
+  the --time option.  Thanks to Stefan Mohr.
+- Fix bug under Windows where SNMPTT was trying to log to syslog instead of
+  the event log.  Thanks to Roger Lindholm.
+
+May 13th, 2006: Alex Burger <alex_b@users.sourceforge.net>
+- Moved unknown_trap_exec to Exec section in snmptt.ini.  Patch
+  1476071.  Thanks to George Kourvoulis.
+
 Mar 23rd, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Added MATCH support for bitwise AND
 
