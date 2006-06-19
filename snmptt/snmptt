@@ -187,6 +187,8 @@ my $dynamic_nodes;
 my $description_mode;
 my $description_clean;
 my $unknown_trap_exec;
+my $threads_enable;
+my $threads_max;
 
 # DaemonMode
 my $daemon_fork;
@@ -318,6 +320,28 @@ if ($DEBUGGING >= 1)
   # print out time
   print "********** SNMPTT $snmptt_version started: ",scalar(localtime($g_start_time))," **********\n\n"
 }
+
+if ($threads_enable == 1)
+{
+  eval 'require threads;';
+  if ($@) {
+    warn $@;
+    print "\nThreads have been enabled but the threads module is not available.  To\n";
+    print "enable threads you need the threads module (not Threads).  This is only\n";
+    print "available in Perl 5.6.0 and higher.\n";
+    die "died";
+  }
+  require threads;  
+
+  eval 'require Thread::Semaphore;';
+  if ($@) {
+    warn $@;
+    print "\nThreads have been enabled but the Thread module is not available.\n";
+    die "died";
+  }
+  require Thread::Semaphore;  
+}
+
 
 if ($syslog_enable == 1 || $syslog_system_enable == 1)
 {
@@ -549,6 +573,9 @@ my $trap_time;                # Time of trap
 my $trap_date_time_epoch;     # Date / time of trap
 my $configfile;               # .ini file to use
 
+my $thread_exec_semaphore;    # Semaphore for EXEC
+my @threads_exec;             # Active threads
+
 # Global variables for statistics
 my $g_total_traps_received = 0;
 my $g_total_traps_translated = 0;
@@ -586,7 +613,7 @@ if ($daemon == 1)
 
   &loadsnmpttconf;	# Load SNMPTT.CONF file
 
-        # Only fork to the background if not Win32
+  # Only fork to the background if not Win32
   if (($^O ne "MSWin32") && ($daemon_fork==1))
   {
           use POSIX qw(setsid);
@@ -705,6 +732,11 @@ if ($daemon == 1)
   # (Do this after switch user IDs when daemon_uid is defined)
   create_db_connections();
 
+  if ($threads_enable == 1) {
+    $thread_exec_semaphore = ();
+    $thread_exec_semaphore = Thread::Semaphore->new($threads_max);
+  }
+  
   while (!$timetodie)
   {
     if (! (chdir($spool_directory)))
@@ -907,6 +939,16 @@ if ($daemon == 1)
       $timetologstatistics = 0;
     }
 
+    if ($DEBUGGING >= 1) {
+      if ($threads_enable == 1) {
+        print "Active threads: ";
+        foreach my $thr (threads->list) {
+          print " " . $thr->tid;
+        }
+        print "\n\n";
+      }   
+    }
+
     if ($DEBUGGING >= 1)
     {
       print "Sleeping for $sleep seconds\n\n";
@@ -962,6 +1004,44 @@ if ($daemon == 1)
 
     eventlog_system($message,1,$eventlog_information);
   }
+  
+  # Attach to all threads to make sure they finish before killing Perl.
+  if ($threads_enable == 1) {
+    
+    if ($DEBUGGING >= 1)
+    {
+      print "Waiting for threads to finish...\n";
+    }
+    if ($syslog_system_enable == 1 &&  $daemon == 1)
+    {
+      syslog_system("Waiting for threads to finish...");
+    }
+    if ($eventlog_system_enable == 1 &&  $daemon == 1)
+    {
+      my $message = "Waiting for threads to finish...\n";     
+      eventlog_system($message,1,$eventlog_information);
+    }
+   
+    foreach my $thr (threads->list) {
+      if ($thr->tid && !threads::equal($thr, threads->self)) {
+        $thr->join;
+      }
+    }
+
+    if ($DEBUGGING >= 1)
+    {
+      print "Threads finished...\n";
+    }
+    if ($syslog_system_enable == 1 &&  $daemon == 1)
+    {
+      syslog_system("Threads finished...");
+    }
+    if ($eventlog_system_enable == 1 &&  $daemon == 1)
+    {
+      my $message = "Threads finished...\n";     
+      eventlog_system($message,1,$eventlog_information);
+    }
+  }   
 }
 else
 {
@@ -1751,8 +1831,25 @@ sub processtrap
               {
                 print "EXEC command:$command\n";
               }
+
               # Execute command
-              system $command;
+              if ($threads_enable == 1  && $daemon == 1) {
+                if ($DEBUGGING >= 1)
+                {
+                  print "EXEC command - creating thread...\n";
+                }
+                my $exec_thread = threads->new(\&exec_thread_sub, $command);
+                push (@threads_exec, $exec_thread);               
+
+                sub exec_thread_sub {
+                  $thread_exec_semaphore->down;
+                  system $command;
+                  $thread_exec_semaphore->up;
+                }
+              }
+              else {
+                system $command;
+              }
             }
           }
         }
@@ -3593,6 +3690,8 @@ sub loadsnmpttini {
   $dynamic_nodes = $cfg->val('General', 'dynamic_nodes');
   $description_mode = $cfg->val('General', 'description_mode');
   $description_clean = $cfg->val('General', 'description_clean');
+  $threads_enable = $cfg->val('General', 'threads_enable');
+  $threads_max = $cfg->val('General', 'threads_max');
 
   # DaemonMode
   $daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -3724,6 +3823,8 @@ sub loadsnmpttini {
   if (! defined ($description_mode)) { $description_mode = 0} ;
   if (! defined ($description_clean)) { $description_clean = 1} ;
   if (! defined ($unknown_trap_exec)) { $unknown_trap_exec = ''} ;
+  if (! defined ($threads_enable)) { $threads_enable = 1} ;
+  if (! defined ($threads_max)) { $threads_max = 10} ;
 
   if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
   if (! defined ($daemon_uid)) { $daemon_uid = ''} ;
