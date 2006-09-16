@@ -240,6 +240,7 @@ Although not required, using the Perl module is recommended.</blockquote>
 
 <h3><b>v1.2beta</b> <b>- ?? ??, 2006</b></h3>
 <ul>
+  <li>Added <b>snmptt.ini</b> options <b>date_format</b>, <b>time_format</b>, <b>date_time_format</b> and <b>date_time_format_sql</b> to allow the output format for <b>$x</b> and <b>$X</b> substitution variables, and the format of the date/time for text logs and SQL to be changed using strftime() variables.  This allows for proper date/time data types to be used in SQL databases.</li>
   <li>Added logging of trap statistics to a SQL table.  Added <b>*table_statistics</b>
   <b>snmptt.ini</b> variable to define the table to be used.</li>
   <li>Added ability to add custom columns to <b>*_table</b> and <b>*_table_unknown</b>

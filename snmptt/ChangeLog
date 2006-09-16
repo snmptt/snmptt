@@ -1,3 +1,10 @@
+Sept 15th, 2006: Alex Burger <alex_b@users.sourceforge.net>
+- Added snmptt.ini options date_format, time_format, date_time_format and
+  date_time_format_sql to allow the output format for $x and $X substitution
+  variables, and the format of the date/time for text logs and SQL to be
+  changed using strftime() variables.  This allows for proper date/time data
+  types to be used in SQL databases.
+
 June 18th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Prevent logging to syslog and event log when running SNMPTT with
   the --time option.  Thanks to Stefan Mohr.

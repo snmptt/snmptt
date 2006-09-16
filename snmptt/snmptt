@@ -189,6 +189,10 @@ my $description_clean;
 my $unknown_trap_exec;
 my $threads_enable;
 my $threads_max;
+my $date_format;
+my $time_format;
+my $date_time_format;
+my $date_time_format_sql;
 
 # DaemonMode
 my $daemon_fork;
@@ -564,7 +568,8 @@ my $agent_dns_name;           # DNS name of trap received
 my $processed;                # Whether or not the trap was processed (found) to determine
                               # if it should search using wildcards and log to unknown
 my $trap_attempted_to_log;    # To keep track of whether or not we attempted to log the trap
-my $trap_date_time;           # Date and time of the trap
+my $trap_date_time;           # Date and time of the trap.  Used for log files.
+my $trap_date_time_sql;       # Date and time of the trap.  Used for SQL.
 my $trap_successfully_logged; # To keep track of whether or not we successfully logged the trap
                               # so we know if we should delete the trap file
 my $db_enterprise;
@@ -1657,7 +1662,7 @@ sub processtrap
             "category", $event2[1],                 # $c
             "severity", $event2[2],                 # $s
             "uptime", $var[2],                      # $T
-            "traptime", $trap_date_time,            # $X/$x
+            "traptime", $trap_date_time_sql,
             "formatline", $message_short2,
             @t_sql_custom_columns) == 1 ) { # 
             $trap_successfully_logged++;
@@ -1702,7 +1707,7 @@ sub processtrap
             "category", $event2[1],                 # $c
             "severity", $event2[2],                 # $s
             "uptime", $var[2],                      # $T
-            "traptime", $trap_date_time,            # $X/$x
+            "traptime", $trap_date_time_sql,
             "formatline", $message_short2,
             @t_sql_custom_columns) == 1 ) { # 
             $trap_successfully_logged++;
@@ -1745,7 +1750,7 @@ sub processtrap
             "category", $event2[1],                 # $c
             "severity", $event2[2],                 # $s
             "uptime", $var[2],                      # $T
-            "traptime", $trap_date_time,            # $X/$x
+            "traptime", $trap_date_time_sql,
             "formatline", $message_short2,
             @t_sql_custom_columns) == 1 ) { # 
             $trap_successfully_logged++;
@@ -1788,7 +1793,7 @@ sub processtrap
             "category", $event2[1],                 # $c
             "severity", $event2[2],                 # $s
             "uptime", $var[2],                      # $T
-            "traptime", $trap_date_time,            # $X/$x
+            "traptime", $trap_date_time_sql,
             "formatline", $message_short2,
             @t_sql_custom_columns) == 1 ) { # 
             $trap_successfully_logged++;
@@ -2847,18 +2852,48 @@ sub readtrap
     $trap_date_time_epoch = time();		# Use current time as time trap was received
   }
 
+  my @localtime_array;
   if ( $daemon == 1 && $use_trap_time == 1 )	# Daemon mode only
   {
-    $trap_date_time = localtime($trap_date_time_epoch);
-    $trap_date = strftime "%a %b %e %Y", localtime($trap_date_time_epoch);
-    $trap_time = strftime "%H:%M:%S", localtime($trap_date_time_epoch);
+    @localtime_array = localtime($trap_date_time_epoch);
+
+    if ($date_time_format eq "") {
+      $trap_date_time = localtime($trap_date_time_epoch);
+    }
+    else {
+      $trap_date_time = strftime $date_time_format, @localtime_array;
+    }
+
+    if ($date_time_format_sql eq "") {
+      $trap_date_time_sql = localtime($trap_date_time_epoch);
+    }
+    else {
+      $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array;
+    }
+    
   }
-  else
+  else  # Standalone mode
   {
-    $trap_date_time = localtime();
-    $trap_date = strftime "%a %b %e %Y", localtime();
-    $trap_time = strftime "%H:%M:%S", localtime();
+    @localtime_array = localtime();
+
+    if ($date_time_format eq "") {
+      $trap_date_time = localtime();
+    }
+    else {
+      $trap_date_time = strftime $date_time_format, @localtime_array;
+    }
+
+    if ($date_time_format_sql eq "") {
+      $trap_date_time_sql = localtime();
+    }
+    else {
+      $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array;
+    }
   }
+
+  $trap_date = strftime $date_format, @localtime_array;
+  $trap_time = strftime $time_format, @localtime_array;
+  
 
   # Pull in passed SNMP info from snmptrapd via STDIN and place in the array @tempvar
 
@@ -3426,7 +3461,7 @@ sub searchfortrap
           "hostname", $agent_dns_name, 
           "agentip", $var[4],
           "uptime", $var[2],
-          "traptime", $trap_date_time,
+          "traptime", $trap_date_time_sql,
           "formatline", $message_short2,
           @t_sql_custom_columns_unknown);
       }
@@ -3463,7 +3498,7 @@ sub searchfortrap
           "hostname", $agent_dns_name, 
           "agentip", $var[4],
           "uptime", $var[2],
-          "traptime", $trap_date_time,
+          "traptime", $trap_date_time_sql,
           "formatline", $message_short2,
           @t_sql_custom_columns_unknown);
 
@@ -3499,7 +3534,7 @@ sub searchfortrap
           "hostname", $agent_dns_name, 
           "agentip", $var[4],
           "uptime", $var[2],
-          "traptime", $trap_date_time,
+          "traptime", $trap_date_time_sql,
           "formatline", $message_short2,
           @t_sql_custom_columns_unknown);
 
@@ -3535,7 +3570,7 @@ sub searchfortrap
           "hostname", $agent_dns_name, 
           "agentip", $var[4],
           "uptime", $var[2],
-          "traptime", $trap_date_time,
+          "traptime", $trap_date_time_sql,
           "formatline", $message_short2,
           @t_sql_custom_columns_unknown);
 
@@ -3692,6 +3727,9 @@ sub loadsnmpttini {
   $description_clean = $cfg->val('General', 'description_clean');
   $threads_enable = $cfg->val('General', 'threads_enable');
   $threads_max = $cfg->val('General', 'threads_max');
+  $date_format = $cfg->val('General', 'date_format');
+  $time_format = $cfg->val('General', 'time_format');
+  $date_time_format = $cfg->val('General', 'date_time_format');
 
   # DaemonMode
   $daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -3783,6 +3821,8 @@ sub loadsnmpttini {
   @sql_custom_columns = $cfg->val('SQL', 'sql_custom_columns');
   @sql_custom_columns_unknown = $cfg->val('SQL', 'sql_custom_columns_unknown');
 
+  $date_time_format_sql = $cfg->val('SQL', 'date_time_format_sql');
+  
   # Debugging
   if ($debugcmdline == 0) {
     $DEBUGGING = $cfg->val('Debugging', 'DEBUGGING');
@@ -3825,6 +3865,10 @@ sub loadsnmpttini {
   if (! defined ($unknown_trap_exec)) { $unknown_trap_exec = ''} ;
   if (! defined ($threads_enable)) { $threads_enable = 1} ;
   if (! defined ($threads_max)) { $threads_max = 10} ;
+  if (! defined ($date_format)) { $date_format = "%a %b %e %Y"} ;
+  if (! defined ($time_format)) { $time_format = "%H:%M:%S"} ;
+  if (! defined ($date_time_format)) { $date_time_format = ""} ;
+  if (! defined ($date_time_format_sql)) { $date_time_format_sql = ""} ;
 
   if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
   if (! defined ($daemon_uid)) { $daemon_uid = ''} ;

@@ -200,6 +200,21 @@ threads_enable = 0
 # execute at once.  Defaults to 10
 threads_max = 10
 
+# The date format for $x in strftime() format.  If not defined, defaults 
+# to %a %b %e %Y.
+#date_format = %a %b %e %Y
+
+# The time format for $X in strftime() format.  If not defined, defaults 
+# to %H:%M:%S.
+#time_format = %H:%M:%S 
+
+# The date time format in strftime() format for the date/time when logging 
+# to standard output, snmptt log files (log_file) and the unknown log file 
+# (unknown_trap_log_file).  Defaults to localtime().  For SQL, see 
+# date_time_format_sql.
+# Example:  %a %b %e %Y %H:%M:%S
+#date_time_format = 
+
 [DaemonMode]
 # Set to 1 to have snmptt fork to the background when run in daemon mode
 # Ignored by Windows.  See documentation
@@ -506,6 +521,12 @@ sql_win32_odbc_username = snmptt
 
 # WinODBC:: Password to use
 sql_win32_odbc_password = password
+
+# The date time format for the traptime column in SQL.  Defaults to 
+# localtime().  When a date/time field is used in SQL, this should
+# be changed to follow a standard that is supported by the SQL server.
+# Example:  For a MySQL DATETIME, use %Y-%m-%d %H:%M:%S.
+#date_time_format_sql = 
 
 [Exec]
 
