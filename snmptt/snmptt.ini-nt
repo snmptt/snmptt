@@ -356,7 +356,7 @@ mysql_dbi_table = snmptt
 mysql_dbi_table_unknown = snmptt_unknown
 
 # MySQL: Table to use for statistics
-# Note: statistics_interval must be set.
+# Note: statistics_interval must be set.  See also stat_time_format_sql.
 #mysql_dbi_table_statistics = snmptt_statistics
 mysql_dbi_table_statistics = 
 
@@ -420,7 +420,7 @@ postgresql_dbi_table = snmptt
 postgresql_dbi_table_unknown = snmptt_unknown
 
 # PostgreSQL: Table to use for statistics
-# Note: statistics_interval must be set.
+# Note: statistics_interval must be set.  See also stat_time_format_sql.
 #postgresql_dbi_table_statistics = snmptt_statistics
 postgresql_dbi_table_statistics = 
 
@@ -527,6 +527,12 @@ sql_win32_odbc_password = password
 # be changed to follow a standard that is supported by the SQL server.
 # Example:  For a MySQL DATETIME, use %Y-%m-%d %H:%M:%S.
 #date_time_format_sql = 
+
+# The date time format for the stat_time column in SQL.  Defaults to 
+# localtime().  When a date/time field is used in SQL, this should
+# be changed to follow a standard that is supported by the SQL server.
+# Example:  For a MySQL DATETIME, use %Y-%m-%d %H:%M:%S.
+#stat_time_format_sql = 
 
 [Exec]
 

@@ -240,7 +240,8 @@ Although not required, using the Perl module is recommended.</blockquote>
 
 <h3><b>v1.2beta</b> <b>- ?? ??, 2006</b></h3>
 <ul>
-  <li>Added <b>snmptt.ini</b> options <b>date_format</b>, <b>time_format</b>, <b>date_time_format</b> and <b>date_time_format_sql</b> to allow the output format for <b>$x</b> and <b>$X</b> substitution variables, and the format of the date/time for text logs and SQL to be changed using strftime() variables.  This allows for proper date/time data types to be used in SQL databases.</li>
+  <li>Added <b>snmptt.ini</b> options <b>date_format</b>, <b>time_format</b>, <b>date_time_format</b>, <b>date_time_format_sql</b> and <b>stat_time_format_sql</b> to allow the output format for <b>$x</b> and <b>$X</b> substitution variables, and the format of the date/time for text logs and SQL to be changed using <b>strftime()</b> variables.  This allows for proper date/time data types to be used in SQL databases.</li>
+  <li>Add threads (Perl ithreads) support for EXEC.  When enabled, EXEC commands will launch in a thread to allow SNMPTT to continue processing other traps.  Added <b>snmptt.ini</b> options <b>threads_enable</b> and <b>threads_max</b>.</li>
   <li>Added logging of trap statistics to a SQL table.  Added <b>*table_statistics</b>
   <b>snmptt.ini</b> variable to define the table to be used.</li>
   <li>Added ability to add custom columns to <b>*_table</b> and <b>*_table_unknown</b>
@@ -248,6 +249,9 @@ Although not required, using the Perl module is recommended.</blockquote>
   <li>Added a <b>$H</b> variable substitution to give the host name of the computer that is running 
   SNMPTT, or a user defined value specified in the new <b>snmptt_system_name</b> <b>snmptt.ini</b> option.</li>
   <li>Added MATCH support for bitwise AND</li>
+  <li>Moved <b>unknown_trap_exec</b> to Exec section in <b>snmptt.ini</b>.</li>
+  <li>Fixed a bug under Windows where SNMPTT was trying to log to syslog instead of the event log.</li>
+  <li>Fixed a bug where SNMPTT was attempting to log to syslog / eventlog when using the --time option.</li>
   <li>Fixed a bug in MATCH where the i modifier was not handled correctly.</li>
   <li>SNMPTTConvertMIB:</li>
   <li style="list-style: none">
@@ -255,7 +259,7 @@ Although not required, using the Perl module is recommended.</blockquote>
     <li>Fixed a bug (1438794) where a TRAP-TYPE / NOTIFICATION-TYPE line would not translate if 
     it was split across two lines.</li>
     <li>Fixed a bug (1438394) where ARGUMENTS lines that have $1, $2 etc instead of %0, %1 would
-    not translate.  Thanks to Todd A. Green.</li>
+    not translate.</li>
   </ul>
   </li>
 </ul>
@@ -1289,7 +1293,8 @@ enterprise VARCHAR(100),</b><br />
 <b>traptime VARCHAR(30),</b><br />
 <b>formatline VARCHAR(255));</b></p>
 </blockquote>
-<p>If you do not want the auto-incrementing id column, remove the 'id INT...'
+<p> Note:  To store the traptime as a real date/time (<b>DATETIME</b> data type), change 'traptime VARCHAR(30),' to 'traptime DATETIME,' and set <b>date_time_format_sql</b> in <b>snmptt.ini</b> to <b>%Y-%m-%d %H:%M:%S</b>.</p> 
+<p>Note:  If you do not want the auto-incrementing id column, remove the 'id INT...'
 line.</p>
 
 <p>If logging of unknown traps to a SQL table is required, create the
@@ -1306,6 +1311,7 @@ enterprise VARCHAR(100),</b><br />
 <b>traptime VARCHAR(30),</b><br />
 <b>formatline VARCHAR(255));</b></p>
 </blockquote>
+<p> Note:  To store the traptime as a real date/time (<b>DATETIME</b> data type), change 'traptime VARCHAR(30),' to 'traptime DATETIME,' and set <b>date_time_format_sql</b> in <b>snmptt.ini</b> to <b>%Y-%m-%d %H:%M:%S</b>.</p> 
 
 <p>If logging of statistics to a SQL table is required, create the
 <b>snmptt_statistics</b> table using:</p>
@@ -1318,10 +1324,11 @@ enterprise VARCHAR(100),</b><br />
 <b>total_ignored BIGINT,</b><br />
 <b>total_unknown BIGINT);</b><br />
 </p>
-
 </blockquote>
-<p>All variables are INSERTted into the database as standard text including
-the date and time.&nbsp; The variable lengths I have chosen above should be
+
+<p> Note:  To store the stat_time as a real date/time (<b>DATETIME</b> data type), change 'stat_time VARCHAR(30),' to 'stat_time DATETIME,' and set <b>stat_time_format_sql</b> in <b>snmptt.ini</b> to <b>%Y-%m-%d %H:%M:%S</b>.</p> 
+
+<p>Note:  The variable lengths I have chosen above should be
 sufficient, but they may need to be increased depending on your
 environment.</p>
 <p>To add a user account called '<b>snmptt</b>' with a password of
@@ -1376,6 +1383,8 @@ create the table. Run these commands as root.</p>
     \q</b></p>
 </blockquote>
 
+<p> Note:  To store the traptime as a real date/time (<b>timestamp</b> data type), change 'traptime VARCHAR(30),' to 'traptime timestamp,' and set <b>date_time_format_sql</b> in <b>snmptt.ini</b> to <b>%Y-%m-%d %H:%M:%S</b>.</p> 
+
 If logging of unknown traps to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_unknown</span> table using:<br />
 <blockquote><b>su - postgres<br />
@@ -1394,6 +1403,8 @@ If logging of unknown traps to a SQL table is required, create the
   <b>\q</b></p>
 </blockquote>
 
+<p> Note:  To store the traptime as a real date/time (<b>timestamp</b> data type), change 'traptime VARCHAR(30),' to 'traptime timestamp,' and set <b>date_time_format_sql</b> in <b>snmptt.ini</b> to <b>%Y-%m-%d %H:%M:%S</b>.</p> 
+
 If logging of statistics to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_statistics </span> table using:<br />
 <blockquote><b>su - postgres<br />
@@ -1405,12 +1416,13 @@ If logging of statistics to a SQL table is required, create the
       total_translated BIGINT,<br />
       total_ignored BIGINT,<br />
       total_unknown BIGINT);<br /></p>
-      GRANT ALL ON snmptt_unknown TO snmptt;</b><br />
+      GRANT ALL ON snmptt_statistics TO snmptt;</b><br />
     \q</b></p>
 </blockquote>
 
-All variables are INSERTted into the database as standard text including the
-date and time.&nbsp; The variable lengths I have chosen above should be
+<p> Note:  To store the stat_time as a real date/time (<b>timestamp</b> data type), change 'stat_time VARCHAR(30),' to 'stat_time timestamp,' and set <b>stat_time_format_sql</b> in <b>snmptt.ini</b> to <b>%Y-%m-%d %H:%M:%S</b>.</p> 
+
+The variable lengths I have chosen above should be
 sufficient, but they may need to be increased depending on your
 environment.<br />
 <br />
@@ -1453,6 +1465,8 @@ existing database.&nbsp; Permissions etc should also be defined.</p>
   <b>traptime character(30) NULL,</b><br />
   <b>formatline character(255) NULL)</b></blockquote>
 
+<p> Note:  To store the traptime as a real date/time, change 'traptime character(30),' to the date/time data type supported by the database and and set <b>date_time_format_sql</b> in <b>snmptt.ini</b> to a compatible format.  For example: <b>%Y-%m-%d %H:%M:%S</b>.</p> 
+
 If logging of unknown traps to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_unknown</span> table using:<br />
 <blockquote><b>CREATE TABLE snmptt_unknown (</b><br />
@@ -1465,6 +1479,8 @@ If logging of unknown traps to a SQL table is required, create the
   <b>traptime character(30) NULL,</b><br />
   <b>formatline character(255) NULL)</b></blockquote>
 
+<p> Note:  To store the traptime as a real date/time, change 'traptime character(30),' to the date/time data type supported by the database and and set <b>date_time_format_sql</b> in <b>snmptt.ini</b> to a compatible format.  For example: <b>%Y-%m-%d %H:%M:%S</b>.</p> 
+
 If logging of statistics to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_statistics  </span> table using:<br />
 <blockquote><b>CREATE TABLE snmptt_statistics   (<br />
@@ -1474,6 +1490,8 @@ If logging of statistics to a SQL table is required, create the
   total_ignored BIGINT NULL,<br />
   total_unknown BIGINT NULL)<br />
 </b></blockquote>
+
+<p> Note:  To store the stat_time as a real date/time, change 'stat_time character(30),' to the date/time data type supported by the database and and set <b>stat_time_format_sql</b> in <b>snmptt.ini</b> to a compatible format.  For example: <b>%Y-%m-%d %H:%M:%S</b>.</p> 
 
 All variables are inserted into the database using '<b>INSERT INTO</b>' as
 text including the date and time.&nbsp; The variable lengths I have chosen
@@ -1516,6 +1534,9 @@ database.&nbsp; Permissions etc should also be defined.</p>
 <b>uptime&nbsp; character(20) NULL,</b><br />
 <b>traptime character(30) NULL,</b><br />
 <b>formatline character(255) NULL)</b></blockquote>
+
+<p> Note:  To store the traptime as a real date/time, change 'traptime character(30),' to the date/time data type supported by the database and and set <b>date_time_format_sql</b> in <b>snmptt.ini</b> to a compatible format.  For example: <b>%Y-%m-%d %H:%M:%S</b>.</p> 
+
 If logging of unknown traps to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_unknown</span> table using:<br />
 <blockquote><b>CREATE TABLE snmptt_unknown (</b><br />
@@ -1528,6 +1549,8 @@ If logging of unknown traps to a SQL table is required, create the
 <b>traptime character(30) NULL,</b><br />
 <b>formatline character(255) NULL)</b></blockquote>
 
+<p> Note:  To store the traptime as a real date/time, change 'traptime character(30),' to the date/time data type supported by the database and and set <b>date_time_format_sql</b> in <b>snmptt.ini</b> to a compatible format.  For example: <b>%Y-%m-%d %H:%M:%S</b>.</p> 
+
 If logging of statistics to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_statistics  </span> table using:<br />
 <blockquote><b>CREATE TABLE snmptt_statistics   (<br />
@@ -1538,6 +1561,7 @@ If logging of statistics to a SQL table is required, create the
   total_unknown BIGINT NULL)<br />
 </b></blockquote>
 
+<p> Note:  To store the stat_time as a real date/time, change 'stat_time character(30),' to the date/time data type supported by the database and and set <b>stat_time_format_sql</b> in <b>snmptt.ini</b> to a compatible format.  For example: <b>%Y-%m-%d %H:%M:%S</b>.</p> 
 
 All variables are inserted into the database using '<b>INSERT INTO</b>' as
 text including the date and time.&nbsp; The variable lengths I have chosen
@@ -1843,7 +1867,7 @@ $x&nbsp; - Date trap was spooled (daemon mode) or current date (standalone
 mode)<br />
 $# - Number of (how many) variable-bindings in the trap<br />
 $$&nbsp; - Print a $<br />
-$@ - Number of seconds since the epoch<br />
+$@ - Number of seconds since the epoch of when the trap was spooled (daemon mode) or the current time (standalone mode)<br />
 $<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) <b>(see Note
 2,5)</b><br />
 $+<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) in the format of

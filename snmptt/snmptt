@@ -193,6 +193,7 @@ my $date_format;
 my $time_format;
 my $date_time_format;
 my $date_time_format_sql;
+my $stat_time_format_sql;
 
 # DaemonMode
 my $daemon_fork;
@@ -941,6 +942,7 @@ if ($daemon == 1)
     if ($timetologstatistics == 1)
     {
       &log_statistics();
+
       $timetologstatistics = 0;
     }
 
@@ -3822,6 +3824,7 @@ sub loadsnmpttini {
   @sql_custom_columns_unknown = $cfg->val('SQL', 'sql_custom_columns_unknown');
 
   $date_time_format_sql = $cfg->val('SQL', 'date_time_format_sql');
+  $stat_time_format_sql = $cfg->val('SQL', 'stat_time_format_sql');
   
   # Debugging
   if ($debugcmdline == 0) {
@@ -3869,6 +3872,7 @@ sub loadsnmpttini {
   if (! defined ($time_format)) { $time_format = "%H:%M:%S"} ;
   if (! defined ($date_time_format)) { $date_time_format = ""} ;
   if (! defined ($date_time_format_sql)) { $date_time_format_sql = ""} ;
+  if (! defined ($stat_time_format_sql)) { $stat_time_format_sql = ""} ;
 
   if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
   if (! defined ($daemon_uid)) { $daemon_uid = ''} ;
@@ -4884,8 +4888,17 @@ sub log_statistics {
 
   if ($mysql_dbi_enable == 1 && defined ($dbh_mysql) && $mysql_dbi_table_statistics ne "")
   {
+    my $stat_time_temp;
+
+    if ($stat_time_format_sql eq "") {
+      $stat_time_temp = localtime();
+    }
+    else {
+      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+    }
+    
     &mysql_insert($mysql_dbi_table_statistics,
-      "stat_time", scalar(localtime(time())),
+      "stat_time", $stat_time_temp,
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
@@ -4894,8 +4907,17 @@ sub log_statistics {
 
   if ($postgresql_dbi_enable == 1 && defined ($dbh_postgresql) && $postgresql_dbi_table_statistics ne "")
   {
+    my $stat_time_temp;
+
+    if ($stat_time_format_sql eq "") {
+      $stat_time_temp = localtime();
+    }
+    else {
+      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+    }
+
     &postgresql_insert($postgresql_dbi_table_statistics,
-      "stat_time", scalar(localtime(time())),
+      "stat_time", $stat_time_temp,
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
@@ -4904,8 +4926,17 @@ sub log_statistics {
 
   if ($dbd_odbc_enable == 1 && defined ($dbh_odbc) && $dbd_odbc_table_statistics ne "")
   {
+    my $stat_time_temp;
+
+    if ($stat_time_format_sql eq "") {
+      $stat_time_temp = localtime();
+    }
+    else {
+      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+    }
+
     &odbc_insert($dbd_odbc_table_statistics,
-      "stat_time", scalar(localtime(time())),
+      "stat_time", $stat_time_temp,
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
@@ -4914,8 +4945,17 @@ sub log_statistics {
 
   if ($sql_win32_odbc_enable == 1 && defined ($dbh_win32_odbc) && $sql_win32_odbc_table_statistics ne "")
   {
+    my $stat_time_temp;
+
+    if ($stat_time_format_sql eq "") {
+      $stat_time_temp = localtime();
+    }
+    else {
+      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+    }
+    
     &sql_win32_odbc_insert($sql_win32_odbc_table_statistics,
-      "stat_time", scalar(localtime(time())),
+      "stat_time", $stat_time_temp,
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
