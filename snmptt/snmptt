@@ -3866,7 +3866,7 @@ sub loadsnmpttini {
   if (! defined ($description_mode)) { $description_mode = 0} ;
   if (! defined ($description_clean)) { $description_clean = 1} ;
   if (! defined ($unknown_trap_exec)) { $unknown_trap_exec = ''} ;
-  if (! defined ($threads_enable)) { $threads_enable = 1} ;
+  if (! defined ($threads_enable)) { $threads_enable = 0} ;
   if (! defined ($threads_max)) { $threads_max = 10} ;
   if (! defined ($date_format)) { $date_format = "%a %b %e %Y"} ;
   if (! defined ($time_format)) { $time_format = "%H:%M:%S"} ;
