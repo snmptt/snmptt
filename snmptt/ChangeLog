@@ -1,3 +1,7 @@
+Sept 23rd, 2006: Alex Burger <alex_b@users.sourceforge.net>
+- Added a simple check to see if the trap file being processed is a
+  valid file.  If it is not, the file is skipped and not deleted.
+
 Sept 15th, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Added snmptt.ini options date_format, time_format, date_time_format,
   date_time_format_sql and stat_time_format_sql to allow the output format 

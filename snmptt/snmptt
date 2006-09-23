@@ -883,7 +883,10 @@ if ($daemon == 1)
 
         $input = 'FILE';
 
-        &readtrap;			# Read trap from STDIN or file
+        if (! (&readtrap())) {			# Read trap from STDIN or file
+          print "  Error processing trap file $file.  Skipping...\n";
+          next;
+        }
 
         &searchfortrap;		# Search for trap snmptt.conf (array)
 
@@ -2847,6 +2850,14 @@ sub readtrap
   if ( $daemon == 1)
   {
     chomp($trap_date_time_epoch = (<$input>));	# Pull time trap was spooled
+    if ($trap_date_time_epoch eq "") {
+      if ($DEBUGGING >= 1) {
+        print "  Invalid trap file.  Expected a serial time on the first line but read: $trap_date_time_epoch\n";
+        return 0;
+      }
+    }
+
+      
     $trap_date_time_epoch =~ s(`)(')g;	#` Replace any back ticks with regular single quote
   }
   else
@@ -2900,10 +2911,22 @@ sub readtrap
   # Pull in passed SNMP info from snmptrapd via STDIN and place in the array @tempvar
 
   chomp($tempvar[0]=<$input>);	# hostname
-  $tempvar[0] =~ s(`)(')g;	#` Replace any back ticks with regular single quote
-
+  $tempvar[0] =~ s(`)(')g;	#` Replace any back ticks with regular single quote 
+  if ($tempvar[0] eq "") {
+    if ($DEBUGGING >= 1) {
+      print "  Invalid trap file.  Expected a hostname on line 2 but got nothing\n";
+      return 0;
+    }
+  }
+    
   chomp($tempvar[1]=<$input>);	# ip address
   $tempvar[1] =~ s(`)(')g;	#` Replace any back ticks with regular single quote
+  if ($tempvar[1] eq "") {
+    if ($DEBUGGING >= 1) {
+      print "  Invalid trap file.  Expected an IP address on line 3 but got nothing\n";
+      return 0;
+    }
+  }
 
   # Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
   # out just the IP address
@@ -3206,6 +3229,8 @@ sub readtrap
       print "Ent Value $i (\$" . ($i+1) . "): $entvarname[$i]=$entvar[$i]\n\n";
     }
   }
+
+  return 1;
 
   # Variables of trap received by SNMPTRAPD:
   #
