@@ -2852,12 +2852,11 @@ sub readtrap
     chomp($trap_date_time_epoch = (<$input>));	# Pull time trap was spooled
     if ($trap_date_time_epoch eq "") {
       if ($DEBUGGING >= 1) {
-        print "  Invalid trap file.  Expected a serial time on the first line but read: $trap_date_time_epoch\n";
+        print "  Invalid trap file.  Expected a serial time on the first line but got nothing\n";
         return 0;
       }
     }
-
-      
+     
     $trap_date_time_epoch =~ s(`)(')g;	#` Replace any back ticks with regular single quote
   }
   else
