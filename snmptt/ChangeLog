@@ -1,3 +1,6 @@
+Nov 18th, 2006: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.2beta1
+
 Sept 23rd, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Added a simple check to see if the trap file being processed is a
   valid file.  If it is not, the file is skipped and not deleted.
