@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v1.2beta1
+# SNMPTT v1.2beta2
 #
 # Copyright 2002-2006 Alex Burger
 # alex_b@users.sourceforge.net
@@ -47,7 +47,7 @@
 #
 use strict;
 
-my $snmptt_version = "v1.2beta1";
+my $snmptt_version = "v1.2beta2";
 
 sub showversion
 {
@@ -186,7 +186,6 @@ my $remove_backslash_from_quotes;
 my $dynamic_nodes;
 my $description_mode;
 my $description_clean;
-my $unknown_trap_exec;
 my $threads_enable;
 my $threads_max;
 my $date_format;
@@ -233,6 +232,9 @@ my $eventlog_system_enable;
 # Exec
 my $exec_enable;
 my $pre_exec_enable;
+my $unknown_trap_exec;
+my $unknown_trap_exec_format;
+my $exec_escape;
 
 # SQL
 my $db_translate_enterprise;
@@ -1418,6 +1420,12 @@ sub processtrap
                 print "PREEXEC command: $command\n";
               }
               # Execute command
+
+              if ($exec_escape == 1) {
+                # Escape wildcard characters
+                $command =~ s/\*/\\\*/g;
+                $command =~ s/\?/\\\?/g;
+              }
               my $result = `$command`;
               chomp $result;
               # Remove spaces before and after
@@ -1853,11 +1861,22 @@ sub processtrap
 
                 sub exec_thread_sub {
                   $thread_exec_semaphore->down;
+
+                  if ($exec_escape == 1) {
+                    # Escape wildcard characters
+                    $command =~ s/\*/\\\*/g;
+                    $command =~ s/\?/\\\?/g;
+                  }
                   system $command;
                   $thread_exec_semaphore->up;
                 }
               }
               else {
+                if ($exec_escape == 1) {
+                  # Escape wildcard characters
+                  $command =~ s/\*/\\\*/g;
+                  $command =~ s/\?/\\\?/g;
+                }
                 system $command;
               }
             }
@@ -3376,25 +3395,43 @@ sub searchfortrap
       if ($DEBUGGING >= 1) {
         print "\n\nUnknown trap EXEC line:\n";
       }
-      my $command = $unknown_trap_exec . " \"";
-      $command .= scalar($trap_date_time) . ": Unknown trap ($var[3]) received from $var[0] at:";
+      
+      my $command;
 
-      #print out all standard variables
-      for (my $i=0;$i <= $#var;$i++) {
-        $command .= " Value $i: $var[$i]";
+      if ($unknown_trap_exec_format ne "") {        
+        $_ = $unknown_trap_exec_format;
+
+        &substitute;
+
+        $command = $unknown_trap_exec .= " \"$_\"";
       }
+      else {
+        $command = $unknown_trap_exec . " \"";
+        $command .= scalar($trap_date_time) . ": Unknown trap ($var[3]) received from $var[0] at:";
 
-      #print out all enterprise specific variables
-      for (my $i=0;$i <= $#entvar;$i++) {
-        $command .= " Ent Value $i: $entvarname[$i]=$entvar[$i]";
+        #print out all standard variables
+        for (my $i=0;$i <= $#var;$i++) {
+          $command .= " Value $i: $var[$i]";
+        }
+
+        #print out all enterprise specific variables
+        for (my $i=0;$i <= $#entvar;$i++) {
+          $command .= " Ent Value $i: $entvarname[$i]=$entvar[$i]";
+        }
+
+        $command .= "\"";
       }
-
-      $command .= "\"";
       if ($DEBUGGING >= 1) {
         print "Unknown trap EXEC command:$command\n";
       }
 
       # Execute command
+
+      if ($exec_escape == 1) {
+        # Escape wildcard characters
+        $command =~ s/\*/\\\*/g;
+        $command =~ s/\?/\\\?/g;
+      }
       system $command;
     }
 
@@ -3796,6 +3833,8 @@ sub loadsnmpttini {
   $exec_enable = $cfg->val('Exec', 'exec_enable');
   $pre_exec_enable = $cfg->val('Exec', 'pre_exec_enable');
   $unknown_trap_exec = $cfg->val('Exec', 'unknown_trap_exec');
+  $unknown_trap_exec_format = $cfg->val('Exec', 'unknown_trap_exec_format');
+  $exec_escape = $cfg->val('Exec', 'exec_escape');
 
   # SQL
   $db_translate_enterprise = $cfg->val('SQL', 'db_translate_enterprise');
@@ -3889,7 +3928,6 @@ sub loadsnmpttini {
   if (! defined ($dynamic_nodes)) { $dynamic_nodes = 0} ;
   if (! defined ($description_mode)) { $description_mode = 0} ;
   if (! defined ($description_clean)) { $description_clean = 1} ;
-  if (! defined ($unknown_trap_exec)) { $unknown_trap_exec = ''} ;
   if (! defined ($threads_enable)) { $threads_enable = 0} ;
   if (! defined ($threads_max)) { $threads_max = 10} ;
   if (! defined ($date_format)) { $date_format = "%a %b %e %Y"} ;
@@ -3922,6 +3960,16 @@ sub loadsnmpttini {
   if (! defined ($eventlog_system_enable)) { $eventlog_system_enable = 0} ;	
   if (! defined ($exec_enable)) { $exec_enable = 1} ;
   if (! defined ($pre_exec_enable)) { $pre_exec_enable = 1} ;
+  if (! defined ($unknown_trap_exec)) { $unknown_trap_exec = ''} ;
+  if (! defined ($unknown_trap_exec_format)) { $unknown_trap_exec_format = ''} ;
+  if (! defined ($exec_escape)) {
+    if ($^O =~ /MSWin32/) {
+      $exec_escape = 0;
+    }
+    else {
+      $exec_escape = 1;
+    }
+  }
   if (! defined ($db_translate_enterprise)) { $db_translate_enterprise = 0} ;
   if (! defined ($db_unknown_trap_format)) { $db_unknown_trap_format = '$-*'} ;
   if (! defined ($mysql_dbi_enable)) { $mysql_dbi_enable = 0} ;

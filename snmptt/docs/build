@@ -44,6 +44,7 @@ chmod +x snmptthandler
 chmod +x snmptt-net-snmp-test
 chown root.root * -R
 cd ..
+chmod 775 snmptt_1.2beta1
 tar cvfz snmptt_1.2beta1.tgz snmptt_1.2beta1
 
 SourceForge:

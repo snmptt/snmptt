@@ -549,6 +549,19 @@ pre_exec_enable = 1
 # but without the newlines.
 unknown_trap_exec = 
 
+# FORMAT line that is passed to the unknown_trap_exec command.  If not defined, it
+# defaults to what is described in the unknown_trap_exec setting.  The following
+# would be *similar* to the default described in the unknown_trap_exec setting
+# (all on one line):
+# $x !! $X: Unknown trap ($o) received from $A at: Value 0: $A Value 1: $aR 
+# Value 2: $T Value 3: $o Value 4: $aA Value 5: $C Value 6: $e Ent Values: $+*
+unknown_trap_exec_format = 
+
+# Set to 1 to escape wildards (* and ?) in EXEC, PREEXEC and the unknown_trap_exec
+# commands.  Enable this to prevent the shell from expanding the wildcard 
+# characters.  The default is 0 for Windows as it is not usually needed.
+exec_escape = 0
+
 [Debugging]
 # 0 - do not output messages
 # 1 - output some basic messages
