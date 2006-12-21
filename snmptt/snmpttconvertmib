@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v1.2beta1
+# SNMPTTCONVERTMIB v1.2beta2
 #
 # Copyright 2002-2006 Alex Burger
 # alex_b@users.sourceforge.net
@@ -50,7 +50,7 @@ my $prepend_type = 1;
 #############################################################################
 #
 
-my $snmpttconvertmib_version = "v1.2beta1";
+my $snmpttconvertmib_version = "v1.2beta2";
 
 sub showversion
 {
@@ -522,10 +522,10 @@ if (1)
               next;
             }
 	    # If next line is a --#SEVERITY, pull out the information and place in $trap_severity
-            if ($line4 =~ /--#SEVERITY(.*)/)
+            if ($line4 =~ /--#SEVERITY\s+(.*)/ && ! ($line4 =~ /--#SEVERITYMAP/))
             {
               # Pull out text and remove beginning and trailing white space and quotes
-              if ($line4 =~ /\s*--#SEVERITY\s*(.*)\s*/)
+              if ($line4 =~ /\s*--#SEVERITY\s+(.*)\s*/)
               {
                 # Remove any quotes
                 $_ = $1;
