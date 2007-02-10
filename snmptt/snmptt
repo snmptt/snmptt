@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-# SNMPTT v1.2beta2
+# SNMPTT v1.2beta3
 #
-# Copyright 2002-2006 Alex Burger
+# Copyright 2002-2007 Alex Burger
 # alex_b@users.sourceforge.net
 # 4/11/2002
 #
@@ -47,12 +47,12 @@
 #
 use strict;
 
-my $snmptt_version = "v1.2beta2";
+my $snmptt_version = "v1.2beta3";
 
 sub showversion
 {
   print "\nSNMPTT $snmptt_version\n";
-  print "(c) 2002-2006 Alex Burger\n";
+  print "(c) 2002-2007 Alex Burger\n";
   print "http://snmptt.sourceforge.net\n\n";
 }
 
@@ -334,11 +334,11 @@ if ($threads_enable == 1)
   if ($@) {
     warn $@;
     print "\nThreads have been enabled but the threads module is not available.  To\n";
-    print "enable threads you need the threads module (not Threads).  This is only\n";
-    print "available in Perl 5.6.0 and higher.\n";
+    print "enable threads you need the threads module (part of ithreads,not Threads).\n";
+    print "This is only available in Perl 5.6.0 and higher.\n";
     die "died";
   }
-  require threads;  
+  require threads;
 
   eval 'require Thread::Semaphore;';
   if ($@) {
@@ -582,7 +582,6 @@ my $trap_date_time_epoch;     # Date / time of trap
 my $configfile;               # .ini file to use
 
 my $thread_exec_semaphore;    # Semaphore for EXEC
-my @threads_exec;             # Active threads
 
 # Global variables for statistics
 my $g_total_traps_received = 0;
@@ -951,16 +950,6 @@ if ($daemon == 1)
       $timetologstatistics = 0;
     }
 
-    if ($DEBUGGING >= 1) {
-      if ($threads_enable == 1) {
-        print "Active threads: ";
-        foreach my $thr (threads->list) {
-          print " " . $thr->tid;
-        }
-        print "\n\n";
-      }   
-    }
-
     if ($DEBUGGING >= 1)
     {
       print "Sleeping for $sleep seconds\n\n";
@@ -1016,44 +1005,6 @@ if ($daemon == 1)
 
     eventlog_system($message,1,$eventlog_information);
   }
-  
-  # Attach to all threads to make sure they finish before killing Perl.
-  if ($threads_enable == 1) {
-    
-    if ($DEBUGGING >= 1)
-    {
-      print "Waiting for threads to finish...\n";
-    }
-    if ($syslog_system_enable == 1 &&  $daemon == 1)
-    {
-      syslog_system("Waiting for threads to finish...");
-    }
-    if ($eventlog_system_enable == 1 &&  $daemon == 1)
-    {
-      my $message = "Waiting for threads to finish...\n";     
-      eventlog_system($message,1,$eventlog_information);
-    }
-   
-    foreach my $thr (threads->list) {
-      if ($thr->tid && !threads::equal($thr, threads->self)) {
-        $thr->join;
-      }
-    }
-
-    if ($DEBUGGING >= 1)
-    {
-      print "Threads finished...\n";
-    }
-    if ($syslog_system_enable == 1 &&  $daemon == 1)
-    {
-      syslog_system("Threads finished...");
-    }
-    if ($eventlog_system_enable == 1 &&  $daemon == 1)
-    {
-      my $message = "Threads finished...\n";     
-      eventlog_system($message,1,$eventlog_information);
-    }
-  }   
 }
 else
 {
@@ -1857,15 +1808,20 @@ sub processtrap
                   print "EXEC command - creating thread...\n";
                 }
                 my $exec_thread = threads->new(\&exec_thread_sub, $command);
-                push (@threads_exec, $exec_thread);               
+                $exec_thread->detach;           # Detach and let it clean up after itself
 
                 sub exec_thread_sub {
+                  my $command = shift;
                   $thread_exec_semaphore->down;
 
                   if ($exec_escape == 1) {
                     # Escape wildcard characters
                     $command =~ s/\*/\\\*/g;
                     $command =~ s/\?/\\\?/g;
+                  }
+                  if ($DEBUGGING >= 1)
+                  {
+                    print "EXECing command in thread:$command\n";
                   }
                   system $command;
                   $thread_exec_semaphore->up;

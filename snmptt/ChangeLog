@@ -1,3 +1,16 @@
+Feb 10th, 2007: Alex Burger <alex_b@users.sourceforge.net>
+- Added information to Nagios section of documentation for
+  using freshness checks to automatically clear trap alerts.
+- Added information to Nagios section of documentation for
+  using SNMP traps as heartbeats by using freshness checks.
+  Thanks to Martin Fuerstenau.  See bug 1629565.
+  
+Jan 27th, 2007: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed bug in threads support.  EXEC'd commands were all passed
+  the same $command variable.  Threads are now detached after
+  being created.
+- Changed version to snmptt_1.2beta3
+
 Dec 21st, 2006: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug in snmpttconvertmib where a --#SEVERITYMAP line
   would be used instead of --#SEVERITY.
