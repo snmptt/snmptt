@@ -8,6 +8,30 @@ Resources
 <p>
 The following web sites are in no way affiliated with SNMPTT, and are only listed to assist SNMP users with learning, configuring and using SNMP and SNMPTT and to list other software that can be integrated with SNMPTT.</p>
 
+<p><b><u>Books</u></b></p>
+<p>
+  'Pro Nagios 2.0' by James Turnbull explains how to integrate SNMPTT with Nagios.<br />
+  Click <a href="http://www.apress.com/book/bookDisplay.html?bID=10096&in=2" target="_blank">here</a> for more information.
+  <br />
+  <br />
+  'Nagios 2.0 - Beginning to system and network monitoring' by Shogo Sato is a book written in Japanese that includes a section on integrating SNMPTT with Nagios.<br />
+  Click <a href="http://book.mycom.co.jp/book/4-8399-2016-8/4-8399-2016-8.shtml" target="_blank">here</a> for more information.
+  <br />
+  <br />
+</p>
+
+<p><b><u>Articles</u></b></p>
+<p>
+  'SNMP Trap Handling with Nagios' explains how to integrate SNMPTT with Nagios.<br />
+  <a href="http://www.samag.com/documents/s=9559/sam0503g/" target="_blank">Sys Admin March 2005 issue</a>
+  <br />
+  <br />
+  'Build a Custom Cisco Configuration Repository' uses SNMPTT to watch for router configuration changes.<br />
+  <a href="http://www.devx.com/enterprise/Article/21647/0/page/1" target="_blank">DevX.com</a>
+  <br />
+  <br />
+</p>
+
 <p><b><u>SNMP links</u></b></p>
 <p>
   Essential SNMP book published by O'Reilly<br />
@@ -58,19 +82,6 @@ The following web sites are in no way affiliated with SNMPTT, and are only liste
   <br />
   <br />
 </p>
-
-<p><b><u>Articles etc</u></b></p>
-<p>
-  SNMP Trap Handling with Nagios<br />
-  <a href="http://www.samag.com/documents/s=9559/sam0503g/" target="_blank">Sys Admin March 2005 issue</a>
-  <br />
-  <br />
-  Build a Custom Cisco Configuration Repository<br />
-  <a href="http://www.devx.com/enterprise/Article/21647/0/page/1" target="_blank">DevX.com</a>
-  <br />
-  <br />
-</p>
-
 
 <br />
 <!-- CONTENT END -->
