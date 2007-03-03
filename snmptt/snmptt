@@ -206,6 +206,8 @@ my $keep_unlogged_traps;
 my $stdout_enable;
 my $log_enable;
 my $log_file;
+my $log_system_enable;
+my $log_system_file;
 my $unknown_trap_log_enable;
 my $unknown_trap_log_file;
 my $statistics_interval;
@@ -388,6 +390,13 @@ if ($syslog_system_enable == 1 && $daemon == 1)
   syslog_system("SNMPTT $snmptt_version started");
   if ($debug_file_open_error == 1) {
     syslog_system("Could not open debug output file!");
+  }
+}
+if ($log_system_enable == 1 && $daemon == 1)
+{
+  log_system("SNMPTT $snmptt_version started");
+  if ($debug_file_open_error == 1) {
+    log_system("Could not open debug output file!");
   }
 }
 
@@ -725,6 +734,12 @@ if ($daemon == 1)
             syslog_system("Could not re-open debug output file!");
           }
         }
+        if ($log_system_enable == 1 && $daemon == 1)
+        {
+          if ($debug_file_open_error == 1) {
+            log_system("Could not re-open debug output file!");
+          }
+        }
 
         if ($eventlog_system_enable == 1 && $daemon == 1){
           if ($debug_file_open_error == 1) {
@@ -758,6 +773,10 @@ if ($daemon == 1)
       {
         syslog_system("Unable to enter spool dir $spool_directory");
       }
+      if ($log_system_enable == 1)
+      {
+        log_system("Unable to enter spool dir $spool_directory");
+      }
       if ($eventlog_system_enable == 1)
       {
         eventlog_system("Unable to enter spool dir $spool_directory",3,$eventlog_error);
@@ -775,6 +794,10 @@ if ($daemon == 1)
       {
         syslog_system("Unable to open spool dir $spool_directory");
       }
+      if ($log_system_enable == 1)
+      {
+        log_system("Unable to open spool dir $spool_directory");
+      }
       if ($eventlog_system_enable == 1)
       {
         eventlog_system("Unable to open spool dir $spool_directory",4,$eventlog_error);
@@ -791,6 +814,10 @@ if ($daemon == 1)
       if ($syslog_system_enable == 1)
       {
         syslog_system("Unable to read spool dir $spool_directory");
+      }
+      if ($log_system_enable == 1)
+      {
+        log_system("Unable to read spool dir $spool_directory");
       }
       if ($eventlog_system_enable == 1)
       {
@@ -825,6 +852,10 @@ if ($daemon == 1)
             {
               syslog_system("Unable to delete !reload file from spool dir");
             }
+            if ($log_system_enable == 1)
+            {
+              log_system("Unable to delete !reload file from spool dir");
+            }
             if ($eventlog_system_enable == 1)
             {
               eventlog_system("Unable to delete !reload file from spool dir",20,$eventlog_error);
@@ -847,6 +878,10 @@ if ($daemon == 1)
             if ($syslog_system_enable == 1)
             {
               syslog_system("Unable to delete !statistics file from spool dir");
+            }
+            if ($log_system_enable == 1)
+            {
+              log_system("Unable to delete !statistics file from spool dir");
             }
             if ($eventlog_system_enable == 1)
             {
@@ -873,6 +908,10 @@ if ($daemon == 1)
           if ($syslog_system_enable == 1)
           {
             syslog_system("Could not open trap file $spool_directory$file");
+          }
+          if ($log_system_enable == 1)
+          {
+            log_system("Could not open trap file $spool_directory$file");
           }
           if ($eventlog_system_enable == 1)
           {
@@ -908,6 +947,10 @@ if ($daemon == 1)
               if ($syslog_system_enable == 1)
               {
                 syslog_system("Unable to delete trap file $file from spool dir");
+              }
+              if ($log_system_enable == 1)
+              {
+                log_system("Unable to delete trap file $file from spool dir");
               }
               if ($eventlog_system_enable == 1)
               {
@@ -956,6 +999,8 @@ if ($daemon == 1)
     }
     sleep $sleep;
 
+    exit;
+
     if ($timetoreload == 1)
     {
       if ($DEBUGGING >= 1)
@@ -966,6 +1011,10 @@ if ($daemon == 1)
       if ($syslog_system_enable == 1)
       {
         syslog_system("Reloading configuration file\(s\)");
+      }
+      if ($log_system_enable == 1)
+      {
+        log_system("Reloading configuration file\(s\)");
       }
       if ($eventlog_system_enable == 1)
       {
@@ -990,6 +1039,15 @@ if ($daemon == 1)
   {
     syslog_system("SNMPTT $snmptt_version shutdown");
     syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");
+    #syslog_system("Total traps received:    $g_total_traps_received");
+    #syslog_system("Total traps translated:  $g_total_traps_translated");
+    #syslog_system("Total traps ignored      $g_total_traps_ignored");
+    #syslog_system("Total unknown traps:     $g_total_traps_unknown");                
+  }
+  if ($log_system_enable == 1 &&  $daemon == 1)
+  {
+    log_system("SNMPTT $snmptt_version shutdown");
+    log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");
     #syslog_system("Total traps received:    $g_total_traps_received");
     #syslog_system("Total traps translated:  $g_total_traps_translated");
     #syslog_system("Total traps ignored      $g_total_traps_ignored");
@@ -1461,7 +1519,10 @@ sub processtrap
             {
               syslog_system("Can not open log file $log_file");
             }
-
+            if ($log_system_enable == 1)
+            {
+              log_system("Can not open log file $log_file");
+            }
             if ($eventlog_system_enable == 1)
             {
               eventlog_system("Can not open log file $log_file",14,$eventlog_error);
@@ -2466,6 +2527,10 @@ sub loadsnmpttconf
     {
       syslog_system("Loading $snmpttconffile");
     }
+    if ($log_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
+    {
+      log_system("Loading $snmpttconffile");
+    }
     if ($eventlog_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
     {
       eventlog_system("Loading $snmpttconffile",9,$eventlog_information);
@@ -2482,6 +2547,10 @@ sub loadsnmpttconf
       if ($syslog_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
       {
         syslog_system("Could not open configuration file: $snmpttconffile");
+      }
+      if ($log_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
+      {
+        log_system("Could not open configuration file: $snmpttconffile");
       }
       if ($eventlog_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
       {
@@ -2506,6 +2575,10 @@ sub loadsnmpttconf
     if ($syslog_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
     {
       syslog_system("Finished loading $tempcount lines from $snmpttconffile");
+    }
+    if ($log_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
+    {
+      log_system("Finished loading $tempcount lines from $snmpttconffile");
     }
     if ($eventlog_system_enable == 1 && $daemon == 1 && $dump == 0 && $time == 0)
     {
@@ -3762,6 +3835,8 @@ sub loadsnmpttini {
   $stdout_enable = $cfg->val('Logging', 'stdout_enable');
   $log_enable = $cfg->val('Logging', 'log_enable');
   $log_file = $cfg->val('Logging', 'log_file');
+  $log_system_enable = $cfg->val('Logging', 'log_system_enable');
+  $log_system_file = $cfg->val('Logging', 'log_system_file');
   $unknown_trap_log_enable = $cfg->val('Logging', 'unknown_trap_log_enable');
   $unknown_trap_log_file = $cfg->val('Logging', 'unknown_trap_log_file');
   $statistics_interval = $cfg->val('Logging', 'statistics_interval');
@@ -3902,6 +3977,8 @@ sub loadsnmpttini {
   if (! defined ($stdout_enable)) { $stdout_enable = 0} ;
   if (! defined ($log_enable)) { $log_enable = 1} ;
   if (! defined ($log_file)) { $log_file = ''} ;
+  if (! defined ($log_system_enable)) { $log_system_enable = 0} ;
+  if (! defined ($log_system_file)) { $log_system_file = ''} ;
   if (! defined ($unknown_trap_log_enable)) { $unknown_trap_log_enable = 0} ;
   if (! defined ($unknown_trap_log_file)) { $unknown_trap_log_file = ''} ;
   if (! defined ($syslog_enable)) { $syslog_enable = 0} ;
@@ -4018,6 +4095,31 @@ sub syslog_system {
     print "Can not open syslog.  Message to be logged: $message\n" if ($DEBUGGING >= 1);
   }
 
+}
+
+sub log_system {
+  my $message = $_[0];
+
+  my @localtime_array = localtime();
+  my $log_time;
+
+  if ($date_time_format eq "") {
+    $log_time = localtime();
+  }
+  else {
+    #$log_time = strftime $date_time_format, @localtime_array;
+  }
+
+  if (open LOGSYSFILE, ">>$log_system_file")
+  {
+    print LOGSYSFILE $log_time." $message\n";
+    close LOGSYSFILE;
+  }
+  else
+  {
+    warn "Can not open log file $log_system_file: $!";
+    print "Can not open syslog.  Message to be logged: $message\n" if ($DEBUGGING >= 1);
+  }
 }
 
 sub eventlog_system {
@@ -4903,6 +5005,10 @@ sub log_statistics {
   {
     syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");                
   }
+  if ($log_system_enable == 1)  
+  {
+    log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");                
+  }
   if ($eventlog_system_enable == 1)
   {
     my $message = "" . \
@@ -5065,6 +5171,10 @@ sub dbh_mysql_connect() {
       {
         syslog_system($msg);
       }
+      if ($log_system_enable == 1)
+      {
+        log_system($msg);
+      }
       if ($eventlog_system_enable == 1)
       {
         eventlog_system($msg,12,$eventlog_error);
@@ -5113,6 +5223,10 @@ sub dbh_postgresql_connect() {
       {
         syslog_system($msg);
       }
+      if ($log_system_enable == 1)
+      {
+        log_system($msg);
+      }
       if ($eventlog_system_enable == 1)
       {
         eventlog_system($msg,18,$eventlog_error);
@@ -5137,6 +5251,10 @@ sub dbh_odbc_connect() {
       if ($syslog_system_enable == 1)
       {
         syslog_system($msg);
+      }
+      if ($log_system_enable == 1)
+      {
+        log_system($msg);
       }
       if ($eventlog_system_enable == 1)
       {
@@ -5295,7 +5413,10 @@ sub mysql_insert {
       {
         syslog_system($msg);
       }
-
+      if ($log_system_enable == 1)
+      {
+        log_system($msg);
+      }
       if ($eventlog_system_enable == 1)
       {
         eventlog_system($msg,23,$eventlog_error);
@@ -5319,6 +5440,11 @@ sub mysql_insert {
         if ($syslog_system_enable == 1)
         {
           syslog_system($msg);
+        }
+
+        if ($log_system_enable == 1)
+        {
+          log_system($msg);
         }
 
         if ($eventlog_system_enable == 1)
@@ -5404,6 +5530,11 @@ sub postgresql_insert {
         syslog_system($msg);
       }
 
+      if ($log_system_enable == 1)
+      {
+        log_system($msg);
+      }
+
       if ($eventlog_system_enable == 1)
       {
         eventlog_system($msg,22,$eventlog_error);
@@ -5427,6 +5558,10 @@ sub postgresql_insert {
         if ($syslog_system_enable == 1)
         {
           syslog_system($msg);
+        }
+        if ($log_system_enable == 1)
+        {
+          log_system($msg);
         }
 
         if ($eventlog_system_enable == 1)
@@ -5507,6 +5642,10 @@ sub odbc_insert {
       if ($syslog_system_enable == 1)
       {
         syslog_system($msg);
+      }
+      if ($log_system_enable == 1)
+      {
+        log_system($msg);
       }
 
       if ($eventlog_system_enable == 1)

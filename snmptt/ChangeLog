@@ -1,3 +1,8 @@
+Mar 3rd, 2007: Alex Burger <alex_b@users.sourceforge.net>
+- Added a text system log in addition to the existing syslog
+  and Event Log logs.  Added log_system and log_system_file
+  snmptt.ini options.
+
 Feb 10th, 2007: Alex Burger <alex_b@users.sourceforge.net>
 - Added information to Nagios section of documentation for
   using freshness checks to automatically clear trap alerts.
