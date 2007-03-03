@@ -197,6 +197,7 @@ my $stat_time_format_sql;
 # DaemonMode
 my $daemon_fork;
 my $daemon_uid;
+my $pid_file;
 my $spool_directory;
 my $sleep;
 my $use_trap_time;
@@ -632,7 +633,7 @@ if ($daemon == 1)
   # Only fork to the background if not Win32
   if (($^O ne "MSWin32") && ($daemon_fork==1))
   {
-          use POSIX qw(setsid);
+    use POSIX qw(setsid);
     use Cwd;
 
     my $working_dir = cwd;
@@ -651,13 +652,17 @@ if ($daemon == 1)
 
     if ($pid)
     {
-      if ( ! (open(PID, ">/var/run/snmptt.pid") ))
+      if ( ! (open(PID, ">$pid_file") ))
       {
         if (open(PID, ">$working_dir/snmptt.pid"))
         {
           print(PID "$pid\n");
           close(PID);
         }
+      }
+      else {
+        print(PID "$pid\n");
+        close(PID);
       }
 
       exit;
@@ -998,8 +1003,6 @@ if ($daemon == 1)
       print "Sleeping for $sleep seconds\n\n";
     }
     sleep $sleep;
-
-    exit;
 
     if ($timetoreload == 1)
     {
@@ -3826,6 +3829,7 @@ sub loadsnmpttini {
   # DaemonMode
   $daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
   $daemon_uid = $cfg->val('DaemonMode', 'daemon_uid');
+  $pid_file = $cfg->val('DaemonMode', 'pid_file');
   $spool_directory = $cfg->val('DaemonMode', 'spool_directory');
   $sleep = $cfg->val('DaemonMode', 'sleep');
   $use_trap_time = $cfg->val('DaemonMode', 'use_trap_time');
@@ -3969,6 +3973,7 @@ sub loadsnmpttini {
 
   if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
   if (! defined ($daemon_uid)) { $daemon_uid = ''} ;
+  if (! defined ($pid_file)) { $pid_file = '/var/run/snmptt.pid'} ;
   if (! defined ($spool_directory)) { $spool_directory = ''} ;
   if (! defined ($sleep)) { $sleep = 5} ;
   if (! defined ($use_trap_time)) { $use_trap_time = 1} ;
@@ -4107,7 +4112,7 @@ sub log_system {
     $log_time = localtime();
   }
   else {
-    #$log_time = strftime $date_time_format, @localtime_array;
+    $log_time = strftime $date_time_format, @localtime_array;
   }
 
   if (open LOGSYSFILE, ">>$log_system_file")
