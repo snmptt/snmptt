@@ -634,7 +634,11 @@ if ($daemon == 1)
   if (($^O ne "MSWin32") && ($daemon_fork==1))
   {
     use POSIX qw(setsid);
+    use POSIX qw(signal_h);
+    use POSIX ":sys_wait_h";
     use Cwd;
+    my $pid;
+    my $pid2;
 
     my $working_dir = cwd;
     print "cwd: $working_dir\n";
@@ -647,22 +651,28 @@ if ($daemon == 1)
        or die "Can't write to /dev/null: $!";
     open STDERR, '>>/dev/null'
        or die "Can't write to /dev/null: $!";
-    defined(my $pid = fork)
-       or die "Can't fork: $!";
 
-    if ($pid)
+    # We fork so we can return back to the shell or whatever started snmptt
+    defined($pid = fork)
+      or die "Can't fork: $!";
+
+    # fork returns: child pid to the parent, 0 to the child, undef if it failed.
+
+    # We write PID using the uid of the user that started snmptt.
+    if ($pid)   # This is run in the parent process
     {
-      if ( ! (open(PID, ">$pid_file") ))
-      {
-        if (open(PID, ">$working_dir/snmptt.pid"))
+      if (open(PID, ">$pid_file") ) {
+        print(PID "$pid\n");
+        close(PID);
+      }
+      else {
+        $pid_file = "$working_dir/snmptt.pid";
+
+        if (open(PID, ">$pid_file") )
         {
           print(PID "$pid\n");
           close(PID);
         }
-      }
-      else {
-        print(PID "$pid\n");
-        close(PID);
       }
 
       exit;
@@ -671,7 +681,36 @@ if ($daemon == 1)
     POSIX:setsid
        or die "Can't start a new session: $!";
     umask 0;
-  }
+
+    # We fork again so there are two processes.  The first which is run using the uid
+    # of the user that started snmptt, and the second which is run as the user as 
+    # defined by daemon_uid in snmptt.ini.  We do this so we can sit and wait for the
+    # child to finish so we can clean up the snmptt.pid file.
+    # We only need to do this if daemon_uid is set..
+    if ($^O ne "MSWin32" && $daemon_uid ne '') {
+      defined($pid2 = fork)
+        or die "Can't fork: $!";
+      
+      if ($pid2)   # This is run in the parent process
+      {
+        $SIG{TERM} = \&signal_handler_die;        # new signal for parent
+        
+        while (1) {
+          if ($timetodie == 1 || waitpid($pid2, WNOHANG) != 0) {
+            kill SIGTERM, $pid2;
+            # Clean up snmptt.pid file
+            unlink($pid_file);
+            exit;
+          }
+          sleep 3;
+        }
+      }
+      
+      POSIX:setsid
+        or die "Can't start a new session: $!";
+      umask 0;
+    }
+  } 
 
   # Change user if not Windows, and daemon_uid ini parameter not blank
   if ($^O ne "MSWin32" && $daemon_uid ne '')
@@ -730,6 +769,10 @@ if ($daemon == 1)
         }
       }
 
+
+      if ($DEBUGGING >= 1) {
+        print DEBUGFILE "Closing debug file $DEBUGGING_FILE\n";
+      }
       # Close debug file (if it is open) before changing users and re-open after
       close(DEBUGFILE);
 
@@ -746,22 +789,24 @@ if ($daemon == 1)
             select DEBUGFILE;	# change default output to debug file
             $debug_file_used = 1;
             $debug_file_open_error = 0;
+            print "Debug file $DEBUGGING_FILE re-opened under uid $daemon_uid\n";
+            warn "Debug file $DEBUGGING_FILE re-opened under uid $daemon_uid\n";
           }
           else
           {
             warn "could not re-open debug output file ($!)";
           }
-        }
-        if ($syslog_system_enable == 1 && $daemon == 1)
-        {
-          if ($debug_file_open_error == 1) {
-            syslog_system("Could not re-open debug output file!");
+          if ($syslog_system_enable == 1 && $daemon == 1)
+          {
+            if ($debug_file_open_error == 1) {
+              syslog_system("Could not re-open debug output file!");
+            }
           }
-        }
-        if ($log_system_enable == 1 && $daemon == 1)
-        {
-          if ($debug_file_open_error == 1) {
-            log_system("Could not re-open debug output file!");
+          if ($log_system_enable == 1 && $daemon == 1)
+          {
+            if ($debug_file_open_error == 1) {              
+              log_system("Could not re-open debug output file!");
+            }
           }
         }
 
@@ -1048,6 +1093,14 @@ if ($daemon == 1)
       $timetoreload = 0;
     }
   }
+
+  # If $daemon_uid was not set, clean up pid file here.  Otherwise it's cleaned up
+  # when the child process is finished above.
+  if ($^O ne "MSWin32" && $daemon_uid eq '') {
+    # Clean up snmptt.pid file
+    unlink($pid_file);
+  }
+
   if ($DEBUGGING >= 1)
   {
     print "SNMPTT $snmptt_version shutdown: ",scalar(localtime),"\n\n";
