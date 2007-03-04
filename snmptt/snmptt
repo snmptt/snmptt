@@ -305,6 +305,7 @@ my @snmptt_conf_files;
 use Text::ParseWords;
 use POSIX qw(strftime);
 use Sys::Hostname;
+use File::Basename;
 
 my $debug_file_used = 0;
 
@@ -618,6 +619,51 @@ my $timetologstatistics;
 
 if ($daemon == 1)
 {
+  # Check for old pid file.
+  my $pid_file_set = 0;
+  if ($pid_file eq '') {
+    $pid_file = '/var/run/snmptt.pid';
+  }
+  else {
+    $pid_file_set = 1;
+  }
+
+  print STDOUT "$pid_file\n";
+  if (-e $pid_file) {
+    open(OLDPID, "<$pid_file");
+    my $old_pid = <OLDPID>;
+    chomp $old_pid;
+    close OLDPID;
+    
+    warn("There seems to be another SNMPTT process (pid $old_pid) running.\n");
+    warn("You may want to kill it and delete the .pid file ($pid_file).  Aborting...\n");
+    if ($syslog_system_enable == 1) {
+      syslog_system("There seems to be another SNMPTT process (pid $old_pid) running.");
+      syslog_system("You may want to kill it and delete the .pid file ($pid_file).  Aborting...");
+    }
+    if ($log_system_enable == 1) {
+      log_system("There seems to be another SNMPTT process (pid $old_pid) running.");
+      log_system("You may want to kill it and delete the .pid file ($pid_file).  Aborting...");
+    }
+    die;
+  }
+
+  # Check to make sure we can create the .pid file if it was set by the user.
+  # If the user didn't set it, then we don't really care.
+  if ($pid_file_set) {
+    if (! (-w dirname($pid_file))) {
+      warn("pid file \'$pid_file\' is not writable.  Aborting...");
+      
+      if ($syslog_system_enable == 1) {
+        syslog_system("pid file \'$pid_file\' is not writable.  Aborting...");
+      }
+      if ($log_system_enable == 1) {
+        log_system("pid file \'$pid_file\' is not writable.  Aborting...");
+      }
+      die;
+    }
+  }
+
   $SIG{HUP} = \&signal_handler_reload;
 
   $SIG{TERM} = \&signal_handler_die;
@@ -660,14 +706,14 @@ if ($daemon == 1)
 
     # We write PID using the uid of the user that started snmptt.
     if ($pid)   # This is run in the parent process
-    {
+    {        
       if (open(PID, ">$pid_file") ) {
         print(PID "$pid\n");
         close(PID);
       }
       else {
         $pid_file = "$working_dir/snmptt.pid";
-
+        
         if (open(PID, ">$pid_file") )
         {
           print(PID "$pid\n");
@@ -4045,7 +4091,7 @@ sub loadsnmpttini {
 
   if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
   if (! defined ($daemon_uid)) { $daemon_uid = ''} ;
-  if (! defined ($pid_file)) { $pid_file = '/var/run/snmptt.pid'} ;
+  if (! defined ($pid_file)) { $pid_file = ''} ;
   if (! defined ($spool_directory)) { $spool_directory = ''} ;
   if (! defined ($sleep)) { $sleep = 5} ;
   if (! defined ($use_trap_time)) { $use_trap_time = 1} ;

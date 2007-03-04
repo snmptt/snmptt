@@ -10,6 +10,11 @@ Mar 4th, 2007: Alex Burger <alex_b@users.sourceforge.net>
   and exit.  The snmptt.pid file will contain the pid of the parent
   process.  Sending a TERM signal to either process will cause
   SNMPTT to terminate gracefully.
+- Now aborts startup if an existing snmptt.pid file is found.
+- Verifies that it is able to write to the pid_file folder before
+  starting up.  If it can not, it aborts.  Only does this if
+  pid_file has been defined.  Otherwise it attempts to create the
+  pid file and if it fails, it just continues as in previous versions.
 
 Mar 3rd, 2007: Alex Burger <alex_b@users.sourceforge.net>
 - Added a text system log in addition to the existing syslog
