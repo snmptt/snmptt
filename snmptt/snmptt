@@ -686,8 +686,15 @@ if ($daemon == 1)
 
       $daemon_uid = getpwnam($daemon_uid_name);
       if (!defined($daemon_uid))
-      {
-        syslog_system("Could not convert user id \'$daemon_uid_name\' to a numeric UID\n");
+      {        
+        warn("Could not convert user id \'$daemon_uid_name\' to a numeric UID\n");
+
+        if ($syslog_system_enable == 1) {
+          syslog_system("Could not convert user id \'$daemon_uid_name\' to a numeric UID\n");
+        }
+        if ($log_system_enable == 1) {
+          log_system("Could not convert user id \'$daemon_uid_name\' to a numeric UID\n");
+        }
       }
     }
 
@@ -696,18 +703,30 @@ if ($daemon == 1)
     {
       if ($daemon_uid_name ne '')
       {
-        syslog_system("Changing to UID: $daemon_uid_name \($daemon_uid\)");
+        if ($syslog_system_enable == 1) {
+          syslog_system("Changing to UID: $daemon_uid_name \($daemon_uid\)");
+        }
+        if ($log_system_enable == 1) {
+          log_system("Changing to UID: $daemon_uid_name \($daemon_uid\)");
+        }
+
         if ($DEBUGGING >= 1)
         {
-    print "Changing to UID: $daemon_uid_name \($daemon_uid\)\n";
+          print "Changing to UID: $daemon_uid_name \($daemon_uid\)\n";
         }
       }
       else
       {
-        syslog_system("Changing to UID: $daemon_uid");
+        if ($syslog_system_enable == 1) {
+          syslog_system("Changing to UID: $daemon_uid");
+        }
+        if ($log_system_enable == 1) {
+          log_system("Changing to UID: $daemon_uid");
+        }
+
         if ($DEBUGGING >= 1)
         {
-    print "Changing to UID: $daemon_uid\n";
+          print "Changing to UID: $daemon_uid\n";
         }
       }
 

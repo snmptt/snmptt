@@ -726,7 +726,8 @@ New</h2>
   <li>Added the ability to log system messages to a text file in addtion to the existing syslog and Event Log. &nbsp;Added&nbsp;<b>snmptt.ini</b> options <b>log_system</b> and <span style="font-weight: bold;">log_system_file</span>.</li>
   <li>Added <span style="font-weight: bold;">snmptt.ini</span> option pid_file to allow for custom pid file locations when running in daemon mode.</li>
   <li>Fixed bug where pid file did not contain the current pid of snmptt.</li>
-
+  <li>Fixed bug where snmptt tried to log to syslog when changing UIDs even if syslog_system_enable was set to 0.</li
+  
   <li>Fixed bug in threads support.&nbsp; EXEC'd commands were all
 passed the same&nbsp;command to execute.&nbsp; Threads are now properly
 detached after being created.</li>

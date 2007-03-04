@@ -1,3 +1,7 @@
+Mar 4th, 2007: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed bug where snmptt tried to log to syslog when 
+  changing UIDs even if syslog_system_enable was set to 0.
+
 Mar 3rd, 2007: Alex Burger <alex_b@users.sourceforge.net>
 - Added a text system log in addition to the existing syslog
   and Event Log logs.  Added log_system and log_system_file
