@@ -870,17 +870,20 @@ New</h2>
 <ul>
 
 
-  <li>Added the ability to log system messages to a text file in addtion to the existing syslog and Event Log. &nbsp;Added&nbsp;<b>snmptt.ini</b> options <b>log_system</b> and <span style="font-weight: bold;">log_system_file</span>.</li>
-
-  <li>Added <span style="font-weight: bold;">snmptt.ini</span> option pid_file to allow for custom pid file locations when running in daemon mode.</li>
+  <li>Added <span style="font-weight: bold;">snmptt.ini</span> option <b>pid_file</b> to allow for custom pid file locations when running in daemon mode.</li>
 
   <li>Fixed bug where pid file did not contain the current pid of snmptt.</li>
+  <li>When <b>daemon_uid</b> is used, two processes will now be spawned.  The first process will be run as the same
+  user that started SNMPTT (which should be root).  The second will run as the <b>daemon_uid</b> user.  This was
+  changed so that SNMPTT could properly clean up the pid file on exit.</li>
 
   <li>Fixed bug where snmptt tried to log to syslog when changing UIDs even if syslog_system_enable was set to 0.</li>
+  <li>Added the ability to log system messages to a text file in addtion to the existing syslog and Event Log. &nbsp;Added&nbsp;<b>snmptt.ini</b> options <b>log_system</b> and <span style="font-weight: bold;">log_system_file</span>.</li>
   <li>Fixed bug in threads support.&nbsp; EXEC'd commands were all
 passed the same&nbsp;command to execute.&nbsp; Threads are now properly
 detached after being created.</li>
-
+  <li>Added a work-around to the Net-SNMP v5.4 traphandle bug (1638225) where the host name was set to &lt;UNKNOWN&gt;.  
+      When detected, SNMPTT will use the host IP address instead.</li>
 
   <li>Added information to Nagios section of documentation for using SNMP traps as heartbeats by using freshness checks.</li>
 
@@ -2621,52 +2624,38 @@ load</li>
 
 <h2><a id="Upgrading" name="Upgrading"></a>Upgrading</h2>
 
-
-
-
-<h3><b>v1.2beta1 to v1.2beta2</b></h3>
-
-
-
-
-<p>To upgrade from v1.2beta1 to v1.2beta2, you should:</p>
-
-
-
-
+<h3><b>v1.2beta2 to v1.2beta3</b></h3>
+<p>To upgrade from v1.2beta2 to v1.2beta3, you should:</p>
 <ol>
-
-
-
-
-  <li>Replace <b>snmptt</b> with the new version
-contained in the v1.2beta2 package.&nbsp; Make sure the file is
-executable (<b>chmod +x <i>snmptt</i></b>).</li>
-
-
-
-
+  <li>Replace <b>snmptt</b> and <b>snmpttconvertmib</b> with the new versions
+contained in the v1.2beta3 package.&nbsp; Make sure the files are
+executable (<b>chmod +x <i>filename</i></b>).</li>
   <li>Backup your <b>snmptt.ini</b> file, replace it
 with the new version, and make any necessary configuration changes to
 it.</li>
-
-
-
-
   <li>Enable any new features in <b>snmptt.ini</b>
 as required.</li>
+  <li>For Linux and Unix (or anything non-Windows), if you are using the <b>daemon_uid</b> option in <b>snmptt.ini</b>,
+  and are monitoring the availability of snmptt by checking for the snmptt process, be aware that there will now be
+  two snmptt processes running instead of one.</li>
+</ol>
 
 
-
-
+<h3><b>v1.2beta1 to v1.2beta2</b></h3>
+<p>To upgrade from v1.2beta1 to v1.2beta2, you should:</p>
+<ol>
+  <li>Replace <b>snmptt</b> with the new version
+contained in the v1.2beta2 package.&nbsp; Make sure the file is
+executable (<b>chmod +x <i>snmptt</i></b>).</li>
+  <li>Backup your <b>snmptt.ini</b> file, replace it
+with the new version, and make any necessary configuration changes to
+it.</li>
+  <li>Enable any new features in <b>snmptt.ini</b>
+as required.</li>
   <li>For Linux and Unix (or anything non-Windows), the <b>snmptt.ini</b>
     <b>exec_escape</b> option is enabled by default which
 will escape wildcard characters (* and ?) for EXEC, PREEXEC and the
 unknown_trap_exec commands. Disable if required.</li>
-
-
-
-
 </ol>
 
 

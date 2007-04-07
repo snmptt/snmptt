@@ -3101,6 +3101,11 @@ sub readtrap
   $tempvar[1] =~ /(\d+\.\d+\.\d+\.\d+)/;
   $tempvar[1] = $1;
 
+  # Net-SNMP 5.4 has a bug which gives <UNKNOWN> for the hostname
+  if ($tempvar[0] =~ /<UNKNOWN>/) {
+    $tempvar[0] = $tempvar[1];
+  }
+
   #Process varbinds
   #Separate everything out, keeping both the variable name and the value
   my $linenum = 1;

@@ -1,15 +1,22 @@
+Apr 6th, 2007: Alex Burger <alex_b@users.sourceforge.net>
+- Add workaround to Net-SNMP 5.4 bug 1638225 where the host name passed
+  in the traphandle is <UNKNOWN>.
+
 Mar 4th, 2007: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug where snmptt tried to log to syslog when 
   changing UIDs even if syslog_system_enable was set to 0.
 - The snmptt.pid file is now deleted when SNMPTT exits gracefully.
-- When running in daemon mode with a daemon_uid user defined,
-  a child snmptt process will be started as the daemon_uid user.
+- When running in daemon mode with a daemon_uid user defined, a
+  second (child) process will be started as the daemon_uid user so
+  there will be two snmptt processes running.
   The first process will continue to run as the user that ran
   snmptt (usually root), waiting for the child to quit.  After the
   child quits, the parent process will remove the snmptt.pid file 
   and exit.  The snmptt.pid file will contain the pid of the parent
   process.  Sending a TERM signal to either process will cause
   SNMPTT to terminate gracefully.
+  If you are not starting snmptt using root, then you should not
+  be defining daemon_uid.
 - Now aborts startup if an existing snmptt.pid file is found.
 - Verifies that it is able to write to the pid_file folder before
   starting up.  If it can not, it aborts.  Only does this if
