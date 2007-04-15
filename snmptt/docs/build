@@ -1,6 +1,6 @@
-Jan 3th, 2006
+April 15th, 2007
 
-snmptt_1.2beta2.tgz:
+snmptt_1.2beta3.tgz:
 
 -fresh cvs checkout
 
@@ -25,11 +25,11 @@ snmptt_1.2beta2.tgz:
 
 -commit changes to CVS
 -check out fresh copy
--tag with new version: cvs ... tag snmptt_1-2beta2
+-tag with new version: cvs ... tag snmptt_1-2beta3
 
 cd snmptt
-find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.2beta2
-cd ../snmptt_1.2beta2
+find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.2beta3
+cd ../snmptt_1.2beta3
 su
 rm -f docs/build
 chmod -R 664 *
@@ -44,8 +44,8 @@ chmod +x snmptthandler
 chmod +x snmptt-net-snmp-test
 chown root.root * -R
 cd ..
-chmod 775 snmptt_1.2beta2
-tar cvfz snmptt_1.2beta2.tgz snmptt_1.2beta2
+chmod 775 snmptt_1.2beta3
+tar cvfz snmptt_1.2beta3.tgz snmptt_1.2beta3
 
 SourceForge:
 -upload file
