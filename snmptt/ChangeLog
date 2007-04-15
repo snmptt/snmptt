@@ -1,4 +1,7 @@
 Apr 6th, 2007: Alex Burger <alex_b@users.sourceforge.net>
+- Release snmptt_1.2beta3
+
+Apr 6th, 2007: Alex Burger <alex_b@users.sourceforge.net>
 - Add workaround to Net-SNMP 5.4 bug 1638225 where the host name passed
   in the traphandle is <UNKNOWN>.
 
