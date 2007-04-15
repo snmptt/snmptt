@@ -868,9 +868,6 @@ New</h2>
 
 
 <ul>
-
-
-  <li>Added workaround to <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1638225&group_id=12694&atid=112694">Net-SNMP 5.4 bug 1638225</a> where the host name passed in the traphandle is &lt;UNKNOWN&gt;.</li>
   <li>Added <span style="font-weight: bold;">snmptt.ini</span> option <b>pid_file</b> to allow for custom pid file locations when running in daemon mode.</li>
 
   <li>Fixed bug where pid file did not contain the current pid of snmptt.</li>
@@ -883,7 +880,7 @@ New</h2>
   <li>Fixed bug in threads support.&nbsp; EXEC'd commands were all
 passed the same&nbsp;command to execute.&nbsp; Threads are now properly
 detached after being created.</li>
-  <li>Added a work-around to the Net-SNMP v5.4 traphandle bug (1638225) where the host name was set to &lt;UNKNOWN&gt;.  
+  <li>Added a work-around to the <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1638225&group_id=12694&atid=112694">Net-SNMP v5.4 traphandle bug (1638225)</a> where the host name was set to &lt;UNKNOWN&gt;.  
       When detected, SNMPTT will use the host IP address instead.</li>
 
   <li>Added information to Nagios section of documentation for using SNMP traps as heartbeats by using freshness checks.</li>
