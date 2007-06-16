@@ -4029,39 +4029,22 @@ privileges.&nbsp; Running with a non privileged account can help
 restrict what
 actions can occur when using features such as <span style="font-weight: bold;">EXEC</span> and <span style="font-weight: bold;">REGEX</span>.<br />
 
-
-
-
   <br />
 
-
-
-
-For Linux and Unix, a user called '<span style="font-weight: bold;">snmptt</span>'
+For Linux and Unix, if you start SNMPTT as root, a user called '<span style="font-weight: bold;">snmptt</span>'
 should be created and the <span style="font-weight: bold;">snmptt.ini</span>
 option <span style="font-weight: bold;">daemon_uid</span>
-set to the numerical user id (eg: 500)
-or textual user id (snmptt).<br />
+should be set to the numerical user id (eg: 500)
+or textual user id (snmptt).  <b>Only define daemon_uid if starting snmptt using root.</b><br />
+  <br />
 
-
-
+  If you start SNMPTT as a non-root user, then <b>daemon_uid</b> is not required (and will probably not work).<br />
 
   <br />
 
-
-
-
-Before forking to the background in daemon mode, SNMPTT will change to
-the
-defined user id.&nbsp; If the system syslog (<span style="font-weight: bold;">syslog_system_enable</span>)
-is enabled, a message will
-be logged stating the user id has been changed.&nbsp; All
-processing from that
-point on will be as the new user id.&nbsp; This can be verified by
-checking
-the user id in the syslog for traps and system messages.&nbsp; For
-example, if
-the user id was changed to 500, the syslog would contain entries with
+  When using <b>daemon_uid</b> in daemon mode, there will be two SNMPTT processes.  The first will run as root and will be responsible for creating the .pid file, and for cleaning up the .pid file on exit.  The second process will run as the user defined by <b>daemon_uid</b>.  If the system syslog (<span style="font-weight: bold;">syslog_system_enable</span>)
+is enabled, a message will be logged stating the user id has been changed.  All processing from that point on will be as the new user id.  This can be verified by checking the user id in the syslog for traps and system messages.  For
+example, if the user id was changed to 500, the syslog would contain entries with
   <span style="font-weight: bold;">snmptt[500]</span>.&nbsp;
 When running as
 root, entries will contain <span style="font-weight: bold;">snmptt[0]</span>.<br />
