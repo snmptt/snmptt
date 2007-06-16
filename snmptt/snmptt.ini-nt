@@ -1,5 +1,5 @@
 #
-# SNMPTT v1.2beta3 Configuration File
+# SNMPTT v1.2 Configuration File
 #
 # Windows NT
 #
@@ -189,6 +189,8 @@ description_mode = 0
 # or SNMPTT.CONF description when description_mode is set to 1 or 2.
 description_clean = 1
 
+# Warning: Experimental.  Not recommended for production environments.
+#          When threads are enabled, SNMPTT may quit unexpectedly.
 # Set to 1 to enable threads (ithreads) in Perl 5.6.0 or higher.  If enabled,
 # EXEC will launch in a thread to allow SNMPTT to continue processing other
 # traps.  See also threads_max.
@@ -196,6 +198,8 @@ description_clean = 1
 # Defaults to 0
 threads_enable = 0
 
+# Warning: Experimental.  Not recommended for production environments.
+#          When threads are enabled, SNMPTT may quit unexpectedly.
 # This option allows you to set the maximum number of threads that will 
 # execute at once.  Defaults to 10
 threads_max = 10
