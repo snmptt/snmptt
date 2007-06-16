@@ -1,98 +1,101 @@
 <!--#include virtual="/page-top.html" -->
 <!-- CONTENT START -->
 
-<h1>SNMP Trap Translator v1.1</h1>
-<b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br>
-This file was last updated on:&nbsp;January 17th, 2006
+<h1>SNMP Trap Translator v1.2</h1>
+<b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
+This file was last updated on: June 16th, 2007
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
-<blockquote><a href="#What-is-it">What is it?</a><br>
-<a href="#Downloading">Downloading</a><br>
-<a href="#Requirements">Requirements</a><br>
-<a href="#Whats-New">What's New</a><br>
-<a href="#Upgrading">Upgrading</a><br>
-<a href="#Installation-Overview">Installation</a><br>
+<blockquote><a href="#What-is-it">What is it?</a><br />
+<a href="#Downloading">Downloading</a><br />
+<a href="#Requirements">Requirements</a><br />
+<a href="#Whats-New">What's New</a><br />
+<a href="#Upgrading">Upgrading</a><br />
+<a href="#Installation-Overview">Installation</a><br />
 <b>&nbsp;&nbsp;</b> <a href=
-"#Installation-Overview">Overview</a><br>
-<b>&nbsp;&nbsp;</b> <a href="#Installation-Unix">Unix</a><br>
-<b>&nbsp;&nbsp;</b> <a href="#Installation-Windows">Windows</a><br>
+"#Installation-Overview">Overview</a><br />
+<b>&nbsp;&nbsp;</b> <a href="#Installation-Unix">Unix</a><br />
+<b>&nbsp;&nbsp;</b> <a href=
+"#Installation-Windows">Windows</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#SecuringSNMPTT">Securing
-SNMPTT</a><br>
+SNMPTT</a><br />
 <a href="#Configuration-Options">Configuration Options -
-snmptt.ini</a><br>
-<a href="#LoggingStandard">Logging</a><br>
-<b>&nbsp;&nbsp;</b> <a href="#LoggingStandard">Standard</a><br>
-<b>&nbsp;&nbsp;</b> <a href="#LoggingUnknown">Unknown Traps</a><br>
-<b>&nbsp;&nbsp;</b> <a href="#LoggingSyslog">Syslog</a><br>
-<b>&nbsp;&nbsp;</b> <a href="#LoggingEventLog">EventLog</a><br>
-<b>&nbsp;&nbsp;</b> <a href="#LoggingDatabase">Database</a><br>
+snmptt.ini</a><br />
+<a href="#LoggingStandard">Logging</a><br />
+<b>&nbsp;&nbsp;</b> <a href="#LoggingStandard">Standard</a><br />
+<b>&nbsp;&nbsp;</b> <a href="#LoggingUnknown">Unknown
+Traps</a><br />
+<b>&nbsp;&nbsp;</b> <a href="#LoggingSyslog">Syslog</a><br />
+<b>&nbsp;&nbsp;</b> <a href="#LoggingEventLog">EventLog</a><br />
+<b>&nbsp;&nbsp;</b> <a href="#LoggingDatabase">Database</a><br />
 <b>&nbsp;&nbsp; &nbsp;</b> <a href=
-"#LoggingDatabase-MySQL">MySQL</a><br>
+"#LoggingDatabase-MySQL">MySQL</a><br />
 <b>&nbsp;&nbsp; &nbsp;</b> <a href=
-"#LoggingDatabase-PostgreSQL">PostgreSQL</a><br>
+"#LoggingDatabase-PostgreSQL">PostgreSQL</a><br />
 <b>&nbsp;&nbsp; &nbsp;</b> <a href=
-"#LoggingDatabase-ODBC">ODBC</a><br>
+"#LoggingDatabase-ODBC">ODBC</a><br />
 <b>&nbsp;&nbsp; &nbsp;</b> <a href=
-"#LoggingDatabase-Windows_ODBC">Windows ODBC</a><br>
+"#LoggingDatabase-Windows_ODBC">Windows ODBC</a><br />
 <a href="#Executing-an-external-program">Executing an external
-program</a><br>
-<a href="#Modes-of-Operation">Modes of Operation</a><br>
-<a href="#Command-line-arguments">Command line arguments</a><br>
+program</a><br />
+<a href="#Modes-of-Operation">Modes of Operation</a><br />
+<a href="#Command-line-arguments">Command line arguments</a><br />
 <a href="#SNMPTT.CONF-Configuration-file-format">SNMPTT.CONF
-Configuration file format</a><br>
-&nbsp;&nbsp; <a href="#SNMPTT.CONF-EVENT">EVENT</a><br>
-&nbsp;&nbsp; <a href="#SNMPTT.CONF-FORMAT">FORMAT</a><br>
+Configuration file format</a><br />
+&nbsp;&nbsp; <a href="#SNMPTT.CONF-EVENT">EVENT</a><br />
+&nbsp;&nbsp; <a href="#SNMPTT.CONF-FORMAT">FORMAT</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href=
-"#Variable-substitutions">Variable-substitutions</a><br>
-&nbsp;&nbsp; <a href="#SNMPTT.CONF-EXEC">EXEC</a><br>
-&nbsp;&nbsp; <a href="#SNMPTT.CONF-PREEXEC">PREEXEC</a><br>
-&nbsp;&nbsp; <a href="#SNMPTT.CONF-NODES">NODES</a><br>
-&nbsp;&nbsp; <a href="#SNMPTT.CONF-MATCH">MATCH</a><br>
-&nbsp;&nbsp; <a href="#SNMPTT.CONF-REGEX">REGEX</a><br>
-&nbsp;&nbsp; <a href="#SNMPTT.CONF-SDESC">SDESC</a><br>
-&nbsp;&nbsp; <a href="#SNMPTT.CONF-EDESC">EDESC</a><br>
+"#Variable-substitutions">Variable-substitutions</a><br />
+&nbsp;&nbsp; <a href="#SNMPTT.CONF-EXEC">EXEC</a><br />
+&nbsp;&nbsp; <a href="#SNMPTT.CONF-PREEXEC">PREEXEC</a><br />
+&nbsp;&nbsp; <a href="#SNMPTT.CONF-NODES">NODES</a><br />
+&nbsp;&nbsp; <a href="#SNMPTT.CONF-MATCH">MATCH</a><br />
+&nbsp;&nbsp; <a href="#SNMPTT.CONF-REGEX">REGEX</a><br />
+&nbsp;&nbsp; <a href="#SNMPTT.CONF-SDESC">SDESC</a><br />
+&nbsp;&nbsp; <a href="#SNMPTT.CONF-EDESC">EDESC</a><br />
 <a href="#SNMPTT.CONF-Configuration-file-Notes">SNMPTT.CONF
-Configuration file Notes</a><br>
-<a href="#DNS">Name resolution / DNS</a><br>
+Configuration file Notes</a><br />
+<a href="#DNS">Name resolution / DNS</a><br />
 <a href="#Sample1-SNMPTT.CONF-file">Sample1 SNMPTT.CONF
-file</a><br>
+file</a><br />
 <a href="#Sample2-SNMPTT.CONF-file">Sample2 SNMPTT.CONF
-file</a><br>
-<a href="#Notes">Notes</a><br>
-<a href="#Limitations">Limitations</a><br>
-<a href="#Feedback">Feedback &amp; Bugs</a><br>
+file</a><br />
+<a href="#Notes">Notes</a><br />
+<a href="#Limitations">Limitations</a><br />
+<a href="#Feedback">Feedback &amp; Bugs</a><br />
 <a href="#Integration-with-other-software">Integration with other
-software</a><br>
+software</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#Nagios-Netsaint">Nagios /
-Netsaint</a><br>
+Netsaint</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#SEC">Simple Event Correlator
-(SEC)</a><br>
+(SEC)</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#EventWin">Windows Event Log
-forwarding</a><br>
+forwarding</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#Hobbit">Hobbit</a></blockquote>
-<br>
+<br />
 <h2><a id="License" name="License"></a>License</h2>
-<p>Copyright 2002-2006 Alex Burger<br>
-alex_b@users.sourceforge.net<br>
+<p>Copyright 2002-2007 Alex Burger<br />
+alex_b@users.sourceforge.net<br />
 4/3/2002</p>
 <p>This program is free software; you can redistribute it and/or
-modify<br>
+modify<br />
 it under the terms of the GNU General Public License as published
-by<br>
+by<br />
 the Free Software Foundation; either version 2 of the License,
-or<br>
+or<br />
 (at your option) any later version.</p>
 <p>This program is distributed in the hope that it will be
-useful,<br>
-but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
+useful,<br />
+but WITHOUT ANY WARRANTY; without even the implied warranty
+of<br />
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.&nbsp; See
-the<br>
+the<br />
 GNU General Public License for more details.</p>
 <p>You should have received a copy of the GNU General Public
-License<br>
-along with this program; if not, write to the Free Software<br>
+License<br />
+along with this program; if not, write to the Free Software<br />
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA&nbsp;
-02111-1307&nbsp; USA<br>
+02111-1307&nbsp; USA<br />
 &nbsp;</p>
 <h2><a id="What-is-it" name="What-is-it"></a>What is it?</h2>
 <p>SNMPTT (SNMP Trap Translator) is an SNMP trap handler written in
@@ -169,17 +172,17 @@ emails etc</li>
 replace on the translated message such as translating the variable
 value "Building alarm 4" to "Moisture detection alarm"</li>
 </ul>
-<br>
+<br />
 <h2><a id="Downloading" name="Downloading"></a>Downloading</h2>
 <p>SNMPTT can be downloaded from <a href=
 "http://www.sourceforge.net/projects/snmptt">http://www.sourceforge.net/projects/snmptt</a></p>
 <h2><a id="Requirements" name="Requirements"></a>Requirements</h2>
 <ul>
 <li>Perl 5.6.1 or higher.&nbsp; SNMPTT is developed with 5.6.1 and
-5.8.0, but other versions may also work.<br></li>
+5.8.0, but other versions may also work.<br /></li>
 <li>Required: <a href="http://www.net-snmp.org">Net-SNMP</a>
 (formerly known as UCD-SNMP).&nbsp; Specifically
-<b>snmptrapd.</b><br></li>
+<b>snmptrapd.</b><br /></li>
 <li>Required: <a href=
 "http://search.cpan.org/search?module=Text::ParseWords">Text::ParseWords</a>
 module (included with most distributions including ActivePerl)</li>
@@ -197,6 +200,18 @@ module</li>
 "http://search.cpan.org/search?module=Time::HiRes">Time::HiRes</a>
 module (only required when using SNMPTT in daemon mode - required
 by <b>snmptthandler</b>)</li>
+<li>Required: <a href=
+"http://search.cpan.org/search?module=Sys::Hostname">Sys::Hostname</a>
+module (included with most if not all distributions including
+ActivePerl).</li>
+<li>Required: <a href=
+"http://search.cpan.org/search?module=File::Basename">File::Basename</a>
+module (included with most if not all distributions including
+ActivePerl).</li>
+<li>Required:&nbsp;<a href=
+"http://search.cpan.org/search?module=Text::Balanced">Text::Balanced</a>
+module (included with most if not all distributions including
+ActivePerl).</li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=Socket">Socket</a> module
 (included with most if not all distributions including ActivePerl).
@@ -207,14 +222,15 @@ module (included with most Unix distributions). Required for Syslog
 support.</li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBI">DBI</a> module.&nbsp;
-Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support.<br></li>
+Required for DBD::MySQL, DBD::PgPP and DBD::ODBC
+support.<br /></li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBD::mysql">DBD::mysql</a>
-module.&nbsp; Required for MySQL support.<br></li>
+module.&nbsp; Required for MySQL support.<br /></li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBD::PgPP">DBD::PgPP</a> or
 <a href="http://search.cpan.org/search?dist=DBD-Pg">DBD:Pg</a>
-module.&nbsp; Required for PostgreSQL support.<br></li>
+module.&nbsp; Required for PostgreSQL support.<br /></li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBD::ODBC">DBD::ODBC</a>
 module.&nbsp; Required for ODBC (SQL etc) access on Linux / Windows
@@ -231,11 +247,18 @@ Net-SNMP 5.0.8+ with <a href=
 "http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
 patch 722075</a>, or Net-SNMP 5.1.1 or higher is
 recommended.&nbsp;&nbsp; This is NOT the same as the Net::SNMP
-module availabe from CPAN.<br></li>
+module availabe from CPAN.</li>
+<li>Optional: <a href=
+"http://search.cpan.org/search?module=threads">threads</a> and
+<a href=
+"http://search.cpan.org/search?query=thread&amp;mode=all">Thread</a>
+module (included with most if not all distributions including
+ActivePerl).&nbsp; Required when enabling threads for EXEC
+statements.</li>
 </ul>
-<p>All development and testing was done with Linux, Windows 2000
-and various versions of Net-SNMP from UCD SNMP v4.2.1 to the
-current Net-SNMP 5.1.x release. The Windows version has been tested
+<p>All development and testing was done with Linux, Windows 2000 or
+higher and various versions of Net-SNMP from UCD SNMP v4.2.1 to the
+current Net-SNMP 5.4.x release. The Windows version has been tested
 with both native mode and under Cygwin.</p>
 <p>Both SNMP V1 and V2 traps have been tested.</p>
 <p>Net-SNMP 5.1.1 or higher is recommended.</p>
@@ -253,6 +276,86 @@ you enable the options <b>translate_integers</b>,
 <b>translate_trap_oid</b> or <b>translate_oids</b>. Although not
 required, using the Perl module is recommended.</blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
+<h3><b>v1.2</b> <b>- June 16th, 2007</b></h3>
+<ul>
+<li>When <b>daemon_uid</b> is used, two processes will now be
+spawned. The first process will be run as the same user that
+started SNMPTT (which should be root). The second will run as the
+<b>daemon_uid</b> user. This was changed so that SNMPTT could
+properly clean up the pid file on exit.</li>
+<li>Added <span style="font-weight: bold;">snmptt.ini</span> option
+<b>pid_file</b> to allow for custom pid file locations when running
+in daemon mode.</li>
+<li>Fixed bug where pid file did not contain the current pid of
+snmptt.</li>
+<li>Added <b>snmptt.ini</b> options <b>date_format</b>,
+<b>time_format</b>, <b>date_time_format</b>,
+<b>date_time_format_sql</b> and <b>stat_time_format_sql</b> to
+allow the output format for <b>$x</b> and <b>$X</b> substitution
+variables, and the format of the date/time for text logs and SQL to
+be changed using <b>strftime()</b> variables. This allows for
+proper date/time data types to be used in SQL databases.</li>
+<li>Added logging of trap statistics to a SQL table. Added
+<b>*table_statistics</b> <b>snmptt.ini</b> variable to define the
+table to be used.</li>
+<li>Added ability to add custom columns to <b>*_table</b> and
+<b>*_table_unknown</b> tables. Added <b>sql_custom_columns</b> and
+<b>sql_custom_columns_unknown</b> <b>snmptt.ini</b> options.</li>
+<li>Added <b>snmptt.ini</b> option <b>unknown_trap_exec_format</b>
+to allow custom output with substitutions.</li>
+<li>Added the ability to log system messages to a text file in
+addtion to the existing syslog and Event Log.
+&nbsp;Added&nbsp;<b>snmptt.ini</b> options <b>log_system</b> and
+<span style="font-weight: bold;">log_system_file</span>.</li>
+<li>Added a work-around to the <a href=
+"http://sourceforge.net/tracker/index.php?func=detail&amp;aid=1638225&amp;group_id=12694&amp;atid=112694">
+Net-SNMP v5.4 traphandle bug (1638225)</a> where the host name was
+set to &lt;UNKNOWN&gt;. When detected, SNMPTT will use the host IP
+address instead.</li>
+<li>Added a <b>$H</b> variable substitution to give the host name
+of the computer that is running SNMPTT, or a user defined value
+specified in the new <b>snmptt_system_name</b> <b>snmptt.ini</b>
+option.</li>
+<li>Added MATCH support for bitwise AND</li>
+<li>Added <b>snmptt.ini</b> option <b>exec_escape</b> to escape
+wildards (* and ?) in EXEC, PREEXEC and the unknown_trap_exec
+commands. This is enabled by default for Linux and Unix (or
+anything non-Windows) to prevent the wildcards from being expanded
+by the shell.</li>
+<li>Moved <b>unknown_trap_exec</b> to Exec section in
+<b>snmptt.ini</b>.</li>
+<li>Added 'use strict' pragma in source code.</li>
+<li>Experimental: &nbsp;Added threads (Perl ithreads) support for
+EXEC. When enabled, EXEC commands will launch in a thread to allow
+SNMPTT to continue processing other traps. Added <b>snmptt.ini</b>
+options <b>threads_enable</b> and <b>threads_max</b>.</li>
+<li>Fixed bug where snmptt tried to log to syslog when changing
+UIDs even if syslog_system_enable was set to 0.</li>
+<li>Fixed a bug in REGEX with handling of captures.
+&nbsp;Text::Balanced module is now required.</li>
+<li>Fixed a bug under Windows where SNMPTT was trying to log to
+syslog instead of the event log.</li>
+<li>Fixed a bug where SNMPTT was attempting to log to syslog /
+eventlog when using the --time option.</li>
+<li>Fixed a bug in MATCH where the i modifier was not handled
+correctly.</li>
+<li>Added information to Nagios section of documentation for using
+SNMP traps as heartbeats by using freshness checks.</li>
+<li>Added information to Nagios section of documentation for using
+freshness checks to automatically clear trap alerts.</li>
+<li>SNMPTTConvertMIB:</li>
+<li style=
+"list-style-type: none; list-style-image: none; list-style-position: outside;">
+<ul>
+<li>Fixed a bug (1438794) where a TRAP-TYPE / NOTIFICATION-TYPE
+line would not translate if it was split across two lines.</li>
+<li>Fixed a bug (1438394) where ARGUMENTS lines that have $1, $2
+etc instead of %0, %1 would not translate.</li>
+<li>Fixed a bug where a --#SEVERITYMAP line would be used instead
+of --#SEVERITY.</li>
+</ul>
+</li>
+</ul>
 <h3><b>v1.1</b> <b>- January 17th, 2006</b></h3>
 <ul>
 <li>Added <b>PREEXEC</b> <b>snmptt.conf</b> file option to allow an
@@ -297,7 +400,8 @@ accepted on the EVENT line.</li>
 <li>Added Windows Event Log forwarding documentation to integration
 section.</li>
 <li>SNMPTTConvertMIB:</li>
-<li style="list-style: none">
+<li style=
+"list-style-type: none; list-style-image: none; list-style-position: outside;">
 <ul>
 <li>Fixed a bug when <b>--format_desc=n</b> was used that caused
 extra trailing whitespaces to be added for every non existent line
@@ -346,7 +450,7 @@ ignored</b> and <b>total unknown traps</b>. Statistics are logged
 at shut down, and optionally at a defined interval defined by the
 new <b>snmptt.ini</b> variable <b>statistics_interval</b>. Logging
 can also be forced by sending the SIGUSR1 signal, or by creating a
-file called !statistics in the spool folder.<br></li>
+file called !statistics in the spool folder.<br /></li>
 <li>Added the error number reported by MySQL to MySQL errors
 (system syslog, eventlog etc)</li>
 <li>Added <b>/usr/local/etc/snmp</b> and <b>/usr/local/etc</b>
@@ -361,7 +465,8 @@ lines</li>
 <li>Added <a href="http://kodu.neti.ee/%7Eristo/sec/">Simple Event
 Correlator (SEC)</a> integration documentation</li>
 <li>SNMPTTConvertMIB:</li>
-<li style="list-style: none">
+<li style=
+"list-style-type: none; list-style-image: none; list-style-position: outside;">
 <ul>
 <li>Fixed bug that prevented the variable list (OBJECTS) of V2 MIB
 files from being converted</li>
@@ -379,19 +484,19 @@ spaces after the closing bracket</li>
 "font-weight: bold;">TRAPD</span> for traps, and <span style=
 "font-weight: bold;">snmptt-sys[<span style=
 "font-style: italic;">pid</span>]</span> instead of <span style=
-"font-weight: bold;">SNMPTT</span> for system messages<br></li>
+"font-weight: bold;">SNMPTT</span> for system messages<br /></li>
 <li>Added the option <span style=
 "font-weight: bold;">daemon_uid</span> which causes <span style=
 "font-weight: bold;">snmptt</span> to change to a different user
 (uid) after launching on Unix systems running in daemon
-mode<br></li>
+mode<br /></li>
 <li>Fixed bug that prevented ip addresses from being detected
 correctly with <span style=
-"font-weight: bold;">translate_value_oids</span><br></li>
+"font-weight: bold;">translate_value_oids</span><br /></li>
 <li>Fixed bug with MATCH that caused integer ranges from not being
 handled correctly</li>
 <li>Separated SNMPTT, SNMPTTCONVERT, SNMPTTCONVERTMIB and FAQ /
-Troubleshooting documentation into separate documents<br></li>
+Troubleshooting documentation into separate documents<br /></li>
 </ul>
 <h3><b>0.8</b> <b>-</b> <b>September 16th</b><b>, 2003</b></h3>
 <ul>
@@ -404,7 +509,7 @@ substitution with captures and the modifiers <span style=
 "font-weight: bold;">g</span> and <span style=
 "font-weight: bold;">e</span>.&nbsp; The <span style=
 "font-weight: bold;">e</span> modifier allows for complex REGEX
-expressions.<br></li>
+expressions.<br /></li>
 <li>Added support for <span style=
 "font-weight: bold;">remote</span> MySQL and PostgreSQL
 databases</li>
@@ -415,18 +520,18 @@ databases</li>
 <li>Added the option <span style=
 "font-weight: bold;">dynamic_nodes</span> to allow NODES files to
 be either loaded at startup or loaded each time an EVENT is
-processed<br></li>
+processed<br /></li>
 <li>Added <span style="font-weight: bold;">trapoid</span> column
 for database logging to contain the actual trap received.&nbsp; The
 <span style="font-weight: bold;">eventid</span> column will contain
 the actual matched entry from the .conf file (which could be a
-wildcard OID)<br></li>
+wildcard OID)<br /></li>
 <li>Fixed bug that prevented some variables from displaying the
 correct values because the received trap OID was replaced with the
-actual EVENT entry<br></li>
+actual EVENT entry<br /></li>
 <li>Fixed bug that caused OIDs not to be translated correctly with
 <span style="font-weight: bold;">translate_value_oids</span>
-enabled<br></li>
+enabled<br /></li>
 <li>Agent IP address is now used instead of 'host' IP address for
 NODES matches, the 'hostname' column in database logs and the
 <span style="font-weight: bold;">$A</span> variable</li>
@@ -441,13 +546,13 @@ the trap in symbolic form.&nbsp; <span style=
 "font-weight: bold;">$o</span> prints the numeric OID</li>
 <li>Added new variable substitution <b>$i</b> to print the actual
 matched entry from the .conf file (which could be a wildcard
-OID)<br></li>
+OID)<br /></li>
 <li>Added the configuration option <span style=
 "font-weight: bold;">dns_enable</span> to enable DNS lookups on
 host and agent IP addresses</li>
 <li>If DNS is enabled, NODES entries are resolved to IP addresses
 and the IP address is used to perform the match.&nbsp; This will
-allow for aliases to be used.<br></li>
+allow for aliases to be used.<br /></li>
 <li>Added the option <span style=
 "font-weight: bold;">resolve_value_ip_addresses</span> to resolve
 ip addresses contained inside enterprise variable values</li>
@@ -456,13 +561,13 @@ ip addresses contained inside enterprise variable values</li>
 "font-weight: bold;">translate_log_trap_oid</span></li>
 <li>Changed snmptt.ini setting <span style=
 "font-weight: bold;">translate_oids</span> to <span style=
-"font-weight: bold;">translate_value_oids</span><br></li>
+"font-weight: bold;">translate_value_oids</span><br /></li>
 <li>Added configuraiton settings: <span style=
 "font-weight: bold;">translate_enterprise_oid_format,
 translate_trap_oid_format,</span> <span style=
 "font-weight: bold;">translate_varname_oid_format</span> and
 <span style=
-"font-weight: bold;">db_translate_enterprise</span><br></li>
+"font-weight: bold;">db_translate_enterprise</span><br /></li>
 <li><span style="font-weight: bold;">$O</span> follows <span style=
 "font-weight: bold;">translate_trap_oid_format</span>, and
 <span style="font-weight: bold;">$o</span> is always the numerical
@@ -478,14 +583,14 @@ setting</li>
 report the correct number of enterprise variables (was 1 lower than
 it should have been)</li>
 <li>Fixed bug with handling traps that contain quoted values that
-span multiple lines<br></li>
+span multiple lines<br /></li>
 <li>PID file now created (/var/run/snmptt.pid or ./snmptt.pid) when
 running in daemon mode on Linux / Unix.&nbsp; snmptt-init.d script
 updated to remove the pid file when shutting down snmptt.</li>
 <li>Added <a href="http://www.nagios.org">Nagios</a> / <a href=
 "http:/www.netsaint.org">Netsaint</a> integration
 documentation</li>
-<li>Added contrib folder<br></li>
+<li>Added contrib folder<br /></li>
 <li>Snmpttconvertmib</li>
 <li style=
 "list-style-type: none; list-style-image: none; list-style-position: outside;">
@@ -497,7 +602,7 @@ set.&nbsp; When using <span style=
 the Syntax (INTEGER, OCTETSTR etc) and Description.&nbsp; If it's
 an INTEGER, will also print out the enumeration tags if any
 exist.</li>
-<li>Improved compatability with MIB files<br></li>
+<li>Improved compatability with MIB files<br /></li>
 </ul>
 </li>
 </ul>
@@ -507,14 +612,14 @@ exist.</li>
 "font-size: 12pt; font-family: &quot;Times New Roman&quot;;">possibility</span>
 of injected commands contained in traps from being executed when
 using the <span style="font-weight: bold;">EXEC</span>
-feature<br></li>
+feature<br /></li>
 <li>Added the ability for traps passed from <span style=
 "font-weight: bold;">snmptrapd</span> or loaded from the
 <span style="font-weight: bold;">snmptt.conf</span> files to
 contain symbolic OIDs such as <span style=
 "font-weight: bold;">linkDown</span> and <span style=
 "font-weight: bold;">IF-MIB::linkUp</span>.&nbsp; This feature
-requires the UCD-SNMP / Net-SNMP Perl module<br></li>
+requires the UCD-SNMP / Net-SNMP Perl module<br /></li>
 <li>Added the configuration options <b>translate_trap_oid</b> and
 <span style="font-weight: bold;">translate_oids</span> to have the
 trap OID and OID values contained in the trap variables converted
@@ -525,10 +630,10 @@ DBD::PgPP</li>
 <li>Added <span style="font-weight: bold;">REGEX</span> keyword
 support to allow user definable search and replace on <span style=
 "font-weight: bold;">FORMAT</span> / <span style=
-"font-weight: bold;">EXEC</span> lines<br></li>
+"font-weight: bold;">EXEC</span> lines<br /></li>
 <li><span style="font-weight: bold;">NODES</span> entry can now
 contain a CIDR address (eg: 192.168.10.0/23), or a network range
-(192.168.10.0-192.168.11.255)<br></li>
+(192.168.10.0-192.168.11.255)<br /></li>
 <li><span style="font-weight: bold;">NODES</span> entry can now
 contain a mix of host names, IP addresses, CIDR addresses, network
 ranges and filenames</li>
@@ -538,9 +643,9 @@ while running in daemon mode by placing a file called <span style=
 <li>Added <span style=
 "font-weight: bold;">snmptt-net-snmp-test</span> program to perform
 various translations of numeric and symbolic OIDS to assist with
-determining if the installed Perl module<br>
+determining if the installed Perl module<br />
 will function as expected with <span style=
-"font-weight: bold;">SNMPTT</span><br></li>
+"font-weight: bold;">SNMPTT</span><br /></li>
 <li>Fixed bug that prevented quoted text from being logged
 correctly to SQL databases</li>
 <li>Fixed bug that would prevent the translation of integer values
@@ -556,28 +661,28 @@ Net-SNMP 5.0.x</li>
 <ul>
 <li>--#SUMMARY <span style="font-weight: bold;">or</span>
 DESCRIPTION (use DESCRIPTION only if --#SUMMARY does not
-exist)<br></li>
+exist)<br /></li>
 <li>description <span style="font-weight: bold;">or</span>
 --#SUMMARY (use --#SUMMARY only if DESCRIPTION does not exist)</li>
 <li>--#SUMMARY <span style="font-weight: bold;">and</span>
 DESCRIPTION</li>
 <li>DESCRIPTION <span style="font-weight: bold;">and</span>
---#SUMMARY<br></li>
+--#SUMMARY<br /></li>
 </ul>
 </li>
 <li>When using the DESCRIPTION to build the FORMAT / EXEC line, can
 now choose between using the first line of the DESCRIPTION field,
 or the first <span style="font-style: italic;">x</span> number of
-sentences<br></li>
+sentences<br /></li>
 <li>The use of the --#SUMMARY and DESCRIPTION line for the FORMAT /
 EXEC line can be disabled</li>
 <li>Support for multiple --#SUMMARY lines</li>
-<li>Support for --#SEVERITY lines<br></li>
+<li>Support for --#SEVERITY lines<br /></li>
 <li>The default of using the $* wildcard can be disabled</li>
 <li>Conversion of the DESCRIPTION section to SDESC / EDESC can be
 disabled</li>
 <li>EXEC line can be specified on the command line</li>
-<li>NODES line can be specified on the command line<br></li>
+<li>NODES line can be specified on the command line<br /></li>
 </ul>
 </li>
 </ul>
@@ -649,7 +754,7 @@ file not to be converted correctly</li>
 </ul>
 </li>
 </ul>
-<b><br></b>
+<b><br /></b>
 <h3><b>0.5 - February 12th, 2003</b></h3>
 <ul>
 <li>Spool file list sorted before processing to ensure traps are
@@ -720,6 +825,25 @@ configuration files to load</li>
 <li>Initial release</li>
 </ul>
 <h2><a id="Upgrading" name="Upgrading"></a>Upgrading</h2>
+<h3><b>v1.1 to v1.2</b></h3>
+<p>To upgrade from v1.1 to v1.2, you should:</p>
+<ol>
+<li>Replace <b>snmptt</b> and <b>snmpttconvertmib</b> with the new
+versions contained in the v1.2 package.&nbsp; Make sure the files
+are executable (<b>chmod +x <i>filename</i></b>).</li>
+<li>Backup your <b>snmptt.ini</b> file, replace it with the new
+version, and make any necessary configuration changes to it.</li>
+<li>Enable any new features in <b>snmptt.ini</b> as required.</li>
+<li>For Linux and Unix (or anything non-Windows), if you are using
+the <b>daemon_uid</b> option in <b>snmptt.ini</b>, and are
+monitoring the availability of snmptt by checking for the snmptt
+process, be aware that there will now be two snmptt processes
+running instead of one.</li>
+<li>For Linux and Unix (or anything non-Windows), the
+<b>snmptt.ini</b> <b>exec_escape</b> option is enabled by default
+which will escape wildcard characters (* and ?) for EXEC, PREEXEC
+and the unknown_trap_exec commands. Disable if required.<br /></li>
+</ol>
 <h3><b>v1.0 to v1.1</b></h3>
 <p>To upgrade from v1.0 to v1.1, you should:</p>
 <ol>
@@ -767,7 +891,7 @@ for <span style="font-weight: bold;">SNMPTT</span> or <span style=
 <span style="font-weight: bold;">snmptt[<span style=
 "font-style: italic;">pid</span>]</span> and <span style=
 "font-weight: bold;">snmptt-sys[<span style=
-"font-style: italic;">pid</span>]</span> instead<br></li>
+"font-style: italic;">pid</span>]</span> instead<br /></li>
 <li>Enable any new features in <span style=
 "font-weight: bold;">snmptt.ini</span> as required</li>
 <li>Test and report any issues to alex_b@users.sourceforge.net, or
@@ -801,7 +925,7 @@ from old <span style="font-weight: bold;">snmptt.ini</span></li>
 <li>In your snmptt.ini file, set <span style=
 "font-weight: bold;">dynamic_nodes</span> to 1 if you want the
 NODES files to be loaded each time an event is processed which is
-how previous versions of snmptt worked<br></li>
+how previous versions of snmptt worked<br /></li>
 <li>In your snmptt.conf files, replace any <span style=
 "font-weight: bold;">$A</span> with <span style=
 "font-weight: bold;">$aA</span> unless you want agent host names to
@@ -818,14 +942,14 @@ format</li>
 "font-weight: bold;">g</span> to the end of all REGEX lines to
 enable global search and replace</li>
 <li>Review other translate settings in <span style=
-"font-weight: bold;">snmptt.ini</span><br></li>
+"font-weight: bold;">snmptt.ini</span><br /></li>
 <li>Enable any new features in <span style=
 "font-weight: bold;">snmptt.ini</span> as required</li>
 <li>If you are using database logging, add a new column called
-<span style="font-weight: bold;">trapoid</span><br></li>
+<span style="font-weight: bold;">trapoid</span><br /></li>
 <li>If you are using database logging and you enable conversions of
 OIDs to long names, make sure the table columns are wide enough to
-hold them<br></li>
+hold them<br /></li>
 <li>Test and report any issues to alex_b@users.sourceforge.net, or
 open a bug report at <a href=
 "http://sourceforge.net/tracker/?group_id=51473&amp;atid=463393">Sourceforge</a>.</li>
@@ -855,7 +979,7 @@ version, and make any necessary configuration changes to it</li>
 "font-weight: bold;">snmptt.ini</span> as required</li>
 <li>Test and report any issues to alex_b@users.sourceforge.net, or
 open a bug report at <a href=
-"http://sourceforge.net/tracker/?group_id=51473&amp;atid=463393">Sourceforge</a>.<br>
+"http://sourceforge.net/tracker/?group_id=51473&amp;atid=463393">Sourceforge</a>.<br />
 </li>
 </ol>
 <h3><b>v0.4 to v0.5</b></h3>
@@ -886,14 +1010,14 @@ file</li>
 <h2><a id="Installation-Overview" name=
 "Installation-Overview"></a>Installation - Overview</h2>
 The following outlines the general steps required to install and
-configure SNMPTT:<br>
-<br>
+configure SNMPTT:<br />
+<br />
 <ol>
 <li>Install Net-SNMP and SNMPTT as described below</li>
 <li>Create an <b>snmptt.conf</b> file <a href=
 "#SNMPTT.CONF-Configuration-file-format">by hand</a>, or using
 <a href=
-"#SNMP-Trap-Translator-Convert-MIB">snmpttconvertmib<br></a></li>
+"#SNMP-Trap-Translator-Convert-MIB">snmpttconvertmib<br /></a></li>
 <li><a href="#Configuration-Options">Modify snmptt.ini</a> to
 include the <b>snmptt.conf</b> file and set any desired
 options</li>
@@ -902,7 +1026,7 @@ options</li>
 SNMPTT machine</li>
 <li>Initiate a trap on your network device and check the SNMPTT log
 files for the result</li>
-<li>Secure the SNMPTT installation<br></li>
+<li>Secure the SNMPTT installation<br /></li>
 </ol>
 <h3><a id="Installation-Unix" name=
 "Installation-Unix"></a>Installation - Unix</h3>
@@ -950,13 +1074,13 @@ immediately with:</p>
 </blockquote>
 6.&nbsp; Start <span style="font-weight: bold;">snmptrapd</span>
 using the command line:&nbsp; <span style=
-"font-weight: bold;">snmptrapd -On</span>.<br>
+"font-weight: bold;">snmptrapd -On</span>.<br />
 &nbsp;&nbsp;&nbsp;&nbsp; You should be able to edit the
 <b>/etc/rc.d/init.d/snmptrapd</b> script if you have one and
-change<br>
+change<br />
 &nbsp;&nbsp;&nbsp;&nbsp; the <b>OPTIONS</b> to <b>"-On"</b>.
-<b><br>
-<span style="font-weight: bold;"><br></span></b>
+<b><br />
+<span style="font-weight: bold;"><br /></span></b>
 <div style="margin-left: 40px;"><b><span style=
 "font-weight: bold;">Note:&nbsp; The -On is recommended.&nbsp; This
 will make snmptrapd pass OIDs in numeric form</span> <span style=
@@ -973,7 +1097,7 @@ translate correctly.&nbsp; See the FAQ for more info.</span></div>
 on the command line.</p>
 <p>7.&nbsp; See the <a href="#SecuringSNMPTT">Securing SNMPTT</a>
 section.</p>
-<br>
+<br />
 <h3><a id="Installation-Windows" name=
 "Installation-Windows"></a>Installation - Windows</h3>
 <p>1.&nbsp; <b><u>Read this entire file to understand how snmptt
@@ -998,28 +1122,28 @@ snmptrapd.conf file by adding the following line:
 <p>Launch snmptt using:</p>
 <p><b>snmptt --daemon</b></p>
 5.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD
--On. <b><br></b><b><span style=
+-On. <b><br /></b> <b><span style=
 "font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; Note:&nbsp; The -On
 is recommended.&nbsp; This will make snmptrapd pass OIDs in numeric
-form</span><br style="font-weight: bold;">
+form</span><br style="font-weight: bold;" />
 <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; and
 prevent SNMPTT from having to translate the symbolic name to
-numerical form.&nbsp; If</span><br style="font-weight: bold;">
+numerical form.&nbsp; If</span><br style="font-weight: bold;" />
 <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;
 the</span></b> <span style="font-weight: bold;">UCD-SNMP / Net-SNMP
-Perl module is not installed, then you MUST use the<br>
+Perl module is not installed, then you MUST use the<br />
 &nbsp;&nbsp;&nbsp;&nbsp; -On switch.&nbsp; Depending on the version
-of UCD-SNMP / Net-SNMP, some symbolic names<br>
+of UCD-SNMP / Net-SNMP, some symbolic names<br />
 &nbsp;&nbsp;&nbsp;&nbsp; may not translate correctly.&nbsp; See the
-FAQ for more info.<br></span><br>
+FAQ for more info.<br /></span><br />
 &nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your
 <b>snmp.conf</b> file to include the line: <b>printNumericOids
 1.&nbsp;</b> This setting will take effect no matter what is used
-on the command line.<br>
-<br>
+on the command line.<br />
+<br />
 6.&nbsp; See the <a href="#SecuringSNMPTT">Securing SNMPTT</a>
-section.<br>
-<br>
+section.<br />
+<br />
 <p><b><u>Windows NT EventLog:</u></b></p>
 <p>If you have enabled Windows Event Log support, then you must
 install an Event Message File to prevent "Event Message Not Found"
@@ -1062,7 +1186,7 @@ Compiling snmptt-eventlog.dll (MS Visual C++ required)
 <li>If your environment is not already set up for command line
 compilation, locate <b>vcvars32.bat</b>, start a command prompt,
 and execute it (<span style=
-"font-weight: bold;">vcvars32.bat</span>).<br></li>
+"font-weight: bold;">vcvars32.bat</span>).<br /></li>
 <li>cd into the directory where <span style=
 "font-weight: bold;">snmptt-eventlog.mc</span> is located (included
 with SNMPTT) and execute the following commands:</li>
@@ -1073,7 +1197,7 @@ with SNMPTT) and execute the following commands:</li>
 -out:snmptt-eventlog.dll snmptt-eventlog.res</b></li>
 <li>Install the DLL as described above</li>
 </ol>
-<p><br>
+<p><br />
 <b><u>Windows NT Service:</u></b></p>
 <p>To configure SNMPTT as a service under Windows NT, follow these
 steps.&nbsp; More information can be obtained from the Windows NT
@@ -1100,62 +1224,70 @@ create a Sting Value (REG_SZ) called <b>AppParameters</b> with the
 value of: <b>c:\snmp\snmptt --daemon</b></p>
 <p>5.&nbsp;&nbsp;&nbsp; Start the service from the control panel,
 or from a command prompt, type:&nbsp; <b>net start snmptt</b></p>
-To remove the service, type:&nbsp; <b>instsrv SNMPTT remove</b><br>
+To remove the service, type:&nbsp; <b>instsrv SNMPTT
+remove</b><br />
 <h3><a id="SecuringSNMPTT" name="SecuringSNMPTT"></a>Securing
 SNMPTT</h3>
 As with most software, SNMPTT should be run without root or
 administrator privileges.&nbsp; Running with a non privileged
 account can help restrict what actions can occur when using
 features such as <span style="font-weight: bold;">EXEC</span> and
-<span style="font-weight: bold;">REGEX</span>.<br>
-<br>
-For Linux and Unix, a user called '<span style=
-"font-weight: bold;">snmptt</span>' should be created and the
-<span style="font-weight: bold;">snmptt.ini</span> option
-<span style="font-weight: bold;">daemon_uid</span> set to the
-numerical user id (eg: 500) or textual user id (snmptt).<br>
-<br>
-Before forking to the background in daemon mode, SNMPTT will change
-to the defined user id.&nbsp; If the system syslog (<span style=
+<span style="font-weight: bold;">REGEX</span>.<br />
+<br />
+For Linux and Unix, if you start SNMPTT as root, a user called
+'<span style="font-weight: bold;">snmptt</span>' should be created
+and the <span style="font-weight: bold;">snmptt.ini</span> option
+<span style="font-weight: bold;">daemon_uid</span> should be set to
+the numerical user id (eg: 500) or textual user id (snmptt).
+<b>Only define daemon_uid if starting snmptt using root.</b><br />
+<br />
+If you start SNMPTT as a non-root user, then <b>daemon_uid</b> is
+not required (and will probably not work).<br />
+<br />
+When using <b>daemon_uid</b> in daemon mode, there will be two
+SNMPTT processes. The first will run as root and will be
+responsible for creating the .pid file, and for cleaning up the
+.pid file on exit. The second process will run as the user defined
+by <b>daemon_uid</b>. If the system syslog (<span style=
 "font-weight: bold;">syslog_system_enable</span>) is enabled, a
-message will be logged stating the user id has been changed.&nbsp;
-All processing from that point on will be as the new user id.&nbsp;
-This can be verified by checking the user id in the syslog for
-traps and system messages.&nbsp; For example, if the user id was
-changed to 500, the syslog would contain entries with <span style=
+message will be logged stating the user id has been changed. All
+processing from that point on will be as the new user id. This can
+be verified by checking the user id in the syslog for traps and
+system messages. For example, if the user id was changed to 500,
+the syslog would contain entries with <span style=
 "font-weight: bold;">snmptt[500]</span>.&nbsp; When running as
 root, entries will contain <span style=
-"font-weight: bold;">snmptt[0]</span>.<br>
-<br>
+"font-weight: bold;">snmptt[0]</span>.<br />
+<br />
 For Windows, a local or domain user account called '<span style=
 "font-weight: bold;">snmptt</span>' should be created.&nbsp; If
 running as an NT service, the service should be configured to use
 the <span style="font-weight: bold;">snmptt</span> user
 account.&nbsp; Otherwise the system should be logged in locally
 with the <span style="font-weight: bold;">snmptt</span> account
-before launching SNMPTT in daemon mode.<br>
-<br>
+before launching SNMPTT in daemon mode.<br />
+<br />
 The script <span style="font-weight: bold;">snmptthandler</span>
 which is called from Net-SNMP's <span style=
 "font-weight: bold;">snmptrapd</span> will be executed in the same
 security context as <span style=
-"font-weight: bold;">snmptrapd</span>.&nbsp;<br>
-<br>
+"font-weight: bold;">snmptrapd</span>.&nbsp;<br />
+<br />
 The <span style="font-weight: bold;">snmptt</span> user should be
 configured with the following permissions:
 <ul>
 <li>read / delete access to spool directory to be able to read new
-traps, and delete processed traps<br></li>
+traps, and delete processed traps<br /></li>
 <li>read access to configuration files (snmptt.ini and all
 snmptt.conf files)</li>
 <li>write access to log files (snmptt.log, snmptt.debug if
 enabled)</li>
 <li>any other permissions required for EXEC statements to
-execute<br></li>
+execute<br /></li>
 </ul>
 If <span style="font-weight: bold;">snmptrapd</span> is run as a
 non root / administrator, it should be configured with the
-following permissions:<br>
+following permissions:<br />
 <ul>
 <li>write access to spool directory</li>
 </ul>
@@ -1172,9 +1304,9 @@ which causes SNMPTT to reload.
 set by editing the <b>snmptt.ini</b> file.</p>
 <p>For Linux / Unix, the following directories are searched to
 locate <b>snmptt.ini</b>:</p>
-<blockquote><b>/etc/snmp/</b><br>
-<b>/etc/</b><br>
-<b>/usr/local/etc/snmp/</b><br>
+<blockquote><b>/etc/snmp/</b><br />
+<b>/etc/</b><br />
+<b>/usr/local/etc/snmp/</b><br />
 <b>/usr/local/etc/</b></blockquote>
 <p>For Windows, the file should be in <b>%SystemRoot%\</b>.&nbsp;
 For example, <b>c:\winnt</b> or <b>c:\windows</b>.</p>
@@ -1193,7 +1325,7 @@ configuration options available in the</span> <b style=
 "font-weight: bold;">as the</span> <b style=
 "font-weight: bold;">snmptt.ini</b> <span style=
 "font-weight: bold;">file contains detailed descriptions for each
-option.<br></span></p>
+option.<br /></span></p>
 <h2><a id="LoggingStandard" name="LoggingStandard"></a>Logging -
 Standard</h2>
 <p>Translated traps can be sent to standard output and to a log
@@ -1202,8 +1334,8 @@ file.&nbsp; The output format is:</p>
 translated-trap</b></blockquote>
 To configure standard output or regular logging, edit the
 <b>snmptt.ini</b> file and modify the following variables:
-<blockquote><b>enable_stdout</b><br>
-<b>enable_log</b><br>
+<blockquote><b>enable_stdout</b><br />
+<b>enable_log</b><br />
 <b>log_file</b></blockquote>
 <h3><a id="LoggingUnknown" name="LoggingUnknown"></a>Logging -
 Unknown traps</h3>
@@ -1211,10 +1343,10 @@ Unknown traps</h3>
 be used mainly for troubleshooting purposes.</p>
 <p>To configure unknown trap logging, edit the snmptt.ini file and
 modify the following variables:</p>
-<blockquote><b>enable_unknown_trap_log</b><br>
-<b>unknown_trap_log_file<br></b></blockquote>
+<blockquote><b>enable_unknown_trap_log</b><br />
+<b>unknown_trap_log_file<br /></b></blockquote>
 Unknown traps can also be logged to a SQL table as described in the
-<a href="#LoggingDatabase">Database</a> section.<br>
+<a href="#LoggingDatabase">Database</a> section.<br />
 <h3><a id="LoggingSyslog" name="LoggingSyslog"></a>Logging -
 Syslog</h3>
 <p>Translated traps can also be sent to syslog.&nbsp; The format of
@@ -1224,47 +1356,47 @@ logs the date):</p>
 translated-trap</b></blockquote>
 Syslog entries normally start with: <span style=
 "font-weight: bold;">date hostname snmptt[<span style=
-"font-style: italic;">pid</span>]:</span><br>
-<br>
+"font-style: italic;">pid</span>]:</span><br />
+<br />
 To configure syslog, edit the snmptt ini file and modify the
 following variables:
-<blockquote><b>syslog_enable</b><br>
-<b>syslog_facility</b><br>
+<blockquote><b>syslog_enable</b><br />
+<b>syslog_facility</b><br />
 <b>syslog_level</b></blockquote>
 SNMPTT system errors can be sent to syslog by editing the
 snmptt.ini file and modifying the following variables:
-<blockquote><b>syslog_system_enable</b><br>
-<b>syslog_system_facility</b><br>
+<blockquote><b>syslog_system_enable</b><br />
+<b>syslog_system_facility</b><br />
 <b>syslog_system_level</b></blockquote>
 Syslog system entries normally start with: <span style=
 "font-weight: bold;">date hostname snmptt-sys[<span style=
-"font-style: italic;">pid</span>]:<br>
-<br></span> The following errors are logged:
-<blockquote>SNMPTT (version) started <b>(*)</b><br>
-Unable to enter spool dir <i>x</i> <b>(*)</b><br>
-Unable to open spool dir <i>x</i> <b>(*)</b><br>
-Unable to read spool dir <i>x</i> <b>(*)</b><br>
-Could not open trap file <i>x</i> <b>(*)</b><br>
-Unable to delete trap file <i>x</i> from spool dir <b>(*)</b><br>
-Unable to delete !reload file spool dir <b>(*)<br></b> Unable to
-delete !statistics file spool dir <b>(*)</b><br>
-Reloading configuration file(s) <b>(*)</b><br>
-SNMPTT (version) shutdown <b>(*)</b><br>
-Loading <i>snmpttconfigfile</i> <b>(*)</b><br>
+"font-style: italic;">pid</span>]:<br />
+<br /></span> The following errors are logged:
+<blockquote>SNMPTT (version) started <b>(*)</b><br />
+Unable to enter spool dir <i>x</i> <b>(*)</b><br />
+Unable to open spool dir <i>x</i> <b>(*)</b><br />
+Unable to read spool dir <i>x</i> <b>(*)</b><br />
+Could not open trap file <i>x</i> <b>(*)</b><br />
+Unable to delete trap file <i>x</i> from spool dir <b>(*)</b><br />
+Unable to delete !reload file spool dir <b>(*)<br /></b> Unable to
+delete !statistics file spool dir <b>(*)</b><br />
+Reloading configuration file(s) <b>(*)</b><br />
+SNMPTT (version) shutdown <b>(*)</b><br />
+Loading <i>snmpttconfigfile</i> <b>(*)</b><br />
 Could not open configuration file:
-<i>snmpttconfigfile</i><b>(*)</b><br>
+<i>snmpttconfigfile</i><b>(*)</b><br />
 Finished loading <i>x</i> lines from <i>snmpttconfigfile</i>
-<b>(*)</b><br>
-MySQL error: Unable to connect to database<br>
-SQL error: Unable to connect to DSN<br>
-Can not open log file <i>logfile</i><br>
-MySQL error: Unable to perform PREPARE<br>
-MySQL error: Unable to perform INSERT INTO (EXECUTE)<br>
-DBI DBD::ODBC error: Unable to perform INSERT INTO<br>
-Win32::ODBC error: Unable to perform INSERT INTO<br>
-PostgreSQL error: Unable to connect to database<br>
-PostgreSQL error: Unable to perform PREPARE<br>
-PostgreSQL error: Unable to perform INSERT INTO (EXECUTE)<br>
+<b>(*)</b><br />
+MySQL error: Unable to connect to database<br />
+SQL error: Unable to connect to DSN<br />
+Can not open log file <i>logfile</i><br />
+MySQL error: Unable to perform PREPARE<br />
+MySQL error: Unable to perform INSERT INTO (EXECUTE)<br />
+DBI DBD::ODBC error: Unable to perform INSERT INTO<br />
+Win32::ODBC error: Unable to perform INSERT INTO<br />
+PostgreSQL error: Unable to connect to database<br />
+PostgreSQL error: Unable to perform PREPARE<br />
+PostgreSQL error: Unable to perform INSERT INTO (EXECUTE)<br />
 <p><b>* (daemon mode only)</b></p>
 </blockquote>
 <h3><a id="LoggingEventLog" name="LoggingEventLog"></a>Logging -
@@ -1279,43 +1411,44 @@ the date):</p>
 translated-trap</b></blockquote>
 To configure eventlog support, edit the snmptt ini file and modify
 the following variables:
-<blockquote><b>eventlog_enable</b><br>
+<blockquote><b>eventlog_enable</b><br />
 <b>eventlog_type</b></blockquote>
 SNMPTT system errors can be sent to the Event Log by editing the
 snmptt.ini file and modifying the following variables:
 <blockquote><b>eventlog_system_enable</b></blockquote>
 The following errors are logged.&nbsp; Note that each error
 contains a unique <span style=
-"font-weight: bold;">EventID</span>:<br>
-<blockquote>EventID 0: SNMPTT (version) started <b>(*)</b><br>
-EventID 3: Unable to enter spool dir <i>x</i> <b>(*)</b><br>
-EventID 4: Unable to open spool dir <i>x</i> <b>(*)</b><br>
-EventID 5: Unable to read spool dir <i>x</i> <b>(*)</b><br>
-EventID 6: Could not open trap file <i>x</i> <b>(*)</b><br>
+"font-weight: bold;">EventID</span>:<br />
+<blockquote>EventID 0: SNMPTT (version) started <b>(*)</b><br />
+EventID 3: Unable to enter spool dir <i>x</i> <b>(*)</b><br />
+EventID 4: Unable to open spool dir <i>x</i> <b>(*)</b><br />
+EventID 5: Unable to read spool dir <i>x</i> <b>(*)</b><br />
+EventID 6: Could not open trap file <i>x</i> <b>(*)</b><br />
 EventID 7: Unable to delete trap file <i>x</i> from spool dir
-<b>(*)</b><br>
-EventID 20: Unable to delete !reload file spool dir <b>(*)<br></b>
-EventID 21: Unable to delete !statistics file spool dir
-<b>(*)</b><br>
-EventID 8: Reloading configuration file(s) <b>(*)</b><br>
-EventID 1: SNMPTT (version) shutdown <b>(*)</b><br>
-EventID 9: Loading <i>snmpttconfigfile</i> <b>(*)</b><br>
+<b>(*)</b><br />
+EventID 20: Unable to delete !reload file spool dir
+<b>(*)<br /></b> EventID 21: Unable to delete !statistics file
+spool dir <b>(*)</b><br />
+EventID 8: Reloading configuration file(s) <b>(*)</b><br />
+EventID 1: SNMPTT (version) shutdown <b>(*)</b><br />
+EventID 9: Loading <i>snmpttconfigfile</i> <b>(*)</b><br />
 EventID 10: Could not open configuration file:
-<i>snmpttconfigfile</i><b>(*)</b><br>
+<i>snmpttconfigfile</i><b>(*)</b><br />
 EventID 11: Finished loading <i>x</i> lines from
-<i>snmpttconfigfile</i><b>(*)</b><br>
-EventID 12: MySQL error: Unable to connect to database<br>
-EventID 13: SQL error: Unable to connect to DSN <i>dsn</i><br>
-EventID 14: Can not open log file <i>logfile</i><br>
-EventID 23: MySQL error: Unable to perform PREPARE<br>
+<i>snmpttconfigfile</i><b>(*)</b><br />
+EventID 12: MySQL error: Unable to connect to database<br />
+EventID 13: SQL error: Unable to connect to DSN <i>dsn</i><br />
+EventID 14: Can not open log file <i>logfile</i><br />
+EventID 23: MySQL error: Unable to perform PREPARE<br />
 EventID 15: MySQL error: Unable to perform INSERT INTO
-(EXECUTE)<br>
-EventID 16: DBI DBD::ODBC error: Unable to perform INSERT INTO<br>
-EventID 17: Win32::ODBC error: Unable to perform INSERT INTO<br>
-EventID 18: PostgreSQL error: Unable to connect to database<br>
-EventID 22: PostgreSQL error: Unable to perform PREPARE<br>
+(EXECUTE)<br />
+EventID 16: DBI DBD::ODBC error: Unable to perform INSERT
+INTO<br />
+EventID 17: Win32::ODBC error: Unable to perform INSERT INTO<br />
+EventID 18: PostgreSQL error: Unable to connect to database<br />
+EventID 22: PostgreSQL error: Unable to perform PREPARE<br />
 EventID 19: PostgreSQL error: Unable to perform INSERT INTO
-(EXECUTE)<br>
+(EXECUTE)<br />
 <p><b>* (daemon mode only)</b></p>
 </blockquote>
 Note:
@@ -1331,18 +1464,18 @@ database.&nbsp; MySQL (tested under Linux), PostgreSQL (tested
 under Linux) and ODBC (tested under Windows NT) can be used.</p>
 <p>To configure unknown trap logging, edit the snmptt.ini file and
 modify the following variables:</p>
-<blockquote><b>enable_unknown_trap_log</b><br>
-<b>db_unknown_trap_format<br>
-<br></b></blockquote>
+<blockquote><b>enable_unknown_trap_log</b><br />
+<b>db_unknown_trap_format<br />
+<br /></b></blockquote>
 <h4><a id="LoggingDatabase-MySQL" name=
 "LoggingDatabase-MySQL"></a>DBD::MySQL</h4>
 <p>To configure SNMPTT for MySQL, modify the following variables in
 the snmptt.ini file.</p>
-<blockquote><b>mysql_dbi_enable</b><br>
-<b>mysql_dbi_host<br></b> <b>mysql_dbi_port</b><br>
-<b>mysql_dbi_database</b><br>
-<b>mysql_dbi_table<br></b><b>mysql_dbi_table_unknown</b><br>
-<b>mysql_dbi_username</b><br>
+<blockquote><b>mysql_dbi_enable</b><br />
+<b>mysql_dbi_host<br /></b> <b>mysql_dbi_port</b><br />
+<b>mysql_dbi_database</b><br />
+<b>mysql_dbi_table<br /></b> <b>mysql_dbi_table_unknown</b><br />
+<b>mysql_dbi_username</b><br />
 <b>mysql_dbi_password</b></blockquote>
 <p>Note:&nbsp; Sample values are defined in the default ini
 file.&nbsp; Defining <span style=
@@ -1351,66 +1484,88 @@ optional.</p>
 <p>The following MySQL script can create the database and table.
 Permissions etc should also be defined. Run '<b>mysql</b>' as root
 and enter:</p>
-<blockquote><b>CREATE DATABASE snmptt;</b><br>
+<blockquote><b>CREATE DATABASE snmptt;</b><br />
 <b>USE snmptt;</b>
-<p><b>DROP TABLE snmptt;;</b><br>
-<b>CREATE TABLE snmptt (</b><br>
-<b>id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,</b><br>
-<b>eventname VARCHAR(50),</b><br>
-<b>eventid VARCHAR(50),</b><br>
-<b>trapoid VARCHAR(100),<br>
-enterprise VARCHAR(100),</b><br>
-<b>community VARCHAR(20),</b><br>
-<b>hostname VARCHAR(100),</b><br>
-<b>agentip&nbsp; VARCHAR(16),</b><br>
-<b>category VARCHAR(20),</b><br>
-<b>severity VARCHAR(20),</b><br>
-<b>uptime&nbsp; VARCHAR(20),</b><br>
-<b>traptime VARCHAR(30),</b><br>
+<p><b>DROP TABLE snmptt;</b><br />
+<b>CREATE TABLE snmptt (</b><br />
+<b>id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,</b><br />
+<b>eventname VARCHAR(50),</b><br />
+<b>eventid VARCHAR(50),</b><br />
+<b>trapoid VARCHAR(100),<br />
+enterprise VARCHAR(100),</b><br />
+<b>community VARCHAR(20),</b><br />
+<b>hostname VARCHAR(100),</b><br />
+<b>agentip&nbsp; VARCHAR(16),</b><br />
+<b>category VARCHAR(20),</b><br />
+<b>severity VARCHAR(20),</b><br />
+<b>uptime&nbsp; VARCHAR(20),</b><br />
+<b>traptime VARCHAR(30),</b><br />
 <b>formatline VARCHAR(255));</b></p>
 </blockquote>
-<p>If you do not want the auto-incrementing id column, remove the
-'id INT...' line.</p>
+<p>Note: To store the traptime as a real date/time (<b>DATETIME</b>
+data type), change 'traptime VARCHAR(30),' to 'traptime DATETIME,'
+and set <b>date_time_format_sql</b> in <b>snmptt.ini</b> to
+<b>%Y-%m-%d %H:%M:%S</b>.</p>
+<p>Note: If you do not want the auto-incrementing id column, remove
+the 'id INT...' line.</p>
 <p>If logging of unknown traps to a SQL table is required, create
 the <b>snmptt_unknown</b> table using:</p>
 <blockquote><b>USE snmptt;</b>
-<p><b>DROP TABLE snmptt_unknown;;</b><br>
-<b>CREATE TABLE snmptt_unknown (</b><br>
-<b>trapoid VARCHAR(100),<br>
-enterprise VARCHAR(100),</b><br>
-<b>community VARCHAR(20),</b><br>
-<b>hostname VARCHAR(100),</b><br>
-<b>agentip&nbsp; VARCHAR(16),</b><br>
-<b>uptime&nbsp; VARCHAR(20),</b><br>
-<b>traptime VARCHAR(30),</b><br>
+<p><b>DROP TABLE snmptt_unknown;</b><br />
+<b>CREATE TABLE snmptt_unknown (</b><br />
+<b>trapoid VARCHAR(100),<br />
+enterprise VARCHAR(100),</b><br />
+<b>community VARCHAR(20),</b><br />
+<b>hostname VARCHAR(100),</b><br />
+<b>agentip&nbsp; VARCHAR(16),</b><br />
+<b>uptime&nbsp; VARCHAR(20),</b><br />
+<b>traptime VARCHAR(30),</b><br />
 <b>formatline VARCHAR(255));</b></p>
 </blockquote>
-<p>All variables are INSERTted into the database as standard text
-including the date and time.&nbsp; The variable lengths I have
-chosen above should be sufficient, but they may need to be
-increased depending on your environment.</p>
+<p>Note: To store the traptime as a real date/time (<b>DATETIME</b>
+data type), change 'traptime VARCHAR(30),' to 'traptime DATETIME,'
+and set <b>date_time_format_sql</b> in <b>snmptt.ini</b> to
+<b>%Y-%m-%d %H:%M:%S</b>.</p>
+<p>If logging of statistics to a SQL table is required, create the
+<b>snmptt_statistics</b> table using:</p>
+<blockquote><b>USE snmptt;</b>
+<p><b>DROP TABLE snmptt_statistics;</b><br />
+<b>CREATE TABLE snmptt_statistics (</b><br />
+<b>stat_time VARCHAR(30),</b><br />
+<b>total_received BIGINT,</b><br />
+<b>total_translated BIGINT,</b><br />
+<b>total_ignored BIGINT,</b><br />
+<b>total_unknown BIGINT);</b><br /></p>
+</blockquote>
+<p>Note: To store the stat_time as a real date/time
+(<b>DATETIME</b> data type), change 'stat_time VARCHAR(30),' to
+'stat_time DATETIME,' and set <b>stat_time_format_sql</b> in
+<b>snmptt.ini</b> to <b>%Y-%m-%d %H:%M:%S</b>.</p>
+<p>Note: The variable lengths I have chosen above should be
+sufficient, but they may need to be increased depending on your
+environment.</p>
 <p>To add a user account called '<b>snmptt</b>' with a password of
 '<b>mytrap</b>' for use by SNMPTT, use the following SQL
 statement:</p>
 <blockquote><b>GRANT ALL PRIVILEGES ON *.* TO 'snmptt'@'localhost'
-IDENTIFIED BY 'mytrap' WITH GRANT OPTION;</b></blockquote>
-<br>
+IDENTIFIED BY 'mytrap';</b></blockquote>
+<br />
 <h4><a id="LoggingDatabase-PostgreSQL" name=
 "LoggingDatabase-PostgreSQL"></a>DBD::PgPP (PostgreSQL)</h4>
 <p>To configure SNMPTT for PostgreSQL, modify the following
 variables in the snmptt.ini file.</p>
-<blockquote><b>postgresql_dbi_enable</b><br>
+<blockquote><b>postgresql_dbi_enable</b><br />
 <span style=
 "font-weight: bold;">postgresql_dbi_module</span><br style=
-"font-weight: bold;">
+"font-weight: bold;" />
 <span style=
-"font-weight: bold;">postgresql_dbi_hostport_enable</span><br style="font-weight: bold;">
+"font-weight: bold;">postgresql_dbi_hostport_enable</span><br style="font-weight: bold;" />
 
-<b>postgresql_dbi_host<br></b> <b>postgresql_dbi_port</b><br>
-<b>postgres</b><b>ql_dbi_database</b><br>
-<b>postgres</b><b>ql_dbi_table<br></b><b>postgres</b><b>ql_dbi_table_unknown</b><br>
-
-<b>postgres</b><b>ql_dbi_username</b><br>
+<b>postgresql_dbi_host<br /></b> <b>postgresql_dbi_port</b><br />
+<b>postgres</b><b>ql_dbi_database</b><br />
+<b>postgres</b><b>ql_dbi_table<br /></b>
+<b>postgres</b><b>ql_dbi_table_unknown</b><br />
+<b>postgres</b><b>ql_dbi_username</b><br />
 <b>postgres</b><b>ql_dbi_password</b></blockquote>
 <p>Note: Sample values are defined in the default ini file.
 Defining <b>postgresql_dbi_table_unknown</b> is optional.</p>
@@ -1420,52 +1575,76 @@ will then create a new snmptt database, a new snmptt user
 (prompting for a password) and then create the table. Run these
 commands as root.</p>
 <blockquote>
-<p><b>su - postgres<br>
-dropdb snmptt<br>
-dropuser snmptt<br></b></p>
-<p>createuser -P snmptt<br>
-createdb -O snmptt snmptt<br>
-psql snmptt</p>
-<p>DROP TABLE snmptt;<br>
-CREATE TABLE snmptt (<br>
-eventname VARCHAR(50),<br>
-eventid VARCHAR(50),<br>
-trapoid VARCHAR(100),<br>
-enterprise VARCHAR(100),<br>
-community VARCHAR(20),<br>
-hostname VARCHAR(100),<br>
-agentip&nbsp; VARCHAR(16),<br>
-category VARCHAR(20),<br>
-severity VARCHAR(20),<br>
-uptime&nbsp; VARCHAR(20),<br>
-traptime VARCHAR(30),<br>
-formatline VARCHAR(255));</p>
-<p>GRANT ALL ON snmptt TO snmptt;<br>
-\q</p>
+<p><b>su - postgres<br />
+dropdb snmptt<br />
+dropuser snmptt<br /></b></p>
+<p><b>createuser -P snmptt<br />
+createdb -O snmptt snmptt<br />
+psql snmptt</b></p>
+<p><b>DROP TABLE snmptt;<br />
+CREATE TABLE snmptt (<br />
+eventname VARCHAR(50),<br />
+eventid VARCHAR(50),<br />
+trapoid VARCHAR(100),<br />
+enterprise VARCHAR(100),<br />
+community VARCHAR(20),<br />
+hostname VARCHAR(100),<br />
+agentip&nbsp; VARCHAR(16),<br />
+category VARCHAR(20),<br />
+severity VARCHAR(20),<br />
+uptime&nbsp; VARCHAR(20),<br />
+traptime VARCHAR(30),<br />
+formatline VARCHAR(255));</b></p>
+<p><b>GRANT ALL ON snmptt TO snmptt;<br />
+\q</b></p>
 </blockquote>
+<p>Note: To store the traptime as a real date/time
+(<b>timestamp</b> data type), change 'traptime VARCHAR(30),' to
+'traptime timestamp,' and set <b>date_time_format_sql</b> in
+<b>snmptt.ini</b> to <b>%Y-%m-%d %H:%M:%S</b>.</p>
 If logging of unknown traps to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_unknown</span> table
-using:<br>
-<blockquote><b>su - postgres<br>
-psql snmptt<br></b>
-<p><b>DROP TABLE snmptt_unknown;</b><br>
-<b>CREATE TABLE snmptt_unknown (</b><br>
-<b>trapoid VARCHAR(100),<br>
-enterprise VARCHAR(100),</b><br>
-<b>community VARCHAR(20),</b><br>
-<b>hostname VARCHAR(100),</b><br>
-<b>agentip&nbsp; VARCHAR(16),</b><br>
-<b>uptime&nbsp; VARCHAR(20),</b><br>
-<b>traptime VARCHAR(30),</b><br>
-<b>formatline VARCHAR(255));<br></b></p>
-<p>GRANT ALL ON snmptt_unknown TO snmptt;<br>
-\q</p>
+using:<br />
+<blockquote><b>su - postgres<br />
+psql snmptt<br /></b>
+<p><b>DROP TABLE snmptt_unknown;</b><br />
+<b>CREATE TABLE snmptt_unknown (</b><br />
+<b>trapoid VARCHAR(100),<br />
+enterprise VARCHAR(100),</b><br />
+<b>community VARCHAR(20),</b><br />
+<b>hostname VARCHAR(100),</b><br />
+<b>agentip&nbsp; VARCHAR(16),</b><br />
+<b>uptime&nbsp; VARCHAR(20),</b><br />
+<b>traptime VARCHAR(30),</b><br />
+<b>formatline VARCHAR(255));<br /></b></p>
+<p><b>GRANT ALL ON snmptt_unknown TO snmptt;</b><br />
+<b>\q</b></p>
 </blockquote>
-All variables are INSERTted into the database as standard text
-including the date and time.&nbsp; The variable lengths I have
-chosen above should be sufficient, but they may need to be
-increased depending on your environment.<br>
-<br>
+<p>Note: To store the traptime as a real date/time
+(<b>timestamp</b> data type), change 'traptime VARCHAR(30),' to
+'traptime timestamp,' and set <b>date_time_format_sql</b> in
+<b>snmptt.ini</b> to <b>%Y-%m-%d %H:%M:%S</b>.</p>
+If logging of statistics to a SQL table is required, create the
+<span style="font-weight: bold;">snmptt_statistics</span> table
+using:<br />
+<blockquote><b>su - postgres<br />
+psql snmptt<br /></b>
+<p><b>DROP TABLE snmptt_statistics;<br />
+CREATE TABLE snmptt_statistics (<br />
+stat_time VARCHAR(30),<br />
+total_received BIGINT,<br />
+total_translated BIGINT,<br />
+total_ignored BIGINT,<br />
+total_unknown BIGINT);<br /></b></p>
+<b>GRANT ALL ON snmptt_statistics TO snmptt;<br />
+\q</b></blockquote>
+<p>Note: To store the stat_time as a real date/time
+(<b>timestamp</b> data type), change 'stat_time VARCHAR(30),' to
+'stat_time timestamp,' and set <b>stat_time_format_sql</b> in
+<b>snmptt.ini</b> to <b>%Y-%m-%d %H:%M:%S</b>.</p>
+The variable lengths I have chosen above should be sufficient, but
+they may need to be increased depending on your environment.<br />
+<br />
 <h4><a id="LoggingDatabase-ODBC" name=
 "LoggingDatabase-ODBC"></a>DBD::ODBC</h4>
 <p>SNMPTT can access ODBC data sources using either the DBD::ODBC
@@ -1473,113 +1652,161 @@ module on Linux and Windows, or the WIN32::ODBC module on
 Windows.</p>
 <p>To configure SNMPTT for ODBC access using the module DBD::ODBC,
 modify the following variables in the snmptt script.</p>
-<blockquote><b>dbd_odbc_enable = 1;</b><br>
-<b>dbd_odbc_dsn = 'snmptt';</b><br>
-<b>dbd_odbc_table = 'snmptt';<br></b><b>dbd_odbc_table_unknown =
-'snmptt';</b><br>
-<b>dbd_odbc_username = 'snmptt';</b><br>
+<blockquote><b>dbd_odbc_enable = 1;</b><br />
+<b>dbd_odbc_dsn = 'snmptt';</b><br />
+<b>dbd_odbc_table = 'snmptt';<br /></b> <b>dbd_odbc_table_unknown =
+'snmptt';</b><br />
+<b>dbd_odbc_username = 'snmptt';</b><br />
 <b>dbd_odbc_password = 'password';</b></blockquote>
-Note:&nbsp;<br>
+Note:&nbsp;<br />
 <div style="margin-left: 40px;">SNMPTT does not create the DSN
 connection. You must define the DSN outside of SNMPTT. See 'Data
 Sources (ODBC)' in Windows help for information on creating a DSN
-connection.<br>
-<br>
+connection.<br />
+<br />
 Defining <span style=
 "font-weight: bold;"><b>dbd_odbc</b></span><span style=
-"font-weight: bold;">_table_unknown</span> is optional.<br>
-<br>
+"font-weight: bold;">_table_unknown</span> is optional.<br />
+<br />
 Sample values are defined in the default ini file.</div>
-<br>
+<br />
 <p>The following MS SQL Server / Access script can create the table
 inside an existing database.&nbsp; Permissions etc should also be
 defined.</p>
-<blockquote><b>CREATE TABLE snmptt (</b><br>
-<b>eventname character(50) NULL,</b><br>
-<b>eventid&nbsp; character(50) NULL,</b><br>
-<b>trapoid</b><b>&nbsp; character(100) NULL,</b><br>
-<b>enterprise character(100) NULL,</b><br>
-<b>community character(20) NULL,</b><br>
-<b>hostname character(100) NULL,</b><br>
-<b>agentip&nbsp; character(16) NULL,</b><br>
-<b>category character(20) NULL,</b><br>
-<b>severity character(20) NULL,</b><br>
-<b>uptime&nbsp; character(20) NULL,</b><br>
-<b>traptime character(30) NULL,</b><br>
+<blockquote><b>CREATE TABLE snmptt (</b><br />
+<b>eventname character(50) NULL,</b><br />
+<b>eventid&nbsp; character(50) NULL,</b><br />
+<b>trapoid</b><b>&nbsp; character(100) NULL,</b><br />
+<b>enterprise character(100) NULL,</b><br />
+<b>community character(20) NULL,</b><br />
+<b>hostname character(100) NULL,</b><br />
+<b>agentip&nbsp; character(16) NULL,</b><br />
+<b>category character(20) NULL,</b><br />
+<b>severity character(20) NULL,</b><br />
+<b>uptime&nbsp; character(20) NULL,</b><br />
+<b>traptime character(30) NULL,</b><br />
 <b>formatline character(255) NULL)</b></blockquote>
+<p>Note: To store the traptime as a real date/time, change
+'traptime character(30),' to the date/time data type supported by
+the database and and set <b>date_time_format_sql</b> in
+<b>snmptt.ini</b> to a compatible format. For example: <b>%Y-%m-%d
+%H:%M:%S</b>.</p>
 If logging of unknown traps to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_unknown</span> table
-using:<br>
-<blockquote><b>CREATE TABLE snmptt_unknown (</b><br>
-<b>trapoid</b><b>&nbsp; character(100) NULL,</b><br>
-<b>enterprise character(100) NULL,</b><br>
-<b>community character(20) NULL,</b><br>
-<b>hostname character(100) NULL,</b><br>
-<b>agentip&nbsp; character(16) NULL,</b><br>
-<b>uptime&nbsp; character(20) NULL,</b><br>
-<b>traptime character(30) NULL,</b><br>
+using:<br />
+<blockquote><b>CREATE TABLE snmptt_unknown (</b><br />
+<b>trapoid</b><b>&nbsp; character(100) NULL,</b><br />
+<b>enterprise character(100) NULL,</b><br />
+<b>community character(20) NULL,</b><br />
+<b>hostname character(100) NULL,</b><br />
+<b>agentip&nbsp; character(16) NULL,</b><br />
+<b>uptime&nbsp; character(20) NULL,</b><br />
+<b>traptime character(30) NULL,</b><br />
 <b>formatline character(255) NULL)</b></blockquote>
+<p>Note: To store the traptime as a real date/time, change
+'traptime character(30),' to the date/time data type supported by
+the database and and set <b>date_time_format_sql</b> in
+<b>snmptt.ini</b> to a compatible format. For example: <b>%Y-%m-%d
+%H:%M:%S</b>.</p>
+If logging of statistics to a SQL table is required, create the
+<span style="font-weight: bold;">snmptt_statistics</span> table
+using:<br />
+<blockquote><b>CREATE TABLE snmptt_statistics (<br />
+stat_time character(30) NULL,<br />
+total_received BIGINT NULL,<br />
+total_translated BIGINT NULL,<br />
+total_ignored BIGINT NULL,<br />
+total_unknown BIGINT NULL)<br /></b></blockquote>
+<p>Note: To store the stat_time as a real date/time, change
+'stat_time character(30),' to the date/time data type supported by
+the database and and set <b>stat_time_format_sql</b> in
+<b>snmptt.ini</b> to a compatible format. For example: <b>%Y-%m-%d
+%H:%M:%S</b>.</p>
 All variables are inserted into the database using '<b>INSERT
 INTO</b>' as text including the date and time.&nbsp; The variable
 lengths I have chosen above should be sufficient, but they may need
-to be increased depending on your environment.<br>
+to be increased depending on your environment.<br />
 &nbsp;
 <h4><a id="LoggingDatabase-Windows_ODBC" name=
-"LoggingDatabase-Windows_ODBC"></a>Win32::ODB</h4>
+"LoggingDatabase-Windows_ODBC"></a>Win32::ODBC</h4>
 <p>SNMPTT can access ODBC data sources using either the DBD::ODBC
 module on Linux and Windows, or the WIN32::ODBC module on
 Windows.</p>
 <p>To configure SNMPTT for MS SQL via ODBC on Windows, modify the
 following variables in the snmptt script.</p>
-<blockquote><b>sql_win32_odbc_enable = 1;</b><br>
-<b>sql_win32_odbc_dsn = 'snmptt';</b><br>
-<b>sql_win32_odbc_table = 'snmptt';</b><br>
-<b>sql_win32_odbc_username = 'snmptt';</b><br>
+<blockquote><b>sql_win32_odbc_enable = 1;</b><br />
+<b>sql_win32_odbc_dsn = 'snmptt';</b><br />
+<b>sql_win32_odbc_table = 'snmptt';</b><br />
+<b>sql_win32_odbc_username = 'snmptt';</b><br />
 <b>sql_win32_odbc_password = 'password';</b></blockquote>
-Note:&nbsp;<br>
+Note:&nbsp;<br />
 <div style="margin-left: 40px;">SNMPTT does not create the DSN
 connection. You must define the DSN outside of SNMPTT. See 'Data
 Sources (ODBC)' in Windows help for information on creating a DSN
-connection.<br>
-<br>
+connection.<br />
+<br />
 Defining <span style=
 "font-weight: bold;"><b>sql_win32_odbc</b></span><span style=
-"font-weight: bold;">_table_unknown</span> is optional.<br>
-<br>
+"font-weight: bold;">_table_unknown</span> is optional.<br />
+<br />
 Sample values are defined in the default ini file.</div>
 <p>The following MS SQL Server script can create the table inside
 an existing database.&nbsp; Permissions etc should also be
 defined.</p>
-<blockquote><b>CREATE TABLE snmptt (</b><br>
-<b>eventname character(50) NULL,</b><br>
-<b>eventid&nbsp; character(50) NULL,</b><br>
-<b>trapoid</b><b>&nbsp; character(50) NULL,</b><br>
-<b>enterprise character(50) NULL,</b><br>
-<b>community character(20) NULL,</b><br>
-<b>hostname character(100) NULL,</b><br>
-<b>agentip&nbsp; character(16) NULL,</b><br>
-<b>category character(20) NULL,</b><br>
-<b>severity character(20) NULL,</b><br>
-<b>uptime&nbsp; character(20) NULL,</b><br>
-<b>traptime character(30) NULL,</b><br>
+<blockquote><b>CREATE TABLE snmptt (</b><br />
+<b>eventname character(50) NULL,</b><br />
+<b>eventid&nbsp; character(50) NULL,</b><br />
+<b>trapoid</b><b>&nbsp; character(50) NULL,</b><br />
+<b>enterprise character(50) NULL,</b><br />
+<b>community character(20) NULL,</b><br />
+<b>hostname character(100) NULL,</b><br />
+<b>agentip&nbsp; character(16) NULL,</b><br />
+<b>category character(20) NULL,</b><br />
+<b>severity character(20) NULL,</b><br />
+<b>uptime&nbsp; character(20) NULL,</b><br />
+<b>traptime character(30) NULL,</b><br />
 <b>formatline character(255) NULL)</b></blockquote>
+<p>Note: To store the traptime as a real date/time, change
+'traptime character(30),' to the date/time data type supported by
+the database and and set <b>date_time_format_sql</b> in
+<b>snmptt.ini</b> to a compatible format. For example: <b>%Y-%m-%d
+%H:%M:%S</b>.</p>
 If logging of unknown traps to a SQL table is required, create the
 <span style="font-weight: bold;">snmptt_unknown</span> table
-using:<br>
-<blockquote><b>CREATE TABLE snmptt_unknown (</b><br>
-<b>trapoid</b><b>&nbsp; character(50) NULL,</b><br>
-<b>enterprise character(50) NULL,</b><br>
-<b>community character(20) NULL,</b><br>
-<b>hostname character(100) NULL,</b><br>
-<b>agentip&nbsp; character(16) NULL,</b><br>
-<b>uptime&nbsp; character(20) NULL,</b><br>
-<b>traptime character(30) NULL,</b><br>
+using:<br />
+<blockquote><b>CREATE TABLE snmptt_unknown (</b><br />
+<b>trapoid</b><b>&nbsp; character(50) NULL,</b><br />
+<b>enterprise character(50) NULL,</b><br />
+<b>community character(20) NULL,</b><br />
+<b>hostname character(100) NULL,</b><br />
+<b>agentip&nbsp; character(16) NULL,</b><br />
+<b>uptime&nbsp; character(20) NULL,</b><br />
+<b>traptime character(30) NULL,</b><br />
 <b>formatline character(255) NULL)</b></blockquote>
+<p>Note: To store the traptime as a real date/time, change
+'traptime character(30),' to the date/time data type supported by
+the database and and set <b>date_time_format_sql</b> in
+<b>snmptt.ini</b> to a compatible format. For example: <b>%Y-%m-%d
+%H:%M:%S</b>.</p>
+If logging of statistics to a SQL table is required, create the
+<span style="font-weight: bold;">snmptt_statistics</span> table
+using:<br />
+<blockquote><b>CREATE TABLE snmptt_statistics (<br />
+stat_time character(30) NULL,<br />
+total_received BIGINT NULL,<br />
+total_translated BIGINT NULL,<br />
+total_ignored BIGINT NULL,<br />
+total_unknown BIGINT NULL)<br /></b></blockquote>
+<p>Note: To store the stat_time as a real date/time, change
+'stat_time character(30),' to the date/time data type supported by
+the database and and set <b>stat_time_format_sql</b> in
+<b>snmptt.ini</b> to a compatible format. For example: <b>%Y-%m-%d
+%H:%M:%S</b>.</p>
 All variables are inserted into the database using '<b>INSERT
 INTO</b>' as text including the date and time.&nbsp; The variable
 lengths I have chosen above should be sufficient, but they may need
-to be increased depending on your environment.<br>
-&nbsp;<br>
+to be increased depending on your environment.<br />
+&nbsp;<br />
 <h2><a id="Executing-an-external-program" name=
 "Executing-an-external-program"></a>Executing an external
 program</h2>
@@ -1716,39 +1943,39 @@ using the interval time defined in the <span style=
 dump can also be forced by adding a file to the spool directory
 called <span style="font-weight: bold;">!statistics</span> which is
 processed similar to the <span style=
-"font-weight: bold;">!reload</span> file.<br>
-<br>
+"font-weight: bold;">!reload</span> file.<br />
+<br />
 <h2><a id="Command-line-arguments" name=
 "Command-line-arguments"></a>Command line arguments</h2>
 <p>The following command line arguments are supported:</p>
-<p>Usage:<br>
-&nbsp;&nbsp;&nbsp; snmptt [&lt;options&gt;]<br>
-Options:<br>
+<p>Usage:<br />
+&nbsp;&nbsp;&nbsp; snmptt [&lt;options&gt;]<br />
+Options:<br />
 &nbsp;&nbsp;&nbsp;
 --daemon&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Start in daemon mode<br>
+Start in daemon mode<br />
 &nbsp;&nbsp;&nbsp;
 --debug=n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Set debug level (1 or 2)<br>
+Set debug level (1 or 2)<br />
 &nbsp;&nbsp;&nbsp; --debugfile=filename&nbsp;&nbsp;&nbsp; Set debug
-output file<br>
+output file<br />
 &nbsp;&nbsp;&nbsp;
 --dump&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Dump (display) defined traps<br>
+Dump (display) defined traps<br />
 &nbsp;&nbsp;&nbsp;
 --help&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Display this message<br>
+Display this message<br />
 &nbsp;&nbsp;&nbsp;
 --ini=filename&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Specify path to snmptt.ini file<br>
+Specify path to snmptt.ini file<br />
 &nbsp;&nbsp;&nbsp;
 --version&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Display author and version information<br>
+Display author and version information<br />
 &nbsp;&nbsp;&nbsp;
 --time&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Use to see how long it takes to load and<br>
+Use to see how long it takes to load and<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-process trap file (eg: time snmptt --time)<br>
+process trap file (eg: time snmptt --time)<br />
 &nbsp;</p>
 <h2><a id="SNMPTT.CONF-Configuration-file-format" name=
 "SNMPTT.CONF-Configuration-file-format"></a><b>SNMPTT.CONF
@@ -1758,16 +1985,16 @@ c:\snmp\snmptt.conf) contains a list of all the defined traps.</p>
 <p>If your snmptt.conf file is getting rather large and you would
 like to divide it up into many smaller files, then do the
 following:</p>
-<p>-create additional snmptt.conf files<br>
+<p>-create additional snmptt.conf files<br />
 -add the file names to the <b>snmptt_conf_files</b> section in the
 snmptt.ini file.</p>
 <p>For example:</p>
-<blockquote>snmptt_conf_files = &lt;&lt;END<br>
-/etc/snmp/snmptt.conf.generic<br>
-/etc/snmp/snmptt.conf.compaq<br>
-/etc/snmp/snmptt.conf.cisco<br>
-/etc/snmp/snmptt.conf.hp<br>
-/etc/snmp/snmptt.conf.3com<br>
+<blockquote>snmptt_conf_files = &lt;&lt;END<br />
+/etc/snmp/snmptt.conf.generic<br />
+/etc/snmp/snmptt.conf.compaq<br />
+/etc/snmp/snmptt.conf.cisco<br />
+/etc/snmp/snmptt.conf.hp<br />
+/etc/snmp/snmptt.conf.3com<br />
 END</blockquote>
 The syntax of the snmptt.conf file&nbsp; is:
 <blockquote><b>EVENT</b> event_name event_OID "category" severity
@@ -1781,7 +2008,7 @@ The syntax of the snmptt.conf file&nbsp; is:
 <p>[<b style="font-weight: bold;">REGEX</b> <span style=
 "font-weight: bold;">(&nbsp;&nbsp;&nbsp; )(&nbsp; &nbsp;
 )</span><span style="font-weight: bold;">[i][g][e]</span>]</p>
-<p>[<b>SDESC</b>]<br>
+<p>[<b>SDESC</b>]<br />
 [<b>EDESC</b>]</p>
 <p>Note: Lines starting with a # will be ignored.</p>
 <p>Note:&nbsp; The EVENT and FORMAT line are REQUIRED.&nbsp;
@@ -1876,53 +2103,55 @@ logged to any of the supported logging methods.</p>
 <p><a id="Variable-substitutions" name=
 "Variable-substitutions"></a>Variable substitution is performed on
 this string using the following variables:</p>
-<blockquote>$A - Trap agent host name <b>(see Note 1)</b><br>
-$aA - Trap agent IP address<br>
-$c - Category<br>
-$C - Trap community string<br>
+<blockquote>$A - Trap agent host name <b>(see Note 1)</b><br />
+$aA - Trap agent IP address<br />
+$c - Category<br />
+$C - Trap community string<br />
 $D - Description text from SNMPTT.CONF or MIB file <b>(see Note
-6)</b><br>
-$E - Enterprise trap OID in symbolic format<br>
-$e&nbsp; - Enterprise trap OID in number format<br>
-$Fa&nbsp; - alarm (bell) (BEL)<br>
-$Ff&nbsp; - form feed (FF)<br>
-$Fn&nbsp; - newline (LF, NL)<br>
-$Fr&nbsp; - return (CR)<br>
-$Ft&nbsp; - tab (HT, TAB)<br>
-$Fz&nbsp; - Translated FORMAT line (EXEC only)<br>
-$G&nbsp; - Generic trap number (0 if enterprise trap)<br>
-$S&nbsp; - Specific trap number (0 if generic trap)<br>
-$N&nbsp; - Event name defined in .conf file of matched entry<br>
+6)</b><br />
+$E - Enterprise trap OID in symbolic format<br />
+$e&nbsp; - Enterprise trap OID in number format<br />
+$Fa&nbsp; - alarm (bell) (BEL)<br />
+$Ff&nbsp; - form feed (FF)<br />
+$Fn&nbsp; - newline (LF, NL)<br />
+$Fr&nbsp; - return (CR)<br />
+$Ft&nbsp; - tab (HT, TAB)<br />
+$Fz&nbsp; - Translated FORMAT line (EXEC only)<br />
+$G&nbsp; - Generic trap number (0 if enterprise trap)<br />
+$H&nbsp; - Host name of the system running SNMPTT<br />
+$S&nbsp; - Specific trap number (0 if generic trap)<br />
+$N&nbsp; - Event name defined in .conf file of matched entry<br />
 $i&nbsp; - Event OID defined in .conf file of matched entry (could
-be a wildcard OID)<br>
-$O - Trap OID in symbolic format <b>(see Note 4)</b><br>
-$o - Trap OID in numerical format <b>(see Note 4)</b><br>
-$R, $r&nbsp; - Hostname <b>(see Note 1)</b><br>
-$aR, $ar - IP address<br>
-$s&nbsp; - Severity<br>
+be a wildcard OID)<br />
+$O - Trap OID in symbolic format <b>(see Note 4)</b><br />
+$o - Trap OID in numerical format <b>(see Note 4)</b><br />
+$R, $r&nbsp; - Trap hostname <b>(see Note 1)</b><br />
+$aR, $ar - IP address<br />
+$s&nbsp; - Severity<br />
 $T&nbsp; - Uptime:&nbsp; Time since network entity was
-initialized<br>
+initialized<br />
 $X&nbsp; - Time trap was spooled (daemon mode) or current time
-(standalone mode)<br>
+(standalone mode)<br />
 $x&nbsp; - Date trap was spooled (daemon mode) or current date
-(standalone mode)<br>
-$# - Number of (how many) variable-bindings in the trap<br>
-$$&nbsp; - Print a $<br>
-$@ - Number of seconds since the epoch<br>
+(standalone mode)<br />
+$# - Number of (how many) variable-bindings in the trap<br />
+$$&nbsp; - Print a $<br />
+$@ - Number of seconds since the epoch of when the trap was spooled
+(daemon mode) or the current time (standalone mode)<br />
 $<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) <b>(see
-Note 2,5)</b><br>
+Note 2,5)</b><br />
 $+<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) in the
 format of <i>variable name:value</i> <b>(see Note
-2,3</b><b>,5</b><b>)</b><br>
+2,3</b><b>,5</b><b>)</b><br />
 $-<i>n</i>&nbsp; - Expand variable-binding n (1-<i>n</i>) in the
 format of <i>variable name (variable type):value</i> <b>(see Note
-2,3</b><b>,5</b><b>)</b><br>
+2,3</b><b>,5</b><b>)</b><br />
 $v<i>n</i>&nbsp; - Expand variable name of the variable-binding n
-(1-<i>n</i>)<b>(see Note 3)</b><br>
-$*&nbsp; - Expand all variable-bindings <b>(see Note 5)</b><br>
+(1-<i>n</i>)<b>(see Note 3)</b><br />
+$*&nbsp; - Expand all variable-bindings <b>(see Note 5)</b><br />
 $+*&nbsp; - Expand all variable-bindings in the format of
 <i>variable name:value</i> <b>(see Note
-2,3</b><b>,5</b><b>)</b><br>
+2,3</b><b>,5</b><b>)</b><br />
 $-*&nbsp; - Expand all variable-bindings in the format of
 <i>variable name (variable type):value</i> <b>(see Note
 2,3</b><b>,5</b><b>)</b></blockquote>
@@ -1946,11 +2175,11 @@ Note (2):
 <blockquote>If&nbsp; <b>translate_integers</b> is enabled in the
 <b>snmptt.ini</b> file, SNMPTT will attempt to convert integer
 values received in traps into text by performing a lookup in the
-MIB file.<br>
-<br>
+MIB file.<br />
+<br />
 You must have the UCD-SNMP / Net-SNMP Perl module installed for
 this to work and you must enable support for it by enabling
-<b>net_snmp_perl_enable</b> in the snmptt.ini file.<br>
+<b>net_snmp_perl_enable</b> in the snmptt.ini file.<br />
 <p>For this feature to work, you must ensure UCD-SNMP / Net-SNMP is
 configured correctly with all the required MIBS.&nbsp; If the
 option is enabled, but the value can not be found, the integer
@@ -1992,8 +2221,8 @@ such as IF-MIB::linkDown.&nbsp; You must have the UCD-SNMP /
 Net-SNMP Perl module installed for this to work and you must enable
 support for it by enabling <b>net_snmp_perl_enable</b> in the
 snmptt.ini file.&nbsp; If <b>net_snmp_perl_enable</b> is not
-enabled, it will default to using the numeric OID.&nbsp;<br>
-<br>
+enabled, it will default to using the numeric OID.&nbsp;<br />
+<br />
 Net-SNMP 5.0.9 and earlier does not support including the module
 name (eg: <span style="font-weight: bold;">IF-MIB::</span>) when
 translating an OID and most of the 5.0.x versions do not properly
@@ -2002,7 +2231,7 @@ available for 5.0.8+ that is included in Net-SNMP 5.1.1 and higher.
 The patch is available from the <a href=
 "http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">
 Net-SNMP patch page</a>.</div>
-<br>
+<br />
 <p>Note (5):</p>
 <blockquote>If&nbsp; <b>translate_oids</b> is enabled in the
 <b>snmptt.ini</b> file, SNMPTT will attempt to convert any numeric
@@ -2011,8 +2240,8 @@ form.&nbsp; You must have the UCD-SNMP / Net-SNMP Perl module
 installed for this to work and you must enable support for it by
 enabling <b>net_snmp_perl_enable</b> in the snmptt.ini file.&nbsp;
 If <b>net_snmp_perl_enable</b> is not enabled, it will default to
-using the numeric OID.&nbsp;<br>
-<br>
+using the numeric OID.&nbsp;<br />
+<br />
 Net-SNMP 5.0.9 and earlier does not support including the module
 name (eg: <span style="font-weight: bold;">IF-MIB::</span>) when
 translating an OID and most of the 5.0.x versions do not properly
@@ -2063,9 +2292,9 @@ enable / disable <b>PREEXEC</b> statements.</p>
 line.</p>
 <p>Example:</p>
 <blockquote>EVENT linkDown .1.3.6.1.6.3.1.1.5.3 "Status Events"
-Normal<br>
+Normal<br />
 FORMAT Link down on interface $1($p1). Admin state: $2. Operational
-state: $3<br>
+state: $3<br />
 <b>PREEXEC /usr/local/bin/snmpget -v 1 -Ovq -c public $aA
 ifDescr.$1</b></blockquote>
 <p>Sample output:</p>
@@ -2098,8 +2327,8 @@ default) and <b>NEG</b> (negative). If set to <b>POS</b>, then
 match. If set to <b>NEG</b>, then <b>NODES</b> is a 'match' only if
 <i>none</i> of the <b>NODES</b> entries match. To change the mode
 of operation, use one of the following statements:</p>
-<p style="margin-left: 40px;"><b>NODES MODE=POS</b><br>
-<b>NODES MODE=NEG</b></p>
+<p style="margin-left: 40px;"><b>NODES MODE=POS</b><br />
+<b>NODES MODE=NEG</b><br /></p>
 <p>A common use for this feature is when you have devices that
 implement a trap in a non-standard way (added additional variables
 for example) such as the linkDown and linkUp traps. By defining two
@@ -2107,18 +2336,18 @@ EVENT statements and using NODES statements with NODES MODE, you
 can have one EVENT statement handle the standard devices, and the
 other handle the other devices with the extended linkDown / linkUp
 traps.</p>
-Example 1:<br>
+Example 1:<br />
 <blockquote>This example will match any hosts called <b>fred</b>,
-<b>barney</b>, <b>betty</b> or <b>wilma</b>:<br>
-<br>
+<b>barney</b>, <b>betty</b> or <b>wilma</b>:<br />
+<br />
 <b>NODES fred barney betty wilma</b></blockquote>
-Example 2:<br>
+Example 2:<br />
 <blockquote>This example will match any hosts <b>not</b> called
-<b>fred</b>, <b>barney</b>, <b>betty</b> or <b>wilma</b>:<br>
-<br>
-<b>NODES fred barney betty wilma</b><br>
+<b>fred</b>, <b>barney</b>, <b>betty</b> or <b>wilma</b>:<br />
+<br />
+<b>NODES fred barney betty wilma</b><br />
 <b>NODES MODE=NEG</b></blockquote>
-Example 3:<br>
+Example 3:<br />
 <blockquote>This example will load the file /etc/snmptt-nodes (see
 below), and match any hosts called <span style=
 "font-weight: bold;">fred</span>, <span style=
@@ -2128,70 +2357,70 @@ below), and match any hosts called <span style=
 192.168.1.3, 192.168.2.1</span>, network range <span style=
 "font-weight: bold;">192.168.50.0/22</span> or network range
 <span style=
-"font-weight: bold;">192.168.60.0-192.168.61.255</span>:<br>
-<br>
+"font-weight: bold;">192.168.60.0-192.168.61.255</span>:<br />
+<br />
 <span style="font-weight: bold;">NODES
 /etc/snmptt-nodes</span></blockquote>
-Example 4:<br>
+Example 4:<br />
 <blockquote>This example will load both files <span style=
 "font-weight: bold;">/etc/snmptt-nodes</span> and <span style=
 "font-weight: bold;">/etc/snmptt-nodes2</span> (see above
-example):<br>
-<br>
+example):<br />
+<br />
 <span style="font-weight: bold;">NODES /etc/snmptt-nodes
 /etc/snmptt-nodes2</span></blockquote>
-Example 5:<br>
+Example 5:<br />
 <blockquote><span style="font-weight: bold;">NODES 192.168.4.0/22
 192.168.60.0-192.168.61.255 /etc/snmptt-nodes2</span></blockquote>
-Example 6:<br>
+Example 6:<br />
 <blockquote>NODES <span style="font-weight: bold;">fred
 /etc/snmptt-nodes pebbles /etc/snmptt-nodes2
 barney</span></blockquote>
 where snmptt-nodes contains:
 <blockquote><span style="font-weight: bold;">fred</span><br style=
-"font-weight: bold;">
+"font-weight: bold;" />
 <span style="font-weight: bold;">barney betty</span><br style=
-"font-weight: bold;">
+"font-weight: bold;" />
 <span style="font-weight: bold;"># comment lines</span><br style=
-"font-weight: bold;">
+"font-weight: bold;" />
 <span style="font-weight: bold;">192.168.1.1 192.168.1.2
-192.168.1.3</span><br style="font-weight: bold;">
+192.168.1.3</span><br style="font-weight: bold;" />
 <span style="font-weight: bold;">192.168.2.1</span><br style=
-"font-weight: bold;">
+"font-weight: bold;" />
 <span style="font-weight: bold;">192.168.50.0/22</span><br style=
-"font-weight: bold;">
+"font-weight: bold;" />
 <span style=
 "font-weight: bold;">192.168.60.0-192.168.61.255</span><br style=
-"font-weight: bold;">
+"font-weight: bold;" />
 <span style="font-weight: bold;">wilma</span></blockquote>
 Notes:
 <blockquote>The names are NOT case sensitive and comment lines are
-permitted by starting the line with a #.<br>
-<br>
+permitted by starting the line with a #.<br />
+<br />
 CIDR network addresses must be specified using 4 octets followed by
 a / followed by the number of bits.&nbsp; For example:
-172.16.0.0/24.&nbsp; Using 172.16/24 will NOT work.<br>
-<br>
+172.16.0.0/24.&nbsp; Using 172.16/24 will NOT work.<br />
+<br />
 Do not use any spaces between network ranges as they will be
 interpreted as two different values.&nbsp; For example,
 192.168.1.1&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp; 192.168.1.20 will not
-work.&nbsp; Use 192.168.1.1-192.168.1.20 instead.<br>
-<br>
+work.&nbsp; Use 192.168.1.1-192.168.1.20 instead.<br />
+<br />
 By default, NODES files are loaded when the <span style=
 "font-weight: bold;">snmptt.conf</span> files are loaded (during
 startup of SNMPTT).&nbsp; The <span style=
 "font-weight: bold;">snmptt.ini</span> option <span style=
 "font-weight: bold;">dynamic_nodes</span> can be set to
 <span style="font-weight: bold;">1</span> to have the nodes files
-loaded each time an EVENT is processed.<br>
-<br>
+loaded each time an EVENT is processed.<br />
+<br />
 <p>See the section '<a href="#DNS">Name Resolution / DNS</a>' for
 important DNS information.</p>
 </blockquote>
 </blockquote>
 <h3><a id="SNMPTT.CONF-MATCH" name=
 "SNMPTT.CONF-MATCH"></a><b>MATCH:</b></h3>
-<div style="margin-left: 40px;"><br>
+<div style="margin-left: 40px;"><br />
 <span style="font-weight: bold;">[MATCH [MODE=[or | and]] |
 [</span><span style="font-weight: bold;">$n:</span><span style=
 "font-weight: bold;">[!][(&nbsp;&nbsp;&nbsp; )[i] | n | n-n | &gt;
@@ -2207,95 +2436,104 @@ modifiers are supported:</p>
 <div style="margin-left: 80px;"><span style=
 "font-weight: bold;">i</span> - ignore case when trying to
 match</div>
-<br>
+<br />
 <p style="margin-left: 40px;">The following command formats are
 available:</p>
-<div style="margin-left: 80px;"><b>MATCH MODE=[or | and]<br>
-MATCH <i>$x:</i> [!] <i>(reg) [i]</i><br>
-MATCH <i>$x:</i> [!] <i>n</i><br>
-MATCH <i>$x:</i> [!] <i>n-n</i><br>
-MATCH <i>$x:</i> [!] <i>&lt; n</i><br>
-MATCH <i>$x:</i> [!] <i>&gt; n</i><br>
-MATCH <i>$x:</i> [!] <i>x.x.x.x</i><br>
-MATCH <i>$x:</i> [!] <i>x.x.x.x-x.x.x.x</i><br>
-MATCH <i>$x:</i> [!] <i>x.x.x.x/x</i><br></b><br>
-where:<br>
+<div style="margin-left: 80px;"><b>MATCH MODE=[or | and]<br />
+MATCH <i>$x:</i> [!] <i>(reg) [i]</i><br />
+MATCH <i>$x:</i> [!] <i>n</i><br />
+MATCH <i>$x:</i> [!] <i>n-n</i><br />
+MATCH <i>$x:</i> [!] <i>&lt; n</i><br />
+MATCH <i>$x:</i> [!] <i>&gt; n</i><br />
+MATCH <i>$x:</i> [!] &amp; <i>n</i><br />
+MATCH <i>$x:</i> [!] <i>x.x.x.x</i><br />
+MATCH <i>$x:</i> [!] <i>x.x.x.x-x.x.x.x</i><br />
+MATCH <i>$x:</i> [!] <i>x.x.x.x/x</i><br /></b><br />
+where:<br />
 <div style="margin-left: 40px;"><b>or</b> or <b>and</b> set the
-default evaluation mode for ALL matches<br>
-<b>$x</b> is any variable (example: $3, $A etc)<br>
-<b>reg</b> is a regular expression<br>
-<b>!</b> is used to negate the result (not)<br>
-<b>n</b> is a number<br>
-<b>x.x.x.x</b> is an IP address<br>
-<b>x.x.x.x-x.x.x.x</b> is an IP network address range<br>
-<b>x.x.x.x/x</b> is an IP CIDR network addresss</div>
+default evaluation mode for ALL matches<br />
+<b>$x</b> is any variable (example: $3, $A etc)<br />
+<b>reg</b> is a regular expression<br />
+<b>!</b> is used to negate the result (not)<br />
+<b>&amp;</b> is used to perform a bitwise AND<br />
+<b>n</b> is a number<br />
+<b>x.x.x.x</b> is an IP address<br />
+<b>x.x.x.x-x.x.x.x</b> is an IP network address range<br />
+<b>x.x.x.x/x</b> is an IP CIDR network addresss<br /></div>
 </div>
 </blockquote>
 <div style="margin-left: 40px;">
-<div style="margin-left: 40px;">Notes:<br>
-<br>
+<div style="margin-left: 40px;">Notes:<br />
+<br />
 <div style="margin-left: 40px;">To limit which devices can be
 mapped to this EVENT definition based on the IP address / hostname
 of the device / agent that sent the trap, the <b>NODES</b> keyword
-is recommended.<br>
-<br>
+is recommended.<br />
+<br />
 If the match mode is 'or', once a match occurs no other matches are
-performed and the end result is true.<br>
-<br>
+performed and the end result is true.<br />
+<br />
 If the match mode is 'and', once a match fails, no other matches
-are performed and the end result is false.<br>
-<br>
+are performed and the end result is false.<br />
+<br />
 To use parentheses ( or ) in the search expression, they must be
-backslashed (\).<br>
-<br>
-If no MATCH MODE= line exists, it defaults to 'or'.<br>
-<br>
+backslashed (\).<br />
+<br />
+If no MATCH MODE= line exists, it defaults to 'or'.<br />
+<br />
 There can be only one match <span style=
 "font-weight: bold;">mode</span> per EVENT.&nbsp; If multiple MATCH
 MODE= lines exists, the last one in the list is used.</div>
 </div>
 </div>
 <div style="margin-left: 40px;">
-<div style="margin-left: 40px;">Examples:<br>
-<br>
+<div style="margin-left: 40px;">Examples:<br />
+<br />
 <div style="margin-left: 40px;">$2 must be between 1000 and
-2000:<br>
-<br>
+2000:<br />
+<br />
 <div style="margin-left: 40px;"><span style=
 "font-weight: bold;">MATCH $2: 1000-2000</span></div>
-<br>
+<br />
 Any one must match (or): $3 must be 52, or $4 must be an IP address
 between 192.168.1.10 and 192.168.1.20, or the severity must be
-'Major':<br>
-<br>
-<div style="margin-left: 40px;"><b>MATCH $3: 52</b><br>
-<b>MATCH $4: 192.168.1.10-192.168.1.20</b><br>
-<b>MATCH $s: (Major)</b></div>
+'Major':<br />
+<br />
+<div style="margin-left: 40px;"><b>MATCH $3: 52</b><br />
+<b>MATCH $4: 192.168.1.10-192.168.1.20</b><br />
+<b>MATCH $s: (Major)</b><br /></div>
 </div>
 </div>
 </div>
 <div style="margin-left: 80px;">
-<div style="margin-left: 40px;"><br>
+<div style="margin-left: 40px;"><br />
 All must match (and): $3 must be greater than 20, and $5 must not
 contain the words alarm or critical, $6 must contain the string
 '(1) remaining' and $7 must contain the string 'power' which is not
-case sensitive:<br>
-<br style="font-weight: bold;">
+case sensitive:<br />
+<br style="font-weight: bold;" />
 <div style="margin-left: 40px;"><span style=
 "font-weight: bold;">MATCH $3: &gt;20</span><br style=
-"font-weight: bold;">
+"font-weight: bold;" />
 <span style="font-weight: bold;">MATCH $5:
-!(alarm|critical)</span><br style="font-weight: bold;">
+!(alarm|critical)</span><br style="font-weight: bold;" />
 <span style="font-weight: bold;">MATCH $6: (\(1\)
-remaining)<br></span><span style="font-weight: bold;">MATCH $7:
-(power)i</span><br style="font-weight: bold;">
+remaining)<br /></span> <span style="font-weight: bold;">MATCH $7:
+(power)i</span><br style="font-weight: bold;" />
 <span style="font-weight: bold;">MATCH MODE=and</span></div>
 </div>
+<br />
+<div style="margin-left: 40px;">The integer $1 must have bit 4
+set:<br />
+<br />
+<div style="margin-left: 40px;"><span style=
+"font-weight: bold;">MATCH $1: &amp;8</span></div>
+<br /></div>
 </div>
 <blockquote>
 <h3><a id="SNMPTT.CONF-REGEX" name=
 "SNMPTT.CONF-REGEX"></a><b>REGEX:</b></h3>
-<div style="margin-left: 40px;"><br>
+<div style="margin-left: 40px;"><br />
 [<b style="font-weight: bold;">REGEX</b><span style=
 "font-weight: bold;">(&nbsp;&nbsp;&nbsp; )(&nbsp;&nbsp;&nbsp;
 )[i][g][e]</span>]</div>
@@ -2305,15 +2543,15 @@ perform a search and replace on the <span style=
 Multiple REGEX (&nbsp;&nbsp;&nbsp; )(&nbsp;&nbsp;&nbsp; ) lines are
 permitted.</p>
 <p style="margin-left: 40px;">First (&nbsp;&nbsp;&nbsp; ) contains
-the search expression.<br>
+the search expression.<br />
 Second (&nbsp;&nbsp;&nbsp; ) contains the replacement text</p>
 <p style="margin-left: 40px;">The following Perl regular expression
 modifiers are supported:</p>
 <div style="margin-left: 80px;"><span style=
 "font-weight: bold;">i</span> - ignore case when trying to match
-left side<br>
+left side<br />
 <span style="font-weight: bold;">g</span> - replace all occurances
-instead of only the first<br>
+instead of only the first<br />
 <span style="font-weight: bold;">e</span> - execute the right side
 (eval) as code</div>
 <p style="margin-left: 40px;">To use substitution with captures
@@ -2336,16 +2574,16 @@ operates on the results of the first REGEX etc.</p>
 has&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; detected
 a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; building
 alarm.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cause: UPS1 Alarm #14:
-Building alarm 3.</span><br>
-<br>
+Building alarm 3.</span><br />
+<br />
 <span style="font-weight: bold;">REGEX (Building alarm 3)(Computer
-room high temperature)<br></span> <span style=
+room high temperature)<br /></span> <span style=
 "font-weight: bold;">REGEX (Building alarm 4)(Moisture detection
-alarm)</span><br style="font-weight: bold;">
+alarm)</span><br style="font-weight: bold;" />
 <span style="font-weight: bold;">REGEX
-(roOm)(ROOM)ig</span><br style="font-weight: bold;">
-<span style="font-weight: bold;">REGEX (UPS)(The big UPS)<br>
-REGEX (\s+)( )g<br></span><br>
+(roOm)(ROOM)ig</span><br style="font-weight: bold;" />
+<span style="font-weight: bold;">REGEX (UPS)(The big UPS)<br />
+REGEX (\s+)( )g<br /></span><br />
 FORMAT line after:&nbsp; <span style="font-weight: bold;">The big
 UPS has detected a building alarm. Cause: UPS1 Alarm #14: Computer
 ROOM high temperature</span></div>
@@ -2356,70 +2594,70 @@ does not need to be backslashed.</p>
 <p style="margin-left: 40px;">Example:</p>
 <div style="margin-left: 80px;">FORMAT line before:&nbsp;
 <span style="font-weight: bold;">Alarm (1) and (2) has been
-triggered</span><br>
-<br>
+triggered</span><br />
+<br />
 <span style="font-weight: bold;">REGEX
-(\(1\))(One)</span><br style="font-weight: bold;">
+(\(1\))(One)</span><br style="font-weight: bold;" />
 <span style="font-weight: bold;">REGEX
-(\(2\))((Two))</span><br style="font-weight: bold;">
-<br>
+(\(2\))((Two))</span><br style="font-weight: bold;" />
+<br />
 FORMAT line after:&nbsp; <span style="font-weight: bold;">Alarm One
 and (Two) has been triggered</span></div>
 </blockquote>
 <div style="margin-left: 80px;">If <span style=
 "font-weight: bold;">allow_unsafe_regex</span> is enabled, then
-captures can be used in the replacement text.<br>
+captures can be used in the replacement text.<br />
 <p>Example:</p>
 <div style="margin-left: 40px;">FORMAT line before:&nbsp;
 <span style="font-weight: bold;">The system has logged exception
-error 55 for the service testservice<br></span></div>
-<br>
+error 55 for the service testservice<br /></span></div>
+<br />
 <div style="margin-left: 40px;"><span style=
 "font-weight: bold;">REGEX (</span><span style=
 "font-weight: bold;">The system has logged exception error (\d+)
 for the service (\w+</span><span style=
 "font-weight: bold;">))(Service $2 generated error
-$1)</span><br style="font-weight: bold;">
-<br>
+$1)</span><br style="font-weight: bold;" />
+<br />
 FORMAT line after:&nbsp; <span style="font-weight: bold;">Service
 testservice generated error 55</span></div>
-<br>
+<br />
 If <span style="font-weight: bold;">allow_unsafe_regex</span> is
 enabled and an <span style="font-weight: bold;">e</span> modifier
 is specified, then the right side is executed (evaluated).&nbsp;
 This allows you to use Perl functions to perform various tasks such
 as convert from hex to decimal, format text using sprintf
 etc.&nbsp; All text must be inside of quotes, and statements can be
-concatenated together using the dot (.).<br>
+concatenated together using the dot (.).<br />
 <p>Example 1:</p>
 <div style="margin-left: 40px;">FORMAT line before:&nbsp;
 <span style="font-weight: bold;">Authentication Failure Trap from
-IP address: C0 A8 1 FE<br></span></div>
-<br>
+IP address: C0 A8 1 FE<br /></span></div>
+<br />
 <div style="margin-left: 40px;"><span style=
 "font-weight: bold;">REGEX (Address:
 (\w+)\s+(\w+)\s+(\w+)\s+(\w+))("address:
 ".hex($1).".".hex($2).".".hex($3).".".hex($4))ei</span><br style=
-"font-weight: bold;">
-<br>
+"font-weight: bold;" />
+<br />
 FORMAT line after:&nbsp; <span style=
 "font-weight: bold;">Authentication Failure Trap from IP address:
 192.168.1.254</span></div>
-<br>
+<br />
 <p>Example 2:</p>
 <div style="margin-left: 40px;">FORMAT line before:&nbsp;
 <span style="font-weight: bold;">Authentication Failure Trap from
-IP address: C0 A8 1 FE<br></span></div>
-<br>
+IP address: C0 A8 1 FE<br /></span></div>
+<br />
 <div style="margin-left: 40px;"><span style=
 "font-weight: bold;">REGEX (Address:
 (\w+)\s+(\w+)\s+(\w+)\s+(\w+))("address:".sprintf("%03d.%03d.%03d.%03d",hex($1),hex($2),hex($3),hex($4)))ie</span></div>
-<br style="font-weight: bold;">
-<br>
+<br style="font-weight: bold;" />
+<br />
 <div style="margin-left: 40px;">FORMAT line after:&nbsp;
 <span style="font-weight: bold;">Authentication Failure Trap from
 IP address: 192.168.001.254</span></div>
-<br>
+<br />
 <p>Example 3</p>
 <div style="margin-left: 40px;">This example is for a BGP
 <span style="font-weight: bold;">bgpBackwardTranstion</span>
@@ -2431,51 +2669,51 @@ address is part of the OID <span style=
 "font-weight: bold;">variable name</span> instead of the OID
 <span style="font-weight: bold;">value</span>, a REGEX expression
 is needed.&nbsp; The following uses the $+1 variable on the FORMAT
-line so REGEX can parse out the IP address.&nbsp;<br>
-<br>
+line so REGEX can parse out the IP address.&nbsp;<br />
+<br />
 FORMAT line before:&nbsp; <span style=
-"font-weight: bold;">Peer:$+2<br>
-<br></span>FORMAT line after substitution, but before REGEX:&nbsp;
-<span style=
+"font-weight: bold;">Peer:$+2<br />
+<br /></span> FORMAT line after substitution, but before
+REGEX:&nbsp; <span style=
 "font-weight: bold;">Peer:bgpPeerState</span>.<span style=
-"font-weight: bold;">192.168.1.1:idle<br></span></div>
-<br>
+"font-weight: bold;">192.168.1.1:idle<br /></span></div>
+<br />
 <div style="margin-left: 40px;"><span style=
 "font-weight: bold;">REGEX
 (Peer:.*\.(\d+\.\d+\.\d+\.\d+):(.*))("Peer: $1 has transitioned to
-$2")e</span><br style="font-weight: bold;">
-<br>
+$2")e</span><br style="font-weight: bold;" />
+<br />
 FORMAT line after:&nbsp; <span style="font-weight: bold;">Peer:
 192.168.1.1 has transitioned to idle</span></div>
 </div>
 <blockquote>
-<p style="margin-left: 40px;"><br>
+<p style="margin-left: 40px;"><br />
 Example 4</p>
 <div style="margin-left: 80px;">This example is a sample of using
 Perl subroutines inside of a <span style=
-"font-weight: bold;">REGEX</span> statement.<br>
-<br>
+"font-weight: bold;">REGEX</span> statement.<br />
+<br />
 FORMAT line before:&nbsp; <span style=
 "font-weight: bold;">Extremely severe error has
-occured<br></span><br>
+occured<br /></span><br />
 <span style="font-weight: bold;">REGEX (</span><span style=
 "font-weight: bold;">Extremely severe error has
 occured</span><span style="font-weight: bold;">)(("Better get a
 lotto ticket!!&nbsp; Here is a lotto number to try:".sprintf ("%s",
 lottonumber());sub lottonumber { for(my $i=0;$i&lt;6;$i++) { $temp
 = $temp . " " . (int(rand 49) +1); } return $temp; }
-)ie</span><br style="font-weight: bold;">
-<br>
+)ie</span><br style="font-weight: bold;" />
+<br />
 FORMAT line after:&nbsp; <span style="font-weight: bold;">Better
 get a lotto ticket!!&nbsp; Here is a lotto number to try: 36 27 38
 32 29 6</span></div>
-<br>
-<div style="margin-left: 40px;"><br>
+<br />
+<div style="margin-left: 40px;"><br />
 Note:&nbsp; The REGEX expression is executed on the final
 translated FORMAT / EXEC line, after all variable substitutions
 have been completed.</div>
-<br>
-<br>
+<br />
+<br />
 <h3><a id="SNMPTT.CONF-SDESC" name=
 "SNMPTT.CONF-SDESC"></a><b>SDESC</b></h3>
 <blockquote>[<b>SDESC</b>]
@@ -2489,9 +2727,9 @@ you use a SDESC, you MUST follow with a EDESC.</p>
 <blockquote>[<b>EDESC</b>]
 <p>Used to end the description section.</p>
 <p>Example:</p>
-<blockquote>SDESC<br>
-Trap used when power supply fails in<br>
-a server.<br>
+<blockquote>SDESC<br />
+Trap used when power supply fails in<br />
+a server.<br />
 EDESC</blockquote>
 </blockquote>
 </blockquote>
@@ -2533,13 +2771,13 @@ the NODES entry <b>OR</b> there is no NODES entry <b>)</b>
 <b>AND</b> <b>(</b> the MATCH statement evaluates to TRUE <b>OR</b>
 the there is no MATCH entry&nbsp; <b>)</b></li>
 </ul>
-<br>
+<br />
 <h2><a id="DNS" name="DNS"></a><b>Name resolution / DNS</b></h2>
 <p>Snmptrapd passes the IP address of the device sending the trap
 (host), the host name of the device sending the trap (host) (if
 configured to resolve host names) and the IP address of the actual
-SNMP agent (agent).<br>
-<br>
+SNMP agent (agent).<br />
+<br />
 If the configuration setting <span style=
 "font-weight: bold;">dns_enable</span> is set to 0 (dns disabled),
 then the host name of the AGENT will not be available for the $A
@@ -2548,14 +2786,14 @@ databases.&nbsp; The only exception to this is if the (host) IP
 address matches the (agent) IP address and snmptrapd is configured
 to resolve host names.&nbsp; In that case, the host name of the
 (host) will be used for the (agent) host name as they are obviously
-the same host.<br>
-<br>
+the same host.<br />
+<br />
 If the configuration setting <span style=
 "font-weight: bold;">dns_enable</span> is set to 1 (dns enabled),
 then the host name of both the host and the AGENT will be resolved
 via DNS.&nbsp; NODES entries will also be resolved to IP addresses
-before performing matches.<br>
-<br>
+before performing matches.<br />
+<br />
 The host name may resolve to the Fully Qualified Domain Name
 (FQDN).&nbsp; For example: barney.bedrock.com.&nbsp; Adding an
 entry for the host in your /etc/hosts file or
@@ -2567,8 +2805,8 @@ SNMPTT strip the domain of any FQDN host.&nbsp; See the
 details.</p>
 To allow IP addresses to be resolved to host names, PTR records
 must exist in DNS or the local hosts file must contain all
-hosts.<br>
-<br>
+hosts.<br />
+<br />
 <span style="font-weight: bold; text-decoration: underline;">It is
 recommended that either DNS be installed on the machine running
 SNMPTT / snmptrapd or a local hosts file be configured will all
@@ -2580,9 +2818,9 @@ resolution, and remove the dependency of the network for DNS.&nbsp;
 not used, then the entire network management station could become
 useless during a DNS / remote network outage and could cause false
 alarms for network management software.</span><br style=
-"font-weight: bold;">
-<br>
-<br>
+"font-weight: bold;" />
+<br />
+<br />
 <h2><a id="Sample1-SNMPTT.CONF-file" name=
 "Sample1-SNMPTT.CONF-file"></a><b>Sample1 SNMPTT.CONF file</b></h2>
 <p>Note: The <span style="font-weight: bold;">examples</span>
@@ -2590,55 +2828,55 @@ folder also contains a sample <span style=
 "font-weight: bold;">snmptt.conf</span> file.</p>
 <p>Following is a sample of two defined traps in
 <b>snmptt.conf:</b></p>
-<blockquote>#<br>
-EVENT COMPAQ_11003 .1.3.6.1.4.1.232.0.11003 "LOGONLY" Normal<br>
-FORMAT Compaq Generic Trap: $*<br>
-EXEC qpage -f TRAP notifygroup1 "Compaq Generic Trap: $*"<br>
-NODES /etc/snmp/cpqnodes<br>
-SDESC<br>
-Generic test trap<br>
-EDESC<br>
-#<br>
-#<br>
+<blockquote>#<br />
+EVENT COMPAQ_11003 .1.3.6.1.4.1.232.0.11003 "LOGONLY" Normal<br />
+FORMAT Compaq Generic Trap: $*<br />
+EXEC qpage -f TRAP notifygroup1 "Compaq Generic Trap: $*"<br />
+NODES /etc/snmp/cpqnodes<br />
+SDESC<br />
+Generic test trap<br />
+EDESC<br />
+#<br />
+#<br />
 EVENT cpqDa3AccelBatteryFailed .1.3.6.1.4.1.232.0.3014 "Error
-Events" Critical<br>
-FORMAT Battery status is $3.<br>
+Events" Critical<br />
+FORMAT Battery status is $3.<br />
 EXEC qpage -f TRAP notifygroup1 "$s $r $x $X: Battery status is
-$3"<br>
-NODES ntserver1 ntserver2 ntserver3<br>
-#<br>
+$3"<br />
+NODES ntserver1 ntserver2 ntserver3<br />
+#<br />
 #</blockquote>
 <h2><a id="Sample2-SNMPTT.CONF-file" name=
 "Sample2-SNMPTT.CONF-file"></a><b>Sample2 SNMPTT.CONF file</b></h2>
 <p>Following is a sample of a list of files to load in
 <b>snmptt.ini:</b></p>
-<blockquote>snmptt_conf_files = &lt;&lt;END<br>
-/etc/snmp/snmp-compaq.conf<br>
-/etc/snmp/snmp-compaq-hsv.conf<br>
+<blockquote>snmptt_conf_files = &lt;&lt;END<br />
+/etc/snmp/snmp-compaq.conf<br />
+/etc/snmp/snmp-compaq-hsv.conf<br />
 END</blockquote>
 Following is a sample of one defined traps in
 <b>/etc/snmp/snmptt-compaq.conf:</b>
-<blockquote>#<br>
-EVENT COMPAQ_11003 .1.3.6.1.4.1.232.0.11003 "LOGONLY" Normal<br>
-FORMAT Compaq Generic Trap: $*<br>
-EXEC qpage -f TRAP notifygroup1 "Compaq Generic Trap: $*"<br>
-NODES /etc/snmp/cpqnodes<br>
-SDESC<br>
-Generic test trap<br>
-EDESC<br>
+<blockquote>#<br />
+EVENT COMPAQ_11003 .1.3.6.1.4.1.232.0.11003 "LOGONLY" Normal<br />
+FORMAT Compaq Generic Trap: $*<br />
+EXEC qpage -f TRAP notifygroup1 "Compaq Generic Trap: $*"<br />
+NODES /etc/snmp/cpqnodes<br />
+SDESC<br />
+Generic test trap<br />
+EDESC<br />
 #</blockquote>
 Following is a sample of one defined traps in
 <b>/etc/snmp/snmptt-compaq-hsv.conf:</b>
-<blockquote>#<br>
+<blockquote>#<br />
 EVENT mngmtAgentTrap-16025 .1.3.6.1.4.1.232.0.136016025 "Status
-Events" Normal<br>
+Events" Normal<br />
 FORMAT Host $1 : SCellName-TimeDate $2 : EventCode $3 : Description
-$4<br>
+$4<br />
 EXEC qpage -f TRAP notifygroup1 "Host $1 : SCellName-TimeDate $2 :
-EventCode $3 : Description $4"<br>
-SDESC<br>
-"Ema EMU Internal State Machine Error [status:10]"<br>
-EDESC<br>
+EventCode $3 : Description $4"<br />
+SDESC<br />
+"Ema EMU Internal State Machine Error [status:10]"<br />
+EDESC<br />
 #</blockquote>
 <h2><a id="Notes" name="Notes"></a><b>Notes</b></h2>
 <p>An existing HP Openview trapd.conf can be used in most cases but
@@ -2655,7 +2893,7 @@ to convert the file to <span style=
 NOTIFICATION definitions.&nbsp; <span style=
 "font-weight: bold;">Snmpttconvertmib</span> can be used to convert
 the file to <span style="font-weight: bold;">snmptt.conf</span>
-format.<br>
+format.<br />
 &nbsp;</p>
 <h2><a id="Limitations" name=
 "Limitations"></a><b>Limitations</b></h2>
@@ -2681,7 +2919,7 @@ is.</p>
 <p>The program called by SNMPTT (EXEC) blocks SNMPTT.&nbsp; If you
 call a program that does not return, SNMPTT will be left
 waiting.&nbsp; In standalone mode, this would cause snmptrapd to
-wait forever also.<br>
+wait forever also.<br />
 &nbsp;</p>
 <h2><a id="Feedback" name="Feedback"></a><b>Feedback &amp;
 Bugs</b></h2>
@@ -2696,13 +2934,13 @@ also use Sourceforge for <a href=
 "http://sourceforge.net/tracker/?group_id=51473&amp;atid=463393">bugs</a>
 and <a href=
 "http://sourceforge.net/tracker/?atid=463396&amp;group_id=51473&amp;func=browse">
-feature requests</a>.<br>
+feature requests</a>.<br />
 &nbsp;</p>
 <h2><a id="Integration-with-other-software" name=
 "Integration-with-other-software"></a><b>Integration with other
-software<br></b></h2>
+software<br /></b></h2>
 <h3><a id="Nagios-Netsaint" name="Nagios-Netsaint"></a><b>Nagios
-/</b> <b>Netsaint<br></b></h3>
+/</b> <b>Netsaint<br /></b></h3>
 <h4>Overview</h4>
 <p>Nagios / Netsaint is a system monitoring application. It
 monitors hosts and services and alerts you when things go
@@ -2716,7 +2954,7 @@ page</a>.&nbsp; You should be able to install and configuration
 Nagios before attempting to integrate it with SNMPTT.&nbsp; You
 should also have a functioning SNMPTT system that can at least log
 translated traps to a log file.</p>
-<br>
+<br />
 <h4><big>Nagios Passive Service Checks</big></h4>
 <p>Passive service checks allow Nagios to process service check
 results that are submitted by external applications.&nbsp; Using
@@ -2725,7 +2963,7 @@ using the <span style=
 "font-weight: bold;">submit_check_result</span> script included
 with Nagios.&nbsp; Once received by Nagios, the trap can be logged,
 a page sent, email sent etc.&nbsp; <span style=
-"font-weight: bold; text-decoration: underline;"><br></span></p>
+"font-weight: bold; text-decoration: underline;"><br /></span></p>
 <p><span style=
 "font-weight: bold; text-decoration: underline;">One</span> service
 is defined for each Nagios host that is to receive traps from
@@ -2742,9 +2980,11 @@ console.&nbsp; Each received trap will be logged, emailed, paged
 etc but the console will only show the last one as being in the
 warning or critical state.&nbsp; <span style=
 "text-decoration: underline;">The service will remain in this state
-until you manually force a service check.</span>&nbsp; See
+until you manually force a service check unless you have freshness
+checking enabled (Nagios 2.0 and higher).</span>&nbsp; See
 <big><small><span style="font-weight: bold;">Clearing received
-traps in Nagios</span> below.<br></small></big></p>
+traps in Nagios</span> below.</small></big></p>
+<p><big><small><br /></small></big></p>
 <h4><big><span style="font-weight: bold;">Nagios Volatile
 Services</span></big></h4>
 <p>When defining the service for receiving the SNMPTT translated
@@ -2760,7 +3000,7 @@ and the state is <span style=
 notified.&nbsp; Because there is only one service entry for the
 SNMP traps, we need to make sure we are contacted every time a trap
 comes in.</p>
-<br>
+<br />
 <h4><big><span style="font-weight: bold;">Creating the Nagios
 service entry</span></big></h4>
 <p>Following is a sample service entry for Nagios.&nbsp; The
@@ -2771,17 +3011,17 @@ not be included in the definition.</p>
 <tr>
 <td class="Definition" colspan="3">define service{</td>
 <td style="vertical-align: top; font-style: italic;">
-Description<br></td>
+Description<br /></td>
 </tr>
 <tr>
-<td><br></td>
+<td><br /></td>
 <td class="Required">host_name</td>
 <td class="Required">server01</td>
 <td style="vertical-align: top; font-style: italic;">Name of
-host<br></td>
+host<br /></td>
 </tr>
 <tr>
-<td><br></td>
+<td><br /></td>
 <td class="Required">service_description</td>
 <td class="Required">TRAP</td>
 <td style="vertical-align: top; font-style: italic;">Name of
@@ -2790,89 +3030,95 @@ service.&nbsp; What you use here must match the same value for the
 script</td>
 </tr>
 <tr>
-<td><br></td>
+<td><br /></td>
 <td class="Optional">is_volatile</td>
 <td class="Optional">1</td>
 <td style="vertical-align: top; font-style: italic;">Enables
 volatile services</td>
 </tr>
 <tr>
-<td><br></td>
+<td><br /></td>
 <td class="Required">check_command</td>
 <td class="Required">check-host-alive</td>
 <td style="vertical-align: top; font-style: italic;">Used to reset
 the status to OK when <span style="font-weight: bold;">'Schedule an
-immediate check of this service'</span> is selected.<br></td>
+immediate check of this service'</span> is selected.<br /></td>
 </tr>
 <tr>
-<td><br></td>
+<td><br /></td>
 <td class="Required">max_check_attempts</td>
-<td class="Required">1<br></td>
+<td class="Required">1<br /></td>
 <td style="vertical-align: top; font-style: italic;">Leave as
 1.</td>
 </tr>
 <tr>
-<td><br></td>
+<td><br /></td>
 <td class="Required">normal_check_interval</td>
-<td class="Required">1<br></td>
+<td class="Required">1<br /></td>
 <td style="vertical-align: top; font-style: italic;">Leave as
 1.</td>
 </tr>
 <tr>
-<td><br></td>
+<td><br /></td>
 <td class="Required">retry_check_interval</td>
-<td class="Required">1<br></td>
+<td class="Required">1<br /></td>
 <td style="vertical-align: top; font-style: italic;">Leave as
 1.</td>
 </tr>
 <tr>
-<td><br></td>
-<td class="Optional">passive_checks_enabled</td>
-<td class="Optional">1</td>
-<td style="vertical-align: top; font-style: italic;">Enables
-passive checks<br></td>
+<td><br /></td>
+<td>active_checks_enabled</td>
+<td>0</td>
+<td>Prevent active checks from occuring as we are only using
+passive checks.</td>
 </tr>
 <tr>
-<td><br></td>
-<td class="Required">check_period</td>
-<td class="Required">none</td>
-<td style="vertical-align: top; font-style: italic;">When this
-servcie can be checked.&nbsp; Because it is a passive service, it
-never needs to be automatically checked</td>
+<td><br /></td>
+<td class="Required">passive_checks_enabled</td>
+<td class="Required">1</td>
+<td style="vertical-align: top; font-style: italic;">Enables
+passive checks<br /></td>
 </tr>
 <!--<tr><td></td><td class="Optional">failure_prediction_enabled</td><td class="Optional">[0/1]</td></tr>//-->
 <tr>
-<td><br></td>
+<td><br /></td>
+<td>check_period</td>
+<td>24x7</td>
+<td>Required for freshness checking.</td>
+</tr>
+<tr>
+<td><br /></td>
 <td class="Required">notification_interval</td>
 <td class="Required">31536000</td>
 <td style="vertical-align: top; font-style: italic;">Notification
 interval.&nbsp; Set to a very high number to prevent you from
 getting pages of previously received traps (1 year - restart Nagios
-at least once a year! - do not set to 0!).<br></td>
+at least once a year! - do not set to 0!).<br /></td>
 </tr>
 <tr>
-<td><br></td>
+<td><br /></td>
 <td class="Required">notification_period</td>
 <td class="Required">24x7</td>
 <td style="vertical-align: top; font-style: italic;">When you can
 be notified.&nbsp; Can be changed</td>
 </tr>
 <tr>
-<td><br></td>
+<td><br /></td>
 <td class="Required">notification_options</td>
-<td class="Required">w,u,c,r</td>
+<td class="Required">w,u,c</td>
 <td style="vertical-align: top; font-style: italic;">Notify on
-warning, unknown, critical and recovery<br></td>
+warning, unknown and&nbsp;critical. &nbsp;Recovery is not enabled
+so we do not get notified when a trap is cleared.<br /></td>
 </tr>
 <tr>
-<td><br></td>
-<td class="Optional">notifications_enabled</td>
-<td class="Optional">1<br></td>
+<td><br /></td>
+<td class="Required">notifications_enabled</td>
+<td class="Required">1<br /></td>
 <td style="vertical-align: top; font-style: italic;">Enable
-notifications<br></td>
+notifications<br /></td>
 </tr>
 <tr>
-<td><br></td>
+<td><br /></td>
 <td class="Required">contact_groups</td>
 <td class="Required">cg_core</td>
 <td style="vertical-align: top; font-style: italic;">Name of
@@ -2881,20 +3127,33 @@ contact group to notify</td>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;</td>
 <td class="Definition" colspan="2">}</td>
-<td style="vertical-align: top; font-style: italic;"><br></td>
+<td style="vertical-align: top; font-style: italic;"><br /></td>
 </tr>
 </tbody>
 </table>
-<p>Following is a sample service entry for Netsaint.</p>
+<p>Note: &nbsp;Previous versions of this documentation defined a
+<span style="font-weight: bold;">check_period</span> of none, and
+did not set <span style=
+"font-weight: bold;">active_checks_enabled</span> to 0. &nbsp;As of
+SNMPTT 1.2, setting <span style=
+"font-weight: bold;">active_checks_enabled</span> to 0 instead of
+setting <span style="font-weight: bold;">check_period</span>to none
+is recommened as freshness checks require it. &nbsp;The recovery
+notification option has also been removed so we do not get notified
+when a trap is cleared.<br /></p>
+<p>Following is a sample service entry for Netsaint. &nbsp;Netsaint
+does not support&nbsp;<span style=
+"font-weight: bold;">active_checks_enabled</span>, so a check
+period of none is used.</p>
 <p style="margin-left: 40px;"><span style=
 "font-weight: bold;">service[server01]=TRAP;1;none;1;1;1;cg_core;31536000;24x7;0;1;1;;check-host-alive</span></p>
 See the Netsaint documentation and the Nagios table above for an
-explanation of the various fields.<br>
-<br>
-<br>
+explanation of the various fields.<br />
+<br />
+<br />
 <h4><big><span style="font-weight: bold;">Creating the SNMPTT EXEC
 statement</span></big></h4>
-<br>
+<br />
 The Nagios distribution should contain the script <span style=
 "font-weight: bold;">submit_check_result</span> in the <span style=
 "font-weight: bold;">contrib/eventhandlers</span> directory.&nbsp;
@@ -2905,63 +3164,65 @@ Create a directory called <span style=
 the <span style="font-weight: bold;">submit_check_result</span>
 script to that directory.&nbsp; Make sure the script is executable
 (<span style="font-weight: bold;">chmod +x
-submit_check_result)</span>.<br>
-<br>
+submit_check_result)</span>.<br />
+<br />
 The <span style="font-weight: bold;">submit_check_result</span>
-script expects the following arguments:<br>
-<br>
+script expects the following arguments:<br />
+<br />
 <div style="margin-left: 40px;"><span style=
 "font-weight: bold;">host_name</span><br style=
-"font-weight: bold;">
+"font-weight: bold;" />
 <span style="font-weight: bold;">svc_description</span><br style=
-"font-weight: bold;">
+"font-weight: bold;" />
 <span style="font-weight: bold;">return_code</span><br style=
-"font-weight: bold;">
+"font-weight: bold;" />
 <span style="font-weight: bold;">plugin_output</span></div>
-<br>
+<br />
 The possible return codes are: 0=OK, 1=WARNING, 2=CRITICAL,
 -1=UNKNOWN.&nbsp; See the top of the <span style=
 "font-weight: bold;">submit_check_result</span> script for a
-detailed description of each argument.<br>
-<br>
+detailed description of each argument.<br />
+<br />
 Create an EXEC statement such as the following for each
 <span style="font-weight: bold;">EVENT</span> entry in your
-<span style="font-weight: bold;">snmptt.conf</span>&nbsp;file:<br>
-<br>
+<span style=
+"font-weight: bold;">snmptt.conf</span>&nbsp;file:<br />
+<br />
 <div style="margin-left: 40px;"><span style=
 "font-weight: bold;">EXEC
-/usr/local/netsaint/libexec/eventhandlers/submit_check_result $r
-TRAP 1 "xxxxxx"</span></div>
-<br>
+/usr/local/nagios/libexec/eventhandlers/submit_check_result $r TRAP
+1 "xxxxxx"</span></div>
+<br />
 where "xxxxxx" is the text for the trap using the same format as
 the <span style="font-weight: bold;">FORMAT</span> statement.&nbsp;
-For example:<br>
-<br>
+For example:<br />
+<br />
 <div style="margin-left: 40px;"><span style=
-"font-weight: bold;">EXEC
-/usr/local/netsaint/libexec/eventhandlers/submit_check_result $r
+"font-weight: bold;">EXEC /usr/local/</span><span style=
+"font-weight: bold;">nagios</span><span style=
+"font-weight: bold;">/libexec/eventhandlers/submit_check_result $r
 TRAP 1 "Drive $1 in bay $2 has failed"</span></div>
-<br>
+<br />
 The variable substitution <span style=
 "font-weight: bold;">$r</span> is used to pass the host name,
 <span style="font-weight: bold;">TRAP</span> matches the service
 definition defined above, <span style="font-weight: bold;">1</span>
 represents a WARNING, and <span style=
 "font-weight: bold;">"xxxxxx"</span> is the translated message from
-SNMPTT.<br>
-<br>
+SNMPTT.<br />
+<br />
 You must make sure that the host definition in Nagios matches the
 hostname that will be passed from SNMPTT using the $r
 variable.&nbsp; See the section '<a href="#DNS">Name Resolution /
-DNS</a>' for important DNS information.<br>
-<br>
-<br>
+DNS</a>' for important DNS information.<br />
+<br />
+<br />
 <h4><big><span style="font-weight: bold;">Clearing received traps
 in Nagios</span></big></h4>
-<br>
-Once a trap is received for a host, it will remain in the
-<span style="font-weight: bold;">WARNING</span> state.&nbsp; To
-clear the trap from the Nagios console, open the <span style=
+Using the above configuration, once a trap is received for a host,
+it will remain in the <span style=
+"font-weight: bold;">WARNING</span> state.&nbsp; To clear the trap
+from the Nagios console, open the <span style=
 "font-weight: bold;">TRAP</span> service and click '<span style=
 "font-weight: bold;">Schedule an immediate check of this
 service</span>'.&nbsp; This will cause the defined service check to
@@ -2969,11 +3230,149 @@ be run (<span style="font-weight: bold;">check-host-alive</span> in
 the example above) which will then change the status code to
 <span style="font-weight: bold;">OK</span> and clear the warning
 after a minute or so, assuming of course the system responds OK to
-the <span style="font-weight: bold;">check-host-alive</span>
-check.<br>
-<br>
+the <span style="font-weight: bold;">check-host-alive</span> check.
+&nbsp;An alternative to using&nbsp;<span style=
+"font-weight: bold;">check-host-alive</span> is to create a new
+command called <span style="font-weight: bold;">reset-trap</span>
+with:<br />
+<br />
+<div style="margin-left: 40px; font-weight: bold;">#!/bin/sh<br />
+/bin/echo "OK: No recent traps received"<br />
+exit 0</div>
+<br />
+Be sure to create a command definition in your *commands.cfg file.
+&nbsp;See the 'Object configuration file options' section of the
+Nagios documentation.<br />
+<br />
+Nagios 2.0 introduced service and host result freshness checks.
+&nbsp;Service freshness checks can be used to automatically reset
+the trap notification to an OK state by defining <span style=
+"font-weight: bold;">check_freshness</span> and <span style=
+"font-weight: bold;">freshness_threshold</span> in the service
+definition. &nbsp;Using freshness checks is recommended over normal
+active checks (defined by <span style=
+"font-weight: bold;">normal_check_interval</span>) because the next
+check time of a normal active check does not change when a service
+changes state. &nbsp;Because of this, if you wanted to clear the
+trap after 24 hours, the last trap would be cleared some time
+between when it happened at 24 hours, depending on when the last
+active check was done. &nbsp;With freshness checking, the check
+command will be run <span style=
+"font-weight: bold;">freshness_threshold</span> seconds after the
+last passive result was received.<br />
+<br />
+For freshness checking to work, <span style=
+"font-weight: bold;">normal_check_interval</span> must be set to
+1,&nbsp;<span style="font-weight: bold;">valid
+check_period</span>&nbsp;should be set to 24x7 and the following
+service definitions should be added. &nbsp;The third column should
+not be included in the definition.<br />
+<br />
+<comment><br /></comment>
+<table border="1">
+<tbody>
+<tr>
+<td class="Required">check_freshness</td>
+<td class="Required">1</td>
+<td style="vertical-align: top; font-style: italic;">Enable
+freshness checking<br /></td>
+</tr>
+<tr>
+<td class="Required">freshness_threshold</td>
+<td class="Required">86400</td>
+<td style="vertical-align: top; font-style: italic;">Reset trap
+alert every 24 hours.</td>
+</tr>
+</tbody>
+</table>
+<br />
+<br />
+<h4><big><span style="font-weight: bold;">SNMP heartbeat
+monitoring</span></big></h4>
+If you have an application that sends periodic SNMP heartbeats, it
+is possible to use freshness checking to alert if a heartbeat has
+not been received.<br />
+<br />
+To configure a heartbeat trap, start by creating a new service
+definition by following 'Creating the Nagios service entry' above,
+but use a new <span style=
+"font-weight: bold;">service_description</span> such as
+<span style="font-weight: bold;">MyApp_heartbeat</span>.
+&nbsp;Next, add / change the following service definitions.
+&nbsp;The third column should not be included in the
+definition.<br />
+<br />
+<table border="1">
+<tbody>
+<tr>
+<td class="Required">check_freshness</td>
+<td class="Required">1</td>
+<td style="vertical-align: top; font-style: italic;">Enable
+freshness checking<br /></td>
+</tr>
+<tr>
+<td class="Required">freshness_threshold</td>
+<td class="Required">1200</td>
+<td style="vertical-align: top; font-style: italic;">Check
+freshness every 20 minutes.</td>
+</tr>
+<tr>
+<td class="Required">check_command</td>
+<td class="Required">myapp_heartbeat_alarm_set</td>
+<td style="vertical-align: top; font-style: italic;">Command to
+execute when a heartbeat is not received within freshness_threshold
+seconds.</td>
+</tr>
+<tr>
+<td class="Required">notification_options</td>
+<td class="Required">w,u,c,r</td>
+<td style="vertical-align: top; font-style: italic;">Notify on
+warning, unknown&nbsp;critical and recovery.</td>
+</tr>
+</tbody>
+</table>
+<br />
+<br />
+Note: &nbsp;For freshness checking to work, <span style=
+"font-weight: bold;">normal_check_interval</span> must be set to
+1,&nbsp;and <span style="font-weight: bold;">valid
+check_period</span> should be set to 24x7.<br />
+<br />
+In this example, it is assumed that the heartbeat trap is received
+every 15 minutes, so a&nbsp;freshness_threshold of 20 minutes was
+selected in case the heartbeat was delayed.<br />
+<br />
+Create the new <span style=
+"font-weight: bold;">myapp_heartbeat_alarm_set</span>&nbsp;command
+for Nagios:<br />
+<br />
+<div style="margin-left: 40px; font-weight: bold;">#!/bin/sh<br />
+/bin/echo "CRITICAL: Heartbeat signal from MyApp was not
+received!"<br />
+exit 2</div>
+<br />
+Be sure to create a command definition in your *commands.cfg file.
+&nbsp;See the 'Object configuration file options' section of the
+Nagios documentation.<br />
+<br />
+Next, add an EXEC statement to the snmptt.conf file for the trap
+definition:<br />
+<br />
+<div style="margin-left: 40px;"><span style=
+"font-weight: bold;">EXEC
+/usr/local/nagios/libexec/eventhandlers/submit_check_result
+$r&nbsp;MyApp_heartbeat 1 "Heartbeat signal from MyApp
+received."</span></div>
+<br />
+As long as the traps are received, the <span style=
+"font-weight: bold;">MyApp_heartbeat</span> service will have an OK
+status. &nbsp;If the heartbeat is not received, the freshness
+command will be executed which will set the status to
+CRITICAL.<br />
+<br />
+<br />
 <h3><a id="SEC" name="SEC"></a><b>SEC - Simple Event
-Correlator</b><b><br></b></h3>
+Correlator</b><b><br /></b></h3>
 <h4>Overview</h4>
 <p><a href="http://kodu.neti.ee/%7Eristo/sec/">Simple Event
 Correlator (SEC)</a> is a free and platform independent event
@@ -2988,21 +3387,26 @@ You should be able to install and configuration SEC before
 attempting to integrate it with SNMPTT.&nbsp; You should also have
 a functioning SNMPTT system that can at least log translated traps
 to a log file.</p>
+This section outlines one method of integrating SEC with SNMPTT.
+&nbsp;Another method is documented in the&nbsp;<a href=
+"http://www.samag.com/articles/2005/0503/">March edition</a> of
+<a href="http://www.samag.com/">Sys Admin Magazine</a> in an
+article written by Francois Meehan.<br />
+<br />
 Here are a couple of examples of why you would want to integrate
-SNMPTT with SEC:&nbsp;<br>
+SNMPTT with SEC:&nbsp;<br />
 <ol>
 <li>You have a 'noisy' device that constantly sends the same trap
 over and over again.&nbsp; It would be possible to simply disable
 the trap in SNMPTT, but you want the trap to be logged, just not
 excessively.&nbsp; The SEC 'SingleWithSupress' could be used to
-reduce the number of traps logged.<br></li>
-<li>&lt;&gt;Router interfaces often go up and down and you are
-receiving a trap for each event.&nbsp; You do not want to be
-alerted every time the interface 'bounces', but you do want to be
-alerted if it happens many times over a set period of time.&nbsp;
-You want to be alerted when the interface is down for more than 10
-seconds, and then when the interface comes back up.&nbsp;
-&lt;/&gt;<br></li>
+reduce the number of traps logged.<br /></li>
+<li>Router interfaces often go up and down and you are receiving a
+trap for each event.&nbsp; You do not want to be alerted every time
+the interface 'bounces', but you do want to be alerted if it
+happens many times over a set period of time.&nbsp; You want to be
+alerted when the interface is down for more than 10 seconds, and
+then when the interface comes back up.<br /></li>
 </ol>
 </blockquote>
 <blockquote>
@@ -3014,16 +3418,16 @@ SEC could take place:</p>
 /var/log/snmptt.sec.log using '/bin/echo ...' for the EXEC
 statement.&nbsp; No FORMAT line is defined so the trap is not
 logged to the regular snmptt.log log file (or SQL table if a SQL
-server is used).<br></li>
+server is used).<br /></li>
 <li>SEC monitors the log file for new entries.</li>
 <li>SEC correlates the messages from the log file.</li>
 <li>When a new alert needs to be generated by SEC based on its
 rules, SEC will call an external script which will feed the
 information back into SNMPTT as a trap using a user defined unique
 trap OID.&nbsp; The unique trap OID is defined in a custom
-snmptt.conf file (such as /etc/snmp/snmptt.conf.sec).<br></li>
+snmptt.conf file (such as /etc/snmp/snmptt.conf.sec).<br /></li>
 <li>SNMPTT will process the new trap as it would any other trap by
-logging to snmptt.log, a SQL table etc.<br></li>
+logging to snmptt.log, a SQL table etc.<br /></li>
 </ol>
 <h4>Configuration Overview</h4>
 <p>The following outlines how example 2 from above could be handled
@@ -3035,7 +3439,7 @@ page</a>.</p>
 <ul>
 <li>Prevents interface flapping from flooding the log files</li>
 <li>Provides an 'unstable' and 'stable' alert based on how often
-the interface bounces.<br></li>
+the interface bounces.<br /></li>
 </ul>
 <p>The following steps need to be completed:</p>
 <ol>
@@ -3047,7 +3451,7 @@ SEC</li>
 linkUp messages and pass new alerts to a script</li>
 <li>Create a script that will feed the messages from SEC back in to
 SNMPTT</li>
-<li>Test<br></li>
+<li>Test<br /></li>
 </ol>
 <h4>1. Modify the Cisco SNMPTT.CONF file</h4>
 <p>The existing SNMPTT.CONF file needs to be modified to output the
@@ -3058,145 +3462,146 @@ linkdown or linkup message to /var/log/snmptt/sec.log.&nbsp; As you
 can see there are no FORMAT lines so the trap will not be logged to
 the regular SNMPTT log system.</p>
 <div style="margin-left: 40px;">EVENT Cisco_Link_Down
-.1.3.6.1.6.3.1.1.5.3.1.3.6.1.4.1.9 "Cisco Events" Minor<br>
+.1.3.6.1.6.3.1.1.5.3.1.3.6.1.4.1.9 "Cisco Events" Minor<br />
 <span style="font-weight: bold;">EXEC /bin/echo "node=$A
 msg_text=cisco linkdown trap on interface $1" &gt;&gt;
-/var/log/snmptt/sec.log</span><br>
-SDESC<br>
-This event occurs when the Cisco agent<br>
-detects an interface has gone down.<br>
-<br>
-A linkDown trap signifies that the sending<br>
-protocol entity recognizes a failure in one of<br>
-the communication links represented in the<br>
-agent's configuration.<br>
-EDESC<br>
-#<br>
-#<br>
-#<br>
+/var/log/snmptt/sec.log</span><br />
+SDESC<br />
+This event occurs when the Cisco agent<br />
+detects an interface has gone down.<br />
+<br />
+A linkDown trap signifies that the sending<br />
+protocol entity recognizes a failure in one of<br />
+the communication links represented in the<br />
+agent's configuration.<br />
+EDESC<br />
+#<br />
+#<br />
+#<br />
 EVENT Cisco_Link_Up .1.3.6.1.6.3.1.1.5.4.1.3.6.1.4.1.9 "Cisco
-Events" Normal<br>
+Events" Normal<br />
 <span style="font-weight: bold;">EXEC /bin/echo "node=$A
 msg_text=cisco linkup trap on interface $1" &gt;&gt;</span>
-<span style="font-weight: bold;">/var/log/snmptt/sec.log</span><br>
-SDESC<br>
-This event occurs when the Cisco agent<br>
-detects an interface has come back up.<br>
-<br>
-A linkUp trap signifies that the sending<br>
-protocol entity recognizes that one of the<br>
-communication links represented in the agent's<br>
-configuration has come up.<br>
-EDESC<br>
-#<br>
-#<br>
+<span style=
+"font-weight: bold;">/var/log/snmptt/sec.log</span><br />
+SDESC<br />
+This event occurs when the Cisco agent<br />
+detects an interface has come back up.<br />
+<br />
+A linkUp trap signifies that the sending<br />
+protocol entity recognizes that one of the<br />
+communication links represented in the agent's<br />
+configuration has come up.<br />
+EDESC<br />
+#<br />
+#<br />
 #</div>
-<br>
+<br />
 <h4>2. Create a new SNMPTT.CONF file for incoming SEC alerts</h4>
 A new SNMPTT.CONF file needs to be created which will handle the
-incoming traps from SEC.<br>
-<br>
+incoming traps from SEC.<br />
+<br />
 Following is an example snmptt.conf.sec file to accept incoming
 traps from SEC.&nbsp; Use an enterprise OID that will not
 interferre with any other OIDs already configured on your
-system.&nbsp; For example, .1.3.6.1.4.1.9999.<br>
-<br>
+system.&nbsp; For example, .1.3.6.1.4.1.9999.<br />
+<br />
 <div style="margin-left: 40px;"><span style=
 "font-weight: bold;">EVENT Cisco_Link_DownUp .1.3.6.1.4.1.9999.1
-"Cisco Events" Normal</span><br>
-FORMAT $1<br>
-#<br>
-#<br>
-#<br>
+"Cisco Events" Normal</span><br />
+FORMAT $1<br />
+#<br />
+#<br />
+#<br />
 <span style="font-weight: bold;">EVENT Cisco_Link_DownUp
-.1.3.6.1.4.1.9999.2 "Cisco Events" Major</span><br>
-FORMAT $1<br>
-#<br>
-#<br>
+.1.3.6.1.4.1.9999.2 "Cisco Events" Major</span><br />
+FORMAT $1<br />
+#<br />
+#<br />
 #</div>
-<br>
+<br />
 <h4>3. Create a SEC configuration file</h4>
 Following is a SEC configuration file that handles the even
 correlation for the Cisco traps.&nbsp; This file is the same as the
 file available on the <a href=
 "http://kodu.neti.ee/%7Eristo/sec/examples.html">SEC Examples
-page</a> except comments and file paths have been modified.<br>
-<br>
+page</a> except comments and file paths have been modified.<br />
+<br />
 <div style="margin-left: 40px;">
-################################################################<br>
+################################################################<br />
 
 #&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sample SEC
-ruleset for SNMPTT<br>
-################################################################<br>
+ruleset for SNMPTT<br />
+################################################################<br />
 
-<br>
-# process Cisco linkDown/linkUp trap events received from<br>
-# SNMPTT via log file<br>
-<br>
-type=PairWithWindow<br>
-ptype=RegExp<br>
+<br />
+# process Cisco linkDown/linkUp trap events received from<br />
+# SNMPTT via log file<br />
+<br />
+type=PairWithWindow<br />
+ptype=RegExp<br />
 pattern=node=(\S+).*msg_text=cisco linkdown trap on interface
-(\S+)<br>
-desc=CISCO $1 INTERFACE $2 DOWN<br>
-action=event %s;<br>
-continue2=TakeNext<br>
-ptype2=RegExp<br>
-pattern2=node=$1.*msg_text=cisco linkup trap on interface $2<br>
-desc2=CISCO %1 INTERFACE %2 BOUNCE<br>
-action2=event %s;<br>
-window=20<br>
-<br>
-type=SingleWithSuppress<br>
-continue=TakeNext<br>
-ptype=RegExp<br>
-pattern=CISCO (\S+) INTERFACE (\S+) DOWN<br>
-desc=cisco $1 interface $2 down<br>
-action=reset +1 %s<br>
-window=60<br>
-<br>
-type=Pair<br>
-ptype=RegExp<br>
-pattern=CISCO (\S+) INTERFACE (\S+) DOWN<br>
-desc=cisco $1 interface $2 down<br>
-action=shellcmd /home/snmptt/cisco_msg $1 $2 major down<br>
-ptype2=RegExp<br>
-pattern2=node=$1.*msg_text=cisco linkup trap on interface $2<br>
-desc2=cisco %1 interface %2 up<br>
-action2=shellcmd /home/snmptt/cisco_msg %1 %2 normal up<br>
-window=86400<br>
-<br>
-type=SingleWith2Thresholds<br>
-ptype=RegExp<br>
-pattern=CISCO (\S+) INTERFACE (\S+) BOUNCE<br>
-desc=cisco $1 interface $2 is unstable<br>
-action=shellcmd /home/snmptt/cisco_msg $1 $2 major unstable<br>
-window=3600<br>
-thresh=10<br>
-desc2=cisco $1 interface $2 is stable again<br>
-action2=shellcmd /home/snmptt/cisco_msg $1 $2 normal stable<br>
-window2=10800<br>
+(\S+)<br />
+desc=CISCO $1 INTERFACE $2 DOWN<br />
+action=event %s;<br />
+continue2=TakeNext<br />
+ptype2=RegExp<br />
+pattern2=node=$1.*msg_text=cisco linkup trap on interface $2<br />
+desc2=CISCO %1 INTERFACE %2 BOUNCE<br />
+action2=event %s;<br />
+window=20<br />
+<br />
+type=SingleWithSuppress<br />
+continue=TakeNext<br />
+ptype=RegExp<br />
+pattern=CISCO (\S+) INTERFACE (\S+) DOWN<br />
+desc=cisco $1 interface $2 down<br />
+action=reset +1 %s<br />
+window=60<br />
+<br />
+type=Pair<br />
+ptype=RegExp<br />
+pattern=CISCO (\S+) INTERFACE (\S+) DOWN<br />
+desc=cisco $1 interface $2 down<br />
+action=shellcmd /home/snmptt/cisco_msg $1 $2 major down<br />
+ptype2=RegExp<br />
+pattern2=node=$1.*msg_text=cisco linkup trap on interface $2<br />
+desc2=cisco %1 interface %2 up<br />
+action2=shellcmd /home/snmptt/cisco_msg %1 %2 normal up<br />
+window=86400<br />
+<br />
+type=SingleWith2Thresholds<br />
+ptype=RegExp<br />
+pattern=CISCO (\S+) INTERFACE (\S+) BOUNCE<br />
+desc=cisco $1 interface $2 is unstable<br />
+action=shellcmd /home/snmptt/cisco_msg $1 $2 major unstable<br />
+window=3600<br />
+thresh=10<br />
+desc2=cisco $1 interface $2 is stable again<br />
+action2=shellcmd /home/snmptt/cisco_msg $1 $2 normal stable<br />
+window2=10800<br />
 thresh2=0</div>
-<br>
-Here is a quick breakdown of what each rule does:<br>
-<br>
-<span style="font-weight: bold;">First rule:</span><br>
+<br />
+Here is a quick breakdown of what each rule does:<br />
+<br />
+<span style="font-weight: bold;">First rule:</span><br />
 <ul>
 <li>If a linkDown is received (node=x msg_text=cisco linkdowni trap
 on interface x from SNMPTT), and then a linkUp is received within
 20 seconds, it is considered a BOUNCE.&nbsp; A new 'event' is
 created with the internal SEC event 'CISCO %1 INTERFACE %2 BOUNCE'
-is created which is passed to the other rules.&nbsp;<br></li>
+is created which is passed to the other rules.&nbsp;<br /></li>
 <li>If a linkDown is received and a linkUp is <span style=
 "font-weight: bold;">not</span> received within 20 seconds, a new
 'down' internal SEC event is created (CISCO $1 INTERFACE $2 DOWN)
 which is passed to the other rules.</li>
 </ul>
-<span style="font-weight: bold;">Second rule:</span><br>
+<span style="font-weight: bold;">Second rule:</span><br />
 <ul>
 <li>Allows only one 'CISCO x INTERFACE x DOWN' message to be
 processed over 60 seconds.</li>
 </ul>
-<span style="font-weight: bold;">Third rule:</span><br>
+<span style="font-weight: bold;">Third rule:</span><br />
 <ul>
 <li>When a SEC internally generated 'CISCO $1 INTERFACE $2 DOWN'
 message is found, it passes the host name, interface number and
@@ -3207,7 +3612,7 @@ message is found, it passes the host name, interface number and
 'normal <span style="font-weight: bold;">up</span>' to the
 cisco_msg script.</li>
 </ul>
-<span style="font-weight: bold;">Fourth rule:</span><br>
+<span style="font-weight: bold;">Fourth rule:</span><br />
 <ul>
 <li>If ten 'CISCO %1 INTERFACE %2 BOUNCE' messages are detected
 over the span of 1 hour, it passes the host name, interface number
@@ -3217,66 +3622,66 @@ cisco_msg script.</li>
 INTERFACE %2 BOUNCE' messages for 3 hours, it passes the host name,
 interface number and 'normal <span style=
 "font-weight: bold;">stable</span>' to the cisco_msg
-script.<br></li>
+script.<br /></li>
 </ul>
-<br>
+<br />
 <h4>4. Create a script to pass a trap back to SNMPTT</h4>
 Following is a Perl script that passes the information passed from
 SEC back to SNMPTT by calling SNMPTTHANDLER directly.&nbsp; This
 file is basically a modified Perl version of the shell script
 available on the <a href=
 "http://kodu.neti.ee/%7Eristo/sec/examples.html">SEC Examples
-page</a>.<br>
-<br>
-<div style="margin-left: 40px;">#!/usr/bin/perl<br>
-#<br>
-# the cisco_msg script:<br>
-#<br>
-use Socket;<br>
-<br>
-$node = shift(@ARGV);<br>
-$interface = shift(@ARGV);<br>
-$severity = shift(@ARGV);<br>
-$text&nbsp; = shift(@ARGV);<br>
-<br>
-$temp_ipaddr = gethostbyname($node);<br>
-if (defined($temp_ipaddr)) {<br>
-&nbsp; $ipaddr = Socket::inet_ntoa(scalar($temp_ipaddr));<br>
-}<br>
-else {<br>
-&nbsp; $ipaddr = "0.0.0.0";<br>
-}<br>
-<br>
-# use snmpget utility from Net-SNMP package<br>
+page</a>.<br />
+<br />
+<div style="margin-left: 40px;">#!/usr/bin/perl<br />
+#<br />
+# the cisco_msg script:<br />
+#<br />
+use Socket;<br />
+<br />
+$node = shift(@ARGV);<br />
+$interface = shift(@ARGV);<br />
+$severity = shift(@ARGV);<br />
+$text&nbsp; = shift(@ARGV);<br />
+<br />
+$temp_ipaddr = gethostbyname($node);<br />
+if (defined($temp_ipaddr)) {<br />
+&nbsp; $ipaddr = Socket::inet_ntoa(scalar($temp_ipaddr));<br />
+}<br />
+else {<br />
+&nbsp; $ipaddr = "0.0.0.0";<br />
+}<br />
+<br />
+# use snmpget utility from Net-SNMP package<br />
 $ifname=`/usr/bin/snmpget -c public -OQv $NODE
-.1.3.6.1.2.1.2.2.1.2.$IF`<br>
+.1.3.6.1.2.1.2.2.1.2.$IF`<br />
 $description=`/usr/bin/snmpget -c public -OQv $NODE
-.1.3.6.1.4.1.9.2.2.1.1.28.$IF`<br>
-<br>
-$message="Interface $ifname ($description) $text";<br>
-$message=~s/\"/\'/g;<br>
-<br>
-open (TRAP, "|/usr/sbin/snmptthandler");<br>
-<br>
-select TRAP;<br>
-<br>
-print "$node\n";<br>
-print "$ipaddr\n";<br>
-print ".1.3.6.1.2.1.1.3.0 00:00:00:00.00\n";<br>
-if ($severity=~/normal/i) {<br>
-&nbsp; print ".1.3.6.1.6.3.1.1.4.1.0 .1.3.6.1.4.1.9999.1\n";<br>
-}<br>
-else {<br>
-&nbsp; print ".1.3.6.1.6.3.1.1.4.1.0 .1.3.6.1.4.1.9999.2\n";<br>
-}<br>
-print ".1.3.6.1.4.1.9999.1.1 $message\n";<br>
-print ".1.3.6.1.6.3.18.1.3.0 $ipaddr\n";<br>
-print ".1.3.6.1.6.3.18.1.4.0 public\n";<br>
-print ".1.3.6.1.6.3.1.1.4.3.0 .1.3.6.1.4.1.9999\n";<br>
-<br>
+.1.3.6.1.4.1.9.2.2.1.1.28.$IF`<br />
+<br />
+$message="Interface $ifname ($description) $text";<br />
+$message=~s/\"/\'/g;<br />
+<br />
+open (TRAP, "|/usr/sbin/snmptthandler");<br />
+<br />
+select TRAP;<br />
+<br />
+print "$node\n";<br />
+print "$ipaddr\n";<br />
+print ".1.3.6.1.2.1.1.3.0 00:00:00:00.00\n";<br />
+if ($severity=~/normal/i) {<br />
+&nbsp; print ".1.3.6.1.6.3.1.1.4.1.0 .1.3.6.1.4.1.9999.1\n";<br />
+}<br />
+else {<br />
+&nbsp; print ".1.3.6.1.6.3.1.1.4.1.0 .1.3.6.1.4.1.9999.2\n";<br />
+}<br />
+print ".1.3.6.1.4.1.9999.1.1 $message\n";<br />
+print ".1.3.6.1.6.3.18.1.3.0 $ipaddr\n";<br />
+print ".1.3.6.1.6.3.18.1.4.0 public\n";<br />
+print ".1.3.6.1.6.3.1.1.4.3.0 .1.3.6.1.4.1.9999\n";<br />
+<br />
 close TRAP;</div>
-<br>
-<h3><a id='EventWin' name='EventWin'></a><b>Windows Event Log
+<br />
+<h3><a id="EventWin" name="EventWin"></a><b>Windows Event Log
 forwarding</b></h3>
 <h4>Overview</h4>
 <p>The Windows utility Event to Trap Translator (<b>evntwin.exe</b>
@@ -3293,9 +3698,9 @@ using the Microsoft SNMP server (not the Net-SNMP snmpd.exe
 agent).&nbsp; It will not attempt to explain how evntwin.exe and
 evntcmd.exe function.&nbsp; Documentation on using evntwin.exe and
 evntcmd.exe is available on the Microsoft web site and should be
-reviewed.</b> You should have a functioning SNMPTT system that can
-at least log translated traps to a log file before attempting
-this.</p>
+reviewed. You should have a functioning SNMPTT system that can at
+least log translated traps to a log file before attempting
+this.</b></p>
 <h4>SNMP Service</h4>
 <p>The Windows SNMP Service is the Microsoft SNMP agent. The agent
 is responsible for handling SNMP requests from management stations
@@ -3393,9 +3798,7 @@ to log on to the system with an invalid username and password, or
 use the <b>runas.exe</b> command from a command prompt. For
 example:</p>
 <ul>
-<li class="MsoNormal" style=
-'mso-list:l2 level1 lfo3;tab-stops:list 36.0pt'><b>runas
-/user:fakeuser cmd</b></li>
+<li class="MsoNormal" style=""><b>runas /user:fakeuser cmd</b></li>
 </ul>
 <p>When prompted for a password, press <b>Enter</b>.</p>
 <p>SNMPTT should log something similar to the following:</p>
@@ -3438,7 +3841,7 @@ by the Windows SNMP Service to create the Description field in the
 Event Log.</p>
 <p>The following lists the enterprise variables that can be used in
 SNMPTT for each trap:</p>
-<ul style="list-style-type: none">
+<ul style="list-style-type: none;">
 <li>$1:Event Log Description</li>
 <li>$2:Event Log User</li>
 <li>$3:Event Log Computer</li>
@@ -3461,12 +3864,12 @@ Process:.seclogon.....Authentication
 Package:.Negotiate.....Workstation Name:.SERVER1.</b></p>
 <p>By reviewing the Description field as defined in the
 <b>evntwin.exe</b> utility, a new cleaned up FORMAT line can be
-used that doesnt contain all the dots.</p>
+used that does not contain all the dots.</p>
 <p>Following is the text from the Description field in
 <b>evntwin.exe</b> which will be used as a reference. Notice the
 use of %<i>n</i> variables which are equivalent to the SNMPTT $n
-variables +5 (%1 = SNMPTTs $6). Note: In the example below, %n is a
-newline and %t is a tab while %<i>n</i> is a variable number.</p>
+variables +5 (%1 = SNMPTT's $6). Note: In the example below, %n is
+a newline and %t is a tab while %<i>n</i> is a variable number.</p>
 <p>Logon Failure:%n %tReason:%t%tUnknown user name or bad
 password%n %tUser Name:%t%1%n %tDomain:%t%t%2%n %tLogon Type:%t%3%n
 %tLogon Process:%t%4%n %tAuthentication Package:%t%5%n
@@ -3474,11 +3877,11 @@ password%n %tUser Name:%t%1%n %tDomain:%t%t%2%n %tLogon Type:%t%3%n
 <p>The EVENT entry could be cleaned up using:</p>
 <p><b>EVENT EventLog
 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121.</b>0.529
-"Regular" Normal<br>
+"Regular" Normal<br />
 FORMAT Logon Failure: Reason: Unknown user name or bad password.
 User Name: $6, Domain: $7, Logon Type: $8, Logon Process: $9, Auth
 package: $10, Workstation name: $11</p>
-<h3><a id='Hobbit' name='Hobbit'></a><b>Hobbit</b></h3>
+<h3><a id="Hobbit" name="Hobbit"></a><b>Hobbit</b></h3>
 Information on handling SNMP traps with <a href=
 "http://hobbitmon.sourceforge.net/">Hobbit</a> can be found at
 <a href=

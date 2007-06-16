@@ -3,6 +3,88 @@
 
 <p class="SectionTitle">Change Log</p>
 
+<u>v1.2 - June 16th, 2007</u>
+<ul>
+<li>When <b>daemon_uid</b> is used, two processes will now be
+spawned. The first process will be run as the same user that
+started SNMPTT (which should be root). The second will run as the
+<b>daemon_uid</b> user. This was changed so that SNMPTT could
+properly clean up the pid file on exit.</li>
+<li>Added <span style="font-weight: bold;">snmptt.ini</span> option
+<b>pid_file</b> to allow for custom pid file locations when running
+in daemon mode.</li>
+<li>Fixed bug where pid file did not contain the current pid of
+snmptt.</li>
+<li>Added <b>snmptt.ini</b> options <b>date_format</b>,
+<b>time_format</b>, <b>date_time_format</b>,
+<b>date_time_format_sql</b> and <b>stat_time_format_sql</b> to
+allow the output format for <b>$x</b> and <b>$X</b> substitution
+variables, and the format of the date/time for text logs and SQL to
+be changed using <b>strftime()</b> variables. This allows for
+proper date/time data types to be used in SQL databases.</li>
+<li>Added logging of trap statistics to a SQL table. Added
+<b>*table_statistics</b> <b>snmptt.ini</b> variable to define the
+table to be used.</li>
+<li>Added ability to add custom columns to <b>*_table</b> and
+<b>*_table_unknown</b> tables. Added <b>sql_custom_columns</b> and
+<b>sql_custom_columns_unknown</b> <b>snmptt.ini</b> options.</li>
+<li>Added <b>snmptt.ini</b> option <b>unknown_trap_exec_format</b>
+to allow custom output with substitutions.</li>
+<li>Added the ability to log system messages to a text file in
+addtion to the existing syslog and Event Log.
+&nbsp;Added&nbsp;<b>snmptt.ini</b> options <b>log_system</b> and
+<span style="font-weight: bold;">log_system_file</span>.</li>
+<li>Added a work-around to the <a href=
+"http://sourceforge.net/tracker/index.php?func=detail&amp;aid=1638225&amp;group_id=12694&amp;atid=112694">
+Net-SNMP v5.4 traphandle bug (1638225)</a> where the host name was
+set to &lt;UNKNOWN&gt;. When detected, SNMPTT will use the host IP
+address instead.</li>
+<li>Added a <b>$H</b> variable substitution to give the host name
+of the computer that is running SNMPTT, or a user defined value
+specified in the new <b>snmptt_system_name</b> <b>snmptt.ini</b>
+option.</li>
+<li>Added MATCH support for bitwise AND</li>
+<li>Added <b>snmptt.ini</b> option <b>exec_escape</b> to escape
+wildards (* and ?) in EXEC, PREEXEC and the unknown_trap_exec
+commands. This is enabled by default for Linux and Unix (or
+anything non-Windows) to prevent the wildcards from being expanded
+by the shell.</li>
+<li>Moved <b>unknown_trap_exec</b> to Exec section in
+<b>snmptt.ini</b>.</li>
+<li>Added 'use strict' pragma in source code.</li>
+<li>Experimental: &nbsp;Added threads (Perl ithreads) support for
+EXEC. When enabled, EXEC commands will launch in a thread to allow
+SNMPTT to continue processing other traps. Added <b>snmptt.ini</b>
+options <b>threads_enable</b> and <b>threads_max</b>.</li>
+<li>Fixed bug where snmptt tried to log to syslog when changing
+UIDs even if syslog_system_enable was set to 0.</li>
+<li>Fixed a bug in REGEX with handling of captures.
+&nbsp;Text::Balanced module is now required.</li>
+<li>Fixed a bug under Windows where SNMPTT was trying to log to
+syslog instead of the event log.</li>
+<li>Fixed a bug where SNMPTT was attempting to log to syslog /
+eventlog when using the --time option.</li>
+<li>Fixed a bug in MATCH where the i modifier was not handled
+correctly.</li>
+<li>Added information to Nagios section of documentation for using
+SNMP traps as heartbeats by using freshness checks.</li>
+<li>Added information to Nagios section of documentation for using
+freshness checks to automatically clear trap alerts.</li>
+<li>SNMPTTConvertMIB:</li>
+<li style=
+"list-style-type: none; list-style-image: none; list-style-position: outside;">
+<ul>
+<li>Fixed a bug (1438794) where a TRAP-TYPE / NOTIFICATION-TYPE
+line would not translate if it was split across two lines.</li>
+<li>Fixed a bug (1438394) where ARGUMENTS lines that have $1, $2
+etc instead of %0, %1 would not translate.</li>
+<li>Fixed a bug where a --#SEVERITYMAP line would be used instead
+of --#SEVERITY.</li>
+</ul>
+</li>
+</ul>
+
+
 <u>v1.1 - January 17th, 2006</u>
 <ul class="SectionBody">
   <li>Added <b>PREEXEC</b> <b>snmptt.conf</b> file option to allow an external 
