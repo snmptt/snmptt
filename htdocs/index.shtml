@@ -17,7 +17,7 @@ News
   <td valign="top" class="NewsItemDate">6/16/2007</td>
   <td class="NewsItem">
     <p><b>SNMPTT v1.2 has been released</b></p>
-    <p>Various database improvements have been added such as support for proper date/time data types in SQL databases, statistics logging and custom columns.  The formatting for unknown_trap_exec can now be changed and support has been added to MATCH for bitwise AND.  A new log file has been added for logging system messages to a text file for users without access to syslog.  Various bug fixes have been applied including support for Net-SNMP 5.4 traphandle, daemon mode pid file, REGEX captures, MATCH modifiers and others.</p>
+    <p>Various database improvements have been added such as support for proper date/time data types, statistics logging and custom columns.  The formatting for unknown_trap_exec can now be changed and support has been added to MATCH for bitwise AND.  A new log file has been added for logging system messages to a text file for users without access to syslog.  Various bug fixes have been applied including support for Net-SNMP 5.4 traphandle, daemon mode pid file, REGEX captures, MATCH modifiers and others.</p>
   <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
   </td>
 </tr>
