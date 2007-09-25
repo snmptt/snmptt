@@ -11,7 +11,7 @@ The following can be used to obtain support for SNMPTT.  If you email me direct 
 <p><b><u>To protect yourself when posting snmptt.debug logs, modify all ip addresses and all SNMP community names before posting</u></b></p>
 
 <ul>
-  <li><a target="main" href="mailinglists.html">Mailing Lists</a></li>
+  <li><a target="main" href="mailinglists.shtml">Mailing Lists</a></li>
   <li><a target="sf-bugtracker" href="http://sourceforge.net/tracker/?group_id=51473&amp;atid=463393">Sourceforge bug database</a></li>
   <li><a target="sf-patches" href="http://sourceforge.net/tracker/?group_id=51473&amp;amp;atid=463395">Sourceforge patch database</a></li>
 </ul>
