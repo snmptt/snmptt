@@ -3152,9 +3152,9 @@ sub readtrap
       $temp1 = translate_symbolic_to_oid($temp1);
 
       # If line begins with a double quote (") but does not END in a double quote then we need to merge
-      # the following lines together into one until we find the closing double quote.
+      # the following lines together into one until we find the closing double quote.  Allow for escaped quotes.
       # Net-SNMP sometimes divides long lines into multiple lines..
-      if ( ($temp2 =~ /^\"/) && ( ! ($temp2 =~ /\"$/)) )
+      if ( ($temp2 =~ /^\"/) && ( ($temp2 =~ /[^\\]\"$/)) )
       {
         if ($DEBUGGING >= 2) {
           print "  Multi-line value detected - merging onto one line...\n";
@@ -3164,7 +3164,7 @@ sub readtrap
         {
           chomp $line2;
           $temp2.=" ".$line2;
-          if ($line2 =~ /\"$/)
+          if ($line2 =~ /[^\\]\"$/)                  # Ends in a non-escaped quote
           {
             last;
           }
@@ -3211,9 +3211,9 @@ sub readtrap
       }
 
       # If line begins with a double quote (") but does not END in a double quote then we need to merge
-      # the following lines together into one until we find the closing double quote.
+      # the following lines together into one until we find the closing double quote.  Allow for escaped quotes.
       # Net-SNMP sometimes divides long lines into multiple lines..
-      if ( ($line =~ /^\"/) && ( ! ($line =~ /\"$/)) )
+      if ( ($line =~ /^\"/) && ( ! ($line =~ /[^\\]\"$/)) )
       {
         if ($DEBUGGING >= 2) {
           print "  Multi-line value detected - merging onto one line...\n";
@@ -3223,7 +3223,7 @@ sub readtrap
         {
           chomp $line2;
           $line.=" ".$line2;
-          if ($line2 =~ /\"$/)
+          if ($line2 =~ /[^\\]\"$/)                  # Ends in a non-escaped quote
           {
             last;
           }
