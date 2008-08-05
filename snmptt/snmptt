@@ -202,6 +202,7 @@ my $spool_directory;
 my $sleep;
 my $use_trap_time;
 my $keep_unlogged_traps;
+my $duplicate_trap_window;
 
 # Logging
 my $stdout_enable;
@@ -564,6 +565,20 @@ if ($sql_win32_odbc_enable == 1)
 }
 
 
+if ($duplicate_trap_window > 0)
+{
+  eval 'require Digest::MD5;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load the Perl module Digest::MD5!  If duplicate_trap_window\n";
+    print "is set then the Digest::MD5 module is required.  Please see snmptt.html\n";
+    print "for system requirements.\n\n";
+    die "died";
+  }
+  require Digest::MD5;
+}
+
+
 ##############################################################################
 ####  MAIN SECTION START
 
@@ -617,6 +632,7 @@ my $g_last_dbd_odbc_ping = $g_start_time;
 my $timetoreload;
 my $timetodie;
 my $timetologstatistics;
+my %duplicate_traps;
 
 if ($daemon == 1)
 {
@@ -877,6 +893,21 @@ if ($daemon == 1)
   
   while (!$timetodie)
   {
+    if ($duplicate_trap_window) {
+      # Purge traps older than duplicate_trap_window in %duplicate_traps
+      my $duplicate_traps_current_time = time();
+      foreach my $key (sort keys %duplicate_traps)
+      {
+        #print "Previous trap digest: $key: " . localtime($duplicate_traps{$key}) . "\n";
+        if ($duplicate_traps{$key} < $duplicate_traps_current_time - $duplicate_trap_window) {
+          # Purge the record
+          delete $duplicate_traps{$key};
+          #print "  Deleted...\n";
+        }
+      }
+      #print "\n";
+    }
+
     if (! (chdir($spool_directory)))
     {
       if ($DEBUGGING >= 1)
@@ -1039,18 +1070,32 @@ if ($daemon == 1)
 
         $input = 'FILE';
 
-        if (! (&readtrap())) {			# Read trap from STDIN or file
+        my $readtrap_result = &readtrap();      # Read trap from STDIN or file
+
+        if ($readtrap_result == 0) {
+          if ($DEBUGGING >= 1) {
           print "  Error processing trap file $file.  Skipping...\n";
+          }
           next;
         }
 
-        &searchfortrap;		# Search for trap snmptt.conf (array)
+        my $trap_is_a_duplicate = 0;
+        if ($readtrap_result == -1) {
+          $trap_is_a_duplicate = 1;
+          if ($DEBUGGING >= 1) {
+            print "  Duplicate trap detected in trap file $file.  Skipping...\n";
+          }
+        }
 
+        # Search for trap only if it's not a duplicate.
+        if (! ($trap_is_a_duplicate)) {			
+          &searchfortrap;		# Search for trap snmptt.conf (array)
+        }
         close FILE;
 
         if ($filesuccess == 1)
         {
-          if ($keep_unlogged_traps == 0 || $trap_successfully_logged == 1)
+          if ($keep_unlogged_traps == 0 || $trap_successfully_logged == 1 || $trap_is_a_duplicate)
           {
             unless (unlink($file))
             {
@@ -1385,7 +1430,6 @@ sub processtrap
          $nodesmatch = 1;
        }
      }
-
      # If NODES MODE=NEG, then reverse the result.
      if ($nodes_mode eq 'neg') {
        if ($nodesmatch == 0) {
@@ -1397,13 +1441,21 @@ sub processtrap
      }
      if ($DEBUGGING >= 1)
      {
-       if ($nodesmatch == 1)
-       {
-         print "  NODES has a positive match (node mode \'$nodes_mode\' and node found in list)\n";
+        if ($nodes_mode eq 'pos') {
+          if ($nodesmatch == 1) {
+            print "  NODES has a positive match (node mode \'pos\' and node found in list)\n";
+          }
+          else {
+            print "  NODES has a negative match (node mode \'pos\' and node NOT found in list)\n";
+          }
+        }
+        else {
+          if ($nodesmatch == 1) {
+            print "  NODES has a positive match (node mode \'neg\' and node NOT found in list)\n";
+          }
+          else {
+            print "  NODES has a negative match (node mode \'neg\' and node found in list)\n";
        }
-       else
-       {
-         print "  NODES has a negative match (node mode \'$nodes_mode\' and node NOT found in list)\n";
        }
      }
    }
@@ -3409,6 +3461,26 @@ sub readtrap
     }
   }
 
+  # Generate hash of trap and detect duplicates
+  if ($duplicate_trap_window) {
+    my $md5 = Digest::MD5->new;
+    # All variables except for uptime.
+    $md5->add($var[0],$var[1].$var[3].$var[4].$var[5].$var[6]."@entvar");
+    
+    my $trap_digest = $md5->hexdigest;
+
+    if ($DEBUGGING >= 2) {
+      print "Trap digest: $trap_digest\n";
+    }
+
+    if ($duplicate_traps{$trap_digest}) {
+      # Duplicate trap detected.  Skipping trap...
+      return -1;
+    }
+
+    $duplicate_traps{$trap_digest} = time();
+  }
+
   return 1;
 
   # Variables of trap received by SNMPTRAPD:
@@ -3963,6 +4035,7 @@ sub loadsnmpttini {
   $sleep = $cfg->val('DaemonMode', 'sleep');
   $use_trap_time = $cfg->val('DaemonMode', 'use_trap_time');
   $keep_unlogged_traps = $cfg->val('DaemonMode', 'keep_unlogged_traps');	
+  $duplicate_trap_window = $cfg->val('DaemonMode', 'duplicate_trap_window');	
 
   # Logging
   $stdout_enable = $cfg->val('Logging', 'stdout_enable');
@@ -4106,8 +4179,9 @@ sub loadsnmpttini {
   if (! defined ($spool_directory)) { $spool_directory = ''} ;
   if (! defined ($sleep)) { $sleep = 5} ;
   if (! defined ($use_trap_time)) { $use_trap_time = 1} ;
-
   if (! defined ($keep_unlogged_traps)) { $keep_unlogged_traps = 1} ;
+  if (! defined ($duplicate_trap_window)) { $duplicate_trap_window = 0} ;
+
   if (! defined ($stdout_enable)) { $stdout_enable = 0} ;
   if (! defined ($log_enable)) { $log_enable = 1} ;
   if (! defined ($log_file)) { $log_file = ''} ;

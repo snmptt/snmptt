@@ -247,6 +247,15 @@ use_trap_time = 1
 # The recommended setting is 1 with only one log system enabled.
 keep_unlogged_traps = 1
 
+# How often duplicate traps will be processed.  An MD5 hash of all incoming traps
+# is stored in memory and is used to check for duplicates.  All variables except for
+# the uptime variable are used when calculating the MD5.  The larger this variable,
+# the more memory snmptt will require.
+# 5 minutes = 300
+# 10 minutes = 600
+# 15 minutes = 900
+duplicate_trap_window = 0
+
 [Logging]
 # Set to 1 to enable messages to be sent to standard output, or 0 to disable.
 # Would normally be disabled unless you are piping this program to another

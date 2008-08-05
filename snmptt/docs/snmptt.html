@@ -14,7 +14,7 @@ name="generator" />
 <body>
 <h1>SNMP Trap Translator v1.2</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on: June 16th, 2007
+This file was last updated on: August 4th, 2008
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -85,7 +85,7 @@ forwarding</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#Hobbit">Hobbit</a></blockquote>
 <br />
 <h2><a id="License" name="License"></a>License</h2>
-<p>Copyright 2002-2007 Alex Burger<br />
+<p>Copyright 2002-2008 Alex Burger<br />
 alex_b@users.sourceforge.net<br />
 4/3/2002</p>
 <p>This program is free software; you can redistribute it and/or
@@ -266,6 +266,10 @@ module availabe from CPAN.</li>
 module (included with most if not all distributions including
 ActivePerl).&nbsp; Required when enabling threads for EXEC
 statements.</li>
+<li>Optional: <a href=
+"http://search.cpan.org/search?module=Digest::MD5">Digest::MD5</a>
+module (included with most if not all distributions including
+ActivePerl).&nbsp; Required when enabling duplicate trap detection.</li>
 </ul>
 <p>All development and testing was done with Linux, Windows 2000 or
 higher and various versions of Net-SNMP from UCD SNMP v4.2.1 to the
@@ -287,6 +291,12 @@ you enable the options <b>translate_integers</b>,
 <b>translate_trap_oid</b> or <b>translate_oids</b>. Although not
 required, using the Perl module is recommended.</blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
+<h3><b>v1.3beta1</b> <b>- August 4th, 2008</b></h3>
+<ul>
+  <li>Added <b>snmptt.ini</b> option <b>duplicate_trap_window variable</b> for duplicate trap detection.</li>
+  <li>Fixed a bug with handling escaped quotes in a trap message.</li>
+  <li>Updated snmptt-net-snmp-test to test MIB descriptions.</li>
+</ul>
 <h3><b>v1.2</b> <b>- June 16th, 2007</b></h3>
 <ul>
 <li>When <b>daemon_uid</b> is used, two processes will now be
