@@ -1,3 +1,8 @@
+January 15th, 2009: Alex Burger <alex_b@users.sourceforge.net>
+- Re-applied patch for bug 1748512.  Somehow it was added wrong and it
+  prevented trap lines that contained single line items inside of quotes
+  from working.
+
 August 4th, 2008: Alex Burger <alex_b@users.sourceforge.net>
 - Added duplicate_trap_window variable for duplicate trap detection.
 

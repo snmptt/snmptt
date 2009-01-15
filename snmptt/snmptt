@@ -3065,6 +3065,7 @@ sub readtrap
   @entvar = ();
   @entvarname = ();
   @preexec_var = ();
+  my @rawtrap = ();
 
   # Statistics
   $g_total_traps_received++;
@@ -3077,6 +3078,7 @@ sub readtrap
   if ( $daemon == 1)
   {
     chomp($trap_date_time_epoch = (<$input>));	# Pull time trap was spooled
+    push(@rawtrap, $trap_date_time_epoch);
     if ($trap_date_time_epoch eq "") {
       if ($DEBUGGING >= 1) {
         print "  Invalid trap file.  Expected a serial time on the first line but got nothing\n";
@@ -3137,6 +3139,7 @@ sub readtrap
   # Pull in passed SNMP info from snmptrapd via STDIN and place in the array @tempvar
 
   chomp($tempvar[0]=<$input>);	# hostname
+  push(@rawtrap, $tempvar[0]);
   $tempvar[0] =~ s(`)(')g;	#` Replace any back ticks with regular single quote 
   if ($tempvar[0] eq "") {
     if ($DEBUGGING >= 1) {
@@ -3146,6 +3149,7 @@ sub readtrap
   }
     
   chomp($tempvar[1]=<$input>);	# ip address
+  push(@rawtrap, $tempvar[1]);
   $tempvar[1] =~ s(`)(')g;	#` Replace any back ticks with regular single quote
   if ($tempvar[1] eq "") {
     if ($DEBUGGING >= 1) {
@@ -3169,6 +3173,7 @@ sub readtrap
   my $linenum = 1;
   while (defined(my $line = <$input>))
   {
+    push(@rawtrap, $line);
     $line =~ s(`)(')g;	#` Replace any back ticks with regular single quote
 
     if ($remove_backslash_from_quotes == 1)  # Remove escape from quotes if enabled
@@ -3206,7 +3211,7 @@ sub readtrap
       # If line begins with a double quote (") but does not END in a double quote then we need to merge
       # the following lines together into one until we find the closing double quote.  Allow for escaped quotes.
       # Net-SNMP sometimes divides long lines into multiple lines..
-      if ( ($temp2 =~ /^\"/) && ( ($temp2 =~ /[^\\]\"$/)) )
+      if ( ($temp2 =~ /^\"/) && ( ! ($temp2 =~ /[^\\]\"$/)) )
       {
         if ($DEBUGGING >= 2) {
           print "  Multi-line value detected - merging onto one line...\n";
@@ -3215,8 +3220,9 @@ sub readtrap
         while (defined(my $line2 = <$input>))
         {
           chomp $line2;
+          push(@rawtrap, $line2);
           $temp2.=" ".$line2;
-          if ($line2 =~ /[^\\]\"$/)                  # Ends in a non-escaped quote
+          if ($line2 =~ /[^\\]\"$/)     # Ends in a non-escaped quote
           {
             last;
           }
@@ -3274,6 +3280,7 @@ sub readtrap
         while (defined(my $line2 = <$input>))
         {
           chomp $line2;
+          push(@rawtrap, $line2);
           $line.=" ".$line2;
           if ($line2 =~ /[^\\]\"$/)                  # Ends in a non-escaped quote
           {
@@ -3306,6 +3313,14 @@ sub readtrap
 
   if ($DEBUGGING >= 2)
   {
+    # Print out raw trap passed from snmptrapd
+    print "\nRaw trap passed from snmptrapd:\n";
+    for (my $i=0;$i <= $#rawtrap;$i++)
+    {
+      chomp($rawtrap[$i]);
+      print "$rawtrap[$i]\n";
+    }
+
     # Print out all items passed from snmptrapd
     print "\nItems passed from snmptrapd:\n";
     for (my $i=0;$i <= $#tempvar;$i++)
