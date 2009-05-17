@@ -6,16 +6,18 @@ May 17th, 2009: Alex Burger <alex_b@users.sourceforge.net>
   for Windows to make it easier to grant write permission to the snmptt
   process.  Thanks to Ville Skytta for the patch.
 - Changed umask for log files to 002 to ensure they are not created as world
-  writable.
+  writable.  Thanks to Ville Skytta for the suggestion.
 - Fixed a bug where the the PID file was being created using the parent (root)
   PID instead of the child (daemon_uid) when daemon_uid is used.
-- The DEBUG log file will now be re-opened when a HUP signal is sent.
+- The DEBUG log file will now be re-opened when a HUP signal is sent.  Thanks 
+  to Ville Skytta for the suggestion.
 - When debugging is enabled, flush buffers every sleep cycle so we can tail
   the debug log file.
 - Don't print messages to the console when starting in daemon mode unless
-  debugging is enabled or an error occurs.
+  debugging is enabled or an error occurs.  Thanks to Ville Skytta for the 
+  suggestion.
 - 'Could not open debug output file!' is no longer reported when debugging
-  is disabled.
+  is disabled.  Thanks to Ville Skytta for the suggestion.
 - Added snmptt.logrotate file from Ville Skytta.
 
 January 15th, 2009: Alex Burger <alex_b@users.sourceforge.net>
