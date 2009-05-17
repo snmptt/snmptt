@@ -265,16 +265,16 @@ stdout_enable = 0
 # location
 log_enable = 1
 
-# Log file location.  The COMPLETE path and filename.  Ex: '/var/log/snmptt.log'
-log_file = c:\\snmp\\snmptt.log
+# Log file location.  The COMPLETE path and filename.  Ex: 'c:\\snmp\\log\\snmptt.log'
+log_file = c:\\snmp\\log\\snmptt.log
 
 # Set to 1 to enable text logging of *SNMPTT system errors*.  Make sure you 
 # specify a log_system_file location
 log_system_enable = 0
 
 # Log file location.  The COMPLETE path and filename.  
-# Ex: '/var/log/snmpttsystem.log'
-log_system_file = c:\\snmp\\snmpttsystem.log
+# Ex: 'c:\\snmp\\log\\snmpttsystem.log'
+log_system_file = c:\\snmp\\log\\snmpttsystem.log
 
 # Set to 1 to enable logging of unknown traps.  This should normally be left off
 # as the file could grow large quickly.  Used primarily for troubleshooting.  If
@@ -286,10 +286,10 @@ log_system_file = c:\\snmp\\snmpttsystem.log
 unknown_trap_log_enable = 0
 
 # Unknown trap log file location.  The COMPLETE path and filename.  
-# Ex: 'c:\\snmp\\snmpttunknown.log'
+# Ex: 'c:\\snmp\\log\\snmpttunknown.log'
 # Leave blank to disable logging to text file if logging to SQL is enabled
 # for unknown traps
-unknown_trap_log_file = c:\\snmp\\snmpttunknown.log
+unknown_trap_log_file = c:\\snmp\\log\\snmpttunknown.log
 
 # How often in seconds statistics should be logged to syslog or the event log.
 # Set to 0 to disable
@@ -594,12 +594,12 @@ DEBUGGING = 0
 # Location of debugging output file.  Leave blank to default to STDOUT (good for
 # standalone mode, or daemon mode without forking)
 DEBUGGING_FILE = 
-# DEBUGGING_FILE = c:\\snmp\\snmptt.debug
+# DEBUGGING_FILE = c:\\snmp\\log\\snmptt.debug
 
 # Debugging file - SNMPTTHANDLER
 # Location of debugging output file.  Leave blank to default to STDOUT
 DEBUGGING_FILE_HANDLER = 
-# DEBUGGING_FILE_HANDLER = c:\\snmp\\snmptthandler.debug
+# DEBUGGING_FILE_HANDLER = c:\\snmp\\log\\snmptthandler.debug
 
 [TrapFiles]
 # A list of snmptt.conf files (this is NOT the snmptrapd.conf file).  The COMPLETE path 

@@ -3,11 +3,21 @@
 # Alex Burger - 8/29/02
 # 	      - 9/8/03 - Added snmptt.pid support to Stop function
 #
-# chkconfig: - 50 50
-# description: Simple Network Management Protocol (SNMP) Daemon
+# chkconfig: - 49 51
+# description: SNMP Trap Translator daemon
 #
 # processname: /usr/sbin/snmptt
 # pidfile: /var/run/snmptt.pid
+
+### BEGIN INIT INFO
+# Provides: snmptt
+# Default-Stop: 0 1 6
+# Required-Start: $syslog $local_fs
+# Required-Stop: $syslog $local_fs
+# Should-Start: $network snmptrapd
+# Should-Stop: $network snmptrapd
+# Short-Description: SNMP Trap Translator daemon
+### END INIT INFO
 
 # source function library
 . /etc/init.d/functions
@@ -65,10 +75,10 @@ case "$1" in
   restart)
 	restart
         ;;
-  reload)
+  reload|force-reload)
 	reload
         ;;
-  condrestart)
+  try-restart|condrestart)
 	condrestart
 	;;
   status)
@@ -76,7 +86,7 @@ case "$1" in
 	RETVAL=$?
         ;;
   *)
-	echo $"Usage: $0 {start|stop|restart|condrestart|reload}"
+	echo $"Usage: $0 {start|stop|status|restart|try-restart|condrestart|reload|force-reload}"
 	RETVAL=1
 esac
 

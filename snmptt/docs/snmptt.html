@@ -1062,7 +1062,8 @@ works</u></b></p>
 <p>4.&nbsp; Copy <b>snmptt.ini</b> to <b>/etc/snmp/</b> or
 <span style="font-weight: bold;">/etc/</span> and edit the options
 inside the file.</p>
-<p>5a.&nbsp;&nbsp; For <b>standlone mode:&nbsp;</b> Modify the
+<p>5.&nbsp; Create the log folder <b>/var/log/snmptt/</b>.</p>
+<p>6a.&nbsp;&nbsp; For <b>standlone mode:&nbsp;</b> Modify the
 Net-SNMP <span style="font-weight: bold;">snmptrapd.conf</span>
 file by adding the following line:</p>
 <blockquote><b>traphandle default /usr/sbin/snmptt</b>
@@ -1071,7 +1072,7 @@ execute <span style="font-weight: bold;">snmptt</span> based on the
 specific trap received, but using the <span style=
 "font-weight: bold;">default</span> option is preferred</p>
 </blockquote>
-5b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
+6b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
 snmptrapd.conf file by adding the following line:
 <blockquote><b>traphandle default /usr/sbin/snmptthandler</b>
 <p>Launch snmptt using:</p>
@@ -1093,7 +1094,7 @@ immediately with:</p>
 <p>or</p>
 <p><b>/etc/rc.d/init.d/snmptt start</b></p>
 </blockquote>
-6.&nbsp; Start <span style="font-weight: bold;">snmptrapd</span>
+7.&nbsp; Start <span style="font-weight: bold;">snmptrapd</span>
 using the command line:&nbsp; <span style=
 "font-weight: bold;">snmptrapd -On</span>.<br />
 &nbsp;&nbsp;&nbsp;&nbsp; You should be able to edit the
@@ -1116,7 +1117,7 @@ translate correctly.&nbsp; See the FAQ for more info.</span></div>
 <b>snmp.conf</b> file to include the line: <b>printNumericOids
 1.&nbsp;</b> This setting will take effect no matter what is used
 on the command line.</p>
-<p>7.&nbsp; See the <a href="#SecuringSNMPTT">Securing SNMPTT</a>
+<p>8.&nbsp; See the <a href="#SecuringSNMPTT">Securing SNMPTT</a>
 section.</p>
 <br />
 <h3><a id="Installation-Windows" name=
@@ -1129,7 +1130,8 @@ works</u></b></p>
 <p>3.&nbsp; Copy <b>snmptt.ini-nt</b> to
 <b>%SystemRoot%\snmptt.ini</b> (c:\winnt\snmptt.ini) and edit the
 options inside the file.</p>
-<p>4a.&nbsp;&nbsp; For <b>standlone mode:&nbsp;</b> Modify the
+<p>4.&nbsp; Create the log folder <b>c:\snmp\log\</b>.</p>
+<p>5a.&nbsp;&nbsp; For <b>standlone mode:&nbsp;</b> Modify the
 Net-SNMP snmptrapd.conf file by adding the following line:</p>
 <blockquote><b>traphandle default perl
 c:\snmp\snmptt</b></blockquote>
@@ -1137,12 +1139,12 @@ c:\snmp\snmptt</b></blockquote>
 to execute snmptt based on the specific trap received, but using
 the <span style="font-weight: bold;">default</span> option is
 preferred</blockquote>
-4b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
+5b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
 snmptrapd.conf file by adding the following line:
 <blockquote><b>traphandle default perl c:\snmp\snmptthandler</b>
 <p>Launch snmptt using:</p>
-<p><b>snmptt --daemon</b></p>
-5.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD
+<p><b>snmptt --daemon</b></blockquote>
+<p>6.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD
 -On. <b><br /></b> <b><span style=
 "font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; Note:&nbsp; The -On
 is recommended.&nbsp; This will make snmptrapd pass OIDs in numeric
@@ -1156,7 +1158,7 @@ Perl module is not installed, then you MUST use the<br />
 &nbsp;&nbsp;&nbsp;&nbsp; -On switch.&nbsp; Depending on the version
 of UCD-SNMP / Net-SNMP, some symbolic names<br />
 &nbsp;&nbsp;&nbsp;&nbsp; may not translate correctly.&nbsp; See the
-FAQ for more info.<br /></span><br />
+FAQ for more info.<br /></span></p>
 &nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your
 <b>snmp.conf</b> file to include the line: <b>printNumericOids
 1.&nbsp;</b> This setting will take effect no matter what is used
@@ -1301,8 +1303,7 @@ configured with the following permissions:
 traps, and delete processed traps<br /></li>
 <li>read access to configuration files (snmptt.ini and all
 snmptt.conf files)</li>
-<li>write access to log files (snmptt.log, snmptt.debug if
-enabled)</li>
+<li>write access to log folder /var/log/snmptt/ or c:\snmp\log\.</li>
 <li>any other permissions required for EXEC statements to
 execute<br /></li>
 </ul>
@@ -3436,7 +3437,7 @@ SEC could take place:</p>
 <ol>
 <li>SNMPTT receives a trap.</li>
 <li>SNMPTT logs the trap to a separate log file such as
-/var/log/snmptt.sec.log using '/bin/echo ...' for the EXEC
+/var/log/snmptt/snmptt.sec.log using '/bin/echo ...' for the EXEC
 statement.&nbsp; No FORMAT line is defined so the trap is not
 logged to the regular snmptt.log log file (or SQL table if a SQL
 server is used).<br /></li>
@@ -3479,14 +3480,14 @@ SNMPTT</li>
 linkDown and linkUp messages to a separate log file for processing
 by SEC.</p>
 <p>Following is an example snmptt.conf.cisco file modified to log a
-linkdown or linkup message to /var/log/snmptt/sec.log.&nbsp; As you
+linkdown or linkup message to /var/log/snmptt/snmptt.sec.log.&nbsp; As you
 can see there are no FORMAT lines so the trap will not be logged to
 the regular SNMPTT log system.</p>
 <div style="margin-left: 40px;">EVENT Cisco_Link_Down
 .1.3.6.1.6.3.1.1.5.3.1.3.6.1.4.1.9 "Cisco Events" Minor<br />
 <span style="font-weight: bold;">EXEC /bin/echo "node=$A
 msg_text=cisco linkdown trap on interface $1" &gt;&gt;
-/var/log/snmptt/sec.log</span><br />
+/var/log/snmptt/snmptt.sec.log</span><br />
 SDESC<br />
 This event occurs when the Cisco agent<br />
 detects an interface has gone down.<br />
@@ -3504,7 +3505,7 @@ Events" Normal<br />
 <span style="font-weight: bold;">EXEC /bin/echo "node=$A
 msg_text=cisco linkup trap on interface $1" &gt;&gt;</span>
 <span style=
-"font-weight: bold;">/var/log/snmptt/sec.log</span><br />
+"font-weight: bold;">/var/log/snmptt/snmptt.sec.log</span><br />
 SDESC<br />
 This event occurs when the Cisco agent<br />
 detects an interface has come back up.<br />
