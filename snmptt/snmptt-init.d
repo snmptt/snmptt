@@ -1,8 +1,9 @@
 #!/bin/bash
 # init file for snmptt
-# Alex Burger - 8/29/02
-# 	      - 9/8/03 - Added snmptt.pid support to Stop function
-#
+# Alex Burger - 08/29/02
+# 	      - 09/08/03 - Added snmptt.pid support to Stop function
+#             - 05/17/09 - Added LSB init keywords, change priority, add
+#                          INIT INFO.
 # chkconfig: - 49 51
 # description: SNMP Trap Translator daemon
 #

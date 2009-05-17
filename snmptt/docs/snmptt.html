@@ -1078,6 +1078,7 @@ snmptrapd.conf file by adding the following line:
 <p>Launch snmptt using:</p>
 <p><b>snmptt --daemon</b></p>
 </blockquote>
+<blockquote>Create the spool folder <b>/var/spool/snmptt/</b>.</blockquote>
 <blockquote>A startup script is included which can be used to start
 and stop <b>snmptt</b> on Mandrake, RedHat and other systems.&nbsp;
 Copy the script to the init.d directory (renaming the file during
@@ -1141,8 +1142,9 @@ the <span style="font-weight: bold;">default</span> option is
 preferred</blockquote>
 5b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
 snmptrapd.conf file by adding the following line:
-<blockquote><b>traphandle default perl c:\snmp\snmptthandler</b>
-<p>Launch snmptt using:</p>
+<blockquote><b>traphandle default perl c:\snmp\snmptthandler</b></blockquote>
+<blockquote>Create the spool folder <b>c:\snmptt\spool\</b>.</blockquote>
+<blockquote><p>Launch snmptt using:</p>
 <p><b>snmptt --daemon</b></blockquote>
 <p>6.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD
 -On. <b><br /></b> <b><span style=

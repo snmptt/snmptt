@@ -2,10 +2,20 @@ May 17th, 2009: Alex Burger <alex_b@users.sourceforge.net>
 - Added LSB init keywords and actions to snmptt-init.d and changed the
   priority for start / stop so that it starts after snmptrapd and stops
   before snmptrapd.  Thanks to Ville Skytta for the patch.
-
 - Changed the default log path to /var/log/snmptt for Unix and c:\snmpt\log
   for Windows to make it easier to grant write permission to the snmptt
   process.  Thanks to Ville Skytta for the patch.
+- Changed umask for log files to 002 to ensure they are not created as world
+  writable.
+- Fixed a bug where the the PID file was being created using the parent (root)
+  PID instead of the child (daemon_uid) when daemon_uid is used.
+- The DEBUG log file will now be re-opened when a HUP signal is sent.
+- When debugging is enabled, flush buffers every sleep cycle so we can tail
+  the debug log file.
+- Don't print messages to the console when starting in daemon mode unless
+  debugging is enabled or an error occurs.
+- 'Could not open debug output file!' is no longer reported when debugging
+  is disabled.
 
 January 15th, 2009: Alex Burger <alex_b@users.sourceforge.net>
 - Re-applied patch for bug 1748512.  Somehow it was added wrong and it

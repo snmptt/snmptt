@@ -316,6 +316,7 @@ my $g_start_time = time();
 my $debug_file_open_error = 1;
 if ($DEBUGGING >= 1)
 {
+  # Open the debug file
   if ($DEBUGGING_FILE ne '') 
   {
     if (open DEBUGFILE, ">>$DEBUGGING_FILE")
@@ -392,14 +393,14 @@ if ($eventlog_system_enable == 1 || $eventlog_enable == 1)
 if ($syslog_system_enable == 1 && $daemon == 1)
 {
   syslog_system("SNMPTT $snmptt_version started");
-  if ($debug_file_open_error == 1) {
+  if ($DEBUGGING >= 1 && $debug_file_open_error == 1) {
     syslog_system("Could not open debug output file!");
   }
 }
 if ($log_system_enable == 1 && $daemon == 1)
 {
   log_system("SNMPTT $snmptt_version started");
-  if ($debug_file_open_error == 1) {
+  if ($DEBUGGING >= 1 && $debug_file_open_error == 1) {
     log_system("Could not open debug output file!");
   }
 }
@@ -407,7 +408,7 @@ if ($log_system_enable == 1 && $daemon == 1)
 if ($eventlog_system_enable == 1 && $daemon == 1)
 {
   eventlog_system("SNMPTT $snmptt_version started",0,$eventlog_information);
-  if ($debug_file_open_error == 1) {
+  if ($DEBUGGING >= 1 && $debug_file_open_error == 1) {
     eventlog_system("Could not open debug output file!",14,$eventlog_warning);
   }
 }
@@ -645,7 +646,9 @@ if ($daemon == 1)
     $pid_file_set = 1;
   }
 
-  print STDOUT "$pid_file\n";
+  if ($DEBUGGING >= 1) {
+    print STDOUT "PID file: $pid_file\n";
+  }
   if (-e $pid_file) {
     open(OLDPID, "<$pid_file");
     my $old_pid = <OLDPID>;
@@ -704,7 +707,9 @@ if ($daemon == 1)
     my $pid2;
 
     my $working_dir = cwd;
-    print "cwd: $working_dir\n";
+    if ($DEBUGGING >= 1) {
+      print "cwd: $working_dir\n";
+    }
 
     chdir '/'
        or die "Can't chdir to /: $!";
@@ -723,18 +728,20 @@ if ($daemon == 1)
 
     # We write PID using the uid of the user that started snmptt.
     if ($pid)   # This is run in the parent process
-    {        
-      if (open(PID, ">$pid_file") ) {
-        print(PID "$pid\n");
-        close(PID);
-      }
-      else {
-        $pid_file = "$working_dir/snmptt.pid";
-        
-        if (open(PID, ">$pid_file") )
-        {
+    {
+      if ($daemon_uid eq '') {
+        if (open(PID, ">$pid_file") ) {
           print(PID "$pid\n");
           close(PID);
+        }
+        else {
+          $pid_file = "$working_dir/snmptt.pid";
+          
+          if (open(PID, ">$pid_file") )
+          {
+            print(PID "$pid\n");
+            close(PID);
+          }
         }
       }
 
@@ -743,14 +750,15 @@ if ($daemon == 1)
 
     POSIX:setsid
        or die "Can't start a new session: $!";
-    umask 0;
+    #umask 0;
+    umask 002;
 
     # We fork again so there are two processes.  The first which is run using the uid
     # of the user that started snmptt, and the second which is run as the user as 
     # defined by daemon_uid in snmptt.ini.  We do this so we can sit and wait for the
     # child to finish so we can clean up the snmptt.pid file.
     # We only need to do this if daemon_uid is set..
-    if ($^O ne "MSWin32" && $daemon_uid ne '') {
+    if ($daemon_uid ne '') {
       defined($pid2 = fork)
         or die "Can't fork: $!";
       
@@ -758,6 +766,20 @@ if ($daemon == 1)
       {
         $SIG{TERM} = \&signal_handler_die;        # new signal for parent
         
+        if (open(PID, ">$pid_file") ) {
+          print(PID "$pid2\n");
+          close(PID);
+        }
+        else {
+          $pid_file = "$working_dir/snmptt.pid";
+          
+          if (open(PID, ">$pid_file") )
+          {
+            print(PID "$pid2\n");
+            close(PID);
+          }
+        }
+
         while (1) {
           if ($timetodie == 1 || waitpid($pid2, WNOHANG) != 0) {
             kill SIGTERM, $pid2;
@@ -771,7 +793,8 @@ if ($daemon == 1)
       
       POSIX:setsid
         or die "Can't start a new session: $!";
-      umask 0;
+      #umask 0;
+      umask 002;
     }
   } 
 
@@ -844,40 +867,8 @@ if ($daemon == 1)
       $debug_file_open_error = 1;
       # Re-open debug file (if needed) as the new user
       if ($DEBUGGING >= 1)
-      {
-        if ($DEBUGGING_FILE ne '')
-        {
-          if (open DEBUGFILE, ">>$DEBUGGING_FILE")
-          {
-            select DEBUGFILE;	# change default output to debug file
-            $debug_file_used = 1;
-            $debug_file_open_error = 0;
-            print "Debug file $DEBUGGING_FILE re-opened under uid $daemon_uid\n";
-            warn "Debug file $DEBUGGING_FILE re-opened under uid $daemon_uid\n";
-          }
-          else
-          {
-            warn "could not re-open debug output file ($!)";
-          }
-          if ($syslog_system_enable == 1 && $daemon == 1)
-          {
-            if ($debug_file_open_error == 1) {
-              syslog_system("Could not re-open debug output file!");
-            }
-          }
-          if ($log_system_enable == 1 && $daemon == 1)
-          {
-            if ($debug_file_open_error == 1) {              
-              log_system("Could not re-open debug output file!");
-            }
-          }
-        }
-
-        if ($eventlog_system_enable == 1 && $daemon == 1){
-          if ($debug_file_open_error == 1) {
-            eventlog_system("Could not re-open debug output file!",14,$eventlog_error);
-          }
-        }
+      {        
+        &reopen_debug_file;
       }
     }
   }
@@ -893,6 +884,12 @@ if ($daemon == 1)
   
   while (!$timetodie)
   {
+    # If debugging, flush the buffers so we can tail snmptt.debug file.
+    if ($DEBUGGING >= 1) {
+      $| = 1;
+      $| = 0;
+    }
+
     if ($duplicate_trap_window) {
       # Purge traps older than duplicate_trap_window in %duplicate_traps
       my $duplicate_traps_current_time = time();
@@ -3984,7 +3981,7 @@ sub loadsnmpttini {
   if( open( CONFIG, $configfile ) ) {
     close CONFIG;
     $cfg = new Config::IniFiles( -file => $configfile);
-    if ($DEBUGGING >= 0) {
+    if ($DEBUGGING >= 1) {
       print "Config file $configfile loaded\n";
     }
   }
@@ -4296,6 +4293,7 @@ sub signal_handler_reload {
   # Daemon reload
   #
   $timetoreload = 1;
+  &reopen_debug_file;
 }
 
 sub signal_handler_die {
@@ -5948,3 +5946,46 @@ sub sql_win32_odbc_insert {
   return 0;
   }
 }
+
+sub reopen_debug_file {
+  if ($DEBUGGING_FILE ne '')
+  {
+    close DEBUGFILE;
+    if (open DEBUGFILE, ">>$DEBUGGING_FILE")
+    {
+      select DEBUGFILE;	# change default output to debug file
+      $debug_file_used = 1;
+      $debug_file_open_error = 0;
+      print "Debug file $DEBUGGING_FILE re-opened under uid $daemon_uid\n";
+      warn "Debug file $DEBUGGING_FILE re-opened under uid $daemon_uid\n";
+    }
+    else
+    {
+      warn "could not re-open debug output file ($!)";
+      
+      if ($syslog_system_enable == 1 && $daemon == 1)
+      {
+        syslog_system("Could not re-open debug output file!");
+      }
+      
+      if ($log_system_enable == 1 && $daemon == 1)
+      {
+        log_system("Could not re-open debug output file!");
+      }
+      
+      if ($eventlog_system_enable == 1 && $daemon == 1){
+        eventlog_system("Could not re-open debug output file!",14,$eventlog_error);
+      }
+      return 0;
+    }
+    return 1;
+  }
+  return 0;
+}
+
+
+
+
+
+
+
