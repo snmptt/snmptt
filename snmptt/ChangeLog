@@ -16,6 +16,7 @@ May 17th, 2009: Alex Burger <alex_b@users.sourceforge.net>
   debugging is enabled or an error occurs.
 - 'Could not open debug output file!' is no longer reported when debugging
   is disabled.
+- Added snmptt.logrotate file from Ville Skytta.
 
 January 15th, 2009: Alex Burger <alex_b@users.sourceforge.net>
 - Re-applied patch for bug 1748512.  Somehow it was added wrong and it
