@@ -1,0 +1,284 @@
+#!/usr/bin/perl
+#
+# SNMPTTHANDLER-E v1.3beta1
+#
+# Copyright 2009 Alex Burger
+# alex_b@users.sourceforge.net
+# 5/17/2009
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+##############################################################################
+#
+# http://www.sourceforge.net/projects/snmptt
+#
+# This script is an embedded snmptrapd trap handler for use with the NET-SNMP 
+# / UCD-SNMP and SNMPTT.  ** It can only be run directly from snmptrapd.  **
+#
+# The script is called by defining a perl handler snmptrapd.conf.  
+# For example:
+#
+# perl do "/sbin/snmptthandler-embedded";
+# 
+# SNMPTTHANDLER-EMBEDDED dumps the received traps into a directory to be 
+# processed by the SNMPTT daemon.
+# 
+##############################################################################
+use strict;
+use Getopt::Long;
+use Time::HiRes qw(gettimeofday);
+use Config::IniFiles;
+
+my $debug = '';         # Override debug level setting in snmptt.ini
+                        # Set to '' to use the snmptt.ini setting or set to 1 to enable.
+
+my $ini = '';           # Override snmptt.ini file location.
+                        # Set to '' to use the default locations of /etc/snmp/snmptt.ini
+                        # and /etc/snmptt.ini for Unix and %SYSTEMROOT%\snmptt.ini for
+                        # Windows.
+
+##############################################################################
+# Don't modify anything below this line
+#
+my $DEBUGGING;
+my $DEBUGGING_FILE;
+my $configfile;
+my $spool_directory;
+
+if ($debug >= 1)
+{
+	$DEBUGGING = 1;
+}
+
+&loadsnmpttini;         # Load snmptt.ini
+
+##############################################################################
+
+# Register the trap receiver
+NetSNMP::TrapReceiver::register("all", \&snmptt_trap_receiver) ||
+warn "failed to register our perl trap handler\n";
+
+print STDERR "Loaded the SNMPTT embedded snmptrapd handler\n";
+
+##############################################################################
+# Trap receiver.
+sub snmptt_trap_receiver {
+  my $pdu_info = $_[0];
+  my $varbinds = $_[1];
+
+  system ("date >> /tmp/date2.txt");
+  my $hostname = $$pdu_info{"receivedfrom"} || "unknown";
+  if ($hostname ne "unknown") {
+    $hostname =~ /.*?->\[(.*?)\].*/;              # UDP: [127.0.0.1]:41070->[127.0.0.1]
+    $hostname = $1 || "unknown";
+  }
+
+  my $ip_address = $$pdu_info{"receivedfrom"} || "unknown";
+  if ($ip_address ne "unknown") {
+    $ip_address =~ /.*?->\[(.*?)\].*/;              # UDP: [127.0.0.1]:41070->[127.0.0.1]
+    $ip_address = $1 || "unknown";
+  }
+
+  my $community = $$pdu_info{"community"} || "unknown";
+
+
+  # securityEngineID in hash = snmpCommunityContextEngineID = .1.3.6.1.6.3.18.1.1.1.4 ?
+  my $securityEngineID = $$pdu_info{"securityEngineID"} || "unknown";
+  $securityEngineID = unpack('h*', $securityEngineID);
+
+  # contextEngineID in hash = snmpEngineID = .1.3.6.1.6.3.10.2.1.1 ?  
+  my $contextEngineID = $$pdu_info{"contextEngineID"} || "unknown";
+  $contextEngineID = unpack('h*', $contextEngineID);
+
+  # SNMPTT expects the 3rd item to be the uptime and the 4th to be the trapname
+  my $uptime;
+  my $trapname;
+  my $other_varbinds;
+
+  # Cycle through all the varbinds  
+  foreach my $x (@$varbinds) {
+    printf "  %-30s type=%-2d value=%s\n", $x->[0], $x->[2], $x->[1];
+
+    my $oid = "$x->[0]";
+    my $value = "$x->[1]";
+    $value =~ s/STRING: //g;
+    $value =~ s/INTEGER: //g;
+
+    if ($oid eq ".1.3.6.1.2.1.1.3.0") {
+      my $temp = $value;
+      $temp =~ /Timeticks: \(.*?\) (.*)/;
+      $uptime = $oid . " " . $1;
+    }
+    elsif ($oid eq ".1.3.6.1.6.3.1.1.4.1.0") {
+      my $temp = $value;
+      $temp =~ /OID: (.*)/;
+      $trapname = $oid . " " . $1;
+    }
+    else {
+      $other_varbinds .= $oid . " " . $value . "\n";
+    }
+  }
+
+  ##############################################################################
+  # Create file in spool directory based on current time
+  my ($s, $usec) = gettimeofday;
+  
+  # Pad the numbers with 0's to make sure they are all the same length.  Sometimes the
+  # usec is shorter than 6.
+  my $s_pad = sprintf("%09d",$s);
+  my $usec_pad = sprintf("%06d",$usec);
+  
+  if ($DEBUGGING >= 1)
+  {
+    if ($DEBUGGING_FILE ne '') 
+    {
+      open DEBUGFILE, ">>$DEBUGGING_FILE"
+        or warn "Could not open debug output file ($!)";
+      
+      select DEBUGFILE;	# Change default output to debug file
+    }
+    
+    # Print out time
+    print "-------------------------------------------------------------\n";
+    print "SNMPTTHANDLER-EMBEDDED started: ",scalar(localtime),"\n\n";
+    print "s = $s, usec = $usec\n";
+    print "s_pad = $s_pad, usec_pad = $usec_pad\n\n";
+    print "Data received:\n\n";
+  }
+  
+  my $spoolfile = $spool_directory.'#snmptt-trap-'.$s_pad.$usec_pad;
+  
+  unless (open SPOOL, ">$spoolfile")
+  {
+    if ($DEBUGGING >= 1)
+    {
+      print "Could not write to file file $spoolfile!  Trap will be lost!\n";
+    }
+    die "Could not write to file $spoolfile!  Trap will be lost!\n";
+  } 
+  
+  print SPOOL time()."\n";
+  print SPOOL $hostname . "\n";
+  print SPOOL $ip_address . "\n";
+  print SPOOL $uptime . "\n";
+  print SPOOL $trapname . "\n";
+  print SPOOL ".1.3.6.1.6.3.18.1.4.0 $community\n";
+  print SPOOL $other_varbinds;
+  if ($securityEngineID ne "") {
+    print SPOOL ".1.3.6.1.6.3.18.1.1.1.4 \"0x$securityEngineID\"\n";
+  }
+  if ($contextEngineID ne "") {
+    print SPOOL ".1.3.6.1.6.3.10.2.1.1 \"0x$contextEngineID\"\n";
+  }
+
+  close SPOOL;
+
+  if ($DEBUGGING >= 1) {
+    print SPOOL time()."\n";
+    print $hostname . "\n";
+    print $ip_address . "\n";
+    print $uptime . "\n";
+    print $trapname . "\n";
+    print ".1.3.6.1.6.3.18.1.4.0 $community\n";
+    print $other_varbinds;
+    if ($securityEngineID ne "") {
+      print ".1.3.6.1.6.3.18.1.1.1.4 \"0x$securityEngineID\"\n";
+    }
+    if ($contextEngineID ne "") {
+      print ".1.3.6.1.6.3.10.2.1.1 \"0x$contextEngineID\"\n";
+    }
+
+    # Flush the buffers for debugging.
+    $| = 1;
+    $| = 0;
+  }
+  
+  return NETSNMPTRAPD_HANDLER_OK;
+}
+
+sub loadsnmpttini {
+  ##############################################################################
+  # Load snmptt.ini
+  #
+  # For Linux / Unix, try /etc/snmp/snmptt.ini first, /etc/snmptt.ini second.
+  #
+  # For Windows, try %SystemRoot%\snmptt.ini only.
+  #
+
+  my $cfg;
+
+  if ($ini ne '') {
+    $configfile = $ini;
+  }
+  else {	
+    if ($^O ne "MSWin32") {
+      if (-f '/etc/snmp/snmptt.ini' && -r '/etc/snmp/snmptt.ini') {
+        $configfile = '/etc/snmp/snmptt.ini';    
+      }
+      elsif (-f '/etc/snmptt.ini' && -r '/etc/snmptt.ini') {
+        $configfile = '/etc/snmptt.ini';    
+      }
+      else {
+        if ($DEBUGGING >= 1) {
+          print "Could not load snmptt.ini from the default file locations (/etc/snmp/ or /etc/).\n";
+        }
+        warn "Could not load snmptt.ini from the default file locations (/etc/snmp/ or /etc/).\n";
+        exit(1);
+      }
+    }
+    else {
+      $configfile = $ENV{'SystemRoot'}."\\snmptt.ini";
+    }
+  }
+
+  if( open( CONFIG, $configfile ) ) {
+    close CONFIG;
+    $cfg = new Config::IniFiles( -file => $configfile);
+  }
+  else
+  {
+    if ($DEBUGGING >= 1) {
+    	print "Config file ($configfile) could not be loaded\n";
+    }
+    warn "Config file ($configfile) could not be loaded\n";
+    exit(1);
+  }
+  
+  if (! $cfg)
+  {
+    if ($DEBUGGING >= 1) {
+  	  print "Error in config file - please check the syntax in the config file\n";
+    }
+    exit(1);
+  }
+  
+  # DaemonMode
+  $spool_directory = $cfg->val('DaemonMode', 'spool_directory');
+  
+  # Debugging
+  if ($debug eq '') {
+    $DEBUGGING = $cfg->val('Debugging', 'DEBUGGING');
+  }
+        $DEBUGGING_FILE = $cfg->val('Debugging', 'DEBUGGING_FILE_HANDLER');
+  
+  $cfg->Delete;
+  
+  # Defaults Start
+  if (! defined ($spool_directory)) { $spool_directory = ''} ;
+  if (! defined ($DEBUGGING)) { $DEBUGGING = 0} ;
+  if (! defined ($DEBUGGING_FILE)) { $DEBUGGING_FILE = ''} ;
+  # Defaults End
+}
+

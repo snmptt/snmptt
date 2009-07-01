@@ -1,4 +1,6 @@
 May 17th, 2009: Alex Burger <alex_b@users.sourceforge.net>
+- Added snmptthandler-embedded - a Net-SNMP embedded Perl version of
+  snmptthandler.
 - Added LSB init keywords and actions to snmptt-init.d and changed the
   priority for start / stop so that it starts after snmptrapd and stops
   before snmptrapd.  Thanks to Ville Skytta for the patch.
