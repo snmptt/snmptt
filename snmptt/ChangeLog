@@ -37,7 +37,7 @@ August 4th, 2008: Alex Burger <alex_b@users.sourceforge.net>
 - Added duplicate_trap_window variable for duplicate trap detection.
 
 March 2nd, 2008: Alex Burger <alex_b@users.sourceforge.net>
-- Fixed a bug where with handling escaped quotes in a traq message.
+- Fixed a bug where with handling escaped quotes in a trap message.
   Bug 1748512.  Thanks to Erwin Abrahamse for the fix.
 
 October 12th, 2007: Alex Burger <alex_b@users.sourceforge.net>
@@ -45,15 +45,15 @@ October 12th, 2007: Alex Burger <alex_b@users.sourceforge.net>
 
 June 16th, 2007: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.3beta1
-
-June 16th, 2007: Alex Burger <alex_b@users.sourceforge.net>
-- Changed version to snmptt_1.2 for release.
 - Fixed a bug where snmpttconvertmib would not recognize a MIB file if the
   DEFINITIONS ::= BEGIN line was split across two lines.  Thanks to Alex 
   Peeters for reporting the bug.  Bug 1678270.
 - Improved a previous bug fix for when a TRAP-TYPE / NOTIFICATION-TYPE line 
   was split across two lines.  Fix did not allow the trap name to contain
   a symbol such as a -.
+
+June 16th, 2007: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.2 for release.
 
 June 9th, 2007: Alex Burger <alex_b@users.sourceforge.net>
 - Change REGEX to use Text::Balanced instead of split to fix bug with
