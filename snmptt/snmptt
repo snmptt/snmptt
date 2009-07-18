@@ -1261,6 +1261,10 @@ sub processtrap
   # $var[4] 		ip address from trap agent
   # $var[5] 		trap community string
   # $var[6] 		enterprise
+  # $var[7] 		securityEngineID                (snmptthandler-embedded required)
+  # $var[8] 		securityName                    (snmptthandler-embedded required)
+  # $var[9] 		contextEngineID                 (snmptthandler-embedded required)
+  # $var[10] 		contextName                     (snmptthandler-embedded required)
   #
   # $entvarname[0]	passed variable name 1
   # $entvarname[1]	passed variable name 2
@@ -2270,6 +2274,18 @@ sub substitute
       &substitute2 ("\$-$i", "$entvarname[$i-1] (unknown):$val");
     }
   }
+
+  # $Be - securityEngineID (snmpEngineID)
+  &substitute2 ("\$Be", $var[7]);
+
+  # $Bu - securityName (snmpCommunitySecurityName)
+  &substitute2 ("\$Bu", $var[8]);
+
+  # $BE - contextEngineID (snmpCommunityContextEngineID)
+  &substitute2 ("\$BE", $var[9]);
+
+  # $Bn - contextName (snmpCommunityContextName)
+  &substitute2 ("\$Bn", $var[10]);
 
   # $c - Category
   #s(\$c)($event2[1])g;
@@ -3335,9 +3351,13 @@ sub readtrap
   $var[3] = $tempvar[5];		# trapname / OID - assume first value after uptime is
           # the trap OID (value for .1.3.6.1.6.3.1.1.4.1.0)
 
-  $var[4] = "";	# Clear ip address from trap agent
-  $var[5] = "";	# Clear trap community string
-  $var[6] = "";	# Clear enterprise
+  $var[4] = "";	 # Clear ip address from trap agent
+  $var[5] = "";	 # Clear trap community string
+  $var[6] = "";	 # Clear enterprise
+  $var[7] = "";	 # Clear securityEngineID
+  $var[8] = "";	 # Clear securityName
+  $var[9] = "";	 # Clear contextEngineID
+  $var[10] = ""; # Clear contextName
 
   # Make sure trap OID is numerical as event lookups are done using numerical OIDs only
   $var[3] = translate_symbolic_to_oid($var[3]);
@@ -3361,6 +3381,22 @@ sub readtrap
       # $var[6] = $tempvar[$i+1];
       # Make sure enterprise value is numerical
       $var[6] = translate_symbolic_to_oid($tempvar[$i+1]);
+    }
+    elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.10.2.1.1.0$/)	# securityEngineID
+    {
+      $var[7] = $tempvar[$i+1];
+    }
+    elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.1.1.3$/)	# securityName
+    {
+      $var[8] = $tempvar[$i+1];
+    }
+    elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.1.1.4$/)	# contextEngineID
+    {
+      $var[9] = $tempvar[$i+1];
+    }
+    elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.1.1.5$/)	# contextName
+    {
+      $var[10] = $tempvar[$i+1];
     }
     else  # application specific variables
     {
@@ -3456,6 +3492,10 @@ sub readtrap
     print "4:		ip address from trap agent\n";
     print "5:		trap community string\n";
     print "6:		enterprise\n";
+    print "7:		securityEngineID        (snmptthandler-embedded required)\n";
+    print "8:		securityName            (snmptthandler-embedded required)\n";
+    print "9:		contextEngineID         (snmptthandler-embedded required)\n";
+    print "10:		contextName             (snmptthandler-embedded required)\n";
     print "0+:		passed variables\n\n";	
 
     #print out all standard variables
@@ -3477,7 +3517,7 @@ sub readtrap
   if ($duplicate_trap_window) {
     my $md5 = Digest::MD5->new;
     # All variables except for uptime.
-    $md5->add($var[0],$var[1].$var[3].$var[4].$var[5].$var[6]."@entvar");
+    $md5->add($var[0],$var[1].$var[3].$var[4].$var[5].$var[6].$var[7].$var[8].$var[9].$var[10]."@entvar");
     
     my $trap_digest = $md5->hexdigest;
 
@@ -3504,6 +3544,10 @@ sub readtrap
   # $var[4]   ip address from trap agent
   # $var[5]   trap community string
   # $var[6]   enterprise
+  # $var[7]   securityEngineID                (snmptthandler-embedded required)
+  # $var[8]   securityName                    (snmptthandler-embedded required)
+  # $var[9]   contextEngineID                 (snmptthandler-embedded required)
+  # $var[10]  contextName                     (snmptthandler-embedded required)
   #
   # $entvarname[0]  passed variable name 1
   # $entvarname[1]  passed variable name 2
@@ -3530,6 +3574,10 @@ sub searchfortrap
   # $var[4]  ip address from trap agent
   # $var[5]  trap community string
   # $var[6]  enterprise
+  # $var[7]  securityEngineID                (snmptthandler-embedded required)
+  # $var[8]  securityName                    (snmptthandler-embedded required)
+  # $var[9]  contextEngineID                 (snmptthandler-embedded required)
+  # $var[10] contextName                     (snmptthandler-embedded required)
   #
   # $entvarname[0] passed variable name 1
   # $entvarname[1] passed variable name 2

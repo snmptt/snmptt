@@ -1,8 +1,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta content=
-"HTML Tidy for Linux/x86 (vers 1 September 2005), see www.w3.org"
-name="generator" />
+"HTML Tidy for Linux (vers 14 June 2007), see www.w3.org" name=
+"generator" />
 <meta http-equiv="Content-Type" content=
 "text/html; charset=us-ascii" />
 <meta name="Author" content="Alex Burger" />
@@ -14,7 +14,7 @@ name="generator" />
 <body>
 <h1>SNMP Trap Translator v1.2</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on: August 4th, 2008
+This file was last updated on: July 18th, 2009
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -25,7 +25,12 @@ This file was last updated on: August 4th, 2008
 <a href="#Installation-Overview">Installation</a><br />
 <b>&nbsp;&nbsp;</b> <a href=
 "#Installation-Overview">Overview</a><br />
-<b>&nbsp;&nbsp;</b> <a href="#Installation-Unix">Unix</a><br />
+<b>&nbsp;&nbsp;</b> <a href=
+"snmptt.html#Installation-Unix">Unix</a><br />
+<div style="margin-left: 40px;"><a href=
+"snmptt.html#Installation-Unix-Standard">Standard handler</a><br />
+<a href="#Installation-Unix-Embedded">Embedded
+handler</a><br /></div>
 <b>&nbsp;&nbsp;</b> <a href=
 "#Installation-Windows">Windows</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#SecuringSNMPTT">Securing
@@ -269,13 +274,18 @@ statements.</li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=Digest::MD5">Digest::MD5</a>
 module (included with most if not all distributions including
-ActivePerl).&nbsp; Required when enabling duplicate trap detection.</li>
+ActivePerl).&nbsp; Required when enabling duplicate trap
+detection.</li>
+<li>Optional: To use <span style=
+"font-weight: bold;">snmptthandler-embedded</span>, Net-SNMP's
+snmptrapd must be compiled with embedded Perl enabled
+(--enable-embedded-perl' configuration option)</li>
 </ul>
 <p>All development and testing was done with Linux, Windows 2000 or
 higher and various versions of Net-SNMP from UCD SNMP v4.2.1 to the
 current Net-SNMP 5.4.x release. The Windows version has been tested
 with both native mode and under Cygwin.</p>
-<p>Both SNMP V1 and V2 traps have been tested.</p>
+<p>SNMP V1,&nbsp;V2 and V3 traps have been tested.</p>
 <p>Net-SNMP 5.1.1 or higher is recommended.</p>
 <p>UCD-SNMP v4.2.3 appears to have a bug that prevents it from
 working correctly with SNMPTT.&nbsp; UCD-SNMP v4.2.1, v4.2.4 and
@@ -289,13 +299,51 @@ want to have variable names translated into symbolic form, want to
 be able to have <b>snmptrapd</b> pass traps using symbolic form, or
 you enable the options <b>translate_integers</b>,
 <b>translate_trap_oid</b> or <b>translate_oids</b>. Although not
-required, using the Perl module is recommended.</blockquote>
+required, using the Perl module is recommended. &nbsp;It is also
+required if you want to use the snmptthandler-embedded trap handler
+with snmptrapd.</blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
-<h3><b>v1.3beta1</b> <b>- August 4th, 2008</b></h3>
+<h3><b>v1.3beta1</b> <b>- July 18th, 2009</b></h3>
 <ul>
-  <li>Added <b>snmptt.ini</b> option <b>duplicate_trap_window variable</b> for duplicate trap detection.</li>
-  <li>Fixed a bug with handling escaped quotes in a trap message.</li>
-  <li>Updated snmptt-net-snmp-test to test MIB descriptions.</li>
+<li>Added <span style=
+"font-weight: bold;">snmptthandler-embedded</span> - a Net-SNMP
+snmptrapd embedded Perl version of snmptthandler.</li>
+<li>Added variable substitutions <span style=
+"font-weight: bold;">$Be</span>, <span style=
+"font-weight: bold;">$Bu</span>, <span style=
+"font-weight: bold;">$BE</span> and <span style=
+"font-weight: bold;">$Bn</span> for SNMPv3 securityEngineID,
+securityName, contextEngineID and contextName&nbsp;(requires
+snmptthandler-embedded handler).</li>
+<li>Added <b>snmptt.ini</b> option <b>duplicate_trap_window
+variable</b> for duplicate trap detection.</li>
+<li>Added LSB init keywords and actions to <span style=
+"font-weight: bold;">snmptt-init.d</span> and changed the priority
+for start / stop so that it starts after snmptrapd and stops before
+snmptrapd.</li>
+<li>Changed the default log path to <span style=
+"font-weight: bold;">/var/log/snmptt</span> for Unix and
+<span style="font-weight: bold;">c:\snmpt\log</span> for Windows to
+make it easier to grant write permission to the
+snmptt&nbsp;process.</li>
+<li>Changed umask for log files to 002 to ensure they are not
+created as world writable.</li>
+<li>Fixed a bug where the the PID file was being created using the
+parent (root) PID instead of the child (daemon_uid) when daemon_uid
+is used.</li>
+<li>The DEBUG log file will now be re-opened when a HUP signal is
+sent.</li>
+<li>When debugging is enabled, flush buffers every sleep cycle so
+we can tail the debug log file.</li>
+<li>Don't print messages to the console when starting in daemon
+mode unless debugging is enabled or an error occurs.</li>
+<li>'Could not open debug output file!' is no longer reported when
+debugging is disabled.<br /></li>
+<li>Added <span style="font-weight: bold;">snmptt.logrotate</span>
+file from Ville Skytta.</li>
+<li>Fixed a bug with handling escaped quotes in a trap
+message.</li>
+<li>Updated snmptt-net-snmp-test to test MIB descriptions.</li>
 </ul>
 <h3><b>v1.2</b> <b>- June 16th, 2007</b></h3>
 <ul>
@@ -846,6 +894,28 @@ configuration files to load</li>
 <li>Initial release</li>
 </ul>
 <h2><a id="Upgrading" name="Upgrading"></a>Upgrading</h2>
+<h3><b>v1.2 to v1.3beta1</b></h3>
+<p>To upgrade from v1.2 to v1.3beta1, you should:</p>
+<ol>
+<li>Replace <b>snmptt</b> with the new version.&nbsp; Make sure the
+files are executable (<b>chmod +x <i>filename</i></b>).</li>
+<li>Copy&nbsp;<span style="font-weight: bold;">snmptt-init.d</span>
+to&nbsp;<span style="font-weight: bold;">/etc/init.d/snmptt</span>.
+&nbsp;Make sure the file is executable (<b>chmod +x
+<i>filename</i></b>).</li>
+<li>Optional: &nbsp;Install and configure the <span style=
+"font-weight: bold;">snmptthandler-embedded</span> trap handler.
+&nbsp;See <a href="snmptt.html#Installation-Unix-Embedded">Embedded
+handler</a> for details.</li>
+<li>Backup your <b>snmptt.ini</b> file, replace it with the new
+version, and make any necessary configuration changes to it.
+&nbsp;The default log paths have changed so modify as needed.</li>
+<li>Setup log rotation by copying <span style=
+"font-weight: bold;">snmptt.logrotate</span> to <span style=
+"font-weight: bold;">/etc/logrotate.d/snmptt</span> and modifying
+as needed for the correct paths, rotate frequency etc.</li>
+<li>Enable any new features in <b>snmptt.ini</b> as required.</li>
+</ol>
 <h3><b>v1.1 to v1.2</b></h3>
 <p>To upgrade from v1.1 to v1.2, you should:</p>
 <ol>
@@ -1051,6 +1121,23 @@ files for the result</li>
 </ol>
 <h3><a id="Installation-Unix" name=
 "Installation-Unix"></a>Installation - Unix</h3>
+<h4><a name="Installation-Unix-Standard"></a>Standard handler</h4>
+The standard handler is a small Perl program that is called each
+time a trap is received by snmptrapd when using daemon mode.
+&nbsp;The limitations of this handler are:<br />
+<ul>
+<li>Each time a trap is received, a process must be created to run
+the snmptthandler program and snmptt.ini is read&nbsp;each
+time.</li>
+<li>SNMPv3 EngineID and names are not passed by snmptrapd to
+snmptthandler</li>
+</ul>
+The benefits of using this handler are:<br />
+<ul>
+<li>Does not require embedded Perl for snmptrapd</li>
+<li>Has been around since v0.1 if snmptt.</li>
+<li>Sufficient for most installations</li>
+</ul>
 <p>1.&nbsp; <b><u>Read this entire file to understand how snmptt
 works</u></b></p>
 <p>2.&nbsp; Copy <b>snmptt</b> to <span style=
@@ -1072,18 +1159,23 @@ execute <span style="font-weight: bold;">snmptt</span> based on the
 specific trap received, but using the <span style=
 "font-weight: bold;">default</span> option is preferred</p>
 </blockquote>
-6b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
-snmptrapd.conf file by adding the following line:
-<blockquote><b>traphandle default /usr/sbin/snmptthandler</b>
-<p>Launch snmptt using:</p>
-<p><b>snmptt --daemon</b></p>
-</blockquote>
-<blockquote>Create the spool folder <b>/var/spool/snmptt/</b>.</blockquote>
+6b.&nbsp;&nbsp; For <b>daemon mode:<br />
+<br /></b>
+<div style="margin-left: 40px;">
+<p>Modify the Net-SNMP snmptrapd.conf file by adding the following
+line:</p>
+</div>
+<blockquote><b>traphandle default
+/usr/sbin/snmptthandler</b><br /></blockquote>
+<blockquote>
+<p>Create the spool folder <b>/var/spool/snmptt/</b>:</p>
+<span style="font-weight: bold;">mkdir
+/var/spool/snmptt/</span><br /></blockquote>
 <blockquote>A startup script is included which can be used to start
 and stop <b>snmptt</b> on Mandrake, RedHat and other systems.&nbsp;
 Copy the script to the init.d directory (renaming the file during
 the copy):
-<p><b>cp snmptt.init.d to /etc/rc.d/init.d/snmptt</b></p>
+<p><b>cp snmptt.init.d&nbsp;/etc/rc.d/init.d/snmptt</b></p>
 <p>Add the service using <span style=
 "font-weight: bold;">chkconfig</span>:</p>
 <p><b>chkconfig --add snmptt</b></p>
@@ -1094,16 +1186,27 @@ immediately with:</p>
 <p><b>service snmptt start</b></p>
 <p>or</p>
 <p><b>/etc/rc.d/init.d/snmptt start</b></p>
+<p>To manually start snmptt, use:</p>
+<p><b>snmptt --daemon</b></p>
 </blockquote>
-7.&nbsp; Start <span style="font-weight: bold;">snmptrapd</span>
-using the command line:&nbsp; <span style=
-"font-weight: bold;">snmptrapd -On</span>.<br />
-&nbsp;&nbsp;&nbsp;&nbsp; You should be able to edit the
+<p>7. &nbsp; &nbsp; &nbsp; A log rotation&nbsp;script is included
+which can be used to rotate the log files&nbsp;on Mandrake, RedHat
+and other systems.&nbsp; Copy the file&nbsp;to the&nbsp;logrotate.d
+directory (renaming the file during the copy):</p>
+<blockquote>
+<p><b>cp snmptt.logrotate&nbsp;/etc/logrotate.d/snmptt</b></p>
+<p>Edit the&nbsp;<b>/etc/logrotate.d/snmptt</b> and update
+the&nbsp;paths and rotate frequency as needed.</p>
+</blockquote>
+8.&nbsp; &nbsp; &nbsp; &nbsp;Start <span style=
+"font-weight: bold;">snmptrapd</span> using the command line:&nbsp;
+<span style="font-weight: bold;">snmptrapd -On</span>.<br />
+<br />
+<div style="margin-left: 40px;">You should be able to edit the
 <b>/etc/rc.d/init.d/snmptrapd</b> script if you have one and
 change<br />
-&nbsp;&nbsp;&nbsp;&nbsp; the <b>OPTIONS</b> to <b>"-On"</b>.
-<b><br />
-<span style="font-weight: bold;"><br /></span></b>
+the <b>OPTIONS</b> to <b>"-On"</b>.<br />
+<br /></div>
 <div style="margin-left: 40px;"><b><span style=
 "font-weight: bold;">Note:&nbsp; The -On is recommended.&nbsp; This
 will make snmptrapd pass OIDs in numeric form</span> <span style=
@@ -1114,15 +1217,124 @@ the symbolic name to numerical form.&nbsp; If</span> <span style=
 installed, then you MUST use the -On switch.&nbsp; Depending on the
 version of UCD-SNMP / Net-SNMP, some symbolic names may not
 translate correctly.&nbsp; See the FAQ for more info.</span></div>
-<p>&nbsp;&nbsp;&nbsp;&nbsp; As an alternative, you can edit your
+<p style="margin-left: 40px;">As an alternative, you can edit your
 <b>snmp.conf</b> file to include the line: <b>printNumericOids
 1.&nbsp;</b> This setting will take effect no matter what is used
 on the command line.</p>
-<p>8.&nbsp; See the <a href="#SecuringSNMPTT">Securing SNMPTT</a>
-section.</p>
+<p>9.&nbsp; &nbsp; &nbsp; &nbsp;See the <a href=
+"#SecuringSNMPTT">Securing SNMPTT</a> section.</p>
+<br />
+<h4><a name="Installation-Unix-Embedded"></a>Embedded handler</h4>
+<br />
+The embedded&nbsp;handler is a small Perl program that is loaded
+directly into snmptrapd when snmptrapd is started. &nbsp;The
+limitations of this handler are:<br />
+<ul>
+<li>Requires embedded Perl for snmptrapd</li>
+<li>Only works with daemon mode</li>
+</ul>
+The benefits of using this handler are:<br />
+<ul>
+<li>The handler is loaded and initialized when snmptrapd is
+started, so there is less overhead as a new process does not need
+to be created and initialization is done only once (loading of
+snmptt.ini).</li>
+<li>SNMPv3 EngineID and names variables are available in snmptt (B*
+variables)</li>
+</ul>
+<p>1.&nbsp; <b><u>Read this entire file to understand how snmptt
+works</u></b></p>
+<p>2. &nbsp;Make sure snmptrapd has embedded Perl support enabled.
+&nbsp;When compiling from source, use the '--enable-embedded-perl'
+configuration option. &nbsp;</p>
+<p>&nbsp;&nbsp; &nbsp; Type&nbsp;<span style=
+"font-weight: bold;">snmptrapd -H 2&gt;&amp;1 | grep perl</span>.
+&nbsp;It should give&nbsp;<span style="font-weight: bold;">perl
+&nbsp; PERLCODE</span> if embedded Perl is enabled. &nbsp;</p>
+<p>&nbsp; &nbsp; &nbsp;If it's not available, you need to compile
+Net-SNMP using the <span style=
+"font-weight: bold;">--enable-embedded-perl</span> configure
+option.</p>
+<p>3.&nbsp; Copy <b>snmptt</b> to <span style=
+"font-weight: bold;">/usr/sbin/</span> and ensure it is executable
+(<b>chmod +x snmptt</b>)</p>
+<p>4.&nbsp; Copy <b>snmptthandler-embedded</b> to <span style=
+"font-weight: bold;">/usr/sbin/</span>. &nbsp;It does not need to
+be executable as it is called directly by snmptrapd.</p>
+<p>5.&nbsp; Copy <b>snmptt.ini</b> to <b>/etc/snmp/</b> or
+<span style="font-weight: bold;">/etc/</span> and edit the options
+inside the file.</p>
+<p>6.&nbsp; Create the log folder <b>/var/log/snmptt/</b>.</p>
+7. &nbsp;Configure snmptrapd and install the service:<br />
+<br />
+<div style="margin-left: 40px;">
+<p>Modify the Net-SNMP snmptrapd.conf file by adding the following
+line:</p>
+</div>
+<blockquote><b>perl do
+"/usr/sbin/snmptthandler-embedded";</b><br /></blockquote>
+<blockquote>Create the spool folder
+<b>/var/spool/snmptt/</b>.</blockquote>
+<blockquote>A startup script is included which can be used to start
+and stop <b>snmptt</b> on Mandrake, RedHat and other systems.&nbsp;
+Copy the script to the init.d directory (renaming the file during
+the copy):
+<p><b>cp snmptt.init.d&nbsp;/etc/rc.d/init.d/snmptt</b></p>
+<p>Add the service using <span style=
+"font-weight: bold;">chkconfig</span>:</p>
+<p><b>chkconfig --add snmptt</b></p>
+<p>Configure the service to start at runlevel 2345:</p>
+<p><b>chkconfig --level 2345 snmptt on</b></p>
+<p>Snmptt will be started at the next reboot, or can be started
+immediately with:</p>
+<p><b>service snmptt start</b></p>
+<p>or</p>
+<p><b>/etc/rc.d/init.d/snmptt start</b></p>
+<p>To manually start snmptt, use:</p>
+<p><b>snmptt --daemon</b><br /></p>
+</blockquote>
+<p>8.&nbsp; &nbsp; &nbsp; &nbsp;A log rotation&nbsp;script is
+included which can be used to rotate the log files&nbsp;on
+Mandrake, RedHat and other systems.&nbsp; Copy the file&nbsp;to
+the&nbsp;logrotate.d directory (renaming the file during the
+copy):</p>
+<blockquote>
+<p><b>cp snmptt.logrotate&nbsp;/etc/logrotate.d/snmptt</b></p>
+<p>Edit the&nbsp;<b>/etc/logrotate.d/snmptt</b> and update the
+paths and rotate frequency as needed.</p>
+</blockquote>
+9.&nbsp; &nbsp; &nbsp; &nbsp;Start <span style=
+"font-weight: bold;">snmptrapd</span> using the command line:&nbsp;
+<span style="font-weight: bold;">snmptrapd -On</span>.<br />
+<div style="margin-left: 40px;"><br />
+You should be able to edit the <b>/etc/rc.d/init.d/snmptrapd</b>
+script if you have one and change<br />
+the <b>OPTIONS</b> to <b>"-On"</b>.<br /></div>
+<b><span style="font-weight: bold;"><br /></span></b>
+<div style="margin-left: 40px;"><b><span style=
+"font-weight: bold;">Note:&nbsp; The -On is recommended.&nbsp; This
+will make snmptrapd pass OIDs in numeric form</span> <span style=
+"font-weight: bold;">and prevent SNMPTT from having to translate
+the symbolic name to numerical form.&nbsp; If</span> <span style=
+"font-weight: bold;">the</span></b> <span style=
+"font-weight: bold;">UCD-SNMP / Net-SNMP Perl module is not
+installed, then you MUST use the -On switch.&nbsp; Depending on the
+version of UCD-SNMP / Net-SNMP, some symbolic names may not
+translate correctly.&nbsp; See the FAQ for more info.</span><br />
+<br />
+<p>As an alternative, you can edit your <b>snmp.conf</b> file to
+include the line: <b>printNumericOids 1.&nbsp;</b> This setting
+will take effect no matter what is used on the command line.</p>
+</div>
+<p>10. &nbsp; &nbsp; See the <a href=
+"snmptt.html#SecuringSNMPTT">Securing SNMPTT</a> section.</p>
+<br />
 <br />
 <h3><a id="Installation-Windows" name=
 "Installation-Windows"></a>Installation - Windows</h3>
+<p>The Net-SNMP trap receiver does not currently support embedded
+Perl, so only the standard trap handler can be used with
+Windows.</p>
 <p>1.&nbsp; <b><u>Read this entire file to understand how snmptt
 works</u></b></p>
 <p>2.&nbsp; Create the directory <span style=
@@ -1142,10 +1354,14 @@ the <span style="font-weight: bold;">default</span> option is
 preferred</blockquote>
 5b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
 snmptrapd.conf file by adding the following line:
-<blockquote><b>traphandle default perl c:\snmp\snmptthandler</b></blockquote>
-<blockquote>Create the spool folder <b>c:\snmptt\spool\</b>.</blockquote>
-<blockquote><p>Launch snmptt using:</p>
-<p><b>snmptt --daemon</b></blockquote>
+<blockquote><b>traphandle default perl
+c:\snmp\snmptthandler</b></blockquote>
+<blockquote>Create the spool folder
+<b>c:\snmptt\spool\</b>.</blockquote>
+<blockquote>
+<p>Launch snmptt using:</p>
+<p><b>snmptt --daemon</b></p>
+</blockquote>
 <p>6.&nbsp; Start SNMPTRAPD using the command line:&nbsp; SNMPTRAPD
 -On. <b><br /></b> <b><span style=
 "font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; Note:&nbsp; The -On
@@ -1305,7 +1521,8 @@ configured with the following permissions:
 traps, and delete processed traps<br /></li>
 <li>read access to configuration files (snmptt.ini and all
 snmptt.conf files)</li>
-<li>write access to log folder /var/log/snmptt/ or c:\snmp\log\.</li>
+<li>write access to log folder /var/log/snmptt/ or
+c:\snmp\log\.</li>
 <li>any other permissions required for EXEC statements to
 execute<br /></li>
 </ul>
@@ -2129,6 +2346,14 @@ logged to any of the supported logging methods.</p>
 this string using the following variables:</p>
 <blockquote>$A - Trap agent host name <b>(see Note 1)</b><br />
 $aA - Trap agent IP address<br />
+$Be - securityEngineID (snmpEngineID) <b>(see Note</b> <span style=
+"font-weight: bold;">7</span><b>)</b><br />
+$Bu - securityName (snmpCommunitySecurityName) <b>(see Note</b>
+<span style="font-weight: bold;">7</span><b>)</b><br />
+$BE - contextEngineID (snmpCommunityContextEngineID) <b>(see
+Note</b> <span style="font-weight: bold;">7</span><b>)</b><br />
+$Bn - contextName (snmpCommunityContextName) <b>(see Note</b>
+<span style="font-weight: bold;">7</span><b>)</b><br />
 $c - Category<br />
 $C - Trap community string<br />
 $D - Description text from SNMPTT.CONF or MIB file <b>(see Note
@@ -2279,7 +2504,12 @@ Net-SNMP patch page</a>.</blockquote>
 must be set to either 1 or 2. If set to 1, the description is
 pulled from the SNMPTT.CONF files. If set to 2, the description is
 pulled from the MIB file. If using the MIB file, you must have the
-UCD-SNMP / Net-SNMP Perl module installed and enabled.</blockquote>
+UCD-SNMP / Net-SNMP Perl module installed and
+enabled.<br /></blockquote>
+Note (7):
+<blockquote>These variables are only available when using the
+embedded trap handler for snmptrapd
+(snmptthandler-embedded).<br /></blockquote>
 </blockquote>
 <h3><a id="SNMPTT.CONF-EXEC" name=
 "SNMPTT.CONF-EXEC"></a><b>EXEC:</b></h3>
@@ -3432,7 +3662,6 @@ happens many times over a set period of time.&nbsp; You want to be
 alerted when the interface is down for more than 10 seconds, and
 then when the interface comes back up.<br /></li>
 </ol>
-</blockquote>
 <blockquote>
 <p>The following outlines how the flow of traps between SNMPTT and
 SEC could take place:</p>
@@ -3482,9 +3711,9 @@ SNMPTT</li>
 linkDown and linkUp messages to a separate log file for processing
 by SEC.</p>
 <p>Following is an example snmptt.conf.cisco file modified to log a
-linkdown or linkup message to /var/log/snmptt/snmptt.sec.log.&nbsp; As you
-can see there are no FORMAT lines so the trap will not be logged to
-the regular SNMPTT log system.</p>
+linkdown or linkup message to /var/log/snmptt/snmptt.sec.log.&nbsp;
+As you can see there are no FORMAT lines so the trap will not be
+logged to the regular SNMPTT log system.</p>
 <div style="margin-left: 40px;">EVENT Cisco_Link_Down
 .1.3.6.1.6.3.1.1.5.3.1.3.6.1.4.1.9 "Cisco Events" Minor<br />
 <span style="font-weight: bold;">EXEC /bin/echo "node=$A

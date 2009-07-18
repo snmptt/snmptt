@@ -93,15 +93,22 @@ sub snmptt_trap_receiver {
 
   my $community = $$pdu_info{"community"} || "unknown";
 
-
-  # securityEngineID in hash = snmpCommunityContextEngineID = .1.3.6.1.6.3.18.1.1.1.4 ?
-  my $securityEngineID = $$pdu_info{"securityEngineID"} || "unknown";
-  $securityEngineID = unpack('h*', $securityEngineID);
-
-  # contextEngineID in hash = snmpEngineID = .1.3.6.1.6.3.10.2.1.1 ?  
+  # contextEngineID in hash = snmpCommunityContextEngineID = .1.3.6.1.6.3.18.1.1.1.4
   my $contextEngineID = $$pdu_info{"contextEngineID"} || "unknown";
   $contextEngineID = unpack('h*', $contextEngineID);
 
+  # contextName in hash = snmpCommunityContextName = .1.3.6.1.6.3.18.1.1.1.5 
+  my $contextName = $$pdu_info{"contextName"} || "unknown";
+
+  # snmplib/snmp_api.c:
+  # static oid      snmpEngineIDoid[]   = { 1,3,6,1,6,3,10,2,1,1,0};
+  # securityEngineID in hash = snmpEngineID = .1.3.6.1.6.3.10.2.1.1.0
+  my $securityEngineID = $$pdu_info{"securityEngineID"} || "unknown";
+  $securityEngineID = unpack('h*', $securityEngineID);
+
+  # securityName in hash = snmpCommunitySecurityName = .1.3.6.1.6.3.18.1.1.1.3 
+  my $securityName = $$pdu_info{"securityName"} || "unknown";
+  
   # SNMPTT expects the 3rd item to be the uptime and the 4th to be the trapname
   my $uptime;
   my $trapname;
@@ -177,10 +184,16 @@ sub snmptt_trap_receiver {
   print SPOOL ".1.3.6.1.6.3.18.1.4.0 $community\n";
   print SPOOL $other_varbinds;
   if ($securityEngineID ne "") {
-    print SPOOL ".1.3.6.1.6.3.18.1.1.1.4 \"0x$securityEngineID\"\n";
+    print SPOOL ".1.3.6.1.6.3.10.2.1.1.0 \"0x$securityEngineID\"\n";
+  }
+  if ($securityName ne "") {
+    print SPOOL ".1.3.6.1.6.3.18.1.1.1.3 \"$securityName\"\n";
   }
   if ($contextEngineID ne "") {
-    print SPOOL ".1.3.6.1.6.3.10.2.1.1 \"0x$contextEngineID\"\n";
+    print SPOOL ".1.3.6.1.6.3.18.1.1.1.4 \"0x$contextEngineID\"\n";
+  }
+  if ($contextName ne "") {
+    print SPOOL ".1.3.6.1.6.3.18.1.1.1.5 \"$contextName\"\n";
   }
 
   close SPOOL;
@@ -194,10 +207,16 @@ sub snmptt_trap_receiver {
     print ".1.3.6.1.6.3.18.1.4.0 $community\n";
     print $other_varbinds;
     if ($securityEngineID ne "") {
-      print ".1.3.6.1.6.3.18.1.1.1.4 \"0x$securityEngineID\"\n";
+      print ".1.3.6.1.6.3.10.2.1.1.0 \"0x$securityEngineID\"\n";
+    }
+    if ($securityName ne "") {
+      print ".1.3.6.1.6.3.18.1.1.1.3 \"$securityName\"\n";
     }
     if ($contextEngineID ne "") {
-      print ".1.3.6.1.6.3.10.2.1.1 \"0x$contextEngineID\"\n";
+      print ".1.3.6.1.6.3.18.1.1.1.4 \"0x$contextEngineID\"\n";
+    }
+    if ($contextName ne "") {
+      print ".1.3.6.1.6.3.18.1.1.1.5 \"$contextName\"\n";
     }
 
     # Flush the buffers for debugging.

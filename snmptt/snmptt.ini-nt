@@ -251,6 +251,10 @@ keep_unlogged_traps = 1
 # is stored in memory and is used to check for duplicates.  All variables except for
 # the uptime variable are used when calculating the MD5.  The larger this variable,
 # the more memory snmptt will require.
+# Note:  In most cases it may be a good idea to enable this but sometimes it can have a 
+#        negative effect.  For example, if you are trying to troubleshoot a wireless device
+#        that keeps losing it's connection you may want to disable this so that you see
+#        all the associations and disassociations.
 # 5 minutes = 300
 # 10 minutes = 600
 # 15 minutes = 900
