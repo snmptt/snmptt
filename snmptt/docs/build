@@ -9,6 +9,7 @@ snmptt_1.3beta1.tgz:
         snmpttconvert
         snmpttconvertmib
         snmptthandler
+        snmptthandler-embedded
         snmptt.ini
         snmptt-nt.ini
         docs/snmptt.html
@@ -29,7 +30,7 @@ snmptt_1.3beta1.tgz:
 
 -commit changes to CVS
 -check out fresh copy
--tag with new version: cvs ... tag snmptt_1-2
+-tag with new version: cvs ... tag snmptt_1-3beta1
 
 cd snmptt
 find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.3beta1
@@ -46,6 +47,7 @@ chmod +x snmpttconvert
 chmod +x snmpttconvertmib
 chmod +x snmptthandler
 chmod +x snmptt-net-snmp-test
+chmod +x snmptt-init.d
 chown root.root * -R
 cd ..
 chmod 775 snmptt_1.3beta1
