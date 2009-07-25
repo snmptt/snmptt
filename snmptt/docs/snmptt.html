@@ -12,9 +12,9 @@
 <title>SNMP Trap Translator</title>
 </head>
 <body>
-<h1>SNMP Trap Translator v1.3beta1</h1>
+<h1>SNMP Trap Translator v1.3beta2</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on: July 18th, 2009
+This file was last updated on: July 25th, 2009
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -303,6 +303,13 @@ required, using the Perl module is recommended. &nbsp;It is also
 required if you want to use the snmptthandler-embedded trap handler
 with snmptrapd.</blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
+<h3><b>v1.3beta1</b> <b>- July 25th, 2009</b></h3>
+<ul>
+<li>Fixed a bug in&nbsp;<span style=
+"font-weight: bold;">smptthandler-embedded</span> where
+the&nbsp;hostname/IP address was set to the management server IP
+address instead of the device sending the trap.</li>
+</ul>
 <h3><b>v1.3beta1</b> <b>- July 18th, 2009</b></h3>
 <ul>
 <li>Added <span style=
@@ -900,12 +907,19 @@ configuration files to load</li>
 <li>Initial release</li>
 </ul>
 <h2><a id="Upgrading" name="Upgrading"></a>Upgrading</h2>
+<h3><b>v1.3beta1 to v1.3beta2</b></h3>
+<p>To upgrade from v1.3beta1 to v1.3beta2, you should:</p>
+<ol>
+<li>Replace <span style=
+"font-weight: bold;">snmptthandler-embedded</span> with the new
+versions.</li>
+</ol>
 <h3><b>v1.2 to v1.3beta1</b></h3>
 <p>To upgrade from v1.2 to v1.3beta1, you should:</p>
 <ol>
 <li>Replace <b>snmptt</b> and <b>snmpttconvertmib</b> with the new
-versions contained in the v1.2 package.&nbsp; Make sure the files
-are executable (<b>chmod +x <i>filename</i></b>).</li>
+versions.&nbsp; Make sure the files are executable (<b>chmod +x
+<i>filename</i></b>).</li>
 <li>Copy&nbsp;<span style="font-weight: bold;">snmptt-init.d</span>
 to&nbsp;<span style="font-weight: bold;">/etc/init.d/snmptt</span>.
 &nbsp;Make sure the file is executable (<b>chmod +x

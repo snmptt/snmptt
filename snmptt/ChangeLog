@@ -1,12 +1,17 @@
+June 25th, 2007: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.3beta2 for release.
+
 July 21th, 2009: Alex Burger <alex_b@users.sourceforge.net>July 18th, 2009: 
 - Fixed bug with snmptthandler-embedded.  It was using the wrong IP address
   for hostname / ipaddress.
 
 July 18th, 2009: Alex Burger <alex_b@users.sourceforge.net>July 18th, 2009: 
+- Updated documentation for 1.3beta1 release
+
+July 18th, 2009: Alex Burger <alex_b@users.sourceforge.net>July 18th, 2009: 
 - Updated snmptthandler-embedded to support securityName and contextName.
 - Added variable substitutions Be, Bu, BE, Bn for SNMPv3 when using
   snmptthandler-embedded.
-- Updated documentation for 1.3beta1 release
 
 May 17th, 2009: Alex Burger <alex_b@users.sourceforge.net>
 - Added snmptthandler-embedded - a Net-SNMP embedded Perl version of
