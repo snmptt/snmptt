@@ -1,3 +1,8 @@
+February 16th, 2010: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.4beta1
+- Added patch 2943209 from Ricardo Duarte for snmpttconvertmib to add new
+  format option 4 for trap name and variables similar to FORMAT $+*.
+
 November 15th, 2009: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.3 for release.
 
