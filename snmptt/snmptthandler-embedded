@@ -115,18 +115,23 @@ sub snmptt_trap_receiver {
 
     my $oid = "$x->[0]";
     my $value = "$x->[1]";
-    $value =~ s/STRING: //g;
-    $value =~ s/INTEGER: //g;
+    $value =~ s/^STRING: //g;
+    $value =~ s/^INTEGER: //g;
+    $value =~ s/^OID: //g;
+    $value =~ s/^IpAddress: //g;
+    $value =~ s/^Timeticks: //g;
 
     if ($oid eq ".1.3.6.1.2.1.1.3.0") {
-      my $temp = $value;
-      $temp =~ /Timeticks: \(.*?\) (.*)/;
-      $uptime = $oid . " " . $1;
+#      my $temp = $value;
+#      $temp =~ /Timeticks: \(.*?\) (.*)/;
+#      $uptime = $oid . " " . $1;
+      $uptime = $oid . " " . $value;
     }
     elsif ($oid eq ".1.3.6.1.6.3.1.1.4.1.0") {
-      my $temp = $value;
-      $temp =~ /OID: (.*)/;
-      $trapname = $oid . " " . $1;
+#      my $temp = $value;
+#      $temp =~ /OID: (.*)/;
+#      $trapname = $oid . " " . $1;
+      $trapname = $oid . " " . $value;
     }
     else {
       $other_varbinds .= $oid . " " . $value . "\n";

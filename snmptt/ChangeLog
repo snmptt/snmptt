@@ -1,3 +1,7 @@
+April 15th, 2010: Alex Burger <alex_b@users.sourceforge.net>
+- Updated snmptthandler-embedded to properly handle IP addresses and OIDs
+  as values.  Have to strip out 'OID: ', 'IpAddress: ' etc.
+
 February 16th, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.4beta1
 - Added patch 2943209 from Ricardo Duarte for snmpttconvertmib to add new
