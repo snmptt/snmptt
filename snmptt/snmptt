@@ -3202,13 +3202,13 @@ sub readtrap
         if ($DEBUGGING >= 2) {
           print "  Multi-line value detected - merging onto one line...\n";
         }
-        chomp $temp2;				# Remove the newline character
+        $temp2 =~ s/[\r\n]//g;			# Remove newline characters
         while (defined(my $line2 = <$input>))
         {
           chomp $line2;
           push(@rawtrap, $line2);
-          $temp2.=" ".$line2;
-          if ($line2 =~ /[^\\]\"$/)     # Ends in a non-escaped quote
+          $temp2 .= " " . $line2;
+          if (($line2 =~ /\"$/) && ($line2 !~ /\\\"$/)) # Ends in a non-escaped quote or it's a single line with a quote.
           {
             last;
           }
@@ -3262,13 +3262,13 @@ sub readtrap
         if ($DEBUGGING >= 2) {
           print "  Multi-line value detected - merging onto one line...\n";
         }
-        chomp $line;				# Remove the newline character
+        $temp2 =~ s/[\r\n]//g;			# Remove newline characters
         while (defined(my $line2 = <$input>))
         {
           chomp $line2;
           push(@rawtrap, $line2);
-          $line.=" ".$line2;
-          if ($line2 =~ /[^\\]\"$/)                  # Ends in a non-escaped quote
+          $temp2 .= " " . $line2;
+          if (($line2 =~ /\"$/) && ($line2 !~ /\\\"$/)) # Ends in a non-escaped quote or it's a single line with a quote.
           {
             last;
           }

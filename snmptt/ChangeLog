@@ -5,6 +5,7 @@ May 5th, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with syslog (2980512).  Log entries were supposed to be logged with
   snmptt[pid] but instad of the pid it was actually the effective user ID.
   Thanks to Matteo P for the fix.
+- Fixed bug with multi-line traps (2915658).  Thanks to AndrewB for the fix.
 
 April 23rd, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with MATCH.  The PREEXEC $p variable could not be used with
