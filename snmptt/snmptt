@@ -591,7 +591,7 @@ my @event2;                   # Copy of the matched event
 my @var;                      # Variables of trap received by SNMPTRAPD
 my @entvar;                   # Enterprise variable values of trap received by SNMPTRAPD
 my @entvarname;               # Enterprise variable names of trap received by SNMPTRAPD
-my @preexec_var;              # PREXEC results
+my @preexec_var;              # PREEXEC results
 my $receivedtrap;             # Received trap
 my $receivedtrap_trans;       # Translated version of received trap
 my $enterprise_trans;         # Translated enterprise of received trap
@@ -1325,6 +1325,7 @@ sub processtrap
     my $hostmatch = 0;
     my $nodesmatch = 0;	# Match from NODES
     my $match_found = 0;	# Match from MATCH
+    my $preexec_already_run = 0;
 
     # $event is the hash of events defined in the config file
     # $event2 is a copy of the matching event
@@ -1509,6 +1510,19 @@ sub processtrap
         }
         #print "!$match_temp!\n";
 
+        # If MATCH statement contains any $p variables (PREEXEC results), then we need to execute PREEXEC first.
+        # It's usually run after NODES and MATCH.
+        if ($match_temp =~ /\$p/) {
+          if ($preexec_already_run == 0) {
+            if ($DEBUGGING >= 1)
+            {
+              print "\nMATCH statement contains \$p value(s).  Executing PREEXEC line(s)...\n";
+            }
+            &preexec_run;
+            $preexec_already_run = 1;
+          }
+        }
+
         # DEFAULT= line
         if ($match_temp =~ /^mode=(.*)/i)
         {
@@ -1571,66 +1585,17 @@ sub processtrap
       # Statistics
       $g_total_traps_translated++;
 
+      if ($DEBUGGING >= 1)
+      {
+        print "\nTrap defined, processing...\n\n";
+      }
 
       #
       # Variable substitution for PREEXEC string
       #
-
-      if ($DEBUGGING >= 1)
-      {
-        print "\nTrap defined, processing...\n\n";
-        print "\n\nPREEXEC line(s):\n";
-      }
-
-      if (defined ($event2[9][0])) # if PREEXEC string has been defined
-      {
-        print "PREEXEC defined\n";
-        if (defined ($event2[9][0]))
-        {
-          for (my $i=0; defined($event2[9][$i]); $i++)
-          {
-            $_ = $event2[9][$i];
-
-            print "Performing substitution on PREEXEC line: $_\n";
-            &substitute();
-            print "Done performing substitution on PREEXEC line: $_\n";
-
-            my $command = $_;
-
-            if ($pre_exec_enable == 1)
-            {
-              if ($DEBUGGING >= 1)
-              {
-                print "PREEXEC command: $command\n";
-              }
-              # Execute command
-
-              if ($exec_escape == 1) {
-                # Escape wildcard characters
-                $command =~ s/\*/\\\*/g;
-                $command =~ s/\?/\\\?/g;
-              }
-              my $result = `$command`;
-              chomp $result;
-              # Remove spaces before and after
-              $result =~ /^\s*(.*?)\s*$/;
-              $result = $1;
-
-              if ($result eq '') {
-                $result = "(no output from PREEXEC)\n";
-              }
-              print "        command output: $result\n";
-              push (@preexec_var, $result);
-            }
-          }
-        }
-        else
-        {
-          if ($DEBUGGING >= 1)
-          {
-            print "  PREEXEC line not defined\n";
-          }
-        }
+      if ($preexec_already_run == 0) {
+        &preexec_run;
+        $preexec_already_run = 1;
       }
 
       if ($DEBUGGING >= 1)
@@ -6031,9 +5996,67 @@ sub reopen_debug_file {
   return 0;
 }
 
+sub preexec_run {
+      #
+      # Variable substitution for PREEXEC string
+      #
 
+      if ($DEBUGGING >= 1)
+      {
+        print "\n\nPREEXEC line(s):\n";
+      }
 
+      if (defined ($event2[9][0])) # if PREEXEC string has been defined
+      {
+        print "PREEXEC defined\n";
+        if (defined ($event2[9][0]))
+        {
+          for (my $i=0; defined($event2[9][$i]); $i++)
+          {
+            $_ = $event2[9][$i];
 
+            print "Performing substitution on PREEXEC line: $_\n";
+            &substitute();
+            print "Done performing substitution on PREEXEC line: $_\n";
+
+            my $command = $_;
+
+            if ($pre_exec_enable == 1)
+            {
+              if ($DEBUGGING >= 1)
+              {
+                print "PREEXEC command: $command\n";
+              }
+              # Execute command
+
+              if ($exec_escape == 1) {
+                # Escape wildcard characters
+                $command =~ s/\*/\\\*/g;
+                $command =~ s/\?/\\\?/g;
+              }
+              my $result = `$command`;
+              chomp $result;
+              # Remove spaces before and after
+              $result =~ /^\s*(.*?)\s*$/;
+              $result = $1;
+
+              if ($result eq '') {
+                $result = "(no output from PREEXEC)\n";
+              }
+              print "        command output: $result\n";
+              push (@preexec_var, $result);
+            }
+          }
+        }
+        else
+        {
+          if ($DEBUGGING >= 1)
+          {
+            print "  PREEXEC line not defined\n";
+          }
+        }
+      }
+}
 
 
 
