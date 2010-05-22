@@ -6,6 +6,10 @@ May 5th, 2010: Alex Burger <alex_b@users.sourceforge.net>
   snmptt[pid] but instad of the pid it was actually the effective user ID.
   Thanks to Matteo P for the fix.
 - Fixed bug with multi-line traps (2915658).  Thanks to AndrewB for the fix.
+- Added snmptt.ini option net_snmp_perl_cache_enable to enable caching of
+  Net-SNMP Perl module OID and ENUM translations.  This should speed up
+  translations and reduce CPU load when net_snmp_perl_enable and translate_* 
+  options are enabled.
 
 April 23rd, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with MATCH.  The PREEXEC $p variable could not be used with

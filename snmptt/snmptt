@@ -171,6 +171,7 @@ my $dns_enable;
 my $strip_domain;
 my @strip_domain_list;
 my $net_snmp_perl_enable;
+my $net_snmp_perl_cache_enable;
 my $net_snmp_perl_best_guess;
 my $translate_log_trap_oid;
 my $translate_value_oids;
@@ -634,6 +635,8 @@ my $timetoreload;
 my $timetodie;
 my $timetologstatistics;
 my %duplicate_traps;
+my %my_translateObj_cache;
+my %my_mapEnum_cache;
 
 if ($daemon == 1)
 {
@@ -4039,6 +4042,7 @@ sub loadsnmpttini {
   $strip_domain = $cfg->val('General', 'strip_domain');
   @strip_domain_list = $cfg->val('General', 'strip_domain_list');
   $net_snmp_perl_enable = $cfg->val('General', 'net_snmp_perl_enable');
+  $net_snmp_perl_cache_enable = $cfg->val('General', 'net_snmp_perl_cache_enable');
   $net_snmp_perl_best_guess = $cfg->val('General', 'net_snmp_perl_best_guess');
   $translate_log_trap_oid = $cfg->val('General', 'translate_log_trap_oid');
   $translate_value_oids = $cfg->val('General', 'translate_value_oids');
@@ -4184,6 +4188,7 @@ sub loadsnmpttini {
   if (! defined ($dns_enable)) { $dns_enable = 0} ;
   if (! defined ($strip_domain)) { $strip_domain = 0} ;
   if (! defined ($net_snmp_perl_enable)) { $net_snmp_perl_enable = 0} ;
+  if (! defined ($net_snmp_perl_cache_enable)) { $net_snmp_perl_cache_enable = 1} ;
   if (! defined ($net_snmp_perl_best_guess)) { $net_snmp_perl_best_guess = 0} ;
   if (! defined ($translate_log_trap_oid)) { $translate_log_trap_oid = 0} ;
   if (! defined ($translate_value_oids)) { $translate_value_oids = 0} ;
@@ -4949,6 +4954,16 @@ sub my_translateObj
   my $oid = shift;
   my $mode = shift;
 
+  # Check cache first
+  my $my_translateObj_cache_value = $my_translateObj_cache{$oid};
+  if ($my_translateObj_cache_value) {
+    if ($DEBUGGING >= 2)
+    {      
+      print "    OID found in cache:  '$oid' -> '$my_translateObj_cache_value'\n";
+    }
+    return $my_translateObj_cache_value;
+  }
+
   my $use_long = 0;
   my $include_module = 0;
   my $temp;
@@ -4983,6 +4998,12 @@ sub my_translateObj
       chop $temp;
     }
   }
+
+  # Update cache if net_snmp_perl_cache_enable is enabled.
+  if ($net_snmp_perl_cache_enable == 1) {
+    $my_translateObj_cache{$oid} = $temp;
+  }
+
   return $temp;	# Will be either the translated trap, or undef if translateObj failed
 }
 
@@ -5062,15 +5083,27 @@ sub my_mapEnum
   my $oid = shift;
   my $value = shift;
 
+  # Check cache first
+  my $my_mapEnum_cache_value = $my_mapEnum_cache{$oid};
+  if ($my_mapEnum_cache_value) {
+    if ($DEBUGGING >= 2)
+    {      
+      print "    ENUM found in cache:  '$oid' -> '$my_mapEnum_cache_value'\n";
+    }
+    return $my_mapEnum_cache_value;
+  }
+
   # Problem #1: UCD-SNMP 4.2.3 allows getType and mapEnum to be passed a numerical OID.  
   # Net-SNMP 5.0.8 does not.  Because of this, lets try using the OID first.  If that 
   # fails, then we try the short textual OID instead. 
 
+  my $result;
   my $enum = SNMP::mapEnum($oid, $value);
   if (defined($enum))
   {
     #print "my_mapEnum: numeric\n";
-    return $enum;
+    #return $enum;
+    $result = $enum;
   }
   else
   {
@@ -5080,14 +5113,22 @@ sub my_mapEnum
     if (defined($enum))
     {
       #print "my_mapEnum: symbolic\n";
-      return $enum;
+      #return $enum;
+      $result = $enum;
     }
     else
     {
       #print "my_mapEnum: failed\n";
-      return undef;
+      #return undef;
+      $result = undef;
     }
   }
+  # Update cache if net_snmp_perl_cache_enable is enabled.
+  if ($net_snmp_perl_cache_enable == 1) {
+    $my_mapEnum_cache{$oid} = $result;
+  }
+
+  return $result;
 }
 
 sub process_nodes
