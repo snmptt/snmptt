@@ -1,9 +1,9 @@
+May 5th, 2010: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed possible bug with MySQL.  Put CONNECT string on one line.
+
 April 23rd, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with MATCH.  The PREEXEC $p variable could not be used with
   MATCH.  PREEXEC is now executed first if MATCH contains $p.
-
-Updated snmptthandler-embedded to properly handle IP addresses and OIDs
-  as values.  Have to strip out 'OID: ', 'IpAddress: ' etc.
 
 April 15th, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Updated snmptthandler-embedded to properly handle IP addresses and OIDs

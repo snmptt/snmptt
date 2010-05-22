@@ -5392,8 +5392,8 @@ sub dbh_mysql_connect() {
   {
     &dbh_mysql_close();
 
-    unless ($dbh_mysql = DBI->connect("DBI:mysql:database=$mysql_dbi_database;host=$mysql_dbi_host;
-        port=$mysql_dbi_port",$mysql_dbi_username,$mysql_dbi_password) )
+    unless ($dbh_mysql = DBI->connect("DBI:mysql:database=$mysql_dbi_database;host=$mysql_dbi_host;" .
+        "port=$mysql_dbi_port",$mysql_dbi_username,$mysql_dbi_password) )
     {
       my $msg = "MySQL error: Unable to connect to database: $DBI::errstr";
       warn $msg, "\n";
