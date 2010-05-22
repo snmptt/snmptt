@@ -3136,6 +3136,13 @@ sub readtrap
     }
   }
 
+  # With DNS resolution disabled in snmptrapd, some systems pass the hostname as:
+  # UDP: [x.x.x.x]:161->[y.y.y.y]
+  # If this is detected, use x.x.x.x as the hostname.
+  if ($tempvar[0] =~ /\[(\d+\.\d+\.\d+\.\d+)\].*?->\[(\d+\.\d+\.\d+\.\d+)\]/) {
+    $tempvar[0] = $1;
+  }
+
   # Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
   # out just the IP address
   $tempvar[1] =~ /(\d+\.\d+\.\d+\.\d+)/;

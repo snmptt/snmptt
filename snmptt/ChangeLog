@@ -1,5 +1,7 @@
 May 5th, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed possible bug with MySQL.  Put CONNECT string on one line.
+- Fixed bug where the hostname is not detected properly when snmptrapd
+  is configured to not use DNS.
 
 April 23rd, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with MATCH.  The PREEXEC $p variable could not be used with
