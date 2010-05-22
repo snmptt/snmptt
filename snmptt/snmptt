@@ -4326,7 +4326,8 @@ sub signal_handler_die {
 
 sub syslog_system {
   my $message = $_[0];
-  if (Sys::Syslog::openlog('snmptt-sys[' . $> . ']', '',$syslog_system_facility) )
+  #if (Sys::Syslog::openlog('snmptt-sys[' . $> . ']', '',$syslog_system_facility) )
+  if (Sys::Syslog::openlog('snmptt-sys','pid',$syslog_system_facility) )
   {
     Sys::Syslog::syslog ($syslog_system_level, $message,1);
     Sys::Syslog::closelog();
