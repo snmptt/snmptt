@@ -1,3 +1,7 @@
+Oct 9th, 2010: Alex Burger <alex_b@users.sourceforge.net>
+- Applied patch for bug 3020696.  If the spool directory isn't defined, files
+  may be deleted from the wrong folder.
+
 May 5th, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed possible bug with MySQL.  Put CONNECT string on one line.
 - Fixed bug where the hostname is not detected properly when snmptrapd
