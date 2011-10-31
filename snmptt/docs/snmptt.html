@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta content=
-"HTML Tidy for Linux (vers 14 June 2007), see www.w3.org" name=
+"HTML Tidy for Linux (vers 11 February 2007), see www.w3.org" name=
 "generator" />
 <meta http-equiv="Content-Type" content=
 "text/html; charset=us-ascii" />
@@ -12,9 +12,9 @@
 <title>SNMP Trap Translator</title>
 </head>
 <body>
-<h1>SNMP Trap Translator v1.3</h1>
+<h1>SNMP Trap Translator v1.4beta1</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on: November 15th, 2009
+This file was last updated on: Octboer 30th, 2011
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -1156,21 +1156,28 @@ works</u></b></p>
 <p>4.&nbsp; Copy <b>snmptt.ini</b> to <b>/etc/snmp/</b> or
 <span style="font-weight: bold;">/etc/</span> and edit the options
 inside the file.</p>
-<p>5.&nbsp; Create the log folder <b>/var/log/snmptt/</b>.</p>
-<p>6a.&nbsp;&nbsp; For <b>standlone mode:&nbsp;</b> Modify the
-Net-SNMP <span style="font-weight: bold;">snmptrapd.conf</span>
-file by adding the following line:</p>
+<p>5.&nbsp;&nbsp;Either copy <span style=
+"font-weight: bold;">examples/snmptt.conf.generic</span> to
+<span style="font-weight: bold;">/etc/snmp/snmptt.conf</span>
+(renaming the file during the copy) or use the touch command to
+create the file (<span style="font-weight: bold;">touch
+/etc/snmp/snmptt.conf).</span></p>
+<p>6.&nbsp; Create the log folder <b>/var/log/snmptt/</b>.</p>
+<p>7a.&nbsp;&nbsp; For <b>standlone mode:&nbsp;</b> Modify (or
+create) the Net-SNMP <span style=
+"font-weight: bold;">snmptrapd.conf</span> file by adding the
+following line:</p>
 <blockquote><b>traphandle default /usr/sbin/snmptt</b>
 <p>Note:&nbsp;&nbsp; It is possible to configure snmptrapd to
 execute <span style="font-weight: bold;">snmptt</span> based on the
 specific trap received, but using the <span style=
 "font-weight: bold;">default</span> option is preferred</p>
 </blockquote>
-6b.&nbsp;&nbsp; For <b>daemon mode:<br />
+7b.&nbsp;&nbsp; For <b>daemon mode:<br />
 <br /></b>
 <div style="margin-left: 40px;">
-<p>Modify the Net-SNMP snmptrapd.conf file by adding the following
-line:</p>
+<p>Modify (or create) the Net-SNMP snmptrapd.conf file by adding
+the following line:</p>
 </div>
 <blockquote><b>traphandle default
 /usr/sbin/snmptthandler</b><br /></blockquote>
@@ -1182,7 +1189,7 @@ line:</p>
 and stop <b>snmptt</b> on Mandrake, RedHat and other systems.&nbsp;
 Copy the script to the init.d directory (renaming the file during
 the copy):
-<p><b>cp snmptt.init.d&nbsp;/etc/rc.d/init.d/snmptt</b></p>
+<p><b>cp snmptt-init.d&nbsp;/etc/rc.d/init.d/snmptt</b></p>
 <p>Add the service using <span style=
 "font-weight: bold;">chkconfig</span>:</p>
 <p><b>chkconfig --add snmptt</b></p>
@@ -1196,7 +1203,7 @@ immediately with:</p>
 <p>To manually start snmptt, use:</p>
 <p><b>snmptt --daemon</b></p>
 </blockquote>
-<p>7. &nbsp; &nbsp; &nbsp; A log rotation&nbsp;script is included
+<p>8. &nbsp; &nbsp; &nbsp; A log rotation&nbsp;script is included
 which can be used to rotate the log files&nbsp;on Mandrake, RedHat
 and other systems.&nbsp; Copy the file&nbsp;to the&nbsp;logrotate.d
 directory (renaming the file during the copy):</p>
@@ -1205,7 +1212,7 @@ directory (renaming the file during the copy):</p>
 <p>Edit the&nbsp;<b>/etc/logrotate.d/snmptt</b> and update
 the&nbsp;paths and rotate frequency as needed.</p>
 </blockquote>
-8.&nbsp; &nbsp; &nbsp; &nbsp;Start <span style=
+9.&nbsp; &nbsp; &nbsp; &nbsp;Start <span style=
 "font-weight: bold;">snmptrapd</span> using the command line:&nbsp;
 <span style="font-weight: bold;">snmptrapd -On</span>.<br />
 <br />
@@ -1228,7 +1235,7 @@ translate correctly.&nbsp; See the FAQ for more info.</span></div>
 <b>snmp.conf</b> file to include the line: <b>printNumericOids
 1.&nbsp;</b> This setting will take effect no matter what is used
 on the command line.</p>
-<p>9.&nbsp; &nbsp; &nbsp; &nbsp;See the <a href=
+<p>10.&nbsp; &nbsp; &nbsp;See the <a href=
 "#SecuringSNMPTT">Securing SNMPTT</a> section.</p>
 <br />
 <h4><a name="Installation-Unix-Embedded"></a>Embedded handler</h4>
@@ -1271,12 +1278,18 @@ be executable as it is called directly by snmptrapd.</p>
 <p>5.&nbsp; Copy <b>snmptt.ini</b> to <b>/etc/snmp/</b> or
 <span style="font-weight: bold;">/etc/</span> and edit the options
 inside the file.</p>
-<p>6.&nbsp; Create the log folder <b>/var/log/snmptt/</b>.</p>
-7. &nbsp;Configure snmptrapd and install the service:<br />
+<p>6.&nbsp;&nbsp;Either copy <span style=
+"font-weight: bold;">examples/snmptt.conf.generic</span> to
+<span style="font-weight: bold;">/etc/snmp/snmptt.conf</span>
+(renaming the file during the copy) or use the touch command to
+create the file (<span style="font-weight: bold;">touch
+/etc/snmp/snmptt.conf).</span></p>
+<p>7.&nbsp; Create the log folder <b>/var/log/snmptt/</b>.</p>
+8. &nbsp;Configure snmptrapd and install the service:<br />
 <br />
 <div style="margin-left: 40px;">
-<p>Modify the Net-SNMP snmptrapd.conf file by adding the following
-line:</p>
+<p>Modify (or create) the Net-SNMP snmptrapd.conf file by adding
+the following line:</p>
 </div>
 <blockquote><b>perl do
 "/usr/sbin/snmptthandler-embedded";</b><br /></blockquote>
@@ -1286,7 +1299,7 @@ line:</p>
 and stop <b>snmptt</b> on Mandrake, RedHat and other systems.&nbsp;
 Copy the script to the init.d directory (renaming the file during
 the copy):
-<p><b>cp snmptt.init.d&nbsp;/etc/rc.d/init.d/snmptt</b></p>
+<p><b>cp snmptt-init.d&nbsp;/etc/rc.d/init.d/snmptt</b></p>
 <p>Add the service using <span style=
 "font-weight: bold;">chkconfig</span>:</p>
 <p><b>chkconfig --add snmptt</b></p>
@@ -1300,7 +1313,7 @@ immediately with:</p>
 <p>To manually start snmptt, use:</p>
 <p><b>snmptt --daemon</b><br /></p>
 </blockquote>
-<p>8.&nbsp; &nbsp; &nbsp; &nbsp;A log rotation&nbsp;script is
+<p>9.&nbsp; &nbsp; &nbsp; &nbsp;A log rotation&nbsp;script is
 included which can be used to rotate the log files&nbsp;on
 Mandrake, RedHat and other systems.&nbsp; Copy the file&nbsp;to
 the&nbsp;logrotate.d directory (renaming the file during the
@@ -1310,7 +1323,7 @@ copy):</p>
 <p>Edit the&nbsp;<b>/etc/logrotate.d/snmptt</b> and update the
 paths and rotate frequency as needed.</p>
 </blockquote>
-9.&nbsp; &nbsp; &nbsp; &nbsp;Start <span style=
+10.&nbsp; &nbsp; &nbsp;Start <span style=
 "font-weight: bold;">snmptrapd</span> using the command line:&nbsp;
 <span style="font-weight: bold;">snmptrapd -On</span>.<br />
 <div style="margin-left: 40px;"><br />
@@ -1333,7 +1346,7 @@ translate correctly.&nbsp; See the FAQ for more info.</span><br />
 include the line: <b>printNumericOids 1.&nbsp;</b> This setting
 will take effect no matter what is used on the command line.</p>
 </div>
-<p>10. &nbsp; &nbsp; See the <a href=
+<p>11. &nbsp; &nbsp; See the <a href=
 "snmptt.html#SecuringSNMPTT">Securing SNMPTT</a> section.</p>
 <br />
 <br />
@@ -1350,17 +1363,23 @@ works</u></b></p>
 <p>3.&nbsp; Copy <b>snmptt.ini-nt</b> to
 <b>%SystemRoot%\snmptt.ini</b> (c:\winnt\snmptt.ini) and edit the
 options inside the file.</p>
+<p>4.&nbsp;&nbsp;Either copy <span style=
+"font-weight: bold;">examples/snmptt.conf.generic</span> to
+<span style="font-weight: bold;">c:\snmp\snmptt.conf</span>
+(renaming the file during the copy) or create the file using
+notepad.</p>
 <p>4.&nbsp; Create the log folder <b>c:\snmp\log\</b>.</p>
-<p>5a.&nbsp;&nbsp; For <b>standlone mode:&nbsp;</b> Modify the
-Net-SNMP snmptrapd.conf file by adding the following line:</p>
+<p>5a.&nbsp;&nbsp; For <b>standlone mode:&nbsp;</b> Modify (or
+create) the Net-SNMP snmptrapd.conf file by adding the following
+line:</p>
 <blockquote><b>traphandle default perl
 c:\snmp\snmptt</b></blockquote>
 <blockquote>Note:&nbsp;&nbsp; It is possible to configure snmptrapd
 to execute snmptt based on the specific trap received, but using
 the <span style="font-weight: bold;">default</span> option is
 preferred</blockquote>
-5b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify the Net-SNMP
-snmptrapd.conf file by adding the following line:
+5b.&nbsp;&nbsp; For <b>daemon mode:&nbsp;</b> Modify (or create)
+the Net-SNMP snmptrapd.conf file by adding the following line:
 <blockquote><b>traphandle default perl
 c:\snmp\snmptthandler</b></blockquote>
 <blockquote>Create the spool folder
@@ -1582,8 +1601,8 @@ file.&nbsp; The output format is:</p>
 translated-trap</b></blockquote>
 To configure standard output or regular logging, edit the
 <b>snmptt.ini</b> file and modify the following variables:
-<blockquote><b>enable_stdout</b><br />
-<b>enable_log</b><br />
+<blockquote><b>stdout_enable</b><br />
+<b>log_enable</b><br />
 <b>log_file</b></blockquote>
 <h3><a id="LoggingUnknown" name="LoggingUnknown"></a>Logging -
 Unknown traps</h3>
@@ -2796,7 +2815,7 @@ set:<br />
 "SNMPTT.CONF-REGEX"></a><b>REGEX:</b></h3>
 <div style="margin-left: 40px;"><br />
 [<b style="font-weight: bold;">REGEX</b><span style=
-"font-weight: bold;">&nbsp;(&nbsp;&nbsp;&nbsp; )(&nbsp;&nbsp;&nbsp;
+"font-weight: bold;">(&nbsp;&nbsp;&nbsp; )(&nbsp;&nbsp;&nbsp;
 )[i][g][e]</span>]</div>
 <p style="margin-left: 40px;">Optional regular expression to
 perform a search and replace on the <span style=
