@@ -1,5 +1,6 @@
 Oct 30th, 2011: Alex Burger <alex_b@users.sourceforge.net>
 - Installation documentation updates.  Thanks to Brian Excarnate.
+- Fixed bug with MATCH.  Number ranges were not working.  Thanks to Maex.
 
 Oct 9th, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Applied patch for bug 3020696.  If the spool directory isn't defined, files
