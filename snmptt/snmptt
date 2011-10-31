@@ -668,7 +668,7 @@ if ($daemon == 1)
       log_system("There seems to be another SNMPTT process (pid $old_pid) running.");
       log_system("You may want to kill it and delete the .pid file ($pid_file).  Aborting...");
     }
-    die;
+    die "Exiting";
   }
 
   # Check to make sure we can create the .pid file if it was set by the user.
@@ -683,7 +683,7 @@ if ($daemon == 1)
       if ($log_system_enable == 1) {
         log_system("pid file \'$pid_file\' is not writable.  Aborting...");
       }
-      die;
+      die "Exiting";
     }
   }
 
@@ -1736,16 +1736,15 @@ sub processtrap
 
           #if (Sys::Syslog::openlog('TRAPD', '',$syslog_facility) )
           #if (Sys::Syslog::openlog('snmptt[' . $> . ']', '',$syslog_facility) )
-          if (Sys::Syslog::openlog('snmptt', 'pid',$syslog_facility) )
-          {
-            Sys::Syslog::syslog ($syslog_level_temp, $message,1);
-            Sys::Syslog::closelog();
-            $trap_successfully_logged++;
-          }
-          else
-          {
-            warn "Can not open log_file: $!";
-          }
+          eval {
+            if (Sys::Syslog::openlog('snmptt', 'pid',$syslog_facility) )
+            {
+              Sys::Syslog::syslog ($syslog_level_temp, $message,1);
+              Sys::Syslog::closelog();
+              $trap_successfully_logged++;
+            }
+          };
+          warn "Cannot write to syslog: $@\n" if $@;
         }
 
         if ($eventlog_enable == 1)
@@ -4352,17 +4351,17 @@ sub signal_handler_die {
 sub syslog_system {
   my $message = $_[0];
   #if (Sys::Syslog::openlog('snmptt-sys[' . $> . ']', '',$syslog_system_facility) )
-  if (Sys::Syslog::openlog('snmptt-sys','pid',$syslog_system_facility) )
-  {
-    Sys::Syslog::syslog ($syslog_system_level, $message,1);
-    Sys::Syslog::closelog();
+  eval {
+    if (Sys::Syslog::openlog('snmptt-sys','pid',$syslog_system_facility) )
+    {
+      Sys::Syslog::syslog ($syslog_system_level, $message,1);
+      Sys::Syslog::closelog();
+    }
+  };
+  if ($@) {
+    warn "Cannot write to syslog: $@\n";
+    print "Cannot write to syslog.  Message to be logged: $message\n" if ($DEBUGGING >= 1);
   }
-  else
-  {
-    warn "Can not open log_file: $!";
-    print "Can not open syslog.  Message to be logged: $message\n" if ($DEBUGGING >= 1);
-  }
-
 }
 
 sub log_system {
