@@ -1,10 +1,10 @@
-November 15th, 2009
+October 21st, 2012
 
-snmptt_1.3.tgz:
+snmptt_1.4beta1.tgz:
 
 -fresh cvs checkout
 
--update version in:
+-update version and (c) date in:
         snmptt
         snmpttconvert
         snmpttconvertmib
@@ -38,11 +38,11 @@ perl -c snmptthandler
 
 -commit changes to CVS
 -check out fresh copy
--tag with new version: cvs ... tag snmptt_1-3
+-tag with new version: cvs ... tag snmptt_1-4beta1
 
 cd snmptt
-find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.3
-cd ../snmptt_1.3
+find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.4beta1
+cd ../snmptt_1.4beta1
 su
 rm -f docs/build
 chmod -R 664 *
@@ -58,8 +58,8 @@ chmod +x snmptt-net-snmp-test
 chmod +x snmptt-init.d
 chown root.root * -R
 cd ..
-chmod 775 snmptt_1.3
-tar cvfz snmptt_1.3.tgz snmptt_1.3
+chmod 775 snmptt_1.4beta1
+tar cvfz snmptt_1.4beta1.tgz snmptt_1.4beta1
 
 SourceForge:
 -upload file
@@ -75,6 +75,7 @@ Web site:
 
 Freshmeat:
 -create new release
+
 
 
 

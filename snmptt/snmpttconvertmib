@@ -50,12 +50,12 @@ my $prepend_type = 1;
 #############################################################################
 #
 
-my $snmpttconvertmib_version = "v1.3";
+my $snmpttconvertmib_version = "v1.4beta1";
 
 sub showversion
 {
   print "\nSNMPTTCONVERTMIB $snmpttconvertmib_version\n";
-  print "(c) 2002-2007 Alex Burger\n";
+  print "(c) 2002-2012 Alex Burger\n";
   print "http://snmptt.sourceforge.net\n\n";
 }
 
