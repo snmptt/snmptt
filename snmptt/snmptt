@@ -864,6 +864,9 @@ if ($daemon == 1)
       }
       # Close debug file (if it is open) before changing users and re-open after
       close(DEBUGFILE);
+	  
+	  # Change owner of debug file so $daemon_uid can write to it.
+	  chown $daemon_uid, -1, $DEBUGGING_FILE;
 
       $> = $daemon_uid;
 

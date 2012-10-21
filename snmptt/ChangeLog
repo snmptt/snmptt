@@ -2,19 +2,25 @@ Oct 21th, 2012: Alex Burger <alex_b@users.sourceforge.net>
 - Release of snmptt1.4beta1
 
 Oct 21th, 2012: Alex Burger <alex_b@users.sourceforge.net>
-- Escape all %'s before sending to syslog.  A single % may cause syslog to 
-  hang (bug 3567748). Thanks to Edward Greenspan.
+- Fixed bug with snmptt hanging if the log message sent to syslog contained a 
+  % symbol.  All %'s are now escaped before sending to syslog (3567748). 
+  Thanks to Edward Greenspan.
 - Fixed bug with LOGONLY severity (3567744).  EXEC was being executed even if
   the trap had a severity of LOGONLY.  
+- Fixed bug with not being able to write to the debug log file when running
+  snmptt as non-root if the debug file didn't already exist with the correct
+  permissions at startup.  The ownership of snmptt.debug is now set to
+  daemon_uid before switching to the new uid.  Patch 3423525.  Thanks to
+  Matvey Marinin.
 
 Oct 30th, 2011: Alex Burger <alex_b@users.sourceforge.net>
 - Installation documentation updates (bug 3425999). Thanks to Brian Excarnate.
-- Fixed bug with MATCH (3397982).  Number ranges were not working.  Thanks to Maex.
-- Fixed bug with syslog logging.  Function was not being called properly. (3166749).
+- Fixed bug with MATCH where number ranges were not working (3397982). Thanks to Maex.
+- Fixed bug with syslog logging.  Function was not being called properly (3166749).
 
 Oct 9th, 2010: Alex Burger <alex_b@users.sourceforge.net>
-- Applied patch for bug 3020696.  If the spool directory is not defined, files
-  may be deleted from the wrong folder.
+- Fixed bug where if the spool directory is not defined, files may be deleted
+  from the wrong folder (3020696).
 
 May 5th, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed possible bug with MySQL.  Put CONNECT string on one line.
@@ -34,8 +40,9 @@ April 23rd, 2010: Alex Burger <alex_b@users.sourceforge.net>
   MATCH.  PREEXEC is now executed first if MATCH contains $p.
 
 April 15th, 2010: Alex Burger <alex_b@users.sourceforge.net>
-- Updated snmptthandler-embedded to properly handle IP addresses and OIDs
-  as values.  Have to strip out 'OID: ', 'IpAddress: ' etc.
+- Fixed bug with snmptthandler-embedded where IP addresses and OIDs were
+  not being detected properly because they contained 'OID:', 'IpAddress:'
+  etc.
 
 February 16th, 2010: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.4beta1
@@ -981,4 +988,5 @@ April 30th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 
 April 18th, 2002: Alex Burger <alex_b@users.sourceforge.net>
 - Initial release of snmptt_0.1
+
 
