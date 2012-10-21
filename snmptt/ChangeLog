@@ -1,3 +1,7 @@
+Oct 21th, 2012: Alex Burger <alex_b@users.sourceforge.net>
+- Escape all %'s before sending to syslog.  A single % may cause syslog to 
+  hang (bug 3567748). Thanks to Edward Greenspan.
+
 Oct 30th, 2011: Alex Burger <alex_b@users.sourceforge.net>
 - Installation documentation updates (bug 3425999). Thanks to Brian Excarnate.
 - Fixed bug with MATCH (3397982).  Number ranges were not working.  Thanks to Maex.
