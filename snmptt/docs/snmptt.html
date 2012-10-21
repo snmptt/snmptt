@@ -14,7 +14,7 @@
 <body>
 <h1>SNMP Trap Translator v1.4beta1</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
-This file was last updated on: Octboer 30th, 2011
+This file was last updated on: Octboer 21st, 2012
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <blockquote><a href="#What-is-it">What is it?</a><br />
@@ -90,7 +90,7 @@ forwarding</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#Hobbit">Hobbit</a></blockquote>
 <br />
 <h2><a id="License" name="License"></a>License</h2>
-<p>Copyright 2002-2008 Alex Burger<br />
+<p>Copyright 2002-2012 Alex Burger<br />
 alex_b@users.sourceforge.net<br />
 4/3/2002</p>
 <p>This program is free software; you can redistribute it and/or
@@ -303,6 +303,47 @@ required, using the Perl module is recommended. &nbsp;It is also
 required if you want to use the snmptthandler-embedded trap handler
 with snmptrapd.</blockquote>
 <h2><a id="Whats-New" name="Whats-New"></a>What's New</h2>
+<h3><b>v1.4beta1</b> <b>- October 21st, 2012</b></h3>
+<ul>
+<li>Added <span style="font-weight: bold;">snmptt.ini</span> option
+<span style="font-weight: bold;">net_snmp_perl_cache_enable</span>
+to enable caching of Net-SNMP Perl module OID and ENUM
+translations.&nbsp; This may speed up translations and reduce CPU
+load when <span style=
+"font-weight: bold;">net_snmp_perl_enable</span> and <span style=
+"font-weight: bold;">translate_*</span> options are enabled.</li>
+<li>Fixed bug with snmptthandler-embedded where IP addresses and
+OIDs were not being detected properly because they contained
+'OID:', 'IpAddress:' etc.</li>
+<li>Fixed bug with MATCH.&nbsp; The PREEXEC $p variable could not
+be used with MATCH.&nbsp; PREEXEC is now executed first if MATCH
+contains $p.</li>
+<li>Fixed bug with syslog.&nbsp; Log entries were supposed to be
+logged with snmptt[pid] but instad of the pid it was actually the
+effective user ID (2980512).</li>
+<li>Fixed bug where the hostname is not detected properly when
+snmptrapd is configured to not use DNS.</li>
+<li>Fixed bug where if the spool directory is not defined, files
+may be deleted from the wrong folder (3020696).</li>
+<li>Fixed bug with syslog logging.&nbsp; Function was not being
+called properly (3166749).</li>
+<li>Fixed bug with MATCH where number ranges were not working
+(3397982).</li>
+<li>Fixed bug with multi-line traps (2915658).</li>
+<li>Fixed bug with LOGONLY severity.&nbsp; EXEC was being executed
+even if the trap had a severity of LOGONLY (3567744).</li>
+<li>Fixed bug with snmptt hanging if the log message sent to syslog
+contained a % symbol. &nbsp;All %'s are now escaped before sending
+to syslog (3567748).</li>
+<li>Fixed possible bug with MySQL.&nbsp; Put CONNECT string on one
+line.</li>
+<li>Fixed bug with not being able to write to the debug log file
+when running snmptt as non-root if the debug file didn't already
+exist with the correct permissions at startup.&nbsp; The ownership
+of snmptt.debug is now set to daemon_uid before switching to the
+new uid.&nbsp; Patch 3423525.</li>
+<li>Installation documentation updates (bug 3425999).</li>
+</ul>
 <h3><b>v1.3</b> <b>- November 15th, 2009</b></h3>
 <ul>
 <li>Added <span style=
@@ -900,6 +941,24 @@ configuration files to load</li>
 <li>Initial release</li>
 </ul>
 <h2><a id="Upgrading" name="Upgrading"></a>Upgrading<br /></h2>
+<h3><b>v1.3 to v1.4beta1</b></h3>
+<p>To upgrade from v1.3 to v1.4, you should:</p>
+<ol>
+<li>Replace <b>snmptt</b> and <b>snmptthandler-embedded</b> with
+the new versions.&nbsp; Make sure the files are executable
+(<b>chmod +x <i>filename</i></b>).</li>
+<li>Backup your <b>snmptt.ini</b> file, replace it with the new
+version, and make any necessary configuration changes to it.
+&nbsp;The only change is the addition of the <span style=
+"font-weight: bold;">net_snmp_perl_cache_enable</span> option.</li>
+<li>Check your snmptt.conf files for any traps defined with
+LOGONLY. &nbsp;These entries will no longer have EXEC lines
+executed. &nbsp;In previous versions EXEC was exectued when it
+should not have been.</li>
+<li>The new <b>snmptt.ini</b> option <span style=
+"font-weight: bold;">net_snmp_perl_cache_enable</span> defaults to
+on, so disable if required.</li>
+</ol>
 <h3><b>v1.2 to v1.3</b></h3>
 <p>To upgrade from v1.2 to v1.3, you should:</p>
 <ol>
@@ -1237,6 +1296,10 @@ translate correctly.&nbsp; See the FAQ for more info.</span></div>
 on the command line.</p>
 <p>10.&nbsp; &nbsp; &nbsp;See the <a href=
 "#SecuringSNMPTT">Securing SNMPTT</a> section.</p>
+<p>Note: &nbsp;The default snmptt.ini enables logging to snmptt.log
+and also syslog for both trap messages and snmptt system messages.
+&nbsp;Change the following settings if required: &nbsp;log_enable,
+syslog_enable and syslog_system_enable.</p>
 <br />
 <h4><a name="Installation-Unix-Embedded"></a>Embedded handler</h4>
 <br />
@@ -1348,6 +1411,10 @@ will take effect no matter what is used on the command line.</p>
 </div>
 <p>11. &nbsp; &nbsp; See the <a href=
 "snmptt.html#SecuringSNMPTT">Securing SNMPTT</a> section.</p>
+Note: &nbsp;The default snmptt.ini enables logging to snmptt.log
+and also syslog for both trap messages and snmptt system messages.
+&nbsp;Change the following settings if required: &nbsp;log_enable,
+syslog_enable and syslog_system_enable.<br />
 <br />
 <br />
 <h3><a id="Installation-Windows" name=
@@ -2554,7 +2621,10 @@ to slot $3, port $4 from slot $5, port $6"</blockquote>
 Note: Unlike the FORMAT line, nothing is prepended to the
 message.&nbsp; If you would like to include the hostname and date
 in the page above, you must use the variables such as $r, $x and
-$X.</blockquote>
+$X.<br />
+<br />
+Note: If the trap severity is set to LOGONLY in the snmptt.conf
+file,&nbsp;EXEC will not be executed.</blockquote>
 <h3><a id="SNMPTT.CONF-PREEXEC" name=
 "SNMPTT.CONF-PREEXEC"></a><b>PREEXEC:</b></h3>
 <blockquote>[<b>PREEXEC</b> command_string]
@@ -2582,6 +2652,8 @@ ifDescr.$1</b></blockquote>
 SERVER1"). Admin state up. Operational state: down</blockquote>
 <p>In the above example the result is in quotes because that is
 what comes back from snmpget (it is not added by SNMPTT).</p>
+<p>Note: PREEXEC will execute even if the&nbsp;trap severity is set
+to LOGONLY in the snmptt.conf file.</p>
 </blockquote>
 <h3><a id="SNMPTT.CONF-NODES" name=
 "SNMPTT.CONF-NODES"></a><b>NODES:</b></h3>
