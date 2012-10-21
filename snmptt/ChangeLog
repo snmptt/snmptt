@@ -1,6 +1,8 @@
 Oct 21th, 2012: Alex Burger <alex_b@users.sourceforge.net>
 - Escape all %'s before sending to syslog.  A single % may cause syslog to 
   hang (bug 3567748). Thanks to Edward Greenspan.
+- Fixed bug with LOGONLY severity (3567744).  EXEC was being executed even if
+  the trap had a severity of LOGONLY.  
 
 Oct 30th, 2011: Alex Burger <alex_b@users.sourceforge.net>
 - Installation documentation updates (bug 3425999). Thanks to Brian Excarnate.

@@ -2010,7 +2010,7 @@ sub processtrap
 
       if (defined ($event2[4][0])) # if EXEC string has been defined
       {
-        if (defined ($event2[4][0]) && $event2[1] ne "LOGONLY")
+        if ($event2[2] ne "LOGONLY")
         {
           for (my $i=0; defined($event2[4][$i]); $i++)
           {
@@ -2066,10 +2066,7 @@ sub processtrap
         }
         elsif ($DEBUGGING >= 1)
         {
-          if ($event2[1] eq "LOGONLY")
-          {
-            print "\n\nTrap set to LOGONLY...\n\n";
-          }
+          print "  Trap severity defined as LOGONLY.  Skipping EXEC processing.\n\n";
         }
       } # end of block if ($event2[4] ne '')
       else
