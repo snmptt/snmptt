@@ -3,6 +3,48 @@
 
 <p class="SectionTitle">Change Log</p>
 
+<u>v1.4beta1 - October 21st, 2012</u>
+<ul>
+<li>Added <span style="font-weight: bold;">snmptt.ini</span> option
+<span style="font-weight: bold;">net_snmp_perl_cache_enable</span>
+to enable caching of Net-SNMP Perl module OID and ENUM
+translations.&nbsp; This may speed up translations and reduce CPU
+load when <span style=
+"font-weight: bold;">net_snmp_perl_enable</span> and <span style=
+"font-weight: bold;">translate_*</span> options are enabled.</li>
+<li>Fixed bug with snmptthandler-embedded where IP addresses and
+OIDs were not being detected properly because they contained
+'OID:', 'IpAddress:' etc.</li>
+<li>Fixed bug with MATCH.&nbsp; The PREEXEC $p variable could not
+be used with MATCH.&nbsp; PREEXEC is now executed first if MATCH
+contains $p.</li>
+<li>Fixed bug with syslog.&nbsp; Log entries were supposed to be
+logged with snmptt[pid] but instad of the pid it was actually the
+effective user ID (2980512).</li>
+<li>Fixed bug where the hostname is not detected properly when
+snmptrapd is configured to not use DNS.</li>
+<li>Fixed bug where if the spool directory is not defined, files
+may be deleted from the wrong folder (3020696).</li>
+<li>Fixed bug with syslog logging.&nbsp; Function was not being
+called properly (3166749).</li>
+<li>Fixed bug with MATCH where number ranges were not working
+(3397982).</li>
+<li>Fixed bug with multi-line traps (2915658).</li>
+<li>Fixed bug with LOGONLY severity.&nbsp; EXEC was being executed
+even if the trap had a severity of LOGONLY (3567744).</li>
+<li>Fixed bug with snmptt hanging if the log message sent to syslog
+contained a % symbol. &nbsp;All %'s are now escaped before sending
+to syslog (3567748).</li>
+<li>Fixed possible bug with MySQL.&nbsp; Put CONNECT string on one
+line.</li>
+<li>Fixed bug with not being able to write to the debug log file
+when running snmptt as non-root if the debug file didn't already
+exist with the correct permissions at startup.&nbsp; The ownership
+of snmptt.debug is now set to daemon_uid before switching to the
+new uid.&nbsp; Patch 3423525.</li>
+<li>Installation documentation updates (bug 3425999).</li>
+</ul>
+
 <u>v1.3 - November 15th, 2009</u>
 <ul>
 <li>Added <span style=
