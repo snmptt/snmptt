@@ -1,10 +1,10 @@
 Oct 30th, 2011: Alex Burger <alex_b@users.sourceforge.net>
 - Installation documentation updates (bug 3425999). Thanks to Brian Excarnate.
 - Fixed bug with MATCH (3397982).  Number ranges were not working.  Thanks to Maex.
-- Fixed bug with syslog logging (3166749).
+- Fixed bug with syslog logging.  Function was not being called properly. (3166749).
 
 Oct 9th, 2010: Alex Burger <alex_b@users.sourceforge.net>
-- Applied patch for bug 3020696.  If the spool directory isn't defined, files
+- Applied patch for bug 3020696.  If the spool directory is not defined, files
   may be deleted from the wrong folder.
 
 May 5th, 2010: Alex Burger <alex_b@users.sourceforge.net>
@@ -16,7 +16,7 @@ May 5th, 2010: Alex Burger <alex_b@users.sourceforge.net>
   Thanks to Matteo P for the fix.
 - Fixed bug with multi-line traps (2915658).  Thanks to AndrewB for the fix.
 - Added snmptt.ini option net_snmp_perl_cache_enable to enable caching of
-  Net-SNMP Perl module OID and ENUM translations.  This should speed up
+  Net-SNMP Perl module OID and ENUM translations.  This may speed up
   translations and reduce CPU load when net_snmp_perl_enable and translate_* 
   options are enabled.
 
