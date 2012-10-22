@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v1.4beta1
+# SNMPTT v1.4beta2
 #
 # Copyright 2002-2009 Alex Burger
 # alex_b@users.sourceforge.net
@@ -47,7 +47,7 @@
 #
 use strict;
 
-my $snmptt_version = "v1.4beta1";
+my $snmptt_version = "v1.4beta2";
 
 sub showversion
 {
@@ -1743,8 +1743,8 @@ sub processtrap
             if (Sys::Syslog::openlog('snmptt', 'pid',$syslog_facility) )
             {
               # Escape all %'s before sending to syslog.  A single % may cause syslog to hang
-              $message=s/%/%%/g;
-			  Sys::Syslog::syslog ($syslog_level_temp, $message,1);
+              $message =~ s/%/%%/g;
+              Sys::Syslog::syslog ($syslog_level_temp, $message,1);
               Sys::Syslog::closelog();
               $trap_successfully_logged++;
             }
@@ -4357,8 +4357,8 @@ sub syslog_system {
     if (Sys::Syslog::openlog('snmptt-sys','pid',$syslog_system_facility) )
     {
       # Escape all %'s before sending to syslog.  A single % may cause syslog to hang
-      $message=s/%/%%/g;
-	  Sys::Syslog::syslog ($syslog_system_level, $message,1);
+      $message =~ s/%/%%/g;
+      Sys::Syslog::syslog ($syslog_system_level, $message,1);
       Sys::Syslog::closelog();
     }
   };
