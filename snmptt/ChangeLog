@@ -1,3 +1,7 @@
+March 18th, 2012: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed bug with unknown_trap_exec_format which resulted in duplicate text
+  when a custom format is used.  (Bug #37)
+
 Oct 22nd, 2012: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with fix that was applied for bug 3567748 (syslog % escaping). 
 - Changed version to snmptt1.4beta2

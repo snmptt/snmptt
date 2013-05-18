@@ -3693,7 +3693,7 @@ sub searchfortrap
 
         &substitute;
 
-        $command = $unknown_trap_exec .= " \"$_\"";
+        $command = $unknown_trap_exec . " \"$_\"";
       }
       else {
         $command = $unknown_trap_exec . " \"";
