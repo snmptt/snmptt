@@ -1,3 +1,6 @@
+November 6th, 2013: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.4 for release.
+
 March 18th, 2012: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug with unknown_trap_exec_format which resulted in duplicate text
   when a custom format is used.  (Bug #37)
