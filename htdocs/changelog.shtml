@@ -3,7 +3,7 @@
 
 <p class="SectionTitle">Change Log</p>
 
-<u>v1.4beta1 - October 21st, 2012</u>
+<u>v1.4beta2 - October 22nd, 2012</u>
 <ul>
 <li>Added <span style="font-weight: bold;">snmptt.ini</span> option
 <span style="font-weight: bold;">net_snmp_perl_cache_enable</span>
