@@ -14,6 +14,18 @@ News
       <table border="0" cellspacing="0" cellpadding="4">
 
 <tr>
+  <td valign="top" class="NewsItemDate">11/6/2013</td>
+  <td class="NewsItem">
+    <p><b>SNMPTT v1.4 has been released</b></p>
+    <p>SNMPTT v1.4 has been released.  A list of new features is available on the 
+      <a href="http://sourceforge.net/projects/snmptt/files/snmptt/snmptt_1.4/snmptt_1.4_releasenotes.txt/view">SourceForge page</a>.</p>
+      <p>Please report any issues to the snmptt-users mail list.</p>
+    <p>There were no changes between 1.4beta2 and the final release.</p>
+    <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
+  </td>
+</tr>
+
+<tr>
   <td valign="top" class="NewsItemDate">10/22/2012</td>
   <td class="NewsItem">
     <p><b>SNMPTT v1.4beta2 has been released</b></p>
