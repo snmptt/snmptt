@@ -1,10 +1,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta content="text/html; charset=us-ascii" http-equiv=
+"content-type" />
 <meta content=
 "HTML Tidy for Linux/x86 (vers 14 June 2007), see www.w3.org" name=
 "generator" />
-<meta http-equiv="Content-Type" content=
-"text/html; charset=us-ascii" />
 <meta name="Author" content="Alex Burger" />
 <meta name="GENERATOR" content=
 "Mozilla/4.78 [en] (Windows NT 5.0; U) [Netscape]" />
@@ -29,8 +29,7 @@ This file was last updated on: November 6th, 2013
 "snmptt.html#Installation-Unix">Unix</a><br />
 <div style="margin-left: 40px;"><a href=
 "snmptt.html#Installation-Unix-Standard">Standard handler</a><br />
-<a href="#Installation-Unix-Embedded">Embedded
-handler</a><br /></div>
+<a href="#Installation-Unix-Embedded">Embedded handler</a></div>
 <b>&nbsp;&nbsp;</b> <a href=
 "#Installation-Windows">Windows</a><br />
 <b>&nbsp;&nbsp;</b> <a href="#SecuringSNMPTT">Securing
@@ -195,10 +194,10 @@ value "Building alarm 4" to "Moisture detection alarm"</li>
 <h2><a id="Requirements" name="Requirements"></a>Requirements</h2>
 <ul>
 <li>Perl 5.6.1 or higher.&nbsp; SNMPTT is developed with 5.6.1 and
-5.8.0, but other versions may also work.<br /></li>
+5.8.0, but other versions may also work.</li>
 <li>Required: <a href="http://www.net-snmp.org">Net-SNMP</a>
 (formerly known as UCD-SNMP).&nbsp; Specifically
-<b>snmptrapd.</b><br /></li>
+<b>snmptrapd.</b></li>
 <li>Required: <a href=
 "http://search.cpan.org/search?module=Text::ParseWords">Text::ParseWords</a>
 module (included with most distributions including ActivePerl)</li>
@@ -238,15 +237,14 @@ module (included with most Unix distributions). Required for Syslog
 support.</li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBI">DBI</a> module.&nbsp;
-Required for DBD::MySQL, DBD::PgPP and DBD::ODBC
-support.<br /></li>
+Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support.</li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBD::mysql">DBD::mysql</a>
-module.&nbsp; Required for MySQL support.<br /></li>
+module.&nbsp; Required for MySQL support.</li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBD::PgPP">DBD::PgPP</a> or
 <a href="http://search.cpan.org/search?dist=DBD-Pg">DBD:Pg</a>
-module.&nbsp; Required for PostgreSQL support.<br /></li>
+module.&nbsp; Required for PostgreSQL support.</li>
 <li>Optional: <a href=
 "http://search.cpan.org/search?module=DBD::ODBC">DBD::ODBC</a>
 module.&nbsp; Required for ODBC (SQL etc) access on Linux / Windows
@@ -379,7 +377,7 @@ we can tail the debug log file.</li>
 <li>Don't print messages to the console when starting in daemon
 mode unless debugging is enabled or an error occurs.</li>
 <li>'Could not open debug output file!' is no longer reported when
-debugging is disabled.<br /></li>
+debugging is disabled.</li>
 <li>Added <span style="font-weight: bold;">snmptt.logrotate</span>
 file from Ville Skytta.</li>
 <li>Fixed a bug (1748512) with handling escaped quotes in a trap
@@ -566,7 +564,7 @@ ignored</b> and <b>total unknown traps</b>. Statistics are logged
 at shut down, and optionally at a defined interval defined by the
 new <b>snmptt.ini</b> variable <b>statistics_interval</b>. Logging
 can also be forced by sending the SIGUSR1 signal, or by creating a
-file called !statistics in the spool folder.<br /></li>
+file called !statistics in the spool folder.</li>
 <li>Added the error number reported by MySQL to MySQL errors
 (system syslog, eventlog etc)</li>
 <li>Added <b>/usr/local/etc/snmp</b> and <b>/usr/local/etc</b>
@@ -600,19 +598,18 @@ spaces after the closing bracket</li>
 "font-weight: bold;">TRAPD</span> for traps, and <span style=
 "font-weight: bold;">snmptt-sys[<span style=
 "font-style: italic;">pid</span>]</span> instead of <span style=
-"font-weight: bold;">SNMPTT</span> for system messages<br /></li>
+"font-weight: bold;">SNMPTT</span> for system messages</li>
 <li>Added the option <span style=
 "font-weight: bold;">daemon_uid</span> which causes <span style=
 "font-weight: bold;">snmptt</span> to change to a different user
-(uid) after launching on Unix systems running in daemon
-mode<br /></li>
+(uid) after launching on Unix systems running in daemon mode</li>
 <li>Fixed bug that prevented ip addresses from being detected
 correctly with <span style=
-"font-weight: bold;">translate_value_oids</span><br /></li>
+"font-weight: bold;">translate_value_oids</span></li>
 <li>Fixed bug with MATCH that caused integer ranges from not being
 handled correctly</li>
 <li>Separated SNMPTT, SNMPTTCONVERT, SNMPTTCONVERTMIB and FAQ /
-Troubleshooting documentation into separate documents<br /></li>
+Troubleshooting documentation into separate documents</li>
 </ul>
 <h3><b>0.8</b> <b>-</b> <b>September 16th</b><b>, 2003</b></h3>
 <ul>
@@ -625,7 +622,7 @@ substitution with captures and the modifiers <span style=
 "font-weight: bold;">g</span> and <span style=
 "font-weight: bold;">e</span>.&nbsp; The <span style=
 "font-weight: bold;">e</span> modifier allows for complex REGEX
-expressions.<br /></li>
+expressions.</li>
 <li>Added support for <span style=
 "font-weight: bold;">remote</span> MySQL and PostgreSQL
 databases</li>
@@ -636,18 +633,18 @@ databases</li>
 <li>Added the option <span style=
 "font-weight: bold;">dynamic_nodes</span> to allow NODES files to
 be either loaded at startup or loaded each time an EVENT is
-processed<br /></li>
+processed</li>
 <li>Added <span style="font-weight: bold;">trapoid</span> column
 for database logging to contain the actual trap received.&nbsp; The
 <span style="font-weight: bold;">eventid</span> column will contain
 the actual matched entry from the .conf file (which could be a
-wildcard OID)<br /></li>
+wildcard OID)</li>
 <li>Fixed bug that prevented some variables from displaying the
 correct values because the received trap OID was replaced with the
-actual EVENT entry<br /></li>
+actual EVENT entry</li>
 <li>Fixed bug that caused OIDs not to be translated correctly with
 <span style="font-weight: bold;">translate_value_oids</span>
-enabled<br /></li>
+enabled</li>
 <li>Agent IP address is now used instead of 'host' IP address for
 NODES matches, the 'hostname' column in database logs and the
 <span style="font-weight: bold;">$A</span> variable</li>
@@ -662,13 +659,13 @@ the trap in symbolic form.&nbsp; <span style=
 "font-weight: bold;">$o</span> prints the numeric OID</li>
 <li>Added new variable substitution <b>$i</b> to print the actual
 matched entry from the .conf file (which could be a wildcard
-OID)<br /></li>
+OID)</li>
 <li>Added the configuration option <span style=
 "font-weight: bold;">dns_enable</span> to enable DNS lookups on
 host and agent IP addresses</li>
 <li>If DNS is enabled, NODES entries are resolved to IP addresses
 and the IP address is used to perform the match.&nbsp; This will
-allow for aliases to be used.<br /></li>
+allow for aliases to be used.</li>
 <li>Added the option <span style=
 "font-weight: bold;">resolve_value_ip_addresses</span> to resolve
 ip addresses contained inside enterprise variable values</li>
@@ -677,13 +674,13 @@ ip addresses contained inside enterprise variable values</li>
 "font-weight: bold;">translate_log_trap_oid</span></li>
 <li>Changed snmptt.ini setting <span style=
 "font-weight: bold;">translate_oids</span> to <span style=
-"font-weight: bold;">translate_value_oids</span><br /></li>
+"font-weight: bold;">translate_value_oids</span></li>
 <li>Added configuraiton settings: <span style=
 "font-weight: bold;">translate_enterprise_oid_format,
 translate_trap_oid_format,</span> <span style=
 "font-weight: bold;">translate_varname_oid_format</span> and
 <span style=
-"font-weight: bold;">db_translate_enterprise</span><br /></li>
+"font-weight: bold;">db_translate_enterprise</span></li>
 <li><span style="font-weight: bold;">$O</span> follows <span style=
 "font-weight: bold;">translate_trap_oid_format</span>, and
 <span style="font-weight: bold;">$o</span> is always the numerical
@@ -699,14 +696,14 @@ setting</li>
 report the correct number of enterprise variables (was 1 lower than
 it should have been)</li>
 <li>Fixed bug with handling traps that contain quoted values that
-span multiple lines<br /></li>
+span multiple lines</li>
 <li>PID file now created (/var/run/snmptt.pid or ./snmptt.pid) when
 running in daemon mode on Linux / Unix.&nbsp; snmptt-init.d script
 updated to remove the pid file when shutting down snmptt.</li>
 <li>Added <a href="http://www.nagios.org">Nagios</a> / <a href=
 "http:/www.netsaint.org">Netsaint</a> integration
 documentation</li>
-<li>Added contrib folder<br /></li>
+<li>Added contrib folder</li>
 <li>Snmpttconvertmib</li>
 <li style=
 "list-style-type: none; list-style-image: none; list-style-position: outside;">
@@ -718,7 +715,7 @@ set.&nbsp; When using <span style=
 the Syntax (INTEGER, OCTETSTR etc) and Description.&nbsp; If it's
 an INTEGER, will also print out the enumeration tags if any
 exist.</li>
-<li>Improved compatability with MIB files<br /></li>
+<li>Improved compatability with MIB files</li>
 </ul>
 </li>
 </ul>
@@ -727,15 +724,14 @@ exist.</li>
 <li>Fixes a vulnerability that prevents the <span style=
 "font-size: 12pt; font-family: &quot;Times New Roman&quot;;">possibility</span>
 of injected commands contained in traps from being executed when
-using the <span style="font-weight: bold;">EXEC</span>
-feature<br /></li>
+using the <span style="font-weight: bold;">EXEC</span> feature</li>
 <li>Added the ability for traps passed from <span style=
 "font-weight: bold;">snmptrapd</span> or loaded from the
 <span style="font-weight: bold;">snmptt.conf</span> files to
 contain symbolic OIDs such as <span style=
 "font-weight: bold;">linkDown</span> and <span style=
 "font-weight: bold;">IF-MIB::linkUp</span>.&nbsp; This feature
-requires the UCD-SNMP / Net-SNMP Perl module<br /></li>
+requires the UCD-SNMP / Net-SNMP Perl module</li>
 <li>Added the configuration options <b>translate_trap_oid</b> and
 <span style="font-weight: bold;">translate_oids</span> to have the
 trap OID and OID values contained in the trap variables converted
@@ -746,10 +742,10 @@ DBD::PgPP</li>
 <li>Added <span style="font-weight: bold;">REGEX</span> keyword
 support to allow user definable search and replace on <span style=
 "font-weight: bold;">FORMAT</span> / <span style=
-"font-weight: bold;">EXEC</span> lines<br /></li>
+"font-weight: bold;">EXEC</span> lines</li>
 <li><span style="font-weight: bold;">NODES</span> entry can now
 contain a CIDR address (eg: 192.168.10.0/23), or a network range
-(192.168.10.0-192.168.11.255)<br /></li>
+(192.168.10.0-192.168.11.255)</li>
 <li><span style="font-weight: bold;">NODES</span> entry can now
 contain a mix of host names, IP addresses, CIDR addresses, network
 ranges and filenames</li>
@@ -761,7 +757,7 @@ while running in daemon mode by placing a file called <span style=
 various translations of numeric and symbolic OIDS to assist with
 determining if the installed Perl module<br />
 will function as expected with <span style=
-"font-weight: bold;">SNMPTT</span><br /></li>
+"font-weight: bold;">SNMPTT</span></li>
 <li>Fixed bug that prevented quoted text from being logged
 correctly to SQL databases</li>
 <li>Fixed bug that would prevent the translation of integer values
@@ -777,28 +773,28 @@ Net-SNMP 5.0.x</li>
 <ul>
 <li>--#SUMMARY <span style="font-weight: bold;">or</span>
 DESCRIPTION (use DESCRIPTION only if --#SUMMARY does not
-exist)<br /></li>
+exist)</li>
 <li>description <span style="font-weight: bold;">or</span>
 --#SUMMARY (use --#SUMMARY only if DESCRIPTION does not exist)</li>
 <li>--#SUMMARY <span style="font-weight: bold;">and</span>
 DESCRIPTION</li>
 <li>DESCRIPTION <span style="font-weight: bold;">and</span>
---#SUMMARY<br /></li>
+--#SUMMARY</li>
 </ul>
 </li>
 <li>When using the DESCRIPTION to build the FORMAT / EXEC line, can
 now choose between using the first line of the DESCRIPTION field,
 or the first <span style="font-style: italic;">x</span> number of
-sentences<br /></li>
+sentences</li>
 <li>The use of the --#SUMMARY and DESCRIPTION line for the FORMAT /
 EXEC line can be disabled</li>
 <li>Support for multiple --#SUMMARY lines</li>
-<li>Support for --#SEVERITY lines<br /></li>
+<li>Support for --#SEVERITY lines</li>
 <li>The default of using the $* wildcard can be disabled</li>
 <li>Conversion of the DESCRIPTION section to SDESC / EDESC can be
 disabled</li>
 <li>EXEC line can be specified on the command line</li>
-<li>NODES line can be specified on the command line<br /></li>
+<li>NODES line can be specified on the command line</li>
 </ul>
 </li>
 </ul>
@@ -940,7 +936,7 @@ configuration files to load</li>
 <ul>
 <li>Initial release</li>
 </ul>
-<h2><a id="Upgrading" name="Upgrading"></a>Upgrading<br /></h2>
+<h2><a id="Upgrading" name="Upgrading"></a>Upgrading</h2>
 <h3><b>v1.3 to v1.4</b></h3>
 <p>To upgrade from v1.3 to v1.4, you should:</p>
 <ol>
@@ -999,7 +995,7 @@ running instead of one.</li>
 <li>For Linux and Unix (or anything non-Windows), the
 <b>snmptt.ini</b> <b>exec_escape</b> option is enabled by default
 which will escape wildcard characters (* and ?) for EXEC, PREEXEC
-and the unknown_trap_exec commands. Disable if required.<br /></li>
+and the unknown_trap_exec commands. Disable if required.</li>
 </ol>
 <h3><b>v1.0 to v1.1</b></h3>
 <p>To upgrade from v1.0 to v1.1, you should:</p>
@@ -1048,7 +1044,7 @@ for <span style="font-weight: bold;">SNMPTT</span> or <span style=
 <span style="font-weight: bold;">snmptt[<span style=
 "font-style: italic;">pid</span>]</span> and <span style=
 "font-weight: bold;">snmptt-sys[<span style=
-"font-style: italic;">pid</span>]</span> instead<br /></li>
+"font-style: italic;">pid</span>]</span> instead</li>
 <li>Enable any new features in <span style=
 "font-weight: bold;">snmptt.ini</span> as required</li>
 <li>Test and report any issues to alex_b@users.sourceforge.net, or
@@ -1082,7 +1078,7 @@ from old <span style="font-weight: bold;">snmptt.ini</span></li>
 <li>In your snmptt.ini file, set <span style=
 "font-weight: bold;">dynamic_nodes</span> to 1 if you want the
 NODES files to be loaded each time an event is processed which is
-how previous versions of snmptt worked<br /></li>
+how previous versions of snmptt worked</li>
 <li>In your snmptt.conf files, replace any <span style=
 "font-weight: bold;">$A</span> with <span style=
 "font-weight: bold;">$aA</span> unless you want agent host names to
@@ -1099,14 +1095,14 @@ format</li>
 "font-weight: bold;">g</span> to the end of all REGEX lines to
 enable global search and replace</li>
 <li>Review other translate settings in <span style=
-"font-weight: bold;">snmptt.ini</span><br /></li>
+"font-weight: bold;">snmptt.ini</span></li>
 <li>Enable any new features in <span style=
 "font-weight: bold;">snmptt.ini</span> as required</li>
 <li>If you are using database logging, add a new column called
-<span style="font-weight: bold;">trapoid</span><br /></li>
+<span style="font-weight: bold;">trapoid</span></li>
 <li>If you are using database logging and you enable conversions of
 OIDs to long names, make sure the table columns are wide enough to
-hold them<br /></li>
+hold them</li>
 <li>Test and report any issues to alex_b@users.sourceforge.net, or
 open a bug report at <a href=
 "http://sourceforge.net/tracker/?group_id=51473&amp;atid=463393">Sourceforge</a>.</li>
@@ -1183,7 +1179,7 @@ options</li>
 SNMPTT machine</li>
 <li>Initiate a trap on your network device and check the SNMPTT log
 files for the result</li>
-<li>Secure the SNMPTT installation<br /></li>
+<li>Secure the SNMPTT installation</li>
 </ol>
 <h3><a id="Installation-Unix" name=
 "Installation-Unix"></a>Installation - Unix</h3>
@@ -1239,11 +1235,11 @@ specific trap received, but using the <span style=
 the following line:</p>
 </div>
 <blockquote><b>traphandle default
-/usr/sbin/snmptthandler</b><br /></blockquote>
+/usr/sbin/snmptthandler</b></blockquote>
 <blockquote>
 <p>Create the spool folder <b>/var/spool/snmptt/</b>:</p>
 <span style="font-weight: bold;">mkdir
-/var/spool/snmptt/</span><br /></blockquote>
+/var/spool/snmptt/</span></blockquote>
 <blockquote>A startup script is included which can be used to start
 and stop <b>snmptt</b> on Mandrake, RedHat and other systems.&nbsp;
 Copy the script to the init.d directory (renaming the file during
@@ -1278,8 +1274,7 @@ the&nbsp;paths and rotate frequency as needed.</p>
 <div style="margin-left: 40px;">You should be able to edit the
 <b>/etc/rc.d/init.d/snmptrapd</b> script if you have one and
 change<br />
-the <b>OPTIONS</b> to <b>"-On"</b>.<br />
-<br /></div>
+the <b>OPTIONS</b> to <b>"-On"</b>.<br /></div>
 <div style="margin-left: 40px;"><b><span style=
 "font-weight: bold;">Note:&nbsp; The -On is recommended.&nbsp; This
 will make snmptrapd pass OIDs in numeric form</span> <span style=
@@ -1355,7 +1350,7 @@ create the file (<span style="font-weight: bold;">touch
 the following line:</p>
 </div>
 <blockquote><b>perl do
-"/usr/sbin/snmptthandler-embedded";</b><br /></blockquote>
+"/usr/sbin/snmptthandler-embedded";</b></blockquote>
 <blockquote>Create the spool folder
 <b>/var/spool/snmptt/</b>.</blockquote>
 <blockquote>A startup script is included which can be used to start
@@ -1374,7 +1369,7 @@ immediately with:</p>
 <p>or</p>
 <p><b>/etc/rc.d/init.d/snmptt start</b></p>
 <p>To manually start snmptt, use:</p>
-<p><b>snmptt --daemon</b><br /></p>
+<p><b>snmptt --daemon</b></p>
 </blockquote>
 <p>9.&nbsp; &nbsp; &nbsp; &nbsp;A log rotation&nbsp;script is
 included which can be used to rotate the log files&nbsp;on
@@ -1392,7 +1387,7 @@ paths and rotate frequency as needed.</p>
 <div style="margin-left: 40px;"><br />
 You should be able to edit the <b>/etc/rc.d/init.d/snmptrapd</b>
 script if you have one and change<br />
-the <b>OPTIONS</b> to <b>"-On"</b>.<br /></div>
+the <b>OPTIONS</b> to <b>"-On"</b>.</div>
 <b><span style="font-weight: bold;"><br /></span></b>
 <div style="margin-left: 40px;"><b><span style=
 "font-weight: bold;">Note:&nbsp; The -On is recommended.&nbsp; This
@@ -1520,7 +1515,7 @@ Compiling snmptt-eventlog.dll (MS Visual C++ required)
 <li>If your environment is not already set up for command line
 compilation, locate <b>vcvars32.bat</b>, start a command prompt,
 and execute it (<span style=
-"font-weight: bold;">vcvars32.bat</span>).<br /></li>
+"font-weight: bold;">vcvars32.bat</span>).</li>
 <li>cd into the directory where <span style=
 "font-weight: bold;">snmptt-eventlog.mc</span> is located (included
 with SNMPTT) and execute the following commands:</li>
@@ -1611,13 +1606,13 @@ The <span style="font-weight: bold;">snmptt</span> user should be
 configured with the following permissions:
 <ul>
 <li>read / delete access to spool directory to be able to read new
-traps, and delete processed traps<br /></li>
+traps, and delete processed traps</li>
 <li>read access to configuration files (snmptt.ini and all
 snmptt.conf files)</li>
 <li>write access to log folder /var/log/snmptt/ or
 c:\snmp\log\.</li>
 <li>any other permissions required for EXEC statements to
-execute<br /></li>
+execute</li>
 </ul>
 If <span style="font-weight: bold;">snmptrapd</span> is run as a
 non root / administrator, it should be configured with the
@@ -1869,7 +1864,7 @@ and set <b>date_time_format_sql</b> in <b>snmptt.ini</b> to
 <b>total_received BIGINT,</b><br />
 <b>total_translated BIGINT,</b><br />
 <b>total_ignored BIGINT,</b><br />
-<b>total_unknown BIGINT);</b><br /></p>
+<b>total_unknown BIGINT);</b></p>
 </blockquote>
 <p>Note: To store the stat_time as a real date/time
 (<b>DATETIME</b> data type), change 'stat_time VARCHAR(30),' to
@@ -2597,12 +2592,11 @@ Net-SNMP patch page</a>.</blockquote>
 must be set to either 1 or 2. If set to 1, the description is
 pulled from the SNMPTT.CONF files. If set to 2, the description is
 pulled from the MIB file. If using the MIB file, you must have the
-UCD-SNMP / Net-SNMP Perl module installed and
-enabled.<br /></blockquote>
+UCD-SNMP / Net-SNMP Perl module installed and enabled.</blockquote>
 Note (7):
 <blockquote>These variables are only available when using the
 embedded trap handler for snmptrapd
-(snmptthandler-embedded).<br /></blockquote>
+(snmptthandler-embedded).</blockquote>
 </blockquote>
 <h3><a id="SNMPTT.CONF-EXEC" name=
 "SNMPTT.CONF-EXEC"></a><b>EXEC:</b></h3>
@@ -2624,7 +2618,11 @@ in the page above, you must use the variables such as $r, $x and
 $X.<br />
 <br />
 Note: If the trap severity is set to LOGONLY in the snmptt.conf
-file,&nbsp;EXEC will not be executed.</blockquote>
+file,&nbsp;EXEC will not be executed.<br />
+<br />
+Note: Embedded scripts may not work with scripting languages that
+prefix variables with dollar signs.&nbsp; For example, "perl -e"
+and "bash -c".</blockquote>
 <h3><a id="SNMPTT.CONF-PREEXEC" name=
 "SNMPTT.CONF-PREEXEC"></a><b>PREEXEC:</b></h3>
 <blockquote>[<b>PREEXEC</b> command_string]
@@ -2654,6 +2652,9 @@ SERVER1"). Admin state up. Operational state: down</blockquote>
 what comes back from snmpget (it is not added by SNMPTT).</p>
 <p>Note: PREEXEC will execute even if the&nbsp;trap severity is set
 to LOGONLY in the snmptt.conf file.</p>
+<p>Note: Embedded scripts may not work with scripting languages
+that prefix variables with dollar signs.&nbsp; For example, "perl
+-e" and "bash -c".</p>
 </blockquote>
 <h3><a id="SNMPTT.CONF-NODES" name=
 "SNMPTT.CONF-NODES"></a><b>NODES:</b></h3>
@@ -2680,7 +2681,7 @@ match. If set to <b>NEG</b>, then <b>NODES</b> is a 'match' only if
 <i>none</i> of the <b>NODES</b> entries match. To change the mode
 of operation, use one of the following statements:</p>
 <p style="margin-left: 40px;"><b>NODES MODE=POS</b><br />
-<b>NODES MODE=NEG</b><br /></p>
+<b>NODES MODE=NEG</b></p>
 <p>A common use for this feature is when you have devices that
 implement a trap in a non-standard way (added additional variables
 for example) such as the linkDown and linkUp traps. By defining two
@@ -2811,7 +2812,7 @@ default evaluation mode for ALL matches<br />
 <b>n</b> is a number<br />
 <b>x.x.x.x</b> is an IP address<br />
 <b>x.x.x.x-x.x.x.x</b> is an IP network address range<br />
-<b>x.x.x.x/x</b> is an IP CIDR network addresss<br /></div>
+<b>x.x.x.x/x</b> is an IP CIDR network addresss</div>
 </div>
 </blockquote>
 <div style="margin-left: 40px;">
@@ -2853,7 +2854,7 @@ between 192.168.1.10 and 192.168.1.20, or the severity must be
 <br />
 <div style="margin-left: 40px;"><b>MATCH $3: 52</b><br />
 <b>MATCH $4: 192.168.1.10-192.168.1.20</b><br />
-<b>MATCH $s: (Major)</b><br /></div>
+<b>MATCH $s: (Major)</b></div>
 </div>
 </div>
 </div>
@@ -2880,7 +2881,7 @@ set:<br />
 <br />
 <div style="margin-left: 40px;"><span style=
 "font-weight: bold;">MATCH $1: &amp;8</span></div>
-<br /></div>
+</div>
 </div>
 <blockquote>
 <h3><a id="SNMPTT.CONF-REGEX" name=
@@ -3363,14 +3364,14 @@ not be included in the definition.</p>
 <tr>
 <td class="Definition" colspan="3">define service{</td>
 <td style="vertical-align: top; font-style: italic;">
-Description<br /></td>
+Description</td>
 </tr>
 <tr>
 <td><br /></td>
 <td class="Required">host_name</td>
 <td class="Required">server01</td>
 <td style="vertical-align: top; font-style: italic;">Name of
-host<br /></td>
+host</td>
 </tr>
 <tr>
 <td><br /></td>
@@ -3394,26 +3395,26 @@ volatile services</td>
 <td class="Required">check-host-alive</td>
 <td style="vertical-align: top; font-style: italic;">Used to reset
 the status to OK when <span style="font-weight: bold;">'Schedule an
-immediate check of this service'</span> is selected.<br /></td>
+immediate check of this service'</span> is selected.</td>
 </tr>
 <tr>
 <td><br /></td>
 <td class="Required">max_check_attempts</td>
-<td class="Required">1<br /></td>
+<td class="Required">1</td>
 <td style="vertical-align: top; font-style: italic;">Leave as
 1.</td>
 </tr>
 <tr>
 <td><br /></td>
 <td class="Required">normal_check_interval</td>
-<td class="Required">1<br /></td>
+<td class="Required">1</td>
 <td style="vertical-align: top; font-style: italic;">Leave as
 1.</td>
 </tr>
 <tr>
 <td><br /></td>
 <td class="Required">retry_check_interval</td>
-<td class="Required">1<br /></td>
+<td class="Required">1</td>
 <td style="vertical-align: top; font-style: italic;">Leave as
 1.</td>
 </tr>
@@ -3429,7 +3430,7 @@ passive checks.</td>
 <td class="Required">passive_checks_enabled</td>
 <td class="Required">1</td>
 <td style="vertical-align: top; font-style: italic;">Enables
-passive checks<br /></td>
+passive checks</td>
 </tr>
 <!--<tr><td></td><td class="Optional">failure_prediction_enabled</td><td class="Optional">[0/1]</td></tr>//-->
 <tr>
@@ -3445,7 +3446,7 @@ passive checks<br /></td>
 <td style="vertical-align: top; font-style: italic;">Notification
 interval.&nbsp; Set to a very high number to prevent you from
 getting pages of previously received traps (1 year - restart Nagios
-at least once a year! - do not set to 0!).<br /></td>
+at least once a year! - do not set to 0!).</td>
 </tr>
 <tr>
 <td><br /></td>
@@ -3460,14 +3461,14 @@ be notified.&nbsp; Can be changed</td>
 <td class="Required">w,u,c</td>
 <td style="vertical-align: top; font-style: italic;">Notify on
 warning, unknown and&nbsp;critical. &nbsp;Recovery is not enabled
-so we do not get notified when a trap is cleared.<br /></td>
+so we do not get notified when a trap is cleared.</td>
 </tr>
 <tr>
 <td><br /></td>
 <td class="Required">notifications_enabled</td>
-<td class="Required">1<br /></td>
+<td class="Required">1</td>
 <td style="vertical-align: top; font-style: italic;">Enable
-notifications<br /></td>
+notifications</td>
 </tr>
 <tr>
 <td><br /></td>
@@ -3492,7 +3493,7 @@ SNMPTT 1.2, setting <span style=
 setting <span style="font-weight: bold;">check_period</span>to none
 is recommened as freshness checks require it. &nbsp;The recovery
 notification option has also been removed so we do not get notified
-when a trap is cleared.<br /></p>
+when a trap is cleared.</p>
 <p>Following is a sample service entry for Netsaint. &nbsp;Netsaint
 does not support&nbsp;<span style=
 "font-weight: bold;">active_checks_enabled</span>, so a check
@@ -3627,7 +3628,7 @@ not be included in the definition.<br />
 <td class="Required">check_freshness</td>
 <td class="Required">1</td>
 <td style="vertical-align: top; font-style: italic;">Enable
-freshness checking<br /></td>
+freshness checking</td>
 </tr>
 <tr>
 <td class="Required">freshness_threshold</td>
@@ -3660,7 +3661,7 @@ definition.<br />
 <td class="Required">check_freshness</td>
 <td class="Required">1</td>
 <td style="vertical-align: top; font-style: italic;">Enable
-freshness checking<br /></td>
+freshness checking</td>
 </tr>
 <tr>
 <td class="Required">freshness_threshold</td>
@@ -3752,13 +3753,13 @@ SNMPTT with SEC:&nbsp;<br />
 over and over again.&nbsp; It would be possible to simply disable
 the trap in SNMPTT, but you want the trap to be logged, just not
 excessively.&nbsp; The SEC 'SingleWithSupress' could be used to
-reduce the number of traps logged.<br /></li>
+reduce the number of traps logged.</li>
 <li>Router interfaces often go up and down and you are receiving a
 trap for each event.&nbsp; You do not want to be alerted every time
 the interface 'bounces', but you do want to be alerted if it
 happens many times over a set period of time.&nbsp; You want to be
 alerted when the interface is down for more than 10 seconds, and
-then when the interface comes back up.<br /></li>
+then when the interface comes back up.</li>
 </ol>
 <blockquote>
 <p>The following outlines how the flow of traps between SNMPTT and
@@ -3769,16 +3770,16 @@ SEC could take place:</p>
 /var/log/snmptt/snmptt.sec.log using '/bin/echo ...' for the EXEC
 statement.&nbsp; No FORMAT line is defined so the trap is not
 logged to the regular snmptt.log log file (or SQL table if a SQL
-server is used).<br /></li>
+server is used).</li>
 <li>SEC monitors the log file for new entries.</li>
 <li>SEC correlates the messages from the log file.</li>
 <li>When a new alert needs to be generated by SEC based on its
 rules, SEC will call an external script which will feed the
 information back into SNMPTT as a trap using a user defined unique
 trap OID.&nbsp; The unique trap OID is defined in a custom
-snmptt.conf file (such as /etc/snmp/snmptt.conf.sec).<br /></li>
+snmptt.conf file (such as /etc/snmp/snmptt.conf.sec).</li>
 <li>SNMPTT will process the new trap as it would any other trap by
-logging to snmptt.log, a SQL table etc.<br /></li>
+logging to snmptt.log, a SQL table etc.</li>
 </ol>
 <h4>Configuration Overview</h4>
 <p>The following outlines how example 2 from above could be handled
@@ -3790,7 +3791,7 @@ page</a>.</p>
 <ul>
 <li>Prevents interface flapping from flooding the log files</li>
 <li>Provides an 'unstable' and 'stable' alert based on how often
-the interface bounces.<br /></li>
+the interface bounces.</li>
 </ul>
 <p>The following steps need to be completed:</p>
 <ol>
@@ -3802,7 +3803,7 @@ SEC</li>
 linkUp messages and pass new alerts to a script</li>
 <li>Create a script that will feed the messages from SEC back in to
 SNMPTT</li>
-<li>Test<br /></li>
+<li>Test</li>
 </ol>
 <h4>1. Modify the Cisco SNMPTT.CONF file</h4>
 <p>The existing SNMPTT.CONF file needs to be modified to output the
@@ -3941,7 +3942,7 @@ Here is a quick breakdown of what each rule does:<br />
 on interface x from SNMPTT), and then a linkUp is received within
 20 seconds, it is considered a BOUNCE.&nbsp; A new 'event' is
 created with the internal SEC event 'CISCO %1 INTERFACE %2 BOUNCE'
-is created which is passed to the other rules.&nbsp;<br /></li>
+is created which is passed to the other rules.&nbsp;</li>
 <li>If a linkDown is received and a linkUp is <span style=
 "font-weight: bold;">not</span> received within 20 seconds, a new
 'down' internal SEC event is created (CISCO $1 INTERFACE $2 DOWN)
@@ -3972,8 +3973,7 @@ cisco_msg script.</li>
 <li>&lt;&gt;If after the last unstable alert there are no 'CISCO %1
 INTERFACE %2 BOUNCE' messages for 3 hours, it passes the host name,
 interface number and 'normal <span style=
-"font-weight: bold;">stable</span>' to the cisco_msg
-script.<br /></li>
+"font-weight: bold;">stable</span>' to the cisco_msg script.</li>
 </ul>
 <br />
 <h4>4. Create a script to pass a trap back to SNMPTT</h4>
