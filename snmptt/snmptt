@@ -1425,6 +1425,7 @@ sub processtrap
            }
          next;
        }
+       # IPv6_TODO
        elsif ($a =~ /^(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IP address / cidr / range
        {
          #if ( $a eq $var[1])     # compare against agent ip
@@ -1433,6 +1434,7 @@ sub processtrap
            $nodesmatch = 1;
          }
        }
+       # IPv6_TODO
        elsif ($dns_enable == 1)	# Resolve NODES entry to IP address, and compare
        {
          my $temp = gethostbyname($a);
@@ -2179,6 +2181,7 @@ sub substitute
       $val = &translate_value_oids_sub($val);
     }
 
+    # IPv6_TODO
     if ($dns_enable == 1 && $resolve_value_ip_addresses == 1 && $net_snmp_perl_enable == 1)
     {
       $val = &resolve_value_ip_addresses_sub($val);
@@ -2362,10 +2365,12 @@ sub substitute
   #s(\$r)($var[0])g;
   &substitute2 ("\$r", $var[0]);
 
+  # IPv6_TODO
   # $A, $a - Trap agent IP address
   #s(\$aA)($var[4])g;		# IP address
   &substitute2 ("\$aA", $var[4]);
 
+  # IPv6_TODO
   #s(\$A)($agent_dns_name)g;	# hostname
   &substitute2 ("\$A", $agent_dns_name);
 
@@ -2806,9 +2811,9 @@ sub loadsnmpttconf
       # 3: FORMAT string
       # 4: EXEC string
       # 5: NODES string
-                	# 6: REGEX array
-                	# 7: MATCH array
-                	# 8: DESC array
+      # 6: REGEX array
+      # 7: MATCH array
+      # 8: DESC array
 
       $tempcount++;		# Temporary counter of the number of EVENTS found
 
@@ -3151,7 +3156,8 @@ sub readtrap
       return 0;
     }
   }
-    
+  
+  # IPv6_TODO  
   chomp($tempvar[1]=<$input>);	# ip address
   push(@rawtrap, $tempvar[1]);
   $tempvar[1] =~ s(`)(')g;	#` Replace any back ticks with regular single quote
@@ -3162,6 +3168,7 @@ sub readtrap
     }
   }
 
+  # IPv6_TODO
   # With DNS resolution disabled in snmptrapd, some systems pass the hostname as:
   # UDP: [x.x.x.x]:161->[y.y.y.y]
   # If this is detected, use x.x.x.x as the hostname.
@@ -3169,6 +3176,7 @@ sub readtrap
     $tempvar[0] = $1;
   }
 
+  # IPv6_TODO
   # Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
   # out just the IP address
   $tempvar[1] =~ /(\d+\.\d+\.\d+\.\d+)/;
@@ -3406,6 +3414,7 @@ sub readtrap
 
   if ($dns_enable == 1 && $var[0] =~  /^\d+\.\d+\.\d+\.\d+$/) # Only if it's not already resolved
   {
+    # IPv6_TODO
     my $temp = gethostbyaddr(Socket::inet_aton($var[0]),Socket::AF_INET());
     if (defined ($temp))
     {
@@ -3424,9 +3433,10 @@ sub readtrap
     }
   }
 
+  # IPv6_TODO
   # If the agent IP is blank, copy the IP from the host IP.
   # var[4] would only be blank if it wasn't passed from snmptrapd, which
-  # should only happen with ucd-snmp 4.2.3, which you should be using anyway!
+  # should only happen with ucd-snmp 4.2.3, which you shouldn't be using anyway!
   if ($var[4] eq '')
   {
     $var[4] = $var[1];
@@ -3436,6 +3446,7 @@ sub readtrap
     }
   }
 
+  # IPv6_TODO
   # If the agent IP is the same as the host IP, then just use the host DNS name, no need
   # to look up, as it's obviously the same..
   if ($var[4] eq $var[1])
@@ -4425,6 +4436,7 @@ sub eventlog_system {
   }
 }
 
+# IPv6_TODO
 sub checkip
 {
   my $node1 = $_[0];		# Should be a plain IP address
@@ -4523,6 +4535,7 @@ sub translate_value_oids_sub
     my $done = 1;
     my $noinf = 0;
 
+    # IPv6_TODO
     # Find any IP addresses and remove from $string_temp
 
     $noinf = 0;
@@ -4626,6 +4639,7 @@ sub translate_value_oids_sub
   return $string;    
 }
 
+# IPv6_TODO
 sub resolve_value_ip_addresses_sub
 {
   my $string = $_[0];
@@ -5031,6 +5045,7 @@ sub my_translateObj
   return $temp;	# Will be either the translated trap, or undef if translateObj failed
 }
 
+# IPv6_TODO
 # Strip domain name from hostname
 sub strip_domain_name
 {
@@ -5155,6 +5170,7 @@ sub my_mapEnum
   return $result;
 }
 
+# IPv6_TODO
 sub process_nodes
 {
   my $nodes_list = shift;
