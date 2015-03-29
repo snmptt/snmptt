@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT v1.4
+# SNMPTT 1.5beta1
 #
 # Copyright 2002-2013 Alex Burger
 # alex_b@users.sourceforge.net
@@ -47,7 +47,7 @@
 #
 use strict;
 
-my $snmptt_version = "v1.4";
+my $snmptt_version = "1.5beta1";
 
 sub showversion
 {
@@ -2121,12 +2121,13 @@ sub substitute
     $temp_wildcard3 = $temp_wildcard3 . "\$-$i" . $wildcard_expansion_separator;
   }
 
-  # Chop off last space
+  # Trim off last wildcard separator
   if (defined ( $temp_wildcard1) )
   {
-    chop ($temp_wildcard1);
-    chop ($temp_wildcard2);
-    chop ($temp_wildcard3);
+    my $end_trim = length($wildcard_expansion_separator);
+    $temp_wildcard1 = substr($temp_wildcard1,0,-$end_trim);
+    $temp_wildcard2 = substr($temp_wildcard2,0,-$end_trim);
+    $temp_wildcard3 = substr($temp_wildcard3,0,-$end_trim);
   }
 
   #s(\$\*)($temp_wildcard1)g;

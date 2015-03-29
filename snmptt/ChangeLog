@@ -1,3 +1,9 @@
+March 29th, 2015: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed a bug with wildcard_expansion_separator which caused an issue when
+  using wildcard separators that were longer than one character (bug 38).  Thanks
+  to Zalex_UA for the patch.
+- Changed version to snmptt1.5beta1
+
 November 6th, 2013: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.4 for release.
 
