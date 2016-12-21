@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-# SNMPTTHANDLER-EMBEDDED v1.4
+# SNMPTTHANDLER-EMBEDDED 1.5beta1
 #
-# Copyright 2009-2013 Alex Burger
+# Copyright 2009-2016 Alex Burger
 # alex_b@users.sourceforge.net
 # 5/17/2009
 #
@@ -40,6 +40,7 @@ use strict;
 use Getopt::Long;
 use Time::HiRes qw(gettimeofday);
 use Config::IniFiles;
+use File::Copy;
 
 my $debug = '';         # Override debug level setting in snmptt.ini
                         # Set to '' to use the snmptt.ini setting or set to 1 to enable.
@@ -56,10 +57,21 @@ my $DEBUGGING;
 my $DEBUGGING_FILE;
 my $configfile;
 my $spool_directory;
+my $locking_method = 0;         # 0 = flock, 1 = rename
 
 if ($debug >= 1)
 {
 	$DEBUGGING = 1;
+}
+
+eval 'require Fcntl;';
+if ($@) {
+  $locking_method = 1;
+  warn $@;
+  print "\nFile locking not available.  Rename method will be used for spool file.\n";
+}
+else {
+  require Fcntl;
 }
 
 &loadsnmpttini;         # Load snmptt.ini
@@ -165,7 +177,13 @@ sub snmptt_trap_receiver {
     print "Data received:\n\n";
   }
   
-  my $spoolfile = $spool_directory.'#snmptt-trap-'.$s_pad.$usec_pad;
+  my $spoolfile_final = $spool_directory.'#snmptt-trap-'.$s_pad.$usec_pad;
+  my $spoolfile = $spoolfile_final;
+
+  if ($locking_method) {
+    # Rename
+    $spoolfile = $spool_directory.'x#snmptt-trap-'.$s_pad.$usec_pad;
+  }
   
   unless (open SPOOL, ">$spoolfile")
   {
@@ -175,7 +193,11 @@ sub snmptt_trap_receiver {
     }
     die "Could not write to file $spoolfile!  Trap will be lost!\n";
   } 
-  
+
+  if (! $locking_method) {
+    flock SPOOL, 2 | 4;           # LOCK_EX | LOCK_NB
+  }
+
   print SPOOL time()."\n";
   print SPOOL $hostname . "\n";
   print SPOOL $ip_address . "\n";
@@ -195,8 +217,6 @@ sub snmptt_trap_receiver {
   if ($contextName ne "") {
     print SPOOL ".1.3.6.1.6.3.18.1.1.1.5 \"$contextName\"\n";
   }
-
-  close SPOOL;
 
   if ($DEBUGGING >= 1) {
     print SPOOL time()."\n";
@@ -223,7 +243,14 @@ sub snmptt_trap_receiver {
     $| = 1;
     $| = 0;
   }
-  
+
+  close SPOOL;
+
+  if ($locking_method) {
+    # Rename
+    move($spoolfile, $spoolfile_final);
+  }
+
   return NETSNMPTRAPD_HANDLER_OK;
 }
 

@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-# SNMPTTHANDLER v1.4
+# SNMPTTHANDLER 1.5beta1
 #
-# Copyright 2002-2013 Alex Burger
+# Copyright 2002-2016 Alex Burger
 # alex_b@users.sourceforge.net
 # 8/26/2002
 #
@@ -51,12 +51,24 @@ use strict;
 
 use Getopt::Long;
 use Time::HiRes qw(gettimeofday);
+use File::Copy;
 
 my $version = '';
 my $debug = '';
 my $help = '';
 my $ini = '';
 my $debugfile = '';
+my $locking_method = 0;         # 0 = flock, 1 = rename
+
+eval 'require Fcntl;';
+if ($@) {
+  $locking_method = 1;
+  warn $@;
+  print "\nFile locking not available.  Rename method will be used for spool file.\n";
+}
+else {
+  require Fcntl;
+}
 
 GetOptions 	('version' => \$version, 
 		'debug:i' => \$debug,
@@ -170,17 +182,26 @@ if ($DEBUGGING >= 1)
 	print "Data received:\n\n";
 }
 
-my $spoolfile = $spool_directory.'#snmptt-trap-'.$s_pad.$usec_pad;
+my $spoolfile_final = $spool_directory.'#snmptt-trap-'.$s_pad.$usec_pad;
+my $spoolfile = $spoolfile_final;
+
+if ($locking_method) {
+  # Rename
+  $spoolfile = $spool_directory.'x#snmptt-trap-'.$s_pad.$usec_pad;
+}
 
 unless (open SPOOL, ">$spoolfile")
 {
-	if ($DEBUGGING >= 1)
-	{
-		print "Could not write to file file $spoolfile!  Trap will be lost!\n";
-	}
-	die "Could not write to file $spoolfile!  Trap will be lost!\n";
+    if ($DEBUGGING >= 1)
+    {
+      print "Could not write to file file $spoolfile!  Trap will be lost!\n";
+    }
+    die "Could not write to file $spoolfile!  Trap will be lost!\n";
 }
 
+if (! $locking_method) {
+  flock SPOOL, 2 | 4;           # LOCK_EX | LOCK_NB
+}
 
 print SPOOL time()."\n";
 
@@ -194,6 +215,12 @@ while (defined(my $line = <>))
 		print $line."\n";
 	}
 
+}
+close SPOOL;
+
+if ($locking_method) {
+  # Rename
+  move($spoolfile, $spoolfile_final);
 }
 
 ##############################################################################	
