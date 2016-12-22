@@ -4,7 +4,7 @@ December 21st, 2016: Alex Burger <alex_b@users.sourceforge.net>
   after creation.  If flock() is not supported, the spool file will be created
   with a temporary filename and then renamed after closing.
   Thanks to Andrew Darmody for reporting the issue and providing a solution.
-  Thanks to Hazuo Ito for an additional fix using flock.
+  Thanks to Kazuo Ito for an additional fix using flock.
 
 March 29th, 2015: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a bug with wildcard_expansion_separator which caused an issue when
