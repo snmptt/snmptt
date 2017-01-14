@@ -2,7 +2,7 @@
 #
 # SNMPTTHANDLER 1.5beta1
 #
-# Copyright 2002-2016 Alex Burger
+# Copyright 2002-2017 Alex Burger
 # alex_b@users.sourceforge.net
 # 8/26/2002
 #
@@ -228,7 +228,7 @@ if ($locking_method) {
 sub showversion
 {
 	printf "\nSNMPTTHANDLER v1.4\n";
-	printf "(c) 2002-2013 Alex Burger\n\n";
+	printf "(c) 2002-2017 Alex Burger\n\n";
 }
 
 ##############################################################################
