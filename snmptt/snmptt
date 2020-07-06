@@ -2559,6 +2559,7 @@ sub substitute
       if ($DEBUGGING >= 2)
       {
         print "  Doing REGEX: s($regex_temp2[0])($regex_temp2[1])$modifiers\n";
+		print "  FORMAT line before: $_\n";
       }
 
       # If unsafe is off, then don't use the e modifier.  This means that variable interopolation
@@ -2648,6 +2649,10 @@ sub substitute
         elsif ($modifiers2 == 5)  { s($regex_temp2[0])($regex_temp2[1])eei; }
         elsif ($modifiers2 == 6)  { s($regex_temp2[0])($regex_temp2[1])eeg; }
         elsif ($modifiers2 == 7)  { s($regex_temp2[0])($regex_temp2[1])eeig; }
+      }
+      if ($DEBUGGING >= 2)
+      {
+        print "  FORMAT line after: $_\n";
       }
     }
   }
