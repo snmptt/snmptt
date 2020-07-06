@@ -1,3 +1,6 @@
+July 5th, 2020: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed an issue with MATCH not matching integers properly (bug 41).
+
 December 21st, 2016: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a race condition bug with snmptthander and snmptthandler-embedded
   which could cause traps to be missed.  Spool files are now immediately locked
