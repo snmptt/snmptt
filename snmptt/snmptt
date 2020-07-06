@@ -3384,6 +3384,12 @@ sub readtrap
     if ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.3.0$/)		# ip address from trap agent
     {
       $var[4] = $tempvar[$i+1];
+
+      # IPv6_TODO
+      # Some systems pass the IP address as IpAddress:iaddress.  This will pull
+      # out just the IP address.  Bug 27.
+      $var[4] =~ /(\d+\.\d+\.\d+\.\d+)/;
+      $var[4] = $1; 	  
     }
     elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.4.0$/)	# trap community string
     {

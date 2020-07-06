@@ -1,5 +1,7 @@
 July 5th, 2020: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed an issue with MATCH not matching integers properly (bug 41).
+- Fixed an issue where the agent IP address was not handled correctly when
+  it's received from Net-SNMP as IpAddress:x.x.x.x.  Bug 27.
 
 December 21st, 2016: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a race condition bug with snmptthander and snmptthandler-embedded
