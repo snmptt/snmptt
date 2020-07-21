@@ -2,7 +2,7 @@
 #
 # SNMPTT 1.5beta1
 #
-# Copyright 2002-2017 Alex Burger
+# Copyright 2002-2020 Alex Burger
 # alex_b@users.sourceforge.net
 # 4/11/2002
 #
@@ -52,7 +52,7 @@ my $snmptt_version = "1.5beta1";
 sub showversion
 {
   print "\nSNMPTT $snmptt_version\n";
-  print "(c) 2002-2017 Alex Burger\n";
+  print "(c) 2002-2020 Alex Burger\n";
   print "http://snmptt.sourceforge.net\n\n";
 }
 
@@ -198,6 +198,7 @@ my $stat_time_format_sql;
 # DaemonMode
 my $daemon_fork;
 my $daemon_uid;
+my $daemon_gid;
 my $pid_file;
 my $spool_directory;
 my $sleep;
@@ -805,7 +806,9 @@ if ($daemon == 1)
   if ($^O ne "MSWin32" && $daemon_uid ne '')
   {
     my $daemon_uid_name = '';
+    my $daemon_gid_name = '';
 
+	# Convert textual daemon_uid to numerical
     if ($daemon_uid =~ /\D/)
     {
       # no numbers found, so assume it's a textual name
@@ -825,6 +828,27 @@ if ($daemon == 1)
         }
       }
     }
+    # Convert textual daemon_gid to numerical
+    # Note:  If daemon_gid is not defined, it defaults to 'nobody'
+    if ($daemon_gid =~ /\D/)
+    {
+      # no numbers found, so assume it's a textual name
+
+      $daemon_gid_name = $daemon_gid;
+
+      $daemon_gid = getpwnam($daemon_gid_name);
+      if (!defined($daemon_gid))
+      {        
+        warn("Could not convert group id \'$daemon_gid_name\' to a numeric GID\n");
+
+        if ($syslog_system_enable == 1) {
+          syslog_system("Could not convert group id \'$daemon_gid_name\' to a numeric GID\n");
+        }
+        if ($log_system_enable == 1) {
+          log_system("Could not convert group id \'$daemon_gid_name\' to a numeric GID\n");
+        }
+      }
+    }
 
     # Change current uid to new_uid
     if (defined($daemon_uid))
@@ -832,29 +856,29 @@ if ($daemon == 1)
       if ($daemon_uid_name ne '')
       {
         if ($syslog_system_enable == 1) {
-          syslog_system("Changing to UID: $daemon_uid_name \($daemon_uid\)");
+          syslog_system("Changing to UID: $daemon_uid_name \($daemon_uid\), GID: $daemon_gid_name \($daemon_gid\)");
         }
         if ($log_system_enable == 1) {
-          log_system("Changing to UID: $daemon_uid_name \($daemon_uid\)");
+          log_system("Changing to UID: $daemon_uid_name \($daemon_uid\), GID: $daemon_gid_name \($daemon_gid\)");
         }
 
         if ($DEBUGGING >= 1)
         {
-          print "Changing to UID: $daemon_uid_name \($daemon_uid\)\n";
+          print "Changing to UID: $daemon_uid_name \($daemon_uid\), GID: $daemon_gid_name \($daemon_gid\)\n";
         }
       }
       else
       {
         if ($syslog_system_enable == 1) {
-          syslog_system("Changing to UID: $daemon_uid");
+          syslog_system("Changing to UID: $daemon_uid, GID: $daemon_gid");
         }
         if ($log_system_enable == 1) {
-          log_system("Changing to UID: $daemon_uid");
+          log_system("Changing to UID: $daemon_uid, GID: $daemon_gid");
         }
 
         if ($DEBUGGING >= 1)
         {
-          print "Changing to UID: $daemon_uid\n";
+          print "Changing to UID: $daemon_uid, GID: $daemon_gid\n";
         }
       }
 
@@ -868,7 +892,33 @@ if ($daemon == 1)
 	  # Change owner of debug file so $daemon_uid can write to it.
 	  chown $daemon_uid, -1, $DEBUGGING_FILE;
 
+      # Permanently change to new uid/gid by setting both effetive and real IDs.
+      $) = $daemon_gid;
+      $( = $);
+	  
       $> = $daemon_uid;
+      $< = $>;
+	  
+      if ($< != $daemon_uid || $( != $daemon_gid) {	  
+        if ($syslog_system_enable == 1) {
+          syslog_system("Could not change to UID: $daemon_uid, GID: $daemon_gid");
+		  syslog_system("SNMPTT $snmptt_version shutdown");
+        }
+        if ($log_system_enable == 1) {
+          log_system("Could not change to UID: $daemon_uid, GID: $daemon_gid");
+		  log_system("SNMPTT $snmptt_version shutdown");
+        }
+
+        # This won't make it into the debug log..  
+        if ($DEBUGGING >= 1)
+        {
+          print "Could not change to UID: $daemon_uid, GID: $daemon_gid\n";
+		  print "SNMPTT $snmptt_version shutdown";
+        }
+
+		warn "Could not change to UID: $daemon_uid, GID: $daemon_gid";
+		exit 1;
+	  }
 
       $debug_file_open_error = 1;
       # Re-open debug file (if needed) as the new user
@@ -3102,7 +3152,7 @@ sub readtrap
       }
     }
      
-    $trap_date_time_epoch =~ s(`)(')g;	#` Replace any back ticks with regular single quote
+    $trap_date_time_epoch =~ s/[^0-9]//g;  # Remove non numeric characters
   }
   else
   {
@@ -3156,7 +3206,8 @@ sub readtrap
 
   chomp($tempvar[0]=<$input>);	# hostname
   push(@rawtrap, $tempvar[0]);
-  $tempvar[0] =~ s(`)(')g;	#` Replace any back ticks with regular single quote 
+  $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_]//g;  # Remove most non alphanumeric characters
+    
   if ($tempvar[0] eq "") {
     if ($DEBUGGING >= 1) {
       print "  Invalid trap file.  Expected a hostname on line 2 but got nothing\n";
@@ -3167,7 +3218,10 @@ sub readtrap
   # IPv6_TODO  
   chomp($tempvar[1]=<$input>);	# ip address
   push(@rawtrap, $tempvar[1]);
-  $tempvar[1] =~ s(`)(')g;	#` Replace any back ticks with regular single quote
+  $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]] //g;  # Remove most non alphanumeric characters
+  # Example: UDP: [127.0.0.1]:38249->[127.0.0.1]:162
+  # Should only be IPs, but also allow for hostname characters, just in case.
+  
   if ($tempvar[1] eq "") {
     if ($DEBUGGING >= 1) {
       print "  Invalid trap file.  Expected an IP address on line 3 but got nothing\n";
@@ -3200,7 +3254,6 @@ sub readtrap
   while (defined(my $line = <$input>))
   {
     push(@rawtrap, $line);
-    $line =~ s(`)(')g;	#` Replace any back ticks with regular single quote
 
     if ($remove_backslash_from_quotes == 1)  # Remove escape from quotes if enabled
     {
@@ -3229,8 +3282,15 @@ sub readtrap
       }
     }
 
-    if ($variable_fix == 0 )
+    if ($variable_fix == 0 )    # We received variable name and value
     {
+      # Clean up variable NAME
+      $temp1  =~ s/[^a-zA-Z0-9.:\-_]//g;  # Remove most non alphanumeric characters
+      # Examples:
+      # .1.3.6.1.2.1.1.3.0
+      # SNMPv2-SMI::enterprises.9.9.187.0.1 ....
+      # OIDs can have -'s.  _'s NOT permitted by Net-SNMP, but leave it in anyway
+
       # Make sure variable names are numerical
       $temp1 = translate_symbolic_to_oid($temp1);
 
@@ -3264,16 +3324,16 @@ sub readtrap
       if ($temp2 =~ /^\"/ && $temp2 =~ /$\"/)			# Have quotes around it?
       {
         $temp2 = substr($temp2,1,(length($temp2)-2));		# Remove quotes
+      }
+	  
+      # Clean up variable VALUE
+      $temp2 =~ s(`)(')g;	#` Replace any back ticks with regular single quote
+      $temp2  =~ s/[^a-zA-Z0-9 !"#%'()+,\-_.:\/=\@{}~\\]//g;  # Remove most non alphanumeric characters
+	  
         push(@tempvar, $temp1);
         push(@tempvar, $temp2);
       }
-      else
-      {
-        push(@tempvar, $temp1);
-        push(@tempvar, $temp2);
-      }
-    }
-    else
+    else    # We received only variable value
     {
       # Should have been variable value, but only value found.  Workaround
       # 
@@ -3289,6 +3349,9 @@ sub readtrap
       # v4.2.3 should NOT be used with SNMPTT as it prevents SNMP V2 traps 
       # from being handled correctly.
 
+      $temp2 = $temp1;
+      $temp1 = "variable";
+
       if ($DEBUGGING >= 2)
       {
         print "Data passed from snmptrapd is incorrect.  UCD-SNMP v4.2.3 is known to cause this\n";
@@ -3297,7 +3360,7 @@ sub readtrap
       # If line begins with a double quote (") but does not END in a double quote then we need to merge
       # the following lines together into one until we find the closing double quote.  Allow for escaped quotes.
       # Net-SNMP sometimes divides long lines into multiple lines..
-      if ( ($line =~ /^\"/) && ( ! ($line =~ /[^\\]\"$/)) )
+      if ( ($temp2 =~ /^\"/) && ( ! ($temp2 =~ /[^\\]\"$/)) )
       {
         if ($DEBUGGING >= 2) {
           print "  Multi-line value detected - merging onto one line...\n";
@@ -3316,22 +3379,22 @@ sub readtrap
       }
 
       # If the value is blank, set it to (null)
-      if ($line eq "")
+      if ($temp2 eq "")
       {
-        $line = "(null)";
+        $temp2 = "(null)";
       }
 
-      if ($line =~ /^\"/ && $line =~ /$\"/)			# Have quotes around it?
+      if ($temp2 =~ /^\"/ && $temp2 =~ /$\"/)			# Have quotes around it?
       {
-        $line = substr($line,1,(length($line)-2));		# Remove quotes
-        push(@tempvar, "variable");
-        push(@tempvar, $line);
+        $temp2 = substr($temp2,1,(length($temp2)-2));		# Remove quotes
       }
-      else
-      {
-        push(@tempvar, "variable");
-        push(@tempvar, $line);
-      }
+        	  
+      # Clean up variable VALUE
+      $temp2 =~ s(`)(')g;	#` Replace any back ticks with regular single quote
+      $temp2  =~ s/[^a-zA-Z0-9 !"#%'()+,\-_.:\/=\@{}~\\]//g;  # Remove most non alphanumeric characters
+
+      push(@tempvar, $temp1);
+      push(@tempvar, $temp2);	  
     }
 
     $linenum++;
@@ -4113,6 +4176,7 @@ sub loadsnmpttini {
   # DaemonMode
   $daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
   $daemon_uid = $cfg->val('DaemonMode', 'daemon_uid');
+  $daemon_gid = $cfg->val('DaemonMode', 'daemon_gid');
   $pid_file = $cfg->val('DaemonMode', 'pid_file');
   $spool_directory = $cfg->val('DaemonMode', 'spool_directory');
   $sleep = $cfg->val('DaemonMode', 'sleep');
