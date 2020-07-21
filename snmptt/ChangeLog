@@ -1,3 +1,15 @@
+July 21st, 2020: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.4.1 for release.
+
+June 29th, 2020: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed a security issue with EXEC / PREXEC / unknown_trap_exec that could 
+  allow malicious shell code to be executed.  Thanks to Toshiyuki Goto for
+  reporting the issue.  Thanks to Toshiyuki Goto and Jon Nistor for testing.
+- Fixed a bug with EXEC / PREXEC / unknown_trap_exec that caused commands to
+  be run as root instead of the user defined in daemon_uid.
+- Added the snmptt.ini option daemon_gid to allow the gid to be set in 
+  addition to the uid.  Defaults to 'nobody' if not defined.
+
 November 6th, 2013: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.4 for release.
 

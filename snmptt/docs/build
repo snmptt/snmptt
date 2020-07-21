@@ -1,8 +1,8 @@
-November 6th, 2013
+July 21, 2020
 
-snmptt_1.4.tgz:
+snmptt_1.4.1.tgz:
 
--fresh cvs checkout
+-fresh git checkout
 
 -update version and (c) date in:
         snmptt
@@ -36,13 +36,17 @@ perl -c snmpttconvert
 perl -c snmpttconvertmib
 perl -c snmptthandler
 
--commit changes to CVS
+-commit changes to git
 -check out fresh copy
--tag with new version: cvs ... tag snmptt_1-4
+-git config user.name
+-git config user.email
+-tag with new version:
+ git tag -a snmptt_1-4-1 -m "Changed version to snmptt_1.4.1 for release"
+ git push --tags
 
 cd snmptt
-find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.4
-cd ../snmptt_1.4
+find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.4.1
+cd ../snmptt_1.4.1
 su
 rm -f docs/build
 chmod -R 664 *
@@ -58,8 +62,8 @@ chmod +x snmptt-net-snmp-test
 chmod +x snmptt-init.d
 chown root.root * -R
 cd ..
-chmod 775 snmptt_1.4
-tar cvfz snmptt_1.4.tgz snmptt_1.4
+chmod 775 snmptt_1.4.1
+tar cvfz snmptt_1.4.1.tgz snmptt_1.4.1
 
 SourceForge:
 -upload file
@@ -72,9 +76,6 @@ Web site:
 -update Change Log page
 -update Documentation pages
 -update License page
-
-Freshmeat:
--create new release
 
 
 
