@@ -14,7 +14,20 @@ News
       <table border="0" cellspacing="0" cellpadding="4">
 
 <tr>
-  <td valign="top" class="NewsItemDate">11/6/2013</td>
+  <td valign="top" class="NewsItemDate">2020/07/21</td>
+  <td class="NewsItem">
+    <p><b>SNMPTT v1.4.1 has been released</b></p>
+    <p>SNMPTT v1.4 has been released.  A list of new features is available on the 
+      <a href="http://sourceforge.net/projects/snmptt/files/snmptt/snmptt_1.4.1/snmptt_1.4.1_releasenotes.txt/view">SourceForge page</a>.</p>
+      <p>Please report any issues to the snmptt-users mail list.</p>
+    <p>This version contains security updates so please update to this release.</p>
+    <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
+	<p></p>
+  </td>
+</tr>
+
+<tr>
+  <td valign="top" class="NewsItemDate">2013/11/06</td>
   <td class="NewsItem">
     <p><b>SNMPTT v1.4 has been released</b></p>
     <p>SNMPTT v1.4 has been released.  A list of new features is available on the 
@@ -22,160 +35,177 @@ News
       <p>Please report any issues to the snmptt-users mail list.</p>
     <p>There were no changes between 1.4beta2 and the final release.</p>
     <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
+	<p></p>
   </td>
 </tr>
 
 <tr>
-  <td valign="top" class="NewsItemDate">10/22/2012</td>
+  <td valign="top" class="NewsItemDate">2012/10/22</td>
   <td class="NewsItem">
     <p><b>SNMPTT v1.4beta2 has been released</b></p>
     <p>A beta for SNMPTT v1.4beta2 has been released.  A list of new features is available on the 
       <a href="http://sourceforge.net/projects/snmptt/files/snmptt/snmptt_1.4beta2/snmptt_1.4beta2_releasenotes.txt/view">SourceForge page</a>.</p>
       <p>Please report any issues to the snmptt-users mail list.</p>
     <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
+	<p></p>
   </td>
 </tr>
 
 <tr>
-  <td valign="top" class="NewsItemDate">10/21/2012</td>
+  <td valign="top" class="NewsItemDate">2012/10/21</td>
   <td class="NewsItem">
     <p><b>SNMPTT v1.4beta1 has been released</b></p>
     <p>A beta for SNMPTT v1.4beta1 has been released.  A list of new features is available on the 
       <a href="http://sourceforge.net/projects/snmptt/files/snmptt/snmptt_1.4beta1/snmptt_1.4beta1_releasenotes.txt/view">SourceForge page</a>.</p>
       <p>Please report any issues to the snmptt-users mail list.</p>
     <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
+	<p></p>
   </td>
 </tr>
 
 <tr>
-  <td valign="top" class="NewsItemDate">11/15/2009</td>
+  <td valign="top" class="NewsItemDate">2009/11/15</td>
   <td class="NewsItem">
     <p><b>SNMPTT v1.3 has been released</b></p>
     <p>A beta for SNMPTT v1.3 has been released.  A list of new features is available on the 
       <a href="http://sourceforge.net/projects/snmptt/files/snmptt/snmptt_1.3/snmptt_1.3_releasenotes.txt/view">SourceForge page</a>.</p>
       <p>Please report any issues to the snmptt-users mail list.</p>
     <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
+	<p></p>
   </td>
 </tr>
 
 <tr>
-  <td valign="top" class="NewsItemDate">7/18/2009</td>
+  <td valign="top" class="NewsItemDate">2009/07/18</td>
   <td class="NewsItem">
     <p><b>SNMPTT v1.3beta1 has been released</b></p>
     <p>A beta for SNMPTT v1.3 has been released.  A list of new features is available on the 
       <a href="https://sourceforge.net/project/shownotes.php?group_id=51473&release_id=697965">SourceForge page</a>.</p>
       <p>Please report any issues to the snmptt-users mail list.</p>
     <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
+	<p></p>
   </td>
 </tr>
 
 <tr>
-  <td valign="top" class="NewsItemDate">6/16/2007</td>
+  <td valign="top" class="NewsItemDate">2007/06/16</td>
   <td class="NewsItem">
     <p><b>SNMPTT v1.2 has been released</b></p>
     <p>Various database improvements have been added such as support for proper date/time data types, statistics logging and custom columns.  The formatting for unknown_trap_exec can now be changed and support has been added to MATCH for bitwise AND.  A new log file has been added for logging system messages to a text file for users without access to syslog.  Various bug fixes have been applied including support for Net-SNMP 5.4 traphandle, daemon mode pid file, REGEX captures, MATCH modifiers and others.</p>
-  <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
+    <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
+	<p></p>
   </td>
 </tr>
 
 <tr>
-  <td valign="top" class="NewsItemDate">1/5/2007</td>
+  <td valign="top" class="NewsItemDate">2007/01/05</td>
   <td class="NewsItem">
     <p><b>SNMPTT v1.2beta2 has been released</b></p>
     <p>A second beta for SNMPTT v1.2 has been released.  A list of new features is available on the 
        <a href="http://sourceforge.net/project/shownotes.php?group_id=51473&release_id=475474">SourceForge page</a>.</p>
+	<p></p>
   </td>
 </tr>
 
 <tr>
-  <td valign="top" class="NewsItemDate">1/17/2006</td>
+  <td valign="top" class="NewsItemDate">2006/01/17</td>
   <td class="NewsItem">
     <p><b>SNMPTT v1.1 has been released</b></p>
     <p>A PREEXEC snmptt.conf file option has been added to allow an external program to be run before processing the FORMAT and EXEC lines.  The NODES statement now allows for both positive and negative matches and the MATCH statement will now accept any variable name instead of only enterprise variables.  A default EXEC command can be set for unknown traps and various bugs have been fixed.</p>
     <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
+	<p></p>
   </td>
 </tr>
       
 <tr>
-  <td valign="top" class="NewsItemDate">5/1/2005</td>
+  <td valign="top" class="NewsItemDate">2005/05/01</td>
   <td class="NewsItem">
     <p><b>Sys Admin Magazine article</b></p>
     <p>The <a href="http://www.samag.com/articles/2005/0503/">March edition</a> of <a href="http://www.samag.com">Sys Admin Magazine</a> features Francois Meehan's article on <a href="http://www.samag.com/documents/s=9559/sam0503g/">SNMP Trap Handling with Nagios</a>.  The article explains an alternative way of integrating SNMPTT and <a href="http://www.nagios.org">Nagios</a> using <a href="http://kodu.neti.ee/%7Eristo/sec/">SEC</a>.  The article can now be <a href="http://www.samag.com/documents/s=9559/sam0503g/">viewed online</a>.</p>   
+	<p></p>
   </td>
 </tr>
         
 <tr>
-  <td valign="top" class="NewsItemDate">9/1/2004</td>
+  <td valign="top" class="NewsItemDate">2004/09/01</td>
   <td class="NewsItem">
     <p><b>SNMPTT v1.0 has been released</b></p>
     <p>Various improvments were added for SQL database connections including database auto-reconnect and logging of unknown traps.  New variable substitutions were added for the trap description and formatting such as newline, form feed etc.  Statistical info on the number of traps received/processed is now logged plus various bug fixes including symbolic traps issues, MIB conversion and FORMAT/EXEC line parsing.</p>
     <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>
+	<p></p>
   </td>
 </tr>
 
 
 <tr>
-  <td valign="top" class="NewsItemDate">8/11/2004</td>
+  <td valign="top" class="NewsItemDate">2004/08/11</td>
   <td class="NewsItem">
     <p><b>Net-SNMP 5.1.2 released</b></p>
     <p>Net-SNMP 5.1.2 has been released.  Source and binaries for Linux and Windows (others are sure to follow) are currently available from the <a href="http://www.net-snmp.org/download/">Net-SNMP download page</a>.</p>
+	<p></p>
   </td>
 </tr>
 
 <tr>
-  <td valign="top" class="NewsItemDate">4/5/2004</td>
+  <td valign="top" class="NewsItemDate">2004/04/05</td>
   <td class="NewsItem">
     <p><b>Net-SNMP 5.1.1 released</b></p>
     <p>Net-SNMP 5.1.1 has been released and is now the recommended version to use with SNMPTT.  V5.1.1 contains all the recommended Perl patches and the problems reported in 5.1 have been fixed.  Net-SNMP source and binaries are available from the <a href="http://www.net-snmp.org/download/">Net-SNMP download page</a>.</p>
+	<p></p>
   </td>
 </tr>
 
         
 <tr>
-  <td valign="top" class="NewsItemDate">12/5/2003</td>
+  <td valign="top" class="NewsItemDate">2003/12/05</td>
   <td class="NewsItem">
     <p><b>Net-SNMP 5.1 problems</b></p>
     <p>There seems to be a problem with the trap handler in Net-SNMP 5.1.  Until it is fixed, please use Net-SNMP 5.0.9 or lower with SNMPTT.</p>
+	<p></p>
   </td>
 </tr>
 
 <tr>
-  <td valign="top" class="NewsItemDate">11/3/2003</td>
+  <td valign="top" class="NewsItemDate">2003/11/03</td>
   <td class="NewsItem">
     <p><b>SNMPTT v0.9 has been released</b></p>
     <p>The process name for syslog output has been changed to 'snmptt[PID]' for traps and 'snmptt-sys[PID]' for system messages. The UID used by snmptt can now be changed after startup, and some bugs have been fixed.</p>
     <p>See the <a href="changelog.shtml" target="main">Change Log</a> for a complete listing of changes.</p>
+	<p></p>
   </td>
 </tr>
 
 <tr>
-  <td valign="top" class="NewsItemDate">10/23/2003</td>
+  <td valign="top" class="NewsItemDate">2003/10/23</td>
   <td class="NewsItem">
     <p><b>Web site changes</b></p>
     <p>This site has been redesigned once again using a combination of the 2 column CSS from <a target="TheLayoutReservoir" href="http://www.bluerobot.com/web/layouts/">The Layout Reservoir</a> and some parts of the <a target="Nagios" href="http://www.nagios.org">Nagios</a> web site CSS.</p>
     <p>All pages are now valid XHTML 1.0 Transitional which means the site should work in all browsers including wireless devices and screen readers.  Some older browsers may not show the correct layout, but the contents of the site should be accessible.</p>
+	<p></p>
   </td>
 </tr>
 	
 	
 <tr>
-  <td valign="top" class="NewsItemDate">10/16/2003</td>
+  <td valign="top" class="NewsItemDate">2003/10/16</td>
   <td class="NewsItem">
     <p><b>Web site launch</b></p>
     <p>Although long overdue, the domain <a target="snmptt" href="http://www.snmptt.org">snmptt</a> has been registered, and this new web site has been created.  The layout and look of the site is based on the <a target="Nagios" href="http://www.nagios.org">Nagios</a> web site, so special thanks to Ethan!</p>
     <p>The old web page was the readme.html file included in the package, and is available from the <a href="docs.html">Documentation</a> menu item on the left.</p>
   
     <p>Over time the documentation will be cleaned up with hopefully a multi-page format and a tutorial section to help new users as the size of current documentation can be a bit intimidating at first.  The basic use of SNMPTT is actually quite simple, but things can get complex when using new features such as REGEX.</p>
+	<p></p>
   </td>
 </tr>
 
 
 <tr>
-  <td valign="top" class="NewsItemDate">09/16/2003</td>
+  <td valign="top" class="NewsItemDate">2003/09/16</td>
   <td class="NewsItem">
     <p><b>SNMPTT v0.8 has been released</b></p>
     <p>New features have been added such as the MATCH keyword to match events based on enterprise variables, the REGEX keyword now supports captures and the i, g, and e modifiers for complex regular expressions, improved PostgreSQL support, DNS lookups, and remote MySQL and PostgreSQL support. Some variable substitutions have been added or changed, and Nagios/ Netsaint integration documentation has been added along with various bug fixes.</p>
     <p>See the <a href="changelog.shtml" target="main">Change Log</a> for a complete listing of changes.</p>
+	<p></p>
   </td>
 </tr>
 

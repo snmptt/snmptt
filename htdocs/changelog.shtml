@@ -1,531 +1,582 @@
 <!--#include virtual="page-top.html" -->
 <!-- CONTENT START -->
-
-<p class="SectionTitle">Change Log</p>
-
-<u>v1.4 - November 6th, 2013</u>
-<ul>
-<li>Added <span style="font-weight: bold;">snmptt.ini</span> option
-<span style="font-weight: bold;">net_snmp_perl_cache_enable</span>
-to enable caching of Net-SNMP Perl module OID and ENUM
-translations.&nbsp; This may speed up translations and reduce CPU
-load when <span style=
-"font-weight: bold;">net_snmp_perl_enable</span> and <span style=
-"font-weight: bold;">translate_*</span> options are enabled.</li>
-<li>Fixed bug with snmptthandler-embedded where IP addresses and
-OIDs were not being detected properly because they contained
-'OID:', 'IpAddress:' etc.</li>
-<li>Fixed bug with MATCH.&nbsp; The PREEXEC $p variable could not
-be used with MATCH.&nbsp; PREEXEC is now executed first if MATCH
-contains $p.</li>
-<li>Fixed bug with syslog.&nbsp; Log entries were supposed to be
-logged with snmptt[pid] but instad of the pid it was actually the
-effective user ID (2980512).</li>
-<li>Fixed bug where the hostname is not detected properly when
-snmptrapd is configured to not use DNS.</li>
-<li>Fixed bug where if the spool directory is not defined, files
-may be deleted from the wrong folder (3020696).</li>
-<li>Fixed bug with syslog logging.&nbsp; Function was not being
-called properly (3166749).</li>
-<li>Fixed bug with MATCH where number ranges were not working
-(3397982).</li>
-<li>Fixed bug with multi-line traps (2915658).</li>
-<li>Fixed bug with LOGONLY severity.&nbsp; EXEC was being executed
-even if the trap had a severity of LOGONLY (3567744).</li>
-<li>Fixed bug with snmptt hanging if the log message sent to syslog
-contained a % symbol. &nbsp;All %'s are now escaped before sending
-to syslog (3567748).</li>
-<li>Fixed possible bug with MySQL.&nbsp; Put CONNECT string on one
-line.</li>
-<li>Fixed bug with not being able to write to the debug log file
-when running snmptt as non-root if the debug file didn't already
-exist with the correct permissions at startup.&nbsp; The ownership
-of snmptt.debug is now set to daemon_uid before switching to the
-new uid.&nbsp; Patch 3423525.</li>
-<li>Installation documentation updates (bug 3425999).</li>
-</ul>
-
-<u>v1.3 - November 15th, 2009</u>
-<ul>
-<li>Added <span style=
-"font-weight: bold;">snmptthandler-embedded</span> - a Net-SNMP
-snmptrapd embedded Perl version of snmptthandler.</li>
-<li>Added variable substitutions <span style=
-"font-weight: bold;">$Be</span>, <span style=
-"font-weight: bold;">$Bu</span>, <span style=
-"font-weight: bold;">$BE</span> and <span style=
-"font-weight: bold;">$Bn</span> for SNMPv3 securityEngineID,
-securityName, contextEngineID and contextName&nbsp;(requires
-snmptthandler-embedded handler).</li>
-<li>Added <b>snmptt.ini</b> option <b>duplicate_trap_window
-variable</b> for duplicate trap detection.</li>
-<li>Added LSB init keywords and actions to <span style=
-"font-weight: bold;">snmptt-init.d</span> and changed the priority
-for start / stop so that it starts after snmptrapd and stops before
-snmptrapd.</li>
-<li>Changed the default log path to <span style=
-"font-weight: bold;">/var/log/snmptt</span> for Unix and
-<span style="font-weight: bold;">c:\snmpt\log</span> for Windows to
-make it easier to grant write permission to the
-snmptt&nbsp;process.</li>
-<li>Changed umask for log files to 002 to ensure they are not
-created as world writable.</li>
-<li>Fixed a bug where the the PID file was being created using the
-parent (root) PID instead of the child (daemon_uid) when daemon_uid
-is used.</li>
-<li>The DEBUG log file will now be re-opened when a HUP signal is
-sent.</li>
-<li>When debugging is enabled, flush buffers every sleep cycle so
-we can tail the debug log file.</li>
-<li>Don't print messages to the console when starting in daemon
-mode unless debugging is enabled or an error occurs.</li>
-<li>'Could not open debug output file!' is no longer reported when
-debugging is disabled.<br /></li>
-<li>Added <span style="font-weight: bold;">snmptt.logrotate</span>
-file from Ville Skytta.</li>
-<li>Fixed a bug (1748512) with handling escaped quotes in a trap
-message.</li>
-<li>Updated snmptt-net-snmp-test to test MIB descriptions.</li>
-<li>SNMPTTConvertMIB:</li>
-<li style=
-"list-style-type: none; list-style-image: none; list-style-position: outside;">
-<ul>
-<li>Fixed a bug (1678270) where a TRAP-TYPE / NOTIFICATION-TYPE
-line would not translate if it was split across two lines.</li>
-</ul>
-</li>
-</ul>
-
-<u>v1.2 - June 16th, 2007</u>
-<ul>
-<li>When <b>daemon_uid</b> is used, two processes will now be
-spawned. The first process will be run as the same user that
-started SNMPTT (which should be root). The second will run as the
-<b>daemon_uid</b> user. This was changed so that SNMPTT could
-properly clean up the pid file on exit.</li>
-<li>Added <span style="font-weight: bold;">snmptt.ini</span> option
-<b>pid_file</b> to allow for custom pid file locations when running
-in daemon mode.</li>
-<li>Fixed bug where pid file did not contain the current pid of
-snmptt.</li>
-<li>Added <b>snmptt.ini</b> options <b>date_format</b>,
-<b>time_format</b>, <b>date_time_format</b>,
-<b>date_time_format_sql</b> and <b>stat_time_format_sql</b> to
-allow the output format for <b>$x</b> and <b>$X</b> substitution
-variables, and the format of the date/time for text logs and SQL to
-be changed using <b>strftime()</b> variables. This allows for
-proper date/time data types to be used in SQL databases.</li>
-<li>Added logging of trap statistics to a SQL table. Added
-<b>*table_statistics</b> <b>snmptt.ini</b> variable to define the
-table to be used.</li>
-<li>Added ability to add custom columns to <b>*_table</b> and
-<b>*_table_unknown</b> tables. Added <b>sql_custom_columns</b> and
-<b>sql_custom_columns_unknown</b> <b>snmptt.ini</b> options.</li>
-<li>Added <b>snmptt.ini</b> option <b>unknown_trap_exec_format</b>
-to allow custom output with substitutions.</li>
-<li>Added the ability to log system messages to a text file in
-addtion to the existing syslog and Event Log.
-&nbsp;Added&nbsp;<b>snmptt.ini</b> options <b>log_system</b> and
-<span style="font-weight: bold;">log_system_file</span>.</li>
-<li>Added a work-around to the <a href=
-"http://sourceforge.net/tracker/index.php?func=detail&amp;aid=1638225&amp;group_id=12694&amp;atid=112694">
-Net-SNMP v5.4 traphandle bug (1638225)</a> where the host name was
-set to &lt;UNKNOWN&gt;. When detected, SNMPTT will use the host IP
-address instead.</li>
-<li>Added a <b>$H</b> variable substitution to give the host name
-of the computer that is running SNMPTT, or a user defined value
-specified in the new <b>snmptt_system_name</b> <b>snmptt.ini</b>
-option.</li>
-<li>Added MATCH support for bitwise AND</li>
-<li>Added <b>snmptt.ini</b> option <b>exec_escape</b> to escape
-wildards (* and ?) in EXEC, PREEXEC and the unknown_trap_exec
-commands. This is enabled by default for Linux and Unix (or
-anything non-Windows) to prevent the wildcards from being expanded
-by the shell.</li>
-<li>Moved <b>unknown_trap_exec</b> to Exec section in
-<b>snmptt.ini</b>.</li>
-<li>Added 'use strict' pragma in source code.</li>
-<li>Experimental: &nbsp;Added threads (Perl ithreads) support for
-EXEC. When enabled, EXEC commands will launch in a thread to allow
-SNMPTT to continue processing other traps. Added <b>snmptt.ini</b>
-options <b>threads_enable</b> and <b>threads_max</b>.</li>
-<li>Fixed bug where snmptt tried to log to syslog when changing
-UIDs even if syslog_system_enable was set to 0.</li>
-<li>Fixed a bug in REGEX with handling of captures.
-&nbsp;Text::Balanced module is now required.</li>
-<li>Fixed a bug under Windows where SNMPTT was trying to log to
-syslog instead of the event log.</li>
-<li>Fixed a bug where SNMPTT was attempting to log to syslog /
-eventlog when using the --time option.</li>
-<li>Fixed a bug in MATCH where the i modifier was not handled
-correctly.</li>
-<li>Added information to Nagios section of documentation for using
-SNMP traps as heartbeats by using freshness checks.</li>
-<li>Added information to Nagios section of documentation for using
-freshness checks to automatically clear trap alerts.</li>
-<li>SNMPTTConvertMIB:</li>
-<li style=
-"list-style-type: none; list-style-image: none; list-style-position: outside;">
-<ul>
-<li>Fixed a bug (1438794) where a TRAP-TYPE / NOTIFICATION-TYPE
-line would not translate if it was split across two lines.</li>
-<li>Fixed a bug (1438394) where ARGUMENTS lines that have $1, $2
-etc instead of %0, %1 would not translate.</li>
-<li>Fixed a bug where a --#SEVERITYMAP line would be used instead
-of --#SEVERITY.</li>
-</ul>
-</li>
-</ul>
-
-
-<u>v1.1 - January 17th, 2006</u>
-<ul class="SectionBody">
-  <li>Added <b>PREEXEC</b> <b>snmptt.conf</b> file option to allow an external 
-  program to be run before processing the FORMAT and EXEC lines.
-  The output of the external program is stored in the <b>$p<i>n</i></b> variable
-  where <b><i>n</i></b> is a number starting from 1.  Multiple <b>PREEXEC</b> lines
-  are permitted.  The first <b>PREEXEC</b> stores the result of the
-  command in <b>$p1</b>, the second in <b>$p2</b> etc.  Any ending newlines
-  are removed.  The <b>snmptt.ini</b> parameter <b>pre_exec_enable</b> can be used
-  to enable / disable it.</li>
-  <li><b>MATCH</b> statement now accepts any variable name instead of only enterprise variables.  Example: MATCH $s:(Normal)</li>
-  <li>Added <b>NODES MODE=</b> snmptt.conf file option to allow you to select either <b>POS</b> (positive - the default) or <b>NEG</b> (negative) for <b>NODES</b> matches.  If set to <b>NEG</b>, then <b>NODES</b> is a 'match' only if <i>none</i> of the <b>NODES</b> entries match.</li>
-  <li>Added <b>unknown_trap_exec</b> <b>snmptt.ini</b> option.  If defined, the 
-  command will be executed for ALL unknown traps.  Passed to the
-  command will be all standard and enterprise variables, similar 
-  to <b>unknown_trap_log_file</b> but without the newlines.</li>
-  <li><b>snmptt --dump</b> which dumps all the configured EVENTs, now displays duplicate 
-  EVENT entries to assist with troubleshooting duplicate entries trap logs.</li>
-  <li>If the debug log file can not be opened, a message is now logged
-  to syslog if <b>syslog_system_enable</b> is enabled, and to the 
-  Event Log if <b>eventlog_system_enable</b> is enabled</li>
-  <li>Fixed bug with PostgreSQL where some trap data was interpreted as 'placeholders'
-  in the INSERT statement which caused logging errors.  PostgreSQL now uses
-  PREPARE / EXECUTE statements instead.
-  <li>MySQL now uses PREPARE / EXECUTE statements instead of a single INSERT statement.</li>
-  <li>Fixed bug in <b>NODES</b> where <b>NODES</b> entries from previous EVENTs were not being purged correctly.</li>
-  <li>Fixed bug where <b>snmptt --dump</b> would attempt to log to syslog or the Event Log.
-  <li>Fixed bug that prevented the wildcard <b>.*</b> from being accepted on the EVENT line.</li>
-  <li>Added Windows Event Log forwarding documentation to integration section.
-  <li>SNMPTTConvertMIB:</li>
-  <li style="list-style: none">
-  <ul>
-    <li>Fixed a bug when <b>--format_desc=n</b> was used that caused extra trailing whitespaces 
-    to be added for every non existent line in the description.</li>
-    <li>Fixed bug that prevented some MIBs from being accepted due to
-    spacing in the <b>DEFINITIONS::= line</b>.</li>
-    <li>Fixed bug in that prevented <b>--ARGUMENTS {}</b> from being parsed 
-    due to spacing.</li>
-  </ul>
-  </li>
-</ul>
-
-<br />
-
-<u>v1.0 - September 1st, 2004</u>
-<ul class="SectionBody">
-  <li>SQL database connections are now opened after forking to the background when running in daemon mode, and after changing users when running SNMPTT as a non-root user. This should prevent 'gone away' and other connection problems with SQL databases due to lost handles.</li>
-  <li>Added mysql_ping_on_insert, postgresql_ping_on_insert and dbd_odbc_ping_on_insert options to 'ping' the database before doing an INSERT. Also added the options mysql_ping_interval, postgresql_ping_interval and dbd_odbc_ping_interval to periodically ping the database. These options will help ensure the connection to the database remains available. If an error is returned, it will attempt to reconnect to the database. This should prevent SNMPTT from having to be restarted if the SQL server is not available due to an outage or a connection timeout due to no activity.</li>
-  <li>Added variable substitution $Fz which when used on an EXEC line will dump the translated FORMAT line. This will allow for simplified EXEC lines when they are the same as the FORMAT line (minus the command to execute of course).</li>
-  <li>Added variable substitutions $Fa, $Ff, $Fn, $Fr, $Ft, for alarm (bell), form feed (FF), newline (LF, NL), return (CR) and tab (HT, TAB)</li>
-  <li>Added variable substitution $D to dump the description text for FORMAT and EXEC lines. The descriptions can be pulled from either the SNMPTT.CONF or MIB files. This is controlled by the description_mode and description_clean snmptt.ini options.</li>
-  <li>Added support for logging unknown traps to a SQL table</li>
-  <li>Added logging of statistical information for total traps received, total traps translated, total traps ignored and total unknown traps. Statistics are logged at shut down, and optionally at a defined interval defined by the new snmptt.ini variable statistics_interval. Logging can also be forced by sending the SIGUSR1 signal, or by creating a file called !statistics in the spool folder.</li>
-  <li>Added the error number reported by MySQL to MySQL errors (system syslog, eventlog etc)</li>
-  <li>Added /usr/local/etc/snmp and /usr/local/etc paths to the list of default directories searched for snmptt.ini.</li>
-  <li>Added some friendly error messages when required Perl modules are not available</li>
-  <li>Fixed bug with with handling traps in symbolic format (snmptrapd without -On)</li>
-  <li>Fixed bug with with using printing $ symbols in FORMAT and EXEC lines</li>
-  <li>Added Simple Event Correlator (SEC) integration documentation</li>
-  <li>SNMPTTConvertMIB:</li>
-  <li style="list-style: none">
+<html>
+  <head>
+    <meta content="text/html; charset=windows-1252" http-equiv="content-type">
+  </head>
+  <body>
+    <p class="SectionTitle">Change Log</p>
+    <u><u>v1.4.1 - July 21st, 2020</u>
+    </u>
     <ul>
-    <li>Fixed bug that prevented the variable list (OBJECTS) of V2 MIB files from being converted</li>
-    <li>Fixed bug that caused an infinite loop processing the VARIABLES/OBJECTS section if the line in the MIB file contained spaces after the closing bracket</li>
+      <li>Fixed a security issue with EXEC / PREXEC / unknown_trap_exec
+        that could allow malicious shell code to be executed.</li>
+      <li>Fixed a bug with EXEC / PREXEC / unknown_trap_exec that caused
+        commands to be run as root instead of the user defined in
+        daemon_uid.</li>
+      <li>Added the snmptt.ini option daemon_gid to allow the gid to be
+        set in addition to the uid.&nbsp; Defaults to 'nobody' if not
+        defined.</li>
     </ul>
-  </li>
-</ul>
-<br />
-
-<u>v0.9 - November 3rd, 2003</u>
-<ul class="SectionBody">
-<li>Syslog messages are now logged with snmptt[<i>pid</i>] instead of TRAPD for traps, and snmptt-sys[<i>pid</i>] instead of SNMPTT for system messages</li>
-<li>Added the option daemon_uid which causes snmptt to change to a different user (uid) after launching on Unix systems running in daemon mode</li>
-<li>Fixed bug that prevented ip addresses from being detected correctly with translate_value_oids</li>
-<li>Fixed bug with MATCH that caused integer ranges from not being handled correctly</li>
-<li>Separated SNMPTT, SNMPTTCONVERT, SNMPTTCONVERTMIB and FAQ / Troubleshooting documentation into separate documents</li>
-</ul>
-<br />
-
-<u>v0.8 - September 16th, 2003</u>
-<ul class="SectionBody">
-<li>Added MATCH keyword support to allow trap matching based on
-values contained inside the trap enterprise variables</li>
-<li>REGEX now supports substitution with captures and the modifiers
-i, g and e. The e modifier allows for complex REGEX
-expressions.</li>
-<li>Added support for remote MySQL and PostgreSQL databases</li>
-<li>Added PostgreSQL support for DBD:Pg</li>
-<li>An EVENT can now contain mulitple EXEC lines</li>
-<li>An EVENT can now contain mulitple NODES lines</li>
-<li>Added the option dynamic_nodes to allow NODES files to be
-either loaded at startup or loaded each time an EVENT is
-processed</li>
-<li>Added trapoid column for database logging to contain the actual
-trap received. The eventid column will contain the actual matched
-entry from the .conf file (which could be a wildcard OID)</li>
-<li>Fixed bug that prevented some variables from displaying the
-correct values because the received trap OID was replaced with the
-actual EVENT entry</li>
-<li>Fixed bug that caused OIDs not to be translated correctly with
-translate_value_oids enabled</li>
-<li>Agent IP address is now used instead of 'host' IP address for
-NODES matches, the 'hostname' column in database logs and the $A
-variable</li>
-<li>Variable $A now prints the agent host name. $aA prints the
-agent IP address.</li>
-<li>Variable $E now prints the enterprise in symbolic form. $e
-prints the numeric OID</li>
-<li>Variable $O now prints the trap in symbolic form. $o prints the
-numeric OID</li>
-<li>Added new variable substitution $i to print the actual matched
-entry from the .conf file (which could be a wildcard OID)</li>
-<li>Added the configuration option dns_enable to enable DNS lookups
-on host and agent IP addresses</li>
-<li>If DNS is enabled, NODES entries are resolved to IP addresses
-and the IP address is used to perform the match. This will allow
-for aliases to be used.</li>
-<li>Added the option resolve_value_ip_addresses to resolve ip
-addresses contained inside enterprise variable values</li>
-<li>Changed snmptt.ini setting translate_trap_oid to
-translate_log_trap_oid</li>
-<li>Changed snmptt.ini setting translate_oids to
-translate_value_oids</li>
-<li>Added configuraiton settings: translate_enterprise_oid_format,
-translate_trap_oid_format, translate_varname_oid_format and
-db_translate_enterprise</li>
-<li>$O follows translate_trap_oid_format, and $o is always the
-numerical trap OID</li>
-<li>$E follows translate_enterprise_oid_format, and $e is always
-the numerical enterprise OID</li>
-<li>The enterprise column when logging to a database now follows
-the db_translate_enterprise setting</li>
-<li>Fixed bug with $# to report the correct number of enterprise
-variables (was 1 lower than it should have been)</li>
-<li>Fixed bug with handling traps that contain quoted values that
-span multiple lines</li>
-<li>PID file now created (/var/run/snmptt.pid or ./snmptt.pid) when
-running in daemon mode on Linux / Unix. snmptt-init.d script
-updated to remove the pid file when shutting down snmptt.</li>
-<li>Added Nagios / Netsaint integration documentation</li>
-<li>Added contrib folder</li>
-<li>Snmpttconvertmib</li>
-<li style="list-style: none">
-<ul>
-<li>Now prints the variables contained in each trap definition
-unless --no_variables is set. When using --net_snmp_perl it will
-also resolve the Syntax (INTEGER, OCTETSTR etc) and Description. If
-it's an INTEGER, will also print out the enumeration tags if any
-exist.</li>
-<li>Improved compatability with MIB files</li>
-</ul>
-</li>
-</ul>
-<br />
-<u>v0.7 - April 17th, 2003</u><br />
-<ul class="SectionBody">
-<li>Fixes a vulnerability that prevents the possibility of injected
-commands contained in traps from being executed when using the EXEC
-feature</li>
-<li>Added the ability for traps passed from snmptrapd or loaded
-from the snmptt.conf files to contain symbolic OIDs such as
-linkDown and IF-MIB::linkUp. This feature requires the UCD-SNMP /
-Net-SNMP Perl module</li>
-<li>Added the configuration options translate_trap_oid and
-translate_oids to have the trap OID and OID values contained in the
-trap variables converted from numerical OID to symbolic form before
-logging. This feature requires the UCD-SNMP / Net-SNMP Perl
-module</li>
-<li>Added support for logging of traps using PostgreSQL via DBI /
-DBD::PgPP</li>
-<li>Added REGEX keyword support to allow user definable search and
-replace on FORMAT / EXEC lines</li>
-<li>NODES entry can now contain a CIDR address (eg:
-192.168.10.0/23), or a network range
-(192.168.10.0-192.168.11.255)</li>
-<li>NODES entry can now contain a mix of host names, IP addresses,
-CIDR addresses, network ranges and filenames</li>
-<li>Added the ability to force a reload of the configuration files
-while running in daemon mode by placing a file called !reload in
-the spool directory</li>
-<li>Added snmptt-net-snmp-test program to perform various
-translations of numeric and symbolic OIDS to assist with
-determining if the installed Perl module will function as expected
-with SNMPTT</li>
-<li>Fixed bug that prevented quoted text from being logged
-correctly to SQL databases</li>
-<li>Fixed bug that would prevent the translation of integer values
-to enumeration tags and variable name substitutions when using
-Net-SNMP 5.0.x</li>
-<li>Snmpttconvertmib
-<ul>
-<li>FORMAT / EXEC line can now contain any of the following:
-<ul>
-<li>--#SUMMARY or DESCRIPTION (use DESCRIPTION only if --#SUMMARY
-does not exist)</li>
-<li>description or --#SUMMARY (use --#SUMMARY only if DESCRIPTION
-does not exist)</li>
-<li>--#SUMMARY and DESCRIPTION</li>
-<li>DESCRIPTION and --#SUMMARY</li>
-</ul>
-</li>
-<li>When using the DESCRIPTION to build the FORMAT / EXEC line, can
-now choose between using the first line of the DESCRIPTION field,
-or the first x number of sentences</li>
-<li>The use of the --#SUMMARY and DESCRIPTION line for the FORMAT /
-EXEC line can be disabled</li>
-<li>Support for multiple --#SUMMARY lines</li>
-<li>Support for --#SEVERITY lines</li>
-<li>The default of using the $* wildcard can be disabled</li>
-<li>Conversion of the DESCRIPTION section to SDESC / EDESC can be
-disabled</li>
-<li>EXEC line can be specified on the command line</li>
-<li>NODES line can be specified on the command line</li>
-</ul>
-</li>
-</ul>
-<br />
-<u>v0.6 - March 25th, 2003</u><br />
-<ul class="SectionBody">
-<li>Logging:
-<ul>
-<li>Added support for logging of traps using DBD::ODBC</li>
-<li>Fixed bug with Win32::ODBC connection not being closed on exit
-of SNMPTT</li>
-<li>MySQL code cleanup</li>
-<li>Added support for logging traps to the NT Event Log including
-the ability to select the Event Log level based on the severity
-level defined in the snmptt.conf file</li>
-<li>Improved syslog support by adding the ability to select the
-syslog level based on the severity level defined in the snmptt.conf
-file</li>
-<li>Added syslog and NT Event Log support for SNMPTT 'system'
-events such as startup, shutdown, errors handling spool directory /
-files, database connectivity errors etc</li>
-<li>Added the option keep_unlogged_traps to have SNMPTT erase the
-spooled trap file only after it successfully logs to at least one
-or all log systems. This will help prevent traps from being lost
-due to logging problems.</li>
-</ul>
-</li>
-<li>Added ability to translate integer values to enumeration tags
-defined in MIB files. This feature requires the UCD-SNMP / Net-SNMP
-Perl module</li>
-<li>Added new variable substitutions: $vn (variable name),
-$+n(variable name:value), $-n (variable name (type):value), $+*
-(same as $+n but wildcard), and $-* (same as $-n but wildcard).
-Translation of the variable name using the MIB requires the
-UCD-SNMP / Net-SNMP Perl module.</li>
-<li>If a variable is passed from snmptrapd that is blank, snmptt
-will replace it with (null)</li>
-<li>Fixed bug that would prevent variables numbered 10 or higher
-from being translated correctly</li>
-<li>Fixed bug with handling trap data that contains spaces but is
-not inside of quotes</li>
-<li>Code cleanup to remove Perl warnings (-w)</li>
-<li>Added separate debug file for snmptthandler</li>
-<li>Cleaned up defaults code for snmptthandler</li>
-<li>Added examples folder containg a sample snmptt.conf file and
-sample trap file</li>
-<li>Added FAQ section to this document</li>
-<li>Snmpttconvertmib
-<ul>
-<li>Code cleanup</li>
-<li>Now uses new command line arguments (snmpttconvertmib -h for
-help).</li>
-<li>Can now use either snmptranslate or the SNMP Perl module
-(Net-SNMP) to process MIB files</li>
-<li>Can now add a NODES line when converting MIB files</li>
-<li>Now checks the version of snmptranslate before converting the
-mib to ensure snmptranslate is called correctly</li>
-<li>Fixed bug which would cause the last notification of a v2 MIB
-file not to be converted correctly</li>
-</ul>
-</li>
-</ul>
-<br />
-<u>v0.5 - February 12th, 2003</u><br />
-<ul class="SectionBody">
-<li>Spool file list sorted before processing to ensure traps are
-processed in the order they are received when in daemon mode</li>
-<li>Added use_trap_time variable to config file for daemon mode to
-have SNMPTT use either the time from the spool file, or the current
-time. Changed SNMPTTHANDLER to output the current date and time on
-the first line of the spool file</li>
-<li>Fixed bug with default variable settings being ignored.
-Defaults were not being set correctly if variable was not defined
-in the .ini file.</li>
-<li>Fixed bug with SNMPTT ignoring the daemon mode parameter in the
-.ini file</li>
-<li>Fixed bug with Nodes list not being flushed out for each
-processed trap when running in daemon mode</li>
-<li>Added strip_domain and strip_domain_list configuration options
-to enable / disable the removal of the domain name from the host
-name passed to SNMPTT. Defaults to disabled (do not strip domain
-name)</li>
-<li>SNMPTTCONVERTMIB now prepends the contents of the --#TYPE line
-(if present) to the --#SUMMARY line to provide a more descriptive
-FORMAT / EXEC line</li>
-</ul>
-<br />
-<u>v0.4 - November 18th, 2002</u><br />
-<ul class="SectionBody">
-<li>Variable substitution changes:
-<ul>
-<li>$X = Date, $x = Time instead of $x being both date and
-time</li>
-<li>$N = Event name instead of $S</li>
-<li>Added $c, $@, $O, $o, $ar, $R, $aR, $G, $S</li>
-</ul>
-</li>
-<li>Configuration moved to a .ini file</li>
-<li>MySQL support via DBI under Linux and Windows</li>
-<li>ODBC support via Win32::ODBC under Windows</li>
-</ul>
-<br />
-<u>v0.3 - September 11th, 2002</u><br />
-<ul class="SectionBody">
-<li>Daemon mode support for SNMPTT. When running as a daemon,
-SNMPTTHANDLER script is used to spool traps from SNMPTRAPD.</li>
-<li>SNMPTTCONVERTMIB utility to convert trap / notify definitions
-from MIB files</li>
-<li>Sample trap file (sample-trap) for testing</li>
-<li>Command line options to SNMPTT</li>
-<li>SNMPTT now strips UDP: and :port from IP addresses when using
-Net-SNMP 5.0+</li>
-<li>NODES files can now contain comments</li>
-<li>NODES files can now contain either host names or IP
-addresses</li>
-<li>You can now have multiple definitions of the same trap so that
-different hosts / nodes can have different actions or one host have
-multiple actions</li>
-<li>Configuration file can now contain a list of other
-configuration files to load</li>
-</ul>
-<br />
-<u>v0.2 - July 10th, 2002</u><br />
-<ul class="SectionBody">
-<li>Improved debugging output</li>
-<li>Severity substitution bug fix</li>
-<li>SNMP V2 trap bug fix</li>
-<li>UCD-SNMP v4.2.3 problem workaround</li>
-</ul>
-<br />
-<u>v0.1 - April 18th, 2002</u><br />
-<ul class="SectionBody">
-<li>Initial release</li>
-</ul>
-
-<!-- CONTENT END -->
-<!--#include virtual="page-bottom.shtml" -->
-
+    <u>v1.4 - November 6th, 2013</u>
+    <ul>
+      <li>Added <span style="font-weight: bold;">snmptt.ini</span> option
+        <span style="font-weight: bold;">net_snmp_perl_cache_enable</span>
+        to enable caching of Net-SNMP Perl module OID and ENUM
+        translations.&nbsp; This may speed up translations and reduce CPU
+        load when <span style="font-weight: bold;">net_snmp_perl_enable</span>
+        and <span style="font-weight: bold;">translate_*</span> options are
+        enabled.</li>
+      <li>Fixed bug with snmptthandler-embedded where IP addresses and
+        OIDs were not being detected properly because they contained
+        'OID:', 'IpAddress:' etc.</li>
+      <li>Fixed bug with MATCH.&nbsp; The PREEXEC $p variable could not
+        be used with MATCH.&nbsp; PREEXEC is now executed first if MATCH
+        contains $p.</li>
+      <li>Fixed bug with syslog.&nbsp; Log entries were supposed to be
+        logged with snmptt[pid] but instad of the pid it was actually the
+        effective user ID (2980512).</li>
+      <li>Fixed bug where the hostname is not detected properly when
+        snmptrapd is configured to not use DNS.</li>
+      <li>Fixed bug where if the spool directory is not defined, files
+        may be deleted from the wrong folder (3020696).</li>
+      <li>Fixed bug with syslog logging.&nbsp; Function was not being
+        called properly (3166749).</li>
+      <li>Fixed bug with MATCH where number ranges were not working
+        (3397982).</li>
+      <li>Fixed bug with multi-line traps (2915658).</li>
+      <li>Fixed bug with LOGONLY severity.&nbsp; EXEC was being executed
+        even if the trap had a severity of LOGONLY (3567744).</li>
+      <li>Fixed bug with snmptt hanging if the log message sent to syslog
+        contained a % symbol. &nbsp;All %'s are now escaped before sending
+        to syslog (3567748).</li>
+      <li>Fixed possible bug with MySQL.&nbsp; Put CONNECT string on one
+        line.</li>
+      <li>Fixed bug with not being able to write to the debug log file
+        when running snmptt as non-root if the debug file didn't already
+        exist with the correct permissions at startup.&nbsp; The ownership
+        of snmptt.debug is now set to daemon_uid before switching to the
+        new uid.&nbsp; Patch 3423525.</li>
+      <li>Installation documentation updates (bug 3425999).</li>
+    </ul>
+    <u>v1.3 - November 15th, 2009</u>
+    <ul>
+      <li>Added <span style="font-weight: bold;">snmptthandler-embedded</span>
+        - a Net-SNMP
+        snmptrapd embedded Perl version of snmptthandler.</li>
+      <li>Added variable substitutions <span style="font-weight: bold;">$Be</span>,
+        <span style="font-weight: bold;">$Bu</span>, <span style="font-weight: bold;">$BE</span>
+        and <span style="font-weight: bold;">$Bn</span> for SNMPv3
+        securityEngineID,
+        securityName, contextEngineID and contextName&nbsp;(requires
+        snmptthandler-embedded handler).</li>
+      <li>Added <b>snmptt.ini</b> option <b>duplicate_trap_window
+          variable</b> for duplicate trap detection.</li>
+      <li>Added LSB init keywords and actions to <span style="font-weight: bold;">snmptt-init.d</span>
+        and changed the priority
+        for start / stop so that it starts after snmptrapd and stops before
+        snmptrapd.</li>
+      <li>Changed the default log path to <span style="font-weight: bold;">/var/log/snmptt</span>
+        for Unix and
+        <span style="font-weight: bold;">c:\snmpt\log</span> for Windows to
+        make it easier to grant write permission to the
+        snmptt&nbsp;process.</li>
+      <li>Changed umask for log files to 002 to ensure they are not
+        created as world writable.</li>
+      <li>Fixed a bug where the the PID file was being created using the
+        parent (root) PID instead of the child (daemon_uid) when daemon_uid
+        is used.</li>
+      <li>The DEBUG log file will now be re-opened when a HUP signal is
+        sent.</li>
+      <li>When debugging is enabled, flush buffers every sleep cycle so
+        we can tail the debug log file.</li>
+      <li>Don't print messages to the console when starting in daemon
+        mode unless debugging is enabled or an error occurs.</li>
+      <li>'Could not open debug output file!' is no longer reported when
+        debugging is disabled.</li>
+      <li>Added <span style="font-weight: bold;">snmptt.logrotate</span>
+        file from Ville Skytta.</li>
+      <li>Fixed a bug (1748512) with handling escaped quotes in a trap
+        message.</li>
+      <li>Updated snmptt-net-snmp-test to test MIB descriptions.</li>
+      <li>SNMPTTConvertMIB:</li>
+      <li style="list-style-type: none; list-style-image: none; list-style-position: outside;">
+        <ul>
+          <li>Fixed a bug (1678270) where a TRAP-TYPE / NOTIFICATION-TYPE
+            line would not translate if it was split across two lines.</li>
+        </ul>
+      </li>
+    </ul>
+    <u>v1.2 - June 16th, 2007</u>
+    <ul>
+      <li>When <b>daemon_uid</b> is used, two processes will now be
+        spawned. The first process will be run as the same user that
+        started SNMPTT (which should be root). The second will run as the
+        <b>daemon_uid</b> user. This was changed so that SNMPTT could
+        properly clean up the pid file on exit.</li>
+      <li>Added <span style="font-weight: bold;">snmptt.ini</span> option
+        <b>pid_file</b> to allow for custom pid file locations when running
+        in daemon mode.</li>
+      <li>Fixed bug where pid file did not contain the current pid of
+        snmptt.</li>
+      <li>Added <b>snmptt.ini</b> options <b>date_format</b>,
+        <b>time_format</b>, <b>date_time_format</b>,
+        <b>date_time_format_sql</b> and <b>stat_time_format_sql</b> to
+        allow the output format for <b>$x</b> and <b>$X</b> substitution
+        variables, and the format of the date/time for text logs and SQL to
+        be changed using <b>strftime()</b> variables. This allows for
+        proper date/time data types to be used in SQL databases.</li>
+      <li>Added logging of trap statistics to a SQL table. Added
+        <b>*table_statistics</b> <b>snmptt.ini</b> variable to define the
+        table to be used.</li>
+      <li>Added ability to add custom columns to <b>*_table</b> and
+        <b>*_table_unknown</b> tables. Added <b>sql_custom_columns</b> and
+        <b>sql_custom_columns_unknown</b> <b>snmptt.ini</b> options.</li>
+      <li>Added <b>snmptt.ini</b> option <b>unknown_trap_exec_format</b>
+        to allow custom output with substitutions.</li>
+      <li>Added the ability to log system messages to a text file in
+        addtion to the existing syslog and Event Log.
+        &nbsp;Added&nbsp;<b>snmptt.ini</b> options <b>log_system</b> and
+        <span style="font-weight: bold;">log_system_file</span>.</li>
+      <li>Added a work-around to the <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=1638225&amp;group_id=12694&amp;atid=112694">
+          Net-SNMP v5.4 traphandle bug (1638225)</a> where the host name was
+        set to &lt;UNKNOWN&gt;. When detected, SNMPTT will use the host IP
+        address instead.</li>
+      <li>Added a <b>$H</b> variable substitution to give the host name
+        of the computer that is running SNMPTT, or a user defined value
+        specified in the new <b>snmptt_system_name</b> <b>snmptt.ini</b>
+        option.</li>
+      <li>Added MATCH support for bitwise AND</li>
+      <li>Added <b>snmptt.ini</b> option <b>exec_escape</b> to escape
+        wildards (* and ?) in EXEC, PREEXEC and the unknown_trap_exec
+        commands. This is enabled by default for Linux and Unix (or
+        anything non-Windows) to prevent the wildcards from being expanded
+        by the shell.</li>
+      <li>Moved <b>unknown_trap_exec</b> to Exec section in
+        <b>snmptt.ini</b>.</li>
+      <li>Added 'use strict' pragma in source code.</li>
+      <li>Experimental: &nbsp;Added threads (Perl ithreads) support for
+        EXEC. When enabled, EXEC commands will launch in a thread to allow
+        SNMPTT to continue processing other traps. Added <b>snmptt.ini</b>
+        options <b>threads_enable</b> and <b>threads_max</b>.</li>
+      <li>Fixed bug where snmptt tried to log to syslog when changing
+        UIDs even if syslog_system_enable was set to 0.</li>
+      <li>Fixed a bug in REGEX with handling of captures.
+        &nbsp;Text::Balanced module is now required.</li>
+      <li>Fixed a bug under Windows where SNMPTT was trying to log to
+        syslog instead of the event log.</li>
+      <li>Fixed a bug where SNMPTT was attempting to log to syslog /
+        eventlog when using the --time option.</li>
+      <li>Fixed a bug in MATCH where the i modifier was not handled
+        correctly.</li>
+      <li>Added information to Nagios section of documentation for using
+        SNMP traps as heartbeats by using freshness checks.</li>
+      <li>Added information to Nagios section of documentation for using
+        freshness checks to automatically clear trap alerts.</li>
+      <li>SNMPTTConvertMIB:</li>
+      <li style="list-style-type: none; list-style-image: none; list-style-position: outside;">
+        <ul>
+          <li>Fixed a bug (1438794) where a TRAP-TYPE / NOTIFICATION-TYPE
+            line would not translate if it was split across two lines.</li>
+          <li>Fixed a bug (1438394) where ARGUMENTS lines that have $1, $2
+            etc instead of %0, %1 would not translate.</li>
+          <li>Fixed a bug where a --#SEVERITYMAP line would be used instead
+            of --#SEVERITY.</li>
+        </ul>
+      </li>
+    </ul>
+    <u>v1.1 - January 17th, 2006</u>
+    <ul class="SectionBody">
+      <li>Added <b>PREEXEC</b> <b>snmptt.conf</b> file option to allow an
+        external program to be run before processing the FORMAT and EXEC lines.
+        The output of the external program is stored in the <b>$p<i>n</i></b>
+        variable where <b><i>n</i></b> is a number starting from 1. Multiple <b>PREEXEC</b>
+        lines are permitted. The first <b>PREEXEC</b> stores the result of the
+        command in <b>$p1</b>, the second in <b>$p2</b> etc. Any ending
+        newlines are removed. The <b>snmptt.ini</b> parameter <b>pre_exec_enable</b>
+        can be used to enable / disable it.</li>
+      <li><b>MATCH</b> statement now accepts any variable name instead of only
+        enterprise variables. Example: MATCH $s:(Normal)</li>
+      <li>Added <b>NODES MODE=</b> snmptt.conf file option to allow you to
+        select either <b>POS</b> (positive - the default) or <b>NEG</b>
+        (negative) for <b>NODES</b> matches. If set to <b>NEG</b>, then <b>NODES</b>
+        is a 'match' only if <i>none</i> of the <b>NODES</b> entries match.</li>
+      <li>Added <b>unknown_trap_exec</b> <b>snmptt.ini</b> option. If defined,
+        the command will be executed for ALL unknown traps. Passed to the
+        command will be all standard and enterprise variables, similar to <b>unknown_trap_log_file</b>
+        but without the newlines.</li>
+      <li><b>snmptt --dump</b> which dumps all the configured EVENTs, now
+        displays duplicate EVENT entries to assist with troubleshooting
+        duplicate entries trap logs.</li>
+      <li>If the debug log file can not be opened, a message is now logged to
+        syslog if <b>syslog_system_enable</b> is enabled, and to the Event Log
+        if <b>eventlog_system_enable</b> is enabled</li>
+      <li>Fixed bug with PostgreSQL where some trap data was interpreted as
+        'placeholders' in the INSERT statement which caused logging errors.
+        PostgreSQL now uses PREPARE / EXECUTE statements instead. </li>
+      <li>MySQL now uses PREPARE / EXECUTE statements instead of a single INSERT
+        statement.</li>
+      <li>Fixed bug in <b>NODES</b> where <b>NODES</b> entries from previous
+        EVENTs were not being purged correctly.</li>
+      <li>Fixed bug where <b>snmptt --dump</b> would attempt to log to syslog
+        or the Event Log. </li>
+      <li>Fixed bug that prevented the wildcard <b>.*</b> from being accepted
+        on the EVENT line.</li>
+      <li>Added Windows Event Log forwarding documentation to integration
+        section. </li>
+      <li>SNMPTTConvertMIB:</li>
+      <li style="list-style: none">
+        <ul>
+          <li>Fixed a bug when <b>--format_desc=n</b> was used that caused
+            extra trailing whitespaces to be added for every non existent line
+            in the description.</li>
+          <li>Fixed bug that prevented some MIBs from being accepted due to
+            spacing in the <b>DEFINITIONS::= line</b>.</li>
+          <li>Fixed bug in that prevented <b>--ARGUMENTS {}</b> from being
+            parsed due to spacing.</li>
+        </ul>
+      </li>
+    </ul>
+    <br>
+    <u>v1.0 - September 1st, 2004</u>
+    <ul class="SectionBody">
+      <li>SQL database connections are now opened after forking to the
+        background when running in daemon mode, and after changing users when
+        running SNMPTT as a non-root user. This should prevent 'gone away' and
+        other connection problems with SQL databases due to lost handles.</li>
+      <li>Added mysql_ping_on_insert, postgresql_ping_on_insert and
+        dbd_odbc_ping_on_insert options to 'ping' the database before doing an
+        INSERT. Also added the options mysql_ping_interval,
+        postgresql_ping_interval and dbd_odbc_ping_interval to periodically ping
+        the database. These options will help ensure the connection to the
+        database remains available. If an error is returned, it will attempt to
+        reconnect to the database. This should prevent SNMPTT from having to be
+        restarted if the SQL server is not available due to an outage or a
+        connection timeout due to no activity.</li>
+      <li>Added variable substitution $Fz which when used on an EXEC line will
+        dump the translated FORMAT line. This will allow for simplified EXEC
+        lines when they are the same as the FORMAT line (minus the command to
+        execute of course).</li>
+      <li>Added variable substitutions $Fa, $Ff, $Fn, $Fr, $Ft, for alarm
+        (bell), form feed (FF), newline (LF, NL), return (CR) and tab (HT, TAB)</li>
+      <li>Added variable substitution $D to dump the description text for FORMAT
+        and EXEC lines. The descriptions can be pulled from either the
+        SNMPTT.CONF or MIB files. This is controlled by the description_mode and
+        description_clean snmptt.ini options.</li>
+      <li>Added support for logging unknown traps to a SQL table</li>
+      <li>Added logging of statistical information for total traps received,
+        total traps translated, total traps ignored and total unknown traps.
+        Statistics are logged at shut down, and optionally at a defined interval
+        defined by the new snmptt.ini variable statistics_interval. Logging can
+        also be forced by sending the SIGUSR1 signal, or by creating a file
+        called !statistics in the spool folder.</li>
+      <li>Added the error number reported by MySQL to MySQL errors (system
+        syslog, eventlog etc)</li>
+      <li>Added /usr/local/etc/snmp and /usr/local/etc paths to the list of
+        default directories searched for snmptt.ini.</li>
+      <li>Added some friendly error messages when required Perl modules are not
+        available</li>
+      <li>Fixed bug with with handling traps in symbolic format (snmptrapd
+        without -On)</li>
+      <li>Fixed bug with with using printing $ symbols in FORMAT and EXEC lines</li>
+      <li>Added Simple Event Correlator (SEC) integration documentation</li>
+      <li>SNMPTTConvertMIB:</li>
+      <li style="list-style: none">
+        <ul>
+          <li>Fixed bug that prevented the variable list (OBJECTS) of V2 MIB
+            files from being converted</li>
+          <li>Fixed bug that caused an infinite loop processing the
+            VARIABLES/OBJECTS section if the line in the MIB file contained
+            spaces after the closing bracket</li>
+        </ul>
+      </li>
+    </ul>
+    <br>
+    <u>v0.9 - November 3rd, 2003</u>
+    <ul class="SectionBody">
+      <li>Syslog messages are now logged with snmptt[<i>pid</i>] instead of
+        TRAPD for traps, and snmptt-sys[<i>pid</i>] instead of SNMPTT for system
+        messages</li>
+      <li>Added the option daemon_uid which causes snmptt to change to a
+        different user (uid) after launching on Unix systems running in daemon
+        mode</li>
+      <li>Fixed bug that prevented ip addresses from being detected correctly
+        with translate_value_oids</li>
+      <li>Fixed bug with MATCH that caused integer ranges from not being handled
+        correctly</li>
+      <li>Separated SNMPTT, SNMPTTCONVERT, SNMPTTCONVERTMIB and FAQ /
+        Troubleshooting documentation into separate documents</li>
+    </ul>
+    <br>
+    <u>v0.8 - September 16th, 2003</u>
+    <ul class="SectionBody">
+      <li>Added MATCH keyword support to allow trap matching based on
+        values contained inside the trap enterprise variables</li>
+      <li>REGEX now supports substitution with captures and the modifiers
+        i, g and e. The e modifier allows for complex REGEX
+        expressions.</li>
+      <li>Added support for remote MySQL and PostgreSQL databases</li>
+      <li>Added PostgreSQL support for DBD:Pg</li>
+      <li>An EVENT can now contain mulitple EXEC lines</li>
+      <li>An EVENT can now contain mulitple NODES lines</li>
+      <li>Added the option dynamic_nodes to allow NODES files to be
+        either loaded at startup or loaded each time an EVENT is
+        processed</li>
+      <li>Added trapoid column for database logging to contain the actual
+        trap received. The eventid column will contain the actual matched
+        entry from the .conf file (which could be a wildcard OID)</li>
+      <li>Fixed bug that prevented some variables from displaying the
+        correct values because the received trap OID was replaced with the
+        actual EVENT entry</li>
+      <li>Fixed bug that caused OIDs not to be translated correctly with
+        translate_value_oids enabled</li>
+      <li>Agent IP address is now used instead of 'host' IP address for
+        NODES matches, the 'hostname' column in database logs and the $A
+        variable</li>
+      <li>Variable $A now prints the agent host name. $aA prints the
+        agent IP address.</li>
+      <li>Variable $E now prints the enterprise in symbolic form. $e
+        prints the numeric OID</li>
+      <li>Variable $O now prints the trap in symbolic form. $o prints the
+        numeric OID</li>
+      <li>Added new variable substitution $i to print the actual matched
+        entry from the .conf file (which could be a wildcard OID)</li>
+      <li>Added the configuration option dns_enable to enable DNS lookups
+        on host and agent IP addresses</li>
+      <li>If DNS is enabled, NODES entries are resolved to IP addresses
+        and the IP address is used to perform the match. This will allow
+        for aliases to be used.</li>
+      <li>Added the option resolve_value_ip_addresses to resolve ip
+        addresses contained inside enterprise variable values</li>
+      <li>Changed snmptt.ini setting translate_trap_oid to
+        translate_log_trap_oid</li>
+      <li>Changed snmptt.ini setting translate_oids to
+        translate_value_oids</li>
+      <li>Added configuraiton settings: translate_enterprise_oid_format,
+        translate_trap_oid_format, translate_varname_oid_format and
+        db_translate_enterprise</li>
+      <li>$O follows translate_trap_oid_format, and $o is always the
+        numerical trap OID</li>
+      <li>$E follows translate_enterprise_oid_format, and $e is always
+        the numerical enterprise OID</li>
+      <li>The enterprise column when logging to a database now follows
+        the db_translate_enterprise setting</li>
+      <li>Fixed bug with $# to report the correct number of enterprise
+        variables (was 1 lower than it should have been)</li>
+      <li>Fixed bug with handling traps that contain quoted values that
+        span multiple lines</li>
+      <li>PID file now created (/var/run/snmptt.pid or ./snmptt.pid) when
+        running in daemon mode on Linux / Unix. snmptt-init.d script
+        updated to remove the pid file when shutting down snmptt.</li>
+      <li>Added Nagios / Netsaint integration documentation</li>
+      <li>Added contrib folder</li>
+      <li>Snmpttconvertmib</li>
+      <li style="list-style: none">
+        <ul>
+          <li>Now prints the variables contained in each trap definition
+            unless --no_variables is set. When using --net_snmp_perl it will
+            also resolve the Syntax (INTEGER, OCTETSTR etc) and Description. If
+            it's an INTEGER, will also print out the enumeration tags if any
+            exist.</li>
+          <li>Improved compatability with MIB files</li>
+        </ul>
+      </li>
+    </ul>
+    <br>
+    <u>v0.7 - April 17th, 2003</u><br>
+    <ul class="SectionBody">
+      <li>Fixes a vulnerability that prevents the possibility of injected
+        commands contained in traps from being executed when using the EXEC
+        feature</li>
+      <li>Added the ability for traps passed from snmptrapd or loaded
+        from the snmptt.conf files to contain symbolic OIDs such as
+        linkDown and IF-MIB::linkUp. This feature requires the UCD-SNMP /
+        Net-SNMP Perl module</li>
+      <li>Added the configuration options translate_trap_oid and
+        translate_oids to have the trap OID and OID values contained in the
+        trap variables converted from numerical OID to symbolic form before
+        logging. This feature requires the UCD-SNMP / Net-SNMP Perl
+        module</li>
+      <li>Added support for logging of traps using PostgreSQL via DBI /
+        DBD::PgPP</li>
+      <li>Added REGEX keyword support to allow user definable search and
+        replace on FORMAT / EXEC lines</li>
+      <li>NODES entry can now contain a CIDR address (eg:
+        192.168.10.0/23), or a network range
+        (192.168.10.0-192.168.11.255)</li>
+      <li>NODES entry can now contain a mix of host names, IP addresses,
+        CIDR addresses, network ranges and filenames</li>
+      <li>Added the ability to force a reload of the configuration files
+        while running in daemon mode by placing a file called !reload in
+        the spool directory</li>
+      <li>Added snmptt-net-snmp-test program to perform various
+        translations of numeric and symbolic OIDS to assist with
+        determining if the installed Perl module will function as expected
+        with SNMPTT</li>
+      <li>Fixed bug that prevented quoted text from being logged
+        correctly to SQL databases</li>
+      <li>Fixed bug that would prevent the translation of integer values
+        to enumeration tags and variable name substitutions when using
+        Net-SNMP 5.0.x</li>
+      <li>Snmpttconvertmib
+        <ul>
+          <li>FORMAT / EXEC line can now contain any of the following:
+            <ul>
+              <li>--#SUMMARY or DESCRIPTION (use DESCRIPTION only if --#SUMMARY
+                does not exist)</li>
+              <li>description or --#SUMMARY (use --#SUMMARY only if DESCRIPTION
+                does not exist)</li>
+              <li>--#SUMMARY and DESCRIPTION</li>
+              <li>DESCRIPTION and --#SUMMARY</li>
+            </ul>
+          </li>
+          <li>When using the DESCRIPTION to build the FORMAT / EXEC line, can
+            now choose between using the first line of the DESCRIPTION field,
+            or the first x number of sentences</li>
+          <li>The use of the --#SUMMARY and DESCRIPTION line for the FORMAT /
+            EXEC line can be disabled</li>
+          <li>Support for multiple --#SUMMARY lines</li>
+          <li>Support for --#SEVERITY lines</li>
+          <li>The default of using the $* wildcard can be disabled</li>
+          <li>Conversion of the DESCRIPTION section to SDESC / EDESC can be
+            disabled</li>
+          <li>EXEC line can be specified on the command line</li>
+          <li>NODES line can be specified on the command line</li>
+        </ul>
+      </li>
+    </ul>
+    <br>
+    <u>v0.6 - March 25th, 2003</u><br>
+    <ul class="SectionBody">
+      <li>Logging:
+        <ul>
+          <li>Added support for logging of traps using DBD::ODBC</li>
+          <li>Fixed bug with Win32::ODBC connection not being closed on exit
+            of SNMPTT</li>
+          <li>MySQL code cleanup</li>
+          <li>Added support for logging traps to the NT Event Log including
+            the ability to select the Event Log level based on the severity
+            level defined in the snmptt.conf file</li>
+          <li>Improved syslog support by adding the ability to select the
+            syslog level based on the severity level defined in the snmptt.conf
+            file</li>
+          <li>Added syslog and NT Event Log support for SNMPTT 'system'
+            events such as startup, shutdown, errors handling spool directory /
+            files, database connectivity errors etc</li>
+          <li>Added the option keep_unlogged_traps to have SNMPTT erase the
+            spooled trap file only after it successfully logs to at least one
+            or all log systems. This will help prevent traps from being lost
+            due to logging problems.</li>
+        </ul>
+      </li>
+      <li>Added ability to translate integer values to enumeration tags
+        defined in MIB files. This feature requires the UCD-SNMP / Net-SNMP
+        Perl module</li>
+      <li>Added new variable substitutions: $vn (variable name),
+        $+n(variable name:value), $-n (variable name (type):value), $+*
+        (same as $+n but wildcard), and $-* (same as $-n but wildcard).
+        Translation of the variable name using the MIB requires the
+        UCD-SNMP / Net-SNMP Perl module.</li>
+      <li>If a variable is passed from snmptrapd that is blank, snmptt
+        will replace it with (null)</li>
+      <li>Fixed bug that would prevent variables numbered 10 or higher
+        from being translated correctly</li>
+      <li>Fixed bug with handling trap data that contains spaces but is
+        not inside of quotes</li>
+      <li>Code cleanup to remove Perl warnings (-w)</li>
+      <li>Added separate debug file for snmptthandler</li>
+      <li>Cleaned up defaults code for snmptthandler</li>
+      <li>Added examples folder containg a sample snmptt.conf file and
+        sample trap file</li>
+      <li>Added FAQ section to this document</li>
+      <li>Snmpttconvertmib
+        <ul>
+          <li>Code cleanup</li>
+          <li>Now uses new command line arguments (snmpttconvertmib -h for
+            help).</li>
+          <li>Can now use either snmptranslate or the SNMP Perl module
+            (Net-SNMP) to process MIB files</li>
+          <li>Can now add a NODES line when converting MIB files</li>
+          <li>Now checks the version of snmptranslate before converting the
+            mib to ensure snmptranslate is called correctly</li>
+          <li>Fixed bug which would cause the last notification of a v2 MIB
+            file not to be converted correctly</li>
+        </ul>
+      </li>
+    </ul>
+    <br>
+    <u>v0.5 - February 12th, 2003</u><br>
+    <ul class="SectionBody">
+      <li>Spool file list sorted before processing to ensure traps are
+        processed in the order they are received when in daemon mode</li>
+      <li>Added use_trap_time variable to config file for daemon mode to
+        have SNMPTT use either the time from the spool file, or the current
+        time. Changed SNMPTTHANDLER to output the current date and time on
+        the first line of the spool file</li>
+      <li>Fixed bug with default variable settings being ignored.
+        Defaults were not being set correctly if variable was not defined
+        in the .ini file.</li>
+      <li>Fixed bug with SNMPTT ignoring the daemon mode parameter in the
+        .ini file</li>
+      <li>Fixed bug with Nodes list not being flushed out for each
+        processed trap when running in daemon mode</li>
+      <li>Added strip_domain and strip_domain_list configuration options
+        to enable / disable the removal of the domain name from the host
+        name passed to SNMPTT. Defaults to disabled (do not strip domain
+        name)</li>
+      <li>SNMPTTCONVERTMIB now prepends the contents of the --#TYPE line
+        (if present) to the --#SUMMARY line to provide a more descriptive
+        FORMAT / EXEC line</li>
+    </ul>
+    <br>
+    <u>v0.4 - November 18th, 2002</u><br>
+    <ul class="SectionBody">
+      <li>Variable substitution changes:
+        <ul>
+          <li>$X = Date, $x = Time instead of $x being both date and
+            time</li>
+          <li>$N = Event name instead of $S</li>
+          <li>Added $c, $@, $O, $o, $ar, $R, $aR, $G, $S</li>
+        </ul>
+      </li>
+      <li>Configuration moved to a .ini file</li>
+      <li>MySQL support via DBI under Linux and Windows</li>
+      <li>ODBC support via Win32::ODBC under Windows</li>
+    </ul>
+    <br>
+    <u>v0.3 - September 11th, 2002</u><br>
+    <ul class="SectionBody">
+      <li>Daemon mode support for SNMPTT. When running as a daemon,
+        SNMPTTHANDLER script is used to spool traps from SNMPTRAPD.</li>
+      <li>SNMPTTCONVERTMIB utility to convert trap / notify definitions
+        from MIB files</li>
+      <li>Sample trap file (sample-trap) for testing</li>
+      <li>Command line options to SNMPTT</li>
+      <li>SNMPTT now strips UDP: and :port from IP addresses when using
+        Net-SNMP 5.0+</li>
+      <li>NODES files can now contain comments</li>
+      <li>NODES files can now contain either host names or IP
+        addresses</li>
+      <li>You can now have multiple definitions of the same trap so that
+        different hosts / nodes can have different actions or one host have
+        multiple actions</li>
+      <li>Configuration file can now contain a list of other
+        configuration files to load</li>
+    </ul>
+    <br>
+    <u>v0.2 - July 10th, 2002</u><br>
+    <ul class="SectionBody">
+      <li>Improved debugging output</li>
+      <li>Severity substitution bug fix</li>
+      <li>SNMP V2 trap bug fix</li>
+      <li>UCD-SNMP v4.2.3 problem workaround</li>
+    </ul>
+    <br>
+    <u>v0.1 - April 18th, 2002</u><br>
+    <ul class="SectionBody">
+      <li>Initial release</li>
+    </ul>
+    <!-- CONTENT END -->
+    <!--#include virtual="page-bottom.shtml" -->
+  </body>
+</html>
