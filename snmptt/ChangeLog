@@ -1,8 +1,9 @@
 July 23rd, 2020: Alex Burger <alex_b@users.sourceforge.net>
-- Changed version to snmptt_1.4.2beta1
+- Changed version to snmptt_1.4.2 for release.
 - Removed the daemon_gid option and enhanced the daemon_uid option so that it
   retreives the group membership for daemon_uid from the OS.  This fixes a bug
-  where it was not possible to define multiple group members with daemon_gid.
+  in 1.4.1 where it was not possible to define multiple group members with
+  daemon_gid.
 
 July 21st, 2020: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.4.1 for release.
