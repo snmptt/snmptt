@@ -6,7 +6,7 @@
   </head>
   <body>
     <p class="SectionTitle">Change Log</p>
-    <u><u>v1.4.1 - July 21st, 2020</u>
+    <u><u>v1.4.2 - July 23rd, 2020</u>
     </u>
     <ul>
       <li>Fixed a security issue with EXEC / PREXEC / unknown_trap_exec
@@ -14,9 +14,6 @@
       <li>Fixed a bug with EXEC / PREXEC / unknown_trap_exec that caused
         commands to be run as root instead of the user defined in
         daemon_uid.</li>
-      <li>Added the snmptt.ini option daemon_gid to allow the gid to be
-        set in addition to the uid.&nbsp; Defaults to 'nobody' if not
-        defined.</li>
     </ul>
     <u>v1.4 - November 6th, 2013</u>
     <ul>

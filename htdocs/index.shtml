@@ -14,11 +14,11 @@ News
       <table border="0" cellspacing="0" cellpadding="4">
 
 <tr>
-  <td valign="top" class="NewsItemDate">2020/07/21</td>
+  <td valign="top" class="NewsItemDate">2020/07/23</td>
   <td class="NewsItem">
-    <p><b>SNMPTT v1.4.1 has been released</b></p>
-    <p>SNMPTT v1.4 has been released.  A list of new features is available on the 
-      <a href="http://sourceforge.net/projects/snmptt/files/snmptt/snmptt_1.4.1/snmptt_1.4.1_releasenotes.txt/view">SourceForge page</a>.</p>
+    <p><b>SNMPTT v1.4.2 has been released</b></p>
+    <p>SNMPTT v1.4.2 has been released.  A list of new features is available on the 
+      <a href="http://sourceforge.net/projects/snmptt/files/snmptt/snmptt_1.4.2/snmptt_1.4.2_releasenotes.txt/view">SourceForge page</a>.</p>
       <p>Please report any issues to the snmptt-users mail list.</p>
     <p><b><i>This version contains security updates so please update to this release.</i></b></p>
     <p>See the <a href="changelog.shtml">Change Log</a> for more details</p>

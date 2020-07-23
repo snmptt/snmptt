@@ -1,6 +1,6 @@
 July 21, 2020
 
-snmptt_1.4.1.tgz:
+snmptt_1.4.2.tgz:
 
 -fresh git checkout
 
@@ -41,12 +41,12 @@ perl -c snmptthandler
 -git config user.name
 -git config user.email
 -tag with new version:
- git tag -a snmptt_1-4-1 -m "Changed version to snmptt_1.4.1 for release"
+ git tag -a snmptt_1-4-2 -m "Changed version to snmptt_1.4.2 for release"
  git push --tags
 
 cd snmptt
-find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.4.1
-cd ../snmptt_1.4.1
+find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.4.2
+cd ../snmptt_1.4.2
 su
 rm -f docs/build
 chmod -R 664 *
@@ -62,11 +62,11 @@ chmod +x snmptt-net-snmp-test
 chmod +x snmptt-init.d
 chown root.root * -R
 cd ..
-chmod 775 snmptt_1.4.1
-tar cvfz snmptt_1.4.1.tgz snmptt_1.4.1
+chmod 775 snmptt_1.4.2
+tar cvfz snmptt_1.4.2.tgz snmptt_1.4.2
 
 SourceForge:
--upload file
+-upload file & set as default download
 -create file release, notify users
 -create news release
 -post message to snmptt-users, snmptt-developer
