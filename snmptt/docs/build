@@ -41,7 +41,7 @@ perl -c snmptthandler
 -git config user.name
 -git config user.email
 -tag with new version:
- git tag -a snmptt_1-4-1 -m "Changed version to snmptt_1.4.2 for release"
+ git tag -a snmptt_1-4-2 -m "Changed version to snmptt_1.4.2 for release"
  git push --tags
 
 cd snmptt
