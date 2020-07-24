@@ -1,3 +1,9 @@
+July 23rd, 2020: Alex Burger <alex_b@users.sourceforge.net>
+- Removed the daemon_gid option and enhanced the daemon_uid option so that it
+  retreives the group membership for daemon_uid from the OS.  This fixes a bug
+  in 1.4.1 where it was not possible to define multiple group members with
+  daemon_gid.
+
 June 29th, 2020: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a security issue with EXEC / PREXEC / unknown_trap_exec that could 
   allow malicious shell code to be executed.  Thanks to Toshiyuki Goto for

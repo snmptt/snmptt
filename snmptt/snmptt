@@ -198,7 +198,6 @@ my $stat_time_format_sql;
 # DaemonMode
 my $daemon_fork;
 my $daemon_uid;
-my $daemon_gid;
 my $pid_file;
 my $spool_directory;
 my $sleep;
@@ -808,6 +807,10 @@ if ($daemon == 1)
     my $daemon_uid_name = '';
     my $daemon_gid_name = '';
 
+    if ($DEBUGGING >= 1) {
+      syslog_system("Configured daemon_uid: $daemon_uid\n");
+    }
+
 	# Convert textual daemon_uid to numerical
     if ($daemon_uid =~ /\D/)
     {
@@ -818,39 +821,96 @@ if ($daemon == 1)
       $daemon_uid = getpwnam($daemon_uid_name);
       if (!defined($daemon_uid))
       {        
-        warn("Could not convert user id \'$daemon_uid_name\' to a numeric UID\n");
-
         if ($syslog_system_enable == 1) {
           syslog_system("Could not convert user id \'$daemon_uid_name\' to a numeric UID\n");
+          syslog_system("SNMPTT $snmptt_version shutdown");
         }
         if ($log_system_enable == 1) {
           log_system("Could not convert user id \'$daemon_uid_name\' to a numeric UID\n");
+          log_system("SNMPTT $snmptt_version shutdown");
         }
-      }
-    }
-    # Convert textual daemon_gid to numerical
-    # Note:  If daemon_gid is not defined, it defaults to 'nobody'
-    if ($daemon_gid =~ /\D/)
-    {
-      # no numbers found, so assume it's a textual name
-
-      $daemon_gid_name = $daemon_gid;
-
-      $daemon_gid = getpwnam($daemon_gid_name);
-      if (!defined($daemon_gid))
-      {        
-        warn("Could not convert group id \'$daemon_gid_name\' to a numeric GID\n");
-
-        if ($syslog_system_enable == 1) {
-          syslog_system("Could not convert group id \'$daemon_gid_name\' to a numeric GID\n");
+        if ($DEBUGGING >= 1)
+        {
+          print "Could not convert user id \'$daemon_uid_name\' to a numeric UID\n";
+          print "SNMPTT $snmptt_version shutdown";
         }
-        if ($log_system_enable == 1) {
-          log_system("Could not convert group id \'$daemon_gid_name\' to a numeric GID\n");
-        }
+
+        warn("Could not convert user id \'$daemon_uid_name\' to a numeric UID\n");
+        exit 1;
       }
     }
 
-    # Change current uid to new_uid
+    # Build textual user group list
+    
+    # Get user primary group
+    (my $name, my $passwd, my $uid, my $gid, my $quota, my $comment, my $gcos, my $dir, my $shell, my $expire) = getpwuid($daemon_uid);
+    my $daemon_gid = $gid;   # numerical
+    $daemon_gid_name = getgrgid($daemon_gid); # textual
+    if ($DEBUGGING >= 1) {
+      syslog_system("daemon_uid primary group: $daemon_gid_name ($daemon_gid)\n");
+    }
+    $daemon_gid_name .= " ";
+    
+    # Get OS groups
+    $daemon_gid .= " ";
+    while( (my $name, my $passwd, my $gid, my $members_list) = getgrent() ) {
+      my @members = split(" ", $members_list);
+      
+      if ($daemon_uid_name ~~ @members) {
+        if ($DEBUGGING >= 1) {
+          syslog_system("daemon_uid $daemon_uid_name found in group $name\n");
+        }
+        $daemon_gid_name .= "$name ";
+      }
+    }
+    chop($daemon_gid_name);
+    
+    $daemon_gid = $daemon_gid_name;
+    my $daemon_gid_list = "";
+    my @daemon_gids = split(' ', $daemon_gid);
+    if ($DEBUGGING >= 1) {
+      syslog_system("daemon_uid group list: @daemon_gids\n");
+    }
+    
+    # Convert textual daemon_gid's to numerical
+    foreach my $daemon_gid (@daemon_gids) {   
+      if ($daemon_gid =~ /\D/)
+      {
+        # no numbers found, so assume it's a textual name
+
+        my $daemon_gid_name_temp = $daemon_gid;
+
+        $daemon_gid = getgrnam($daemon_gid_name_temp);
+        if (!defined($daemon_gid))
+        {        
+          if ($syslog_system_enable == 1) {
+            syslog_system("Could not convert group id \'$daemon_gid_name_temp\' to a numeric GID\n");
+            syslog_system("SNMPTT $snmptt_version shutdown");
+          }
+          if ($log_system_enable == 1) {
+            log_system("Could not convert group id \'$daemon_gid_name_temp\' to a numeric GID\n");
+            log_system("SNMPTT $snmptt_version shutdown");
+          }
+          if ($DEBUGGING >= 1)
+          {
+            print "Could not convert group id \'$daemon_gid_name_temp\' to a numeric GID\n";
+            print "SNMPTT $snmptt_version shutdown";
+          }
+
+          warn("Could not convert group id \'$daemon_gid_name_temp\' to a numeric GID\n");
+          exit 1;
+        }
+      }
+      $daemon_gid_list .= "$daemon_gid ";
+    }
+    chop($daemon_gid_list);
+   
+    $daemon_gid = $daemon_gid_list;
+    if ($DEBUGGING >= 1) {
+      syslog_system("Final daemon_gid group list: $daemon_gid_name ($daemon_gid)\n");
+    }
+
+    # Change current uid to daemon_uid and gid to daemon_gid
     if (defined($daemon_uid))
     {
       if ($daemon_uid_name ne '')
@@ -889,8 +949,8 @@ if ($daemon == 1)
       # Close debug file (if it is open) before changing users and re-open after
       close(DEBUGFILE);
 	  
-	  # Change owner of debug file so $daemon_uid can write to it.
-	  chown $daemon_uid, -1, $DEBUGGING_FILE;
+	    # Change owner of debug file so $daemon_uid can write to it.
+	    chown $daemon_uid, -1, $DEBUGGING_FILE;
 
       # Permanently change to new uid/gid by setting both effetive and real IDs.
       $) = $daemon_gid;
@@ -902,23 +962,23 @@ if ($daemon == 1)
       if ($< != $daemon_uid || $( != $daemon_gid) {	  
         if ($syslog_system_enable == 1) {
           syslog_system("Could not change to UID: $daemon_uid, GID: $daemon_gid");
-		  syslog_system("SNMPTT $snmptt_version shutdown");
+          syslog_system("SNMPTT $snmptt_version shutdown");
         }
         if ($log_system_enable == 1) {
           log_system("Could not change to UID: $daemon_uid, GID: $daemon_gid");
-		  log_system("SNMPTT $snmptt_version shutdown");
+          log_system("SNMPTT $snmptt_version shutdown");
         }
 
         # This won't make it into the debug log..  
         if ($DEBUGGING >= 1)
         {
           print "Could not change to UID: $daemon_uid, GID: $daemon_gid\n";
-		  print "SNMPTT $snmptt_version shutdown";
+          print "SNMPTT $snmptt_version shutdown";
         }
 
-		warn "Could not change to UID: $daemon_uid, GID: $daemon_gid";
-		exit 1;
-	  }
+        warn "Could not change to UID: $daemon_uid, GID: $daemon_gid";
+        exit 1;
+	    }
 
       $debug_file_open_error = 1;
       # Re-open debug file (if needed) as the new user
@@ -4176,7 +4236,6 @@ sub loadsnmpttini {
   # DaemonMode
   $daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
   $daemon_uid = $cfg->val('DaemonMode', 'daemon_uid');
-  $daemon_gid = $cfg->val('DaemonMode', 'daemon_gid');
   $pid_file = $cfg->val('DaemonMode', 'pid_file');
   $spool_directory = $cfg->val('DaemonMode', 'spool_directory');
   $sleep = $cfg->val('DaemonMode', 'sleep');
