@@ -1294,7 +1294,12 @@ if ($daemon == 1)
     {
       print "Sleeping for $sleep seconds\n\n";
     }
-    sleep $sleep;
+    if($sleep < 1) {
+      select(undef, undef, undef, $sleep);
+    }
+    else {
+      sleep $sleep;
+    }
 
     if ($timetoreload == 1)
     {

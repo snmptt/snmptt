@@ -1,6 +1,7 @@
 February 22nd, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Fix a bug with daemon_uid that prevented SNMPTT from starting on FreeBSD
   (bug 47).  Thanks to Christian Ullrich for the fix.
+- Add support for sub-second sleep.  Thanks to Tyler Leeds for the code.
 
 July 23rd, 2020: Alex Burger <alex_b@users.sourceforge.net>
 - Removed the daemon_gid option and enhanced the daemon_uid option so that it

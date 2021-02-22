@@ -235,7 +235,8 @@ daemon_fork = 1
 # Don't forget the trailing slashes!
 spool_directory = c:\\snmp\\spool\\
 
-# Amount of time in seconds to sleep between processing spool files
+# Amount of time in seconds to sleep between processing spool files.  Value is
+# rounded to a full second unless the value is less than 1.
 sleep = 5
 
 # Set to 1 to have SNMPTT use the time that the trap was processed by SNMPTTHANDLER
