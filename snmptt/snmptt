@@ -1172,7 +1172,7 @@ if ($daemon == 1)
           next;
         }
 
-        next if (! ($file =~ /\#.*/));    # Must start with #
+        next if (! ($file =~ /\#.*/));    # Must start with # (for file locking change)
 
         if ($DEBUGGING >= 1)
         {
