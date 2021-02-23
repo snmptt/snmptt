@@ -2,6 +2,8 @@ February 22nd, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Fix a bug with daemon_uid that prevented SNMPTT from starting on FreeBSD
   (bug 47).  Thanks to Christian Ullrich for the fix.
 - Add support for sub-second sleep.  Thanks to Tyler Leeds for the code.
+- Fixed a bug where traps arriving with the hostname set to UNKNOWN were
+  not being handled properly (bug 46).  Thanks to Tom Griep for the fix.
 
 July 23rd, 2020: Alex Burger <alex_b@users.sourceforge.net>
 - Removed the daemon_gid option and enhanced the daemon_uid option so that it
@@ -27,7 +29,8 @@ December 21st, 2016: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a race condition bug with snmptthander and snmptthandler-embedded
   which could cause traps to be missed.  Spool files are now immediately locked
   after creation.  If flock() is not supported, the spool file will be created
-  with a temporary filename and then renamed after closing.
+  with a temporary filename and then renamed after closing.  Spool files must
+  now start with # otherwise they are ignored.
   Thanks to Andrew Darmody for reporting the issue and providing a solution.
   Thanks to Kazuo Ito for an additional fix using flock.
 

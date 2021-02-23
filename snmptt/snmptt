@@ -3310,7 +3310,7 @@ sub readtrap
   $tempvar[1] = $1;
 
   # Net-SNMP 5.4 has a bug which gives <UNKNOWN> for the hostname
-  if ($tempvar[0] =~ /<UNKNOWN>/) {
+  if ($tempvar[0] =~ /^UNKNOWN$/) {
     $tempvar[0] = $tempvar[1];
   }
 
