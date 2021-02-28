@@ -3946,7 +3946,7 @@ Create an EXEC statement such as the following for each
 "font-weight: bold;">snmptt.conf</span>&nbsp;file:<br />
 <br />
 <div style="margin-left: 40px;"><span style=
-"font-weight: bold;">curl -k -s -S -i -u
+"font-weight: bold;">EXEC /usr/bin/curl -k -s -S -i -u
 <em>apiuser</em>:<em>password</em> -H 'Accept: application/json' -X
 POST 'https://localhost:5665/v1/actions/process-check-result' -d '{
 "type": "Service", "filter": "host.name==\"$A\" &amp;&amp;
