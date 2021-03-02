@@ -4137,8 +4137,13 @@ sub findsnmpttini
   {
     if ($^O ne "MSWin32")
     {
-      $configfile = '/etc/snmp/snmptt.ini';
-      if( open( CONFIG, '/etc/snmp/snmptt.ini' ) )
+      $configfile = '/etc/snmptt/snmptt.ini';
+      if( open( CONFIG, '/etc/snmptt/snmptt.ini' ) )
+      {
+        $configfile = '/etc/snmp/snmptt.ini';
+        close CONFIG;
+      }
+      elsif( open( CONFIG, '/etc/snmp/snmptt.ini' ) )
       {
         $configfile = '/etc/snmp/snmptt.ini';
         close CONFIG;

@@ -270,11 +270,20 @@ sub loadsnmpttini {
   }
   else {	
     if ($^O ne "MSWin32") {
-      if (-f '/etc/snmp/snmptt.ini' && -r '/etc/snmp/snmptt.ini') {
+      if (-f '/etc/snmptt/snmptt.ini' && -r '/etc/snmptt/snmptt.ini') {
+        $configfile = '/etc/snmptt/snmptt.ini';    
+      }
+      elsif (-f '/etc/snmp/snmptt.ini' && -r '/etc/snmp/snmptt.ini') {
         $configfile = '/etc/snmp/snmptt.ini';    
       }
       elsif (-f '/etc/snmptt.ini' && -r '/etc/snmptt.ini') {
         $configfile = '/etc/snmptt.ini';    
+      }
+      elsif (-f '/usr/local/etc/snmp/snmptt.ini' && -r '/usr/local/etc/snmp/snmptt.ini') {
+        $configfile = '/usr/local/etc/snmp/snmptt.ini';    
+      }
+      elsif (-f '/usr/local/etc/snmptt.ini' && -r '/usr/local/etc/snmptt.ini') {
+        $configfile = '/usr/local/etc/snmptt.ini';    
       }
       else {
         if ($DEBUGGING >= 1) {

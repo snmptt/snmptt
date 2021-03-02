@@ -1,3 +1,7 @@
+February 28th, 2021: Alex Burger <alex_b@users.sourceforge.net>
+- snmptt.ini can now be located in /etc/snmptt and is looked for at this
+  location first.
+
 February 22nd, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Fix a bug with daemon_uid that prevented SNMPTT from starting on FreeBSD
   (bug 47).  Thanks to Christian Ullrich for the fix.

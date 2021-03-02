@@ -60,6 +60,16 @@ h4{
 	color:#000;
         }	
 
+h5{
+	margin:10px 0px 15px 0px;
+	padding:0px;
+	font-size:1.1em;
+	line-height:1em;
+	font-weight:900;
+	color:#000;
+		}	
+
+		
 p {
 	/* font:11px/20px verdana, arial, helvetica, sans-serif; */
 	margin:0px 0px 1em 0px;
@@ -68,6 +78,19 @@ p {
 	}
 /* #Content>p {margin:0px;}  */
 /* #Content>p+p {text-indent:30px;}  */
+
+code {
+	background-color: #eee;
+	border: 1px solid #999;
+	display: block;
+	padding: 10px;
+  }
+pre code {
+	background-color: #eee;
+	border: 1px solid #999;
+	display: block;
+	padding: 10px;
+  }
 
 a {
 	color:#09c;

@@ -134,18 +134,33 @@ else
 {	
  	if ($^O ne "MSWin32")
 	{
-	  $configfile = '/etc/snmp/snmptt.ini';
-	  if( open( CONFIG, '/etc/snmp/snmptt.ini' ) )
-	  {
-	    $configfile = '/etc/snmp/snmptt.ini';
-	    close CONFIG;
-	  }
-	  elsif ( open( CONFIG, '/etc/snmptt.ini' ) )
-	  {
-	    $configfile = '/etc/snmptt.ini';
-	    close CONFIG;
-	  }
-	}
+      $configfile = '/etc/snmptt/snmptt.ini';
+      if( open( CONFIG, '/etc/snmptt/snmptt.ini' ) )
+      {
+        $configfile = '/etc/snmp/snmptt.ini';
+        close CONFIG;
+      }
+      elsif( open( CONFIG, '/etc/snmp/snmptt.ini' ) )
+      {
+        $configfile = '/etc/snmp/snmptt.ini';
+        close CONFIG;
+      }
+      elsif ( open( CONFIG, '/etc/snmptt.ini' ) )
+      {
+        $configfile = '/etc/snmptt.ini';
+        close CONFIG;
+      }
+      elsif ( open( CONFIG, '/usr/local/etc/snmp/snmptt.ini' ) )
+      {
+        $configfile = '/usr/local/etc/snmp/snmptt.ini';
+        close CONFIG;
+      }
+      elsif ( open( CONFIG, '/usr/local/etc/snmptt.ini' ) )
+      {
+        $configfile = '/usr/local/etc/snmptt.ini';
+        close CONFIG;
+      }
+    }
 	else {
 	  $configfile = $ENV{'SystemRoot'}."\\snmptt.ini";
 	}
