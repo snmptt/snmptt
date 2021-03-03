@@ -33,7 +33,7 @@ This file was last updated on:  July 18th, 2009
 
 ## General
 
-* [I have enabled net\_snmp\_perl\_enable but the variable names are not being translated into text using $v_n, $-n, $+n, $-\* or $+\*_. How do I troubleshoot it?](#I_have_enabled_net_snmp_perl_enable_but_the_variable)
+* [I have enabled net\_snmp\_perl\_enable but the variable names are not being translated into text using $vn, $-n, $+n, $-\* or $+\*. How do I troubleshoot it?](#I_have_enabled_net_snmp_perl_enable_but_the_variable)
 * [I have enabled translate\_integers but the integer values are not being translated into text. How do I troubleshoot it?](#I_have_enabled_net_snmp_perl_enable_but_the_variable)
 * [SNMPTT is not working! How do I troubleshoot it?](#SNMPTT_is_not_working)
 * [I have configured SNMPTT correctly with an snmptt.ini file, snmptt.conf file(s) etc and it still does not process traps. Everything appears in the snmpttunknowntrap.log file. What did I do wrong?](#I_have_configured_SNMPTT_correctly_with_an_snmptt)
@@ -66,7 +66,6 @@ The standard way to apply the patch is to follow these steps:
 If you run freebsd, you can simply copy the patch file into /usr/ports/net/net-snmp/files and rename it to patch-snmp-72205.  When you rebuild Net-SNMP, the patch will be included.
 
 **<a name="Do_I_need_the_UCD-SNMP_Net-SNMP_Perl_module"></a>Q: Do I need the UCD-SNMP / Net-SNMP Perl module?**
-**
 
 A:  SNMPTT does not REQUIRE the Perl module, but it is recommended.  By enabling the Perl module, you will get the following benefits:  
 
@@ -84,13 +83,13 @@ Note1:  In addition to the regular Perl modules, Net-SNMP allows Perl to be emb
 Note2:  Do not confuse the CPAN module Net::SNMP (use Net::SNMP;) with the Net-SNMP Perl module (use SNMP;).  They are two completely unrelated programs.  Net::SNMP is a stand-alone SNMP module for Perl, while the Net-SNMP Perl module is a Perl extension of the [Net-SNMP](http://www.net-snmp.org) software and is included with [Net-SNMP](http://www.net-snmp.org). Distributions such as RedHat provide the Perl modules in a separate RPM package called 'net-snmp-perl'.  
   
 
-**<a name="I_want_to_enable_the_Perl_support_for_UCD-SNMP"></a>Q:  I want to enable the Perl support for under Linux, but I installed **Net-SNMP** using RPMs.  What is the easiest way to install the module without recompiling everything?**
+**<a name="I_want_to_enable_the_Perl_support_for_UCD-SNMP"></a>Q:  I want to enable the Perl support for under Linux, but I installed *Net-SNMP* using RPMs.  What is the easiest way to install the module without recompiling everything?**
 
 A:  There are two Perl components for Net-SNMP:
 
-1) The Perl modules which allow you to create stand-alone Perl programs that use the 'SNMP' module (use SNMP;)
+> 1) The Perl modules which allow you to create stand-alone Perl programs that use the 'SNMP' module (use SNMP;)
 
-2) Embedded Perl for snmpd and snmptrapd which allow you to write Perl programs that are loaded and run from inside of snmpd and snmptrapd.
+> 2) Embedded Perl for snmpd and snmptrapd which allow you to write Perl programs that are loaded and run from inside of snmpd and snmptrapd.
 
 The Perl modules (1) are optional but recommended.  See [**Do I need the UCD-SNMP / Net-SNMP Perl module?**](Do_I_need_the_UCD-SNMP_Net-SNMP_Perl_module) for the benefits of enabling the Perl modules.  
 
@@ -108,9 +107,9 @@ If you get an error message starting with 'Can't locate SNMP.pm in @INC....' the
 
 For embedded Perl support (2), you may have to compile Net-SNMP yourself using the '--enable-embedded-perl' configuration option.  To test to see if you already have embedded Perl enabled:
 
-     Type **snmptrapd -H 2>&1 | grep perl**.  It should give **perl   PERLCODE** if embedded Perl is enabled.  
+> Type **snmptrapd -H 2>&1 | grep perl**.  It should give **perl   PERLCODE** if embedded Perl is enabled.  
 
-     If it's not available, you need to compile and install Net-SNMP using the **\--enable-embedded-perl** configure option.  Use the net-snmp-users mail list for assistance.
+> If it's not available, you need to compile and install Net-SNMP using the **\--enable-embedded-perl** configure option.  Use the net-snmp-users mail list for assistance.
 
 If you are using UCD-SNMP, you should not have to re-compile the entire package.  Try the following:
 
