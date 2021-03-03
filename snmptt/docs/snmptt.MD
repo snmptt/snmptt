@@ -1,3 +1,16 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8" />
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0" />
+<meta content="Alex Burger" name="Author" />
+<meta content="Mozilla/4.78 [en] (Windows NT 5.0; U) [Netscape]"
+name="GENERATOR" />
+<link rel="StyleSheet" type="text/css" href="layout1.css" />
+<title>SNMP Trap Translator</title>
+</head>
+
 # SNMP Trap Translator v1.5beta1
 **([SNMPTT](http://www.snmptt.org))**
 
