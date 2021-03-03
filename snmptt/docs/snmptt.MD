@@ -1312,13 +1312,13 @@ The following errors are logged.  Note that each error contains a unique EventI
 > EventID 5: Unable to read spool dir _x_ **(\*)**  
 > EventID 6: Could not open trap file _x_ **(\*)**  
 > EventID 7: Unable to delete trap file _x_ from spool dir **(\*)**  
-> EventID 20: Unable to delete !reload file spool dir **(\*)  
+> EventID 20: Unable to delete !reload file spool dir **(\*)**  
 > EventID 21: Unable to delete !statistics file spool dir **(\*)**  
 > EventID 8: Reloading configuration file(s) **(\*)**  
 > EventID 1: SNMPTT (version) shutdown **(\*)**  
 > EventID 9: Loading _snmpttconfigfile_ **(\*)**  
 > EventID 10: Could not open configuration file: _snmpttconfigfile_**(\*)**  
-> EventID 11: Finished loading _x_ lines from _snmpttconfigfile_**(\*)**  
+> EventID 11: Finished loading _x_ lines from _snmpttconfigfile_**(\*)**
 > EventID 12: MySQL error: Unable to connect to database  
 > EventID 13: SQL error: Unable to connect to DSN _dsn_  
 > EventID 14: Can not open log file _logfile_  
@@ -1541,7 +1541,7 @@ The following MS SQL Server / Access script can create the table inside an exist
     CREATE TABLE snmptt (
     eventname character(50) NULL,
     eventid  character(50) NULL,
-    trapoid** **character(100) NULL,
+    trapoid character(100) NULL,
     enterprise character(100) NULL,
     community character(20) NULL,
     hostname character(100) NULL,
@@ -1557,7 +1557,7 @@ Note: To store the traptime as a real date/time, change 'traptime character(30),
 If logging of unknown traps to a SQL table is required, create the snmptt\_unknown table using:  
 
     CREATE TABLE snmptt\_unknown (
-    trapoid** **character(100) NULL,
+    trapoid character(100) NULL,
     enterprise character(100) NULL,
     community character(20) NULL,
     hostname character(100) NULL,
@@ -1570,12 +1570,12 @@ Note: To store the traptime as a real date/time, change 'traptime character(30),
 
 If logging of statistics to a SQL table is required, create the snmptt\_statistics table using:  
 
-    CREATE TABLE snmptt\_statistics (  
-    stat\_time character(30) NULL,  
-    total\_received BIGINT NULL,  
-    total\_translated BIGINT NULL,  
-    total\_ignored BIGINT NULL,  
-    total\_unknown BIGINT NULL);
+    CREATE TABLE snmptt_statistics (  
+    stat_time character(30) NULL,  
+    total_received BIGINT NULL,  
+    total_translated BIGINT NULL,  
+    total_ignored BIGINT NULL,  
+    total_unknown BIGINT NULL);
 
 
 Note: To store the stat\_time as a real date/time, change 'stat\_time character(30),' to the date/time data type supported by the database and and set **stat\_time\_format\_sql** in **snmptt.ini** to a compatible format. For example: **%Y-%m-%d %H:%M:%S**.
@@ -1588,11 +1588,11 @@ SNMPTT can access ODBC data sources using either the DBD::ODBC module on Linux a
 
 To configure SNMPTT for MS SQL via ODBC on Windows, modify the following variables in the snmptt script.
 
-> **sql\_win32\_odbc\_enable = 1;**  
-> **sql\_win32\_odbc\_dsn = 'snmptt';**  
-> **sql\_win32\_odbc\_table = 'snmptt';**  
-> **sql\_win32\_odbc\_username = 'snmptt';**  
-> **sql\_win32\_odbc\_password = 'password';**
+    sql_win32_odbc_enable = 1;  
+    sql_win32_odbc_dsn = 'snmptt';  
+    sql_win32_odbc_table = 'snmptt';  
+    sql_win32_odbc_username = 'snmptt';  
+    sql_win32_odbc_password = 'password';  
 
 Note:   
 
@@ -2944,7 +2944,7 @@ Trap Specific ID: 529
  
 Based on the information above, the following EVENT line would be used::
  
-EVENT EventLog 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121.**0**.529 "Regular" Normal
+    EVENT EventLog 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121.0.529 "Regular" Normal
  
 #### Enterprise variables
  
@@ -2975,8 +2975,8 @@ Logon Failure:%n %tReason:%t%tUnknown user name or bad password%n %tUser Name:%t
 
 The EVENT entry could be cleaned up using:
 
-**EVENT EventLog 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121.**0.529 "Regular" Normal  
-FORMAT Logon Failure: Reason: Unknown user name or bad password. User Name: $6, Domain: $7, Logon Type: $8, Logon Process: $9, Auth package: $10, Workstation name: $11
+    EVENT EventLog 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121.0.529 "Regular" Normal  
+    FORMAT Logon Failure: Reason: Unknown user name or bad password. User Name: $6, Domain: $7, Logon Type: $8, Logon Process: $9, Auth package: $10, Workstation name: $11
 
 ## <a name="Hobbit"></a>Hobbit
 
