@@ -100,16 +100,15 @@ For the Perl modules (1), most Linux distributions provide RPMs.  For RedHat, i
 If you compiled Net-SNMP from source, then the Perl module should be enabled by default.  Typing the following is an easy test to see if the Perl module has been installed:
 
     perl
-
     use SNMP;
 
 If you get an error message starting with 'Can't locate SNMP.pm in @INC....' then the Perl module has not been installed.  Press control-C to exit Perl if there was no error.
 
 For embedded Perl support (2), you may have to compile Net-SNMP yourself using the '--enable-embedded-perl' configuration option.  To test to see if you already have embedded Perl enabled:
 
-> Type **snmptrapd -H 2>&1 | grep perl**.  It should give **perl   PERLCODE** if embedded Perl is enabled.  
+* Type **snmptrapd -H 2>&1 | grep perl**.  It should give **perl   PERLCODE** if embedded Perl is enabled.  
 
-> If it's not available, you need to compile and install Net-SNMP using the **\--enable-embedded-perl** configure option.  Use the net-snmp-users mail list for assistance.
+* If it's not available, you need to compile and install Net-SNMP using the **\--enable-embedded-perl** configure option.  Use the net-snmp-users mail list for assistance.
 
 If you are using UCD-SNMP, you should not have to re-compile the entire package.  Try the following:
 
@@ -136,9 +135,9 @@ A:  You have at least three options:
 
 A:  There are two Perl components for Net-SNMP:
 
-1) The Perl modules which allow you to create stand-alone Perl programs that use the 'SNMP' module (use SNMP;)
+1. The Perl modules which allow you to create stand-alone Perl programs that use the 'SNMP' module (use SNMP;)
 
-2) Embedded Perl for snmpd and snmptrapd which allow you to write Perl programs that are loaded and run from inside of snmpd and snmptrapd.
+2. Embedded Perl for snmpd and snmptrapd which allow you to write Perl programs that are loaded and run from inside of snmpd and snmptrapd.
 
 The Perl modules (1) are optional but recommended.  See [**Do I need the UCD-SNMP / Net-SNMP Perl module?**](Do_I_need_the_UCD-SNMP_Net-SNMP_Perl_module) for the benefits of enabling the Perl modules.  
   
@@ -214,8 +213,8 @@ A:  You must have the UCD-SNMP / Net-SNMP Perl module installed and working, an
 
 For starters, make sure the SNMP module is working.  Type:
 
-> perl  
-> use SNMP;
+    perl
+    use SNMP;
 
 If you get an error after typing 'use SNMP', then the module is not installed correctly.  Re-install the module and make sure you execute the tests while building.
 
@@ -223,7 +222,7 @@ If the MIB files are present, but translations do not occur, ensure UCD-SNMP / N
 
 If everything appears to be fine, try translating the variable name by hand by using snmptranslate.  Get the variable name OID from the snmptt.debug file from the second Value 0+ section, and type:
 
-> snmptranslate -Td _oid_
+    snmptranslate -Td _oid_
 
 This should return the OBJECT-TYPE for the variable if it exists in a MIB file
 
@@ -280,13 +279,13 @@ The program **snmptt-net-snmp-test** can be used to perform various translations
   
 **<a name="I_converted_a_MIB_using_snmpttconvertmib_but_the_OIDs"></a>Q:  I converted a MIB using snmpttconvertmib but the OIDs are appearing as text instead of being numerical.  Why?**
 
-> **For example:**
+**For example:**
 
-> **EVENT linkUp .iso.org.dod.internet.snmpV2.snmpModules.snmpMIB.snmpMIBObjects.snmpTraps.linkUp "Status Events" Normal**
-> 
-> **instead of**
-> 
-> **EVENT linkUp .1.3.6.1.6.3.1.1.5.4 "Status Events" Normal**
+    EVENT linkUp .iso.org.dod.internet.snmpV2.snmpModules.snmpMIB.snmpMIBObjects.snmpTraps.linkUp "Status Events" Normal
+
+instead of
+
+    EVENT linkUp .1.3.6.1.6.3.1.1.5.4 "Status Events" Normal
 
   
 A:  **Snmpttconvertmib** uses the **snmptranslate** command to convert MIB files.  With Net-SNMP v5.0.2 and newer, setting the **\-On** switch on the **snmptranslate** command causes the output to be in numerical format, which is what is needed for **snmpttconvertmib**.

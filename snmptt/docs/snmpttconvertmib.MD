@@ -143,9 +143,9 @@ To convert all the CPQ\* files in the current folder, you can use:
 Unix / Linux:
 
     for i in CPQ\*  
-    > do  
-    > /usr/local/sbin/snmpttconvertmib --in=$i --out=snmptt.conf.compaq  
-    > done  
+      do  
+      /usr/local/sbin/snmpttconvertmib --in=$i --out=snmptt.conf.compaq  
+    done  
 
 Windows:
 

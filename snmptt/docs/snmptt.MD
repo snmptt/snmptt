@@ -1660,7 +1660,7 @@ $r is translated to the hostname, and $x is the current date, and $X is the curr
 
 To enable or disable the execution of EXEC definitions, edit the snmptt.ini file and modify the following variable:
 
-> **exec\_enable**
+    exec_enable
 
 It is also possible to launch an external program when an unknown trap is received. This can be enabled by defining **unknown\_trap\_exec** in **snmptt.ini**. Passed to the command will be all standard and enterprise variables, similar to **unknown\_trap\_log\_file** but without the newlines.
 
@@ -2359,24 +2359,24 @@ When defining the service for receiving the SNMPTT translated trap, the service 
 Following is a sample service entry for Nagios.  The Description column should not be included in the definition.
  
     define service{
-        host_name	                server01	        # Name of host
-        service_description	        TRAP	            # Name of service.  What you use here must match the same value for the submit_check_result script
-        is_volatile	                1	                # Enables volatile services
-        check_command	            check-host-alive	# Used to reset the status to OK when 'Schedule an immediate check of this service' is selected.
-        max_check_attempts	        1               	# Leave as 1.
-        normal_check_interval	    1	                # Leave as 1.
-        retry_check_interval	    1	                # Leave as 1.
-        active_checks_enabled	    0	                # Prevent active checks from occuring as we are only using passive checks.
-        passive_checks_enabled	    1	                # Enables passive checks
-        check_period            	24x7	            # Required for freshness checking.
-        notification_interval	    31536000	        # Notification interval.  Set to a very high number to prevent you from
-                                                        #  getting pages of previously received traps (1 year - restart Nagios 
-                                                        #  at least once a year! - do not set to 0!).
-        notification_period         24x7	            # When you can be notified.  Can be changed
-        notification_options	    w,u,c	            # Notify on warning, unknown and critical.  Recovery is not enabled so we do not 
-                                                        #  get notified when a trap is cleared.
-        notifications_enabled	    1	                # Enable notifications
-        contact_groups	            cg_core	            # Name of contact group to notify
+        host_name               server01            # Name of host
+        service_description     TRAP                # Name of service.  What you use here must match the same value for the submit_check_result script
+        is_volatile             1                   # Enables volatile services
+        check_command           check-host-alive    # Used to reset the status to OK when 'Schedule an immediate check of this service' is selected.
+        max_check_attempts      1                   # Leave as 1.
+        normal_check_interval   1                   # Leave as 1.
+        retry_check_interval    1                   # Leave as 1.
+        active_checks_enabled   0                   # Prevent active checks from occuring as we are only using passive checks.
+        passive_checks_enabled  1                   # Enables passive checks
+        check_period            24x7                # Required for freshness checking.
+        notification_interval   31536000            # Notification interval.  Set to a very high number to prevent you from
+                                                    #  getting pages of previously received traps (1 year - restart Nagios 
+                                                    #  at least once a year! - do not set to 0!).
+        notification_period     24x7                # When you can be notified.  Can be changed
+        notification_options    w,u,c               # Notify on warning, unknown and critical.  Recovery is not enabled so we do not 
+                                                    #  get notified when a trap is cleared.
+        notifications_enabled   1                   # Enable notifications
+        contact_groups          cg_core             # Name of contact group to notify
     }
 
 Note:  To simplify the configuration, you can create a service template.
@@ -2432,10 +2432,10 @@ If you have an application that sends periodic SNMP heartbeats, it is possible t
   
 To configure a heartbeat trap, start by creating a new service definition by following 'Creating the Nagios service entry' above, but use a new service\_description such as MyApp\_heartbeat.  Next, add / change the following service definitions.  The third column should not be included in the definition.  
 
-    check_freshness	            1	                        # Enable freshness checking
-    freshness_threshold	        1200	                    # Check freshness every 20 minutes.
-    check_command	            myapp_heartbeat_alarm_set	# Command to execute when a heartbeat is not received within freshness_threshold seconds.
-    notification_options	    w,u,c,r	                    # Notify on warning, unknown critical and recovery.
+    check_freshness         1                           # Enable freshness checking
+    freshness_threshold     1200                        # Check freshness every 20 minutes.
+    check_command           myapp_heartbeat_alarm_set   # Command to execute when a heartbeat is not received within freshness_threshold seconds.
+    notification_options    w,u,c,r                     # Notify on warning, unknown critical and recovery.
   
 Note:  For freshness checking to work, **normal\_check\_interval** must be set to **1**, and valid **check\_period** should be set to **24x7**.  
   
