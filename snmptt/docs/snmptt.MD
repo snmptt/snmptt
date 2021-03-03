@@ -1224,9 +1224,9 @@ Translated traps can be sent to standard output and to a log file.  The output 
 
 To configure standard output or regular logging, edit the **snmptt.ini** file and modify the following variables:
 
-> **stdout\_enable**  
-> **log\_enable**  
-> **log\_file**
+    stdout_enable
+    log_enable
+    log_file
 
 ## <a name="LoggingUnknown"></a>Logging - Unknown traps
 
@@ -1234,9 +1234,8 @@ Logging of unrecognized traps is possible.  This would be used mainly for troub
 
 To configure unknown trap logging, edit the snmptt.ini file and modify the following variables:
 
-> **enable\_unknown\_trap\_log**  
-> **unknown\_trap\_log\_file  
-> **
+    enable_unknown_trap_log
+    unknown_trap_log_file  
 
 Unknown traps can be logged to a SQL table as described in the [Database](#LoggingDatabase) section.  
 
@@ -1244,21 +1243,21 @@ Unknown traps can be logged to a SQL table as described in the [Database](#Loggi
 
 Translated traps can be sent to syslog.  The format of the entries will be similar to above without the date (as syslogd adds the date):
 
-> **trap-oid severity category hostname translated-trap**
+    trap-oid severity category hostname translated-trap
 
 Syslog entries normally start with: **date hostname snmptt\[pid\]:** 
   
 To configure syslog, edit the snmptt ini file and modify the following variables:
 
-> **syslog\_enable**  
-> **syslog\_facility**  
-> **syslog\_level**
+    syslog\_enable
+    syslog\_facility
+    syslog\_level
 
 SNMPTT system errors and messages such as startup, shutdown, trap statistics etc can be sent to syslog by editing the snmptt.ini file and modifying the following variables:
 
-> **syslog\_system\_enable**  
-> **syslog\_system\_facility**  
-> **syslog\_system\_level**
+    syslog\_system\_enable
+    syslog\_system\_facility
+    syslog\_system\_level
 
 Syslog system entries normally start with: **date hostname snmptt-sys\[pid\]:**
   
@@ -1298,12 +1297,12 @@ When running under Windows, translated traps can be sent to the EventLog.  All 
 
 To configure eventlog support, edit the snmptt ini file and modify the following variables:
 
-> **eventlog\_enable**  
-> **eventlog\_type**
+    eventlog_enable
+    eventlog_type
 
 SNMPTT system errors can be sent to the Event Log by editing the snmptt.ini file and modifying the following variables:
 
-> **eventlog\_system\_enable**
+    eventlog_system_enable
 
 The following errors are logged.  Note that each error contains a unique EventID:  
 
@@ -1314,7 +1313,7 @@ The following errors are logged.  Note that each error contains a unique EventI
 > EventID 6: Could not open trap file _x_ **(\*)**  
 > EventID 7: Unable to delete trap file _x_ from spool dir **(\*)**  
 > EventID 20: Unable to delete !reload file spool dir **(\*)  
-> **EventID 21: Unable to delete !statistics file spool dir **(\*)**  
+> EventID 21: Unable to delete !statistics file spool dir **(\*)**  
 > EventID 8: Reloading configuration file(s) **(\*)**  
 > EventID 1: SNMPTT (version) shutdown **(\*)**  
 > EventID 9: Loading _snmpttconfigfile_ **(\*)**  
@@ -1343,21 +1342,21 @@ Translated and unrecognized traps can be sent to a database.  MySQL (tested und
 
 To configure unknown trap logging, edit the snmptt.ini file and modify the following variables:
 
-> **enable\_unknown\_trap\_log**  
-> **db\_unknown\_trap\_format**
+    enable_unknown_trap_log
+    db_unknown_trap_format
 
 ## <a name="LoggingDatabase-MySQL"></a>DBD::MySQL
 
 To configure SNMPTT for MySQL, modify the following variables in the snmptt.ini file.
 
-> **mysql\_dbi\_enable**  
-> **mysql\_dbi\_host  
-> ****mysql\_dbi\_port**  
-> **mysql\_dbi\_database**  
-> **mysql\_dbi\_table  
-> ****mysql\_dbi\_table\_unknown**  
-> **mysql\_dbi\_username**  
-> **mysql\_dbi\_password**
+    mysql_dbi_enable
+    mysql_dbi_host
+    mysql_dbi_port
+    mysql_dbi_database
+    mysql_dbi_table
+    mysql_dbi_table_unknown
+    mysql_dbi_username
+    mysql_dbi_password
 
 Note:  Sample values are defined in the default ini file.  Defining mysql\_dbi\_table\_unknown is optional.
 
@@ -1702,274 +1701,274 @@ The syntax of the snmptt.conf file  is:
 > \[**SDESC**\]  
 > \[**EDESC**\]
 > 
-> Note: Lines starting with a # will be ignored.
-> 
-> Note:  The EVENT and FORMAT line are REQUIRED.  Commands in \[\] are optional.  Do NOT include the \[\]s in the configuration file!
+ Note: Lines starting with a # will be ignored.
+ 
+ Note:  The EVENT and FORMAT line are REQUIRED.  Commands in \[\] are optional.  Do NOT include the \[\]s in the configuration file!
 
 ## <a name="SNMPTT.CONF-EVENT"></a>EVENT
 
-> **EVENT** event\_name event\_OID "category" severity
-> 
-> **event\_name:**
-> 
-> > Unique text label (alias) **containing no spaces**.  This would match the name on the TRAP-TYPE or NOTIFICATION-TYPE line in the MIB file when converted using **snmpttconvertmib**.
-> 
-> **event\_OID:**
-> 
-> > Object identifier string in dotted format or symbolic notation **containing no spaces**.
-> > 
-> > For example, a Compaq (enterprise .1.3.6.1.4.1.232) cpqHoGenericTrap trap (trap 11001) would be written as:
-> > 
-> > > .1.3.6.1.4.1.232.0.11001
-> > 
-> > Symbolic names can also be used if the Net-SNMP Perl module is installed and enabled by setting **net\_snmp\_perl\_enable** in the snmptt.ini file.  For example:
-> > 
-> > linkDown
-> > 
-> > IF-MIB::linkDown
-> > 
-> > Notes:
-> > 
-> > * Net-SNMP 5.0.9 and earlier does not support including the module name (eg: IF-MIB::) when translating an OID.  A patch is available for 5.0.8+ that is included in Net-SNMP 5.1.1 and higher. The patch is available from the [Net-SNMP patch page](http://sourceforge.net/tracker/index.php?func=detail&aid=722075&group_id=12694&atid=312694).  If the version of Net-SNMP you are using does not support this feature and the event OID is specified with the module name, the event definition will be ignored.  Also note that UCD-SNMP may not properly convert symbolic names to numeric OIDs which could result in traps not being matched.
-
-> > * SNMP V1 traps are in the format of enterprise ID (.1.3.6.1.4.1.232) followed by a 0, and then followed by the trap number (11001).
-
-> > * There can be multiple entries for the same trap OID in the configuration file.  If **multiple\_event** is enabled in the snmptt.ini, then it will process all matching traps.  If **multiple\_event** is disabled, only the first matching entry will be used.
-> > 
-> > Wildcards in dotted format notation can  also be used.  For example:
-> > 
-> > > .1.3.6.1.4.1.232.1.2.\*
-> > 
-> > Notes:
-> > 
-> > * Specific trap matches are performed before wildcards so if you have an entry for .1.3.6.1.4.1.232.1.2.5 AND .1.3.6.1.4.1.232.1.2.\*, it will process the .5 trap when received even if the wildcard is defined first.
+ **EVENT** event\_name event\_OID "category" severity
  
-> > * Wildcard matches are only matched if there are NO exact matches.  This takes into consideration the NODES list.  Therefore, if there is a matching trap, but the NODES list prevents it from being considered a match, the wildcard entry will only be used if there are no other exact matches.
-> 
-> **category:**
-> 
-> > Character string enclosed in double quotes (").  Used when logging output (see above).
-> > 
-> > If the category is "**IGNORE**", no action will take place even if the snmptt.conf contains FORMAT and / or EXEC statements.
-> > 
-> > If the category is "**LOGONLY**", the trap will be logged as usual, but the EXEC statement will be ignored.
-> > 
-> > Note:   If you plan on using an external program such as Nagios for logging, paging etc, you probably do not want any traps defined with **LOGONLY** as the EXEC line would never be used to submit the passive service check.
-> 
-> **severity:**
-> 
-> > Character string of the severity of the event.  Used in the output when logging.  Example: Minor, Major, Normal, Critical, Warning.  The **snmptt.ini** contains options to match the syslog level or NT Event Log type to the severity level.
+ **event\_name:**
+ 
+ > Unique text label (alias) **containing no spaces**.  This would match the name on the TRAP-TYPE or NOTIFICATION-TYPE line in the MIB file when converted using **snmpttconvertmib**.
+ 
+ **event\_OID:**
+ 
+ > Object identifier string in dotted format or symbolic notation **containing no spaces**.
+ > 
+ > For example, a Compaq (enterprise .1.3.6.1.4.1.232) cpqHoGenericTrap trap (trap 11001) would be written as:
+ > 
+ > > .1.3.6.1.4.1.232.0.11001
+ > 
+ > Symbolic names can also be used if the Net-SNMP Perl module is installed and enabled by setting **net\_snmp\_perl\_enable** in the snmptt.ini file.  For example:
+ > 
+ > > linkDown
+ > 
+ > > IF-MIB::linkDown
+ > 
+ > Notes:
+ > 
+ > * Net-SNMP 5.0.9 and earlier does not support including the module name (eg: IF-MIB::) when translating an OID.  A patch is available for 5.0.8+ that is included in Net-SNMP 5.1.1 and higher. The patch is available from the [Net-SNMP patch page](http://sourceforge.net/tracker/index.php?func=detail&aid=722075&group_id=12694&atid=312694).  If the version of Net-SNMP you are using does not support this feature and the event OID is specified with the module name, the event definition will be ignored.  Also note that UCD-SNMP may not properly convert symbolic names to numeric OIDs which could result in traps not being matched.
+
+ > * SNMP V1 traps are in the format of enterprise ID (.1.3.6.1.4.1.232) followed by a 0, and then followed by the trap number (11001).
+
+ > * There can be multiple entries for the same trap OID in the configuration file.  If **multiple\_event** is enabled in the snmptt.ini, then it will process all matching traps.  If **multiple\_event** is disabled, only the first matching entry will be used.
+ > 
+ > Wildcards in dotted format notation can  also be used.  For example:
+ > 
+ > > .1.3.6.1.4.1.232.1.2.\*
+ > 
+ > Notes:
+ > 
+ > * Specific trap matches are performed before wildcards so if you have an entry for .1.3.6.1.4.1.232.1.2.5 AND .1.3.6.1.4.1.232.1.2.\*, it will process the .5 trap when received even if the wildcard is defined first.
+ 
+ > * Wildcard matches are only matched if there are NO exact matches.  This takes into consideration the NODES list.  Therefore, if there is a matching trap, but the NODES list prevents it from being considered a match, the wildcard entry will only be used if there are no other exact matches.
+ 
+ **category:**
+ 
+ * Character string enclosed in double quotes (").  Used when logging output (see above).
+ 
+ * If the category is "**IGNORE**", no action will take place even if the snmptt.conf contains FORMAT and / or EXEC statements.
+ 
+ * If the category is "**LOGONLY**", the trap will be logged as usual, but the EXEC statement will be ignored.
+
+ Note:   If you plan on using an external program such as Nagios for logging, paging etc, you probably do not want any traps defined with **LOGONLY** as the EXEC line would never be used to submit the passive service check.
+ 
+ **severity:**
+ 
+ * Character string of the severity of the event.  Used in the output when logging.  Example: Minor, Major, Normal, Critical, Warning.  The **snmptt.ini** contains options to match the syslog level or NT Event Log type to the severity level.
  
 ## <a name="SNMPTT.CONF-FORMAT"></a>FORMAT
 
-> **FORMAT** format\_string
-> 
-> There can be only one FORMAT line per EVENT.
-> 
-> The format string is used to generate the text that will be logged to any of the supported logging methods.
-> 
-> <a name="Variable-substitutions"></a>Variable substitution is performed on this string using the following variables:
-> 
-> > $A - Trap agent host name **(see Note 1)**  
-> > $aA - Trap agent IP address  
-> > $Be - securityEngineID (snmpEngineID) **(see Note** 7**)**  
-> > $Bu - securityName (snmpCommunitySecurityName) **(see Note** 7**)**  
-> > $BE - contextEngineID (snmpCommunityContextEngineID) **(see Note** 7**)**  
-> > $c - Category  
-> > $Bn - contextName (snmpCommunityContextName) **(see Note** 7**)**  
-> > $C - Trap community string  
-> > $D - Description text from SNMPTT.CONF or MIB file **(see Note 6)**  
-> > $E - Enterprise trap OID in symbolic format  
-> > $e  - Enterprise trap OID in number format  
-> > $Fa  - alarm (bell) (BEL)  
-> > $Ff  - form feed (FF)  
-> > $Fn  - newline (LF, NL)  
-> > $Fr  - return (CR)  
-> > $Ft  - tab (HT, TAB)  
-> > $Fz  - Translated FORMAT line (EXEC only)  
-> > $G  - Generic trap number (0 if enterprise trap)  
-> > $H  - Host name of the system running SNMPTT  
-> > $S  - Specific trap number (0 if generic trap)  
-> > $N  - Event name defined in .conf file of matched entry  
-> > $i  - Event OID defined in .conf file of matched entry (could be a wildcard OID)  
-> > $O - Trap OID in symbolic format **(see Note 4)**  
-> > $o - Trap OID in numerical format **(see Note 4)**  
-> > $R, $r  - Trap hostname **(see Note 1)**  
-> > $aR, $ar - IP address  
-> > $s  - Severity  
-> > $T  - Uptime:  Time since network entity was initialized  
-> > $X  - Time trap was spooled (daemon mode) or current time (standalone mode)  
-> > $x  - Date trap was spooled (daemon mode) or current date (standalone mode)  
-> > $# - Number of (how many) variable-bindings in the trap  
-> > $$  - Print a $  
-> > $@ - Number of seconds since the epoch of when the trap was spooled (daemon mode) or the current time (standalone mode)  
-> > $_n_  - Expand variable-binding n (1-_n_) **(see Note 2,5)**  
-> > $+_n_  - Expand variable-binding n (1-_n_) in the format of _variable name:value_ **(see Note 2,3****,5****)**  
-> > $-_n_  - Expand variable-binding n (1-_n_) in the format of _variable name (variable type):value_ **(see Note 2,3****,5****)**  
-> > $v_n_  - Expand variable name of the variable-binding n (1-_n_)**(see Note 3)**  
-> > $\*  - Expand all variable-bindings **(see Note 5)**  
-> > $+\*  - Expand all variable-bindings in the format of _variable name:value_ **(see Note 2,3****,5****)**  
-> > $-\*  - Expand all variable-bindings in the format of _variable name (variable type):value_ **(see Note 2,3****,5****)**
-> 
-> Example:
-> 
-> > FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6
-> 
-> Notes:
-> 
-> > For the text log file, the output will be formatted as:
-> > 
-> > > **_date time trap-OID severity category hostname - format_**
-> > 
-> > For all other log files except MySQL, DBD::ODBC and Win32::ODBC, the output will be formatted as:
-> > 
-> > > **_trap-OID severity category hostname - format_**
-> > 
-> > For MySQL, DBD::ODBC and Win32::ODBC, the **formatline** column will contain only the **format** text.
-> 
-> Note (1):
-> 
-> > See the section '[Name Resolution / DNS](#DNS)' for important DNS information.
-> 
-> Note (2):
-> 
-> > If  **translate\_integers** is enabled in the **snmptt.ini** file, SNMPTT will attempt to convert integer values received in traps into text by performing a lookup in the MIB file.  
-> > You must have the Net-SNMP Perl module installed for this to work and you must enable support for it by enabling **net\_snmp\_perl\_enable** in the snmptt.ini file.  
-> > 
-> > For this feature to work, you must ensure Net-SNMP is configured correctly with all the required MIBS.  If the option is enabled, but the value can not be found, the integer value will be used.  If the MIB files are present, but translations do not occur, ensure Net-SNMP is correctly configured to process all the required mibs.  This is configured in the Net-SNMP **snmp.conf** file.  Alternatively, you can try setting the **mibs\_enviroment** variable in **snmptt.ini** to **ALL** (no quotes) to force all MIBS to be initialized at SNMPTT startup.
-> > 
-> > If **translate\_integers** is enabled while using stand-alone mode, it may take longer to process each trap due to the initialization of the MIB files.
-> 
-> Note (3):
-> 
-> > $v_n_, $+_n_ and $-_n_ variable names and variable type are translated into the text name by performing a lookup in the MIB file.  You must have the Net-SNMP Perl module installed for this to work and you must enable support for it by enabling **net\_snmp\_perl\_enable** in the snmptt.ini file.  If **net\_snmp\_perl\_enable** is not enabled, the $v_n_ variable will be replaced with the text 'variable_n_' where _n_ is the variable number (1+).
-> > 
-> > For the name translation to work, you must ensure Net-SNMP is configured correctly with all the required MIBS.  If the option is enabled and the correct name is not returned, ensure Net-SNMP is correctly configured to process all the required mibs.  This is configured in the Net-SNMP **snmp.conf** file.  Alternatively, you can try setting the **mibs\_enviroment** variable in **snmptt.ini** to **ALL** (no quotes) to force all MIBS to be initialized at SNMPTT startup.
-> 
-> Note (4):
-> 
-> > If  **translate\_trap\_oid** is enabled in the **snmptt.ini** file, SNMPTT will attempt to convert the numeric OID of the received trap into symbolic form such as IF-MIB::linkDown.  You must have the Net-SNMP Perl module installed for this to work and you must enable support for it by enabling **net\_snmp\_perl\_enable** in the snmptt.ini file.  If **net\_snmp\_perl\_enable** is not enabled, it will default to using the numeric OID.   
+ **FORMAT** format\_string
+ 
+ There can be only one FORMAT line per EVENT.
+ 
+ The format string is used to generate the text that will be logged to any of the supported logging methods.
+ 
+ <a name="Variable-substitutions"></a>Variable substitution is performed on this string using the following variables:
+ 
+ > $A - Trap agent host name (**see Note 1**)  
+ > $aA - Trap agent IP address  
+ > $Be - securityEngineID (snmpEngineID) (**see Note 7**)  
+ > $Bu - securityName (snmpCommunitySecurityName) (**see Note 7**)  
+ > $BE - contextEngineID (snmpCommunityContextEngineID) (**see Note 7**)  
+ > $c - Category  
+ > $Bn - contextName (snmpCommunityContextName) (**see Note 7**)  
+ > $C - Trap community string  
+ > $D - Description text from SNMPTT.CONF or MIB file (**see Note 6**)  
+ > $E - Enterprise trap OID in symbolic format  
+ > $e  - Enterprise trap OID in number format  
+ > $Fa  - alarm (bell) (BEL)  
+ > $Ff  - form feed (FF)  
+ > $Fn  - newline (LF, NL)  
+ > $Fr  - return (CR)  
+ > $Ft  - tab (HT, TAB)  
+ > $Fz  - Translated FORMAT line (EXEC only)  
+ > $G  - Generic trap number (0 if enterprise trap)  
+ > $H  - Host name of the system running SNMPTT  
+ > $S  - Specific trap number (0 if generic trap)  
+ > $N  - Event name defined in .conf file of matched entry  
+ > $i  - Event OID defined in .conf file of matched entry (could be a wildcard OID)  
+ > $O - Trap OID in symbolic format (**see Note 4**)  
+ > $o - Trap OID in numerical format (**see Note 4**)  
+ > $R, $r  - Trap hostname (**see Note 1**)  
+ > $aR, $ar - IP address  
+ > $s  - Severity  
+ > $T  - Uptime:  Time since network entity was initialized  
+ > $X  - Time trap was spooled (daemon mode) or current time (standalone mode)  
+ > $x  - Date trap was spooled (daemon mode) or current date (standalone mode)  
+ > $# - Number of (how many) variable-bindings in the trap  
+ > $$  - Print a $  
+ > $@ - Number of seconds since the epoch of when the trap was spooled (daemon mode) or the current time (standalone mode)  
+ > $_n_  - Expand variable-binding n (1-_n_) (**see Note 2,5**)  
+ > $+_n_  - Expand variable-binding n (1-_n_) in the format of _variable name:value_ (**see Note 2,3,5**)  
+ > $-_n_  - Expand variable-binding n (1-_n_) in the format of _variable name (variable type):value_ (**see Note 2,3,5**)  
+ > $v_n_  - Expand variable name of the variable-binding n (1-_n_)(**see Note 3**)  
+ > $\*  - Expand all variable-bindings (**see Note 5**)  
+ > $+\*  - Expand all variable-bindings in the format of _variable name:value_ (**see Note 2,3,5**)  
+ > $-\*  - Expand all variable-bindings in the format of _variable name (variable type):value_ (**see Note 2,3,5**)  
+ 
+ Example:
+ 
+ > FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6
+ 
+ Notes:
+ 
+ > For the text log file, the output will be formatted as:
+ > 
+ > > **_date time trap-OID severity category hostname - format_**
+ > 
+ > For all other log files except MySQL, DBD::ODBC and Win32::ODBC, the output will be formatted as:
+ > 
+ > > **_trap-OID severity category hostname - format_**
+ > 
+ > For MySQL, DBD::ODBC and Win32::ODBC, the **formatline** column will contain only the **format** text.
+ 
+ Note (1):
+ 
+ > See the section '[Name Resolution / DNS](#DNS)' for important DNS information.
+ 
+ Note (2):
+ 
+ > If  **translate\_integers** is enabled in the **snmptt.ini** file, SNMPTT will attempt to convert integer values received in traps into text by performing a lookup in the MIB file.  
+ > You must have the Net-SNMP Perl module installed for this to work and you must enable support for it by enabling **net\_snmp\_perl\_enable** in the snmptt.ini file.  
+ > 
+ > For this feature to work, you must ensure Net-SNMP is configured correctly with all the required MIBS.  If the option is enabled, but the value can not be found, the integer value will be used.  If the MIB files are present, but translations do not occur, ensure Net-SNMP is correctly configured to process all the required mibs.  This is configured in the Net-SNMP **snmp.conf** file.  Alternatively, you can try setting the **mibs\_enviroment** variable in **snmptt.ini** to **ALL** (no quotes) to force all MIBS to be initialized at SNMPTT startup.
+ > 
+ > If **translate\_integers** is enabled while using stand-alone mode, it may take longer to process each trap due to the initialization of the MIB files.
+ 
+ Note (3):
+ 
+ > $v_n_, $+_n_ and $-_n_ variable names and variable type are translated into the text name by performing a lookup in the MIB file.  You must have the Net-SNMP Perl module installed for this to work and you must enable support for it by enabling **net\_snmp\_perl\_enable** in the snmptt.ini file.  If **net\_snmp\_perl\_enable** is not enabled, the $v_n_ variable will be replaced with the text 'variable_n_' where _n_ is the variable number (1+).
+ > 
+ > For the name translation to work, you must ensure Net-SNMP is configured correctly with all the required MIBS.  If the option is enabled and the correct name is not returned, ensure Net-SNMP is correctly configured to process all the required mibs.  This is configured in the Net-SNMP **snmp.conf** file.  Alternatively, you can try setting the **mibs\_enviroment** variable in **snmptt.ini** to **ALL** (no quotes) to force all MIBS to be initialized at SNMPTT startup.
+ 
+ Note (4):
+ 
+ > If  **translate\_trap\_oid** is enabled in the **snmptt.ini** file, SNMPTT will attempt to convert the numeric OID of the received trap into symbolic form such as IF-MIB::linkDown.  You must have the Net-SNMP Perl module installed for this to work and you must enable support for it by enabling **net\_snmp\_perl\_enable** in the snmptt.ini file.  If **net\_snmp\_perl\_enable** is not enabled, it will default to using the numeric OID.   
 
-> > Net-SNMP 5.0.9 and earlier does not support including the module name (eg: IF-MIB::) when translating an OID and most of the 5.0.x versions do not properly tranlsate numeric OIDs to long symbolic names.  A patch is available for 5.0.8+ that is included in Net-SNMP 5.1.1 and higher. The patch is available from the [Net-SNMP patch page](http://sourceforge.net/tracker/index.php?func=detail&aid=722075&group_id=12694&atid=312694).
+ > Net-SNMP 5.0.9 and earlier does not support including the module name (eg: IF-MIB::) when translating an OID and most of the 5.0.x versions do not properly tranlsate numeric OIDs to long symbolic names.  A patch is available for 5.0.8+ that is included in Net-SNMP 5.1.1 and higher. The patch is available from the [Net-SNMP patch page](http://sourceforge.net/tracker/index.php?func=detail&aid=722075&group_id=12694&atid=312694).
 
-> Note (5):
-> 
-> > If  **translate\_oids** is enabled in the **snmptt.ini** file, SNMPTT will attempt to convert any numeric OIDs found inside the variables passed inside the trap to symbolic form.  You must have the Net-SNMP Perl module installed for this to work and you must enable support for it by enabling **net\_snmp\_perl\_enable** in the snmptt.ini file.  If **net\_snmp\_perl\_enable** is not enabled, it will default to using the numeric OID.   
-> >   
-> > Net-SNMP 5.0.9 and earlier does not support including the module name (eg: IF-MIB::) when translating an OID and most of the 5.0.x versions do not properly tranlsate numeric OIDs to long symbolic names.  A patch is available for 5.0.8+ that is inlcuded in Net-SNMP 5.1.1 and higher. The patch is available from the [Net-SNMP patch page](http://sourceforge.net/tracker/index.php?func=detail&aid=722075&group_id=12694&atid=312694).
-> 
-> Note (6):
-> 
-> > The **snmptt.ini** **description\_mode** option must be set to either 1 or 2. If set to 1, the description is pulled from the SNMPTT.CONF files. If set to 2, the description is pulled from the MIB file. If using the MIB file, you must have the Net-SNMP Perl module installed and enabled.
+ Note (5):
+ 
+ > If  **translate\_oids** is enabled in the **snmptt.ini** file, SNMPTT will attempt to convert any numeric OIDs found inside the variables passed inside the trap to symbolic form.  You must have the Net-SNMP Perl module installed for this to work and you must enable support for it by enabling **net\_snmp\_perl\_enable** in the snmptt.ini file.  If **net\_snmp\_perl\_enable** is not enabled, it will default to using the numeric OID.   
+ >   
+ > Net-SNMP 5.0.9 and earlier does not support including the module name (eg: IF-MIB::) when translating an OID and most of the 5.0.x versions do not properly tranlsate numeric OIDs to long symbolic names.  A patch is available for 5.0.8+ that is inlcuded in Net-SNMP 5.1.1 and higher. The patch is available from the [Net-SNMP patch page](http://sourceforge.net/tracker/index.php?func=detail&aid=722075&group_id=12694&atid=312694).
+ 
+ Note (6):
+ 
+ > The **snmptt.ini** **description\_mode** option must be set to either 1 or 2. If set to 1, the description is pulled from the SNMPTT.CONF files. If set to 2, the description is pulled from the MIB file. If using the MIB file, you must have the Net-SNMP Perl module installed and enabled.
 
-> Note (7):
-> 
-> > These variables are only available when using the embedded trap handler for snmptrapd (snmptthandler-embedded).
+ Note (7):
+ 
+ > These variables are only available when using the embedded trap handler for snmptrapd (snmptthandler-embedded).
  
 ## <a name="SNMPTT.CONF-EXEC"></a>EXEC
  
-> \[**EXEC** command\_string\]
-> 
-> There can be multiple EXEC lines per EVENT.
-> 
-> Optional string containing a command to execute when trap is received and arguments to pass to the program.  The EXEC lines are executed in the order that they appear.
-> 
-> EXEC uses the same variable substitution as the FORMAT line.
-> 
-> Example:
-> 
+ \[**EXEC** command\_string\]
+ 
+ There can be multiple EXEC lines per EVENT.
+ 
+ Optional string containing a command to execute when trap is received and arguments to pass to the program.  The EXEC lines are executed in the order that they appear.
+ 
+ EXEC uses the same variable substitution as the FORMAT line.
+ 
+ Example:
+ 
     EXEC /usr/bin/qpage -f TRAP alex "$r: $x $X - NIC switchover to slot $3, port $4 from slot $5, port $6"
-> 
-> or
-> 
+ 
+ or
+ 
     EXEC c:\\snmp\\pager netops "$r: $x $X - NIC switchover to slot $3, port $4 from slot $5, port $6"
-> 
-> Note: Unlike the FORMAT line, nothing is prepended to the message.  If you would like to include the hostname and date in the page above, you must use the variables such as $r, $x and $X.  
->   
-> Note: If the trap severity is set to LOGONLY in the snmptt.conf file, EXEC will not be executed.
+ 
+ Note: Unlike the FORMAT line, nothing is prepended to the message.  If you would like to include the hostname and date in the page above, you must use the variables such as $r, $x and $X.  
+   
+ Note: If the trap severity is set to LOGONLY in the snmptt.conf file, EXEC will not be executed.
  
 ## <a name="SNMPTT.CONF-PREEXEC"></a>PREEXEC
  
-> \[**PREEXEC** command\_string\]
-> 
-> There can be multiple PREEXEC lines per EVENT.
-> 
-> Optional string containing a command to execute after a trap is received but **_before_** the FORMAT and EXEC statements are processed. The output of the external program is stored in the **$p_n_** variable where **_n_** is a number starting from 1. Multiple PREEXEC lines are permitted. The first PREEXEC stores the result of the command in **$p1**, the second in **$p2** etc. Any ending newlines are removed. The **snmptt.ini** parameter **pre\_exec\_enable** can be used to enable / disable **PREEXEC** statements.
-> 
-> **PREEXEC** uses the same variable substitution as the FORMAT line.
-> 
-> Example:
-> 
+ \[**PREEXEC** command\_string\]
+ 
+ There can be multiple PREEXEC lines per EVENT.
+ 
+ Optional string containing a command to execute after a trap is received but **_before_** the FORMAT and EXEC statements are processed. The output of the external program is stored in the **$p_n_** variable where **_n_** is a number starting from 1. Multiple PREEXEC lines are permitted. The first PREEXEC stores the result of the command in **$p1**, the second in **$p2** etc. Any ending newlines are removed. The **snmptt.ini** parameter **pre\_exec\_enable** can be used to enable / disable **PREEXEC** statements.
+ 
+ **PREEXEC** uses the same variable substitution as the FORMAT line.
+ 
+ Example:
+ 
     EVENT linkDown .1.3.6.1.6.3.1.1.5.3 "Status Events" Normal  
     FORMAT Link down on interface $1($p1). Admin state: $2. Operational state: $3  
     PREEXEC /usr/local/bin/snmpget -v 1 -Ovq -c public $aA ifDescr.$1
-> 
-> Sample output:
-> 
-> > Link down on interface 69("100BaseTX Port 1/6 Name SERVER1"). Admin state up. Operational state: down
-> 
-> In the above example the result is in quotes because that is what comes back from snmpget (it is not added by SNMPTT).
-> 
-> Note: PREEXEC will execute even if the trap severity is set to LOGONLY in the snmptt.conf file.
+ 
+ Sample output:
+ 
+ > Link down on interface 69("100BaseTX Port 1/6 Name SERVER1"). Admin state up. Operational state: down
+ 
+ In the above example the result is in quotes because that is what comes back from snmpget (it is not added by SNMPTT).
+ 
+ Note: PREEXEC will execute even if the trap severity is set to LOGONLY in the snmptt.conf file.
 
 ## <a name="SNMPTT.CONF-NODES"></a>NODES
  
-> \[**NODES** sources\_list\]
-> 
-> Used to limit which devices can be mapped to this EVENT definition. 
-> 
-> There can be multiple NODES lines per EVENT.
-> 
-> Optional string containing any combination of host names, IP addresses, CIDR network address, network IP address ranges, or a filename.  If this keyword omitted then ALL sources will be accepted.  Each entry is checked for a match.  As soon as one match occurs, searching stops.
-> 
-> For example, if you only wanted devices on the subnet 192.168.1.0/24 to trigger this EVENT, you could use a NODES entry of:
-> 
+ \[**NODES** sources\_list\]
+ 
+ Used to limit which devices can be mapped to this EVENT definition. 
+ 
+ There can be multiple NODES lines per EVENT.
+ 
+ Optional string containing any combination of host names, IP addresses, CIDR network address, network IP address ranges, or a filename.  If this keyword omitted then ALL sources will be accepted.  Each entry is checked for a match.  As soon as one match occurs, searching stops.
+ 
+ For example, if you only wanted devices on the subnet 192.168.1.0/24 to trigger this EVENT, you could use a NODES entry of:
+ 
     NODES 192.168.1.0/24
-> 
-> If a filename is specified, it must be specified with a full path. 
-> 
-> There are two modes of operation: **POS** (positive - the default) and **NEG** (negative). If set to **POS**, then **NODES** is a 'match' if _any_ of the **NODES** entries match. If set to **NEG**, then **NODES** is a 'match' only if _none_ of the **NODES** entries match. To change the mode of operation, use one of the following statements:
-> 
+ 
+ If a filename is specified, it must be specified with a full path. 
+ 
+ There are two modes of operation: **POS** (positive - the default) and **NEG** (negative). If set to **POS**, then **NODES** is a 'match' if _any_ of the **NODES** entries match. If set to **NEG**, then **NODES** is a 'match' only if _none_ of the **NODES** entries match. To change the mode of operation, use one of the following statements:
+ 
     NODES MODE=POS
     NODES MODE=NEG
-> 
-> A common use for this feature is when you have devices that implement a trap in a non-standard way (added additional variables for example) such as the linkDown and linkUp traps. By defining two EVENT statements and using NODES statements with NODES MODE, you can have one EVENT statement handle the standard devices, and the other handle the other devices with the extended linkDown / linkUp traps.
-> 
-> Example 1:  
-> 
-> > This example will match any hosts called **fred**, **barney**, **betty** or **wilma**:  
-> >   
+ 
+ A common use for this feature is when you have devices that implement a trap in a non-standard way (added additional variables for example) such as the linkDown and linkUp traps. By defining two EVENT statements and using NODES statements with NODES MODE, you can have one EVENT statement handle the standard devices, and the other handle the other devices with the extended linkDown / linkUp traps.
+ 
+ Example 1:  
+ 
+ > This example will match any hosts called **fred**, **barney**, **betty** or **wilma**:  
+ >   
     NODES fred barney betty wilma
-> 
-> Example 2:  
-> 
-> > This example will match any hosts **not** called **fred**, **barney**, **betty** or **wilma**:  
-> >   
+ 
+ Example 2:  
+ 
+ > This example will match any hosts **not** called **fred**, **barney**, **betty** or **wilma**:  
+ >   
     NODES fred barney betty wilma
     NODES MODE=NEG
-> 
-> Example 3:  
-> 
-> > This example will load the file /etc/snmptt-nodes (see below), and match any hosts called fred, barney, betty, network ip addresses  192.168.1.1, 192.168.1.2, 192.168.1.3, 192.168.2.1, network range 192.168.50.0/22 or network range 192.168.60.0-192.168.61.255:  
-> >   
+ 
+ Example 3:  
+ 
+ > This example will load the file /etc/snmptt-nodes (see below), and match any hosts called fred, barney, betty, network ip addresses  192.168.1.1, 192.168.1.2, 192.168.1.3, 192.168.2.1, network range 192.168.50.0/22 or network range 192.168.60.0-192.168.61.255:  
+ >   
     NODES /etc/snmptt-nodes
-> 
-> Example 4:  
-> 
-> > This example will load both files /etc/snmptt-nodes and /etc/snmptt-nodes2 (see above example):  
-> >   
+ 
+ Example 4:  
+ 
+ > This example will load both files /etc/snmptt-nodes and /etc/snmptt-nodes2 (see above example):  
+ >   
     NODES /etc/snmptt-nodes /etc/snmptt-nodes2
-> 
-> Example 5:  
-> >
+ 
+ Example 5:  
+ >
     NODES 192.168.4.0/22 192.168.60.0-192.168.61.255 /etc/snmptt-nodes2
-> 
-> Example 6:  
-> >
+ 
+ Example 6:  
+ >
     NODES fred /etc/snmptt-nodes pebbles /etc/snmptt-nodes2 barney
-> 
-> where snmptt-nodes contains:
-> >
+ 
+ where snmptt-nodes contains:
+ >
     fred  
     barney betty  
     # comment lines  
@@ -1979,125 +1978,125 @@ The syntax of the snmptt.conf file  is:
     192.168.60.0-192.168.61.255  
     wilma
 
-> Notes:
-> 
-> * The names are NOT case sensitive and comment lines are permitted by starting the line with a #.  
->    
-> * CIDR network addresses must be specified using 4 octets followed by a / followed by the number of bits.  For example: 172.16.0.0/24.  Using 172.16/24 will NOT work.  
->    
-> * Do not use any spaces between network ranges as they will be interpreted as two different values.  For example, 192.168.1.1   -    192.168.1.20 will not work.  Use 192.168.1.1-192.168.1.20 instead.  
->    
-> * By default, NODES files are loaded when the snmptt.conf files are loaded (during startup of SNMPTT).  The snmptt.ini option dynamic\_nodes can be set to 1 to have the nodes files loaded each time an EVENT is processed.  
+ Notes:
+ 
+ * The names are NOT case sensitive and comment lines are permitted by starting the line with a #.  
+    
+ * CIDR network addresses must be specified using 4 octets followed by a / followed by the number of bits.  For example: 172.16.0.0/24.  Using 172.16/24 will NOT work.  
+    
+ * Do not use any spaces between network ranges as they will be interpreted as two different values.  For example, 192.168.1.1   -    192.168.1.20 will not work.  Use 192.168.1.1-192.168.1.20 instead.  
+    
+ * By default, NODES files are loaded when the snmptt.conf files are loaded (during startup of SNMPTT).  The snmptt.ini option dynamic\_nodes can be set to 1 to have the nodes files loaded each time an EVENT is processed.  
 
-> * See the section '[Name Resolution / DNS](#DNS)' for important DNS information.
+ * See the section '[Name Resolution / DNS](#DNS)' for important DNS information.
 
 ## <a name="SNMPTT.CONF-MATCH"></a>MATCH
 
-> \[MATCH \[MODE=\[or | and\]\] | \[$n:\[!\]\[(    )\[i\] | n | n-n | > n | < n | x.x.x.x | x.x.x.x-x.x.x.x | x.x.x.x/x\]\]
-> 
-> Optional match expression that must be evaluated to true for the trap to be considered a match to this EVENT definition.
-> 
-> If a MATCH statement exists, and no matches evaluate to true, then the default will be to NOT match this EVENT definition.
-> 
-> The following Perl regular expression modifiers are supported:
-> 
-> > i - ignore case when trying to match
-> 
->   
-> 
-> The following command formats are available:
-> 
-> > **MATCH MODE=\[or | and\]  
-> > MATCH _$x:_ \[!\] _(reg) \[i\]_  
-> > MATCH _$x:_ \[!\] _n_  
-> > MATCH _$x:_ \[!\] _n-n_  
-> > MATCH _$x:_ \[!\] _< n_  
-> > MATCH _$x:_ \[!\] _\> n_  
-> > MATCH _$x:_ \[!\] & _n_  
-> > MATCH _$x:_ \[!\] _x.x.x.x_  
-> > MATCH _$x:_ \[!\] _x.x.x.x-x.x.x.x_  
-> > MATCH _$x:_ \[!\] _x.x.x.x/x_  
-> > **  
+ \[MATCH \[MODE=\[or | and\]\] | \[$n:\[!\]\[(    )\[i\] | n | n-n | > n | < n | x.x.x.x | x.x.x.x-x.x.x.x | x.x.x.x/x\]\]
+ 
+ Optional match expression that must be evaluated to true for the trap to be considered a match to this EVENT definition.
+ 
+ If a MATCH statement exists, and no matches evaluate to true, then the default will be to NOT match this EVENT definition.
+ 
+ The following Perl regular expression modifiers are supported:
+ 
+ > i - ignore case when trying to match
+ 
+   
+ 
+ The following command formats are available:
+ 
+ > **MATCH MODE=\[or | and\]  
+ > MATCH _$x:_ \[!\] _(reg) \[i\]_  
+ > MATCH _$x:_ \[!\] _n_  
+ > MATCH _$x:_ \[!\] _n-n_  
+ > MATCH _$x:_ \[!\] _< n_  
+ > MATCH _$x:_ \[!\] _\> n_  
+ > MATCH _$x:_ \[!\] & _n_  
+ > MATCH _$x:_ \[!\] _x.x.x.x_  
+ > MATCH _$x:_ \[!\] _x.x.x.x-x.x.x.x_  
+ > MATCH _$x:_ \[!\] _x.x.x.x/x_  
+ > **  
 
-> where:  
-> 
-> > **or** or **and** set the default evaluation mode for ALL matches  
-> > **$x** is any variable (example: $3, $A etc)  
-> > **reg** is a regular expression  
-> > **!** is used to negate the result (not)  
-> > **&** is used to perform a bitwise AND  
-> > **n** is a number  
-> > **x.x.x.x** is an IP address  
-> > **x.x.x.x-x.x.x.x** is an IP network address range  
-> > **x.x.x.x/x** is an IP CIDR network addresss
+ where:  
+ 
+ > **or** or **and** set the default evaluation mode for ALL matches  
+ > **$x** is any variable (example: $3, $A etc)  
+ > **reg** is a regular expression  
+ > **!** is used to negate the result (not)  
+ > **&** is used to perform a bitwise AND  
+ > **n** is a number  
+ > **x.x.x.x** is an IP address  
+ > **x.x.x.x-x.x.x.x** is an IP network address range  
+ > **x.x.x.x/x** is an IP CIDR network addresss
 
-> Notes:  
+ Notes:  
   
-> * To limit which devices can be mapped to this EVENT definition based on the IP address / hostname of the device / agent that sent the trap, the **NODES** keyword is recommended.  
+ * To limit which devices can be mapped to this EVENT definition based on the IP address / hostname of the device / agent that sent the trap, the **NODES** keyword is recommended.  
   
-> * If the match mode is 'or', once a match occurs no other matches are performed and the end result is true.  
+ * If the match mode is 'or', once a match occurs no other matches are performed and the end result is true.  
   
-> * If the match mode is 'and', once a match fails, no other matches are performed and the end result is false.  
+ * If the match mode is 'and', once a match fails, no other matches are performed and the end result is false.  
   
-> * To use parentheses ( or ) in the search expression, they must be backslashed (\\).  
+ * To use parentheses ( or ) in the search expression, they must be backslashed (\\).  
   
-> * If no MATCH MODE= line exists, it defaults to 'or'.  
+ * If no MATCH MODE= line exists, it defaults to 'or'.  
   
-> * There can be only one match mode per EVENT.  If multiple MATCH MODE= lines exists, the last one in the list is used.
+ * There can be only one match mode per EVENT.  If multiple MATCH MODE= lines exists, the last one in the list is used.
 
-> Examples:  
+ Examples:  
   
-> > $2 must be between 1000 and 2000:  
+ > $2 must be between 1000 and 2000:  
 
-> >
+ >
     MATCH $2: 1000-2000
 
-> > Any one must match (or): $3 must be 52, or $4 must be an IP address between 192.168.1.10 and 192.168.1.20, or the severity must be 'Major':  
+ > Any one must match (or): $3 must be 52, or $4 must be an IP address between 192.168.1.10 and 192.168.1.20, or the severity must be 'Major':  
   
-> >
+ >
     MATCH $3: 52
     MATCH $4: 192.168.1.10-192.168.1.20
     MATCH $s: (Major)
 
-> > All must match (and): $3 must be greater than 20, and $5 must not contain the words alarm or critical, $6 must contain the string '(1) remaining' and $7 must contain the string 'power' which is not case sensitive:  
+ > All must match (and): $3 must be greater than 20, and $5 must not contain the words alarm or critical, $6 must contain the string '(1) remaining' and $7 must contain the string 'power' which is not case sensitive:  
   
-> >
+ >
     MATCH $3: >20  
     MATCH $5: !(alarm|critical)  
     MATCH $6: (\(1\) remaining)  
     MATCH $7: (power)i  
     MATCH MODE=and
 
-> > The integer $1 must have bit 4 set:  
+ > The integer $1 must have bit 4 set:  
 
-> >
+ >
     MATCH $1: &8
 
 ## <a name="SNMPTT.CONF-REGEX"></a>REGEX
-> 
->   
-> \[**REGEX**(    )(    )\[i\]\[g\]\[e\]\]
-> 
-> Optional regular expression to perform a search and replace on the translated FORMAT / EXEC line.  Multiple REGEX (    )(    ) lines are permitted.
-> 
-> First (    ) contains the search expression.  
-> Second (    ) contains the replacement text
-> 
-> The following Perl regular expression modifiers are supported:
-> 
-> > i - ignore case when trying to match left side  
-> > g - replace all occurances instead of only the first  
-> > e - execute the right side (eval) as code
-> 
-> To use substitution with captures (memory parenthesis) or the e modifier, you must first enable support in the snmptt.ini file by setting allow\_unsafe\_regex to 1.  Note:  This is considered unsafe because the contents of the right expression is executed (eval) by Perl which could contain unsafe code.  If this option is enabled, **BE SURE THAT THE SNMPTT CONFIGURATION FILES ARE SECURE!**
-> 
-> Each REGEX line is processed in order from top to bottom and are accumulative.  The second REGEX operates on the results of the first REGEX etc.
-> 
-> **Example:**
-> 
-> > FORMAT line before:  UPS has       detected a      building alarm.       Cause: UPS1 Alarm #14: Building alarm 3.  
+ 
+   
+ \[**REGEX**(    )(    )\[i\]\[g\]\[e\]\]
+ 
+ Optional regular expression to perform a search and replace on the translated FORMAT / EXEC line.  Multiple REGEX (    )(    ) lines are permitted.
+ 
+ First (    ) contains the search expression.  
+ Second (    ) contains the replacement text
+ 
+ The following Perl regular expression modifiers are supported:
+ 
+ > i - ignore case when trying to match left side  
+ > g - replace all occurances instead of only the first  
+ > e - execute the right side (eval) as code
+ 
+ To use substitution with captures (memory parenthesis) or the e modifier, you must first enable support in the snmptt.ini file by setting allow\_unsafe\_regex to 1.  Note:  This is considered unsafe because the contents of the right expression is executed (eval) by Perl which could contain unsafe code.  If this option is enabled, **BE SURE THAT THE SNMPTT CONFIGURATION FILES ARE SECURE!**
+ 
+ Each REGEX line is processed in order from top to bottom and are accumulative.  The second REGEX operates on the results of the first REGEX etc.
+ 
+ **Example:**
+ 
+ > FORMAT line before:  UPS has       detected a      building alarm.       Cause: UPS1 Alarm #14: Building alarm 3.  
 
-> >   
+ >   
     REGEX (Building alarm 3)(Computer room high temperature)  
     REGEX (Building alarm 4)(Moisture detection alarm)  
     REGEX (roOm)(ROOM)ig  
@@ -2105,95 +2104,95 @@ The syntax of the snmptt.conf file  is:
     REGEX (\s+)( )g  
     >   
 
-> > FORMAT line after:  The big UPS has detected a building alarm. Cause: UPS1 Alarm #14: Computer ROOM high temperature
+ > FORMAT line after:  The big UPS has detected a building alarm. Cause: UPS1 Alarm #14: Computer ROOM high temperature
 >
-> To use parentheses ( or ) in the search expression, they must be backslashed (\\) otherwise it is interpreted as a capture (see below).  The replacement text does not need to be backslashed.
-> 
-> **Example:**
-> 
-> > FORMAT line before:  Alarm (1) and (2) has been triggered  
+ To use parentheses ( or ) in the search expression, they must be backslashed (\\) otherwise it is interpreted as a capture (see below).  The replacement text does not need to be backslashed.
+ 
+ **Example:**
+ 
+ > FORMAT line before:  Alarm (1) and (2) has been triggered  
 
-> >  
+ >  
     REGEX (\(1\))(One)  
     REGEX (\(2\))((Two))  
    
-> > FORMAT line after:  Alarm One and (Two) has been triggered
+ > FORMAT line after:  Alarm One and (Two) has been triggered
 
-> If allow\_unsafe\_regex is enabled, then captures can be used in the replacement text.  
+ If allow\_unsafe\_regex is enabled, then captures can be used in the replacement text.  
 
-> **Example:**
+ **Example:**
 
-> > FORMAT line before:  The system has logged exception error 55 for the service testservice  
+ > FORMAT line before:  The system has logged exception error 55 for the service testservice  
   
-> > 
+ > 
     REGEX (The system has logged exception error (\d+) for the service (\w+))(Service $2 generated error $1)  
   
-> > FORMAT line after:  Service testservice generated error 55
+ > FORMAT line after:  Service testservice generated error 55
 
-> If allow\_unsafe\_regex is enabled and an e modifier is specified, then the right side is executed (evaluated).  This allows you to use Perl functions to perform various tasks such as convert from hex to decimal, format text using sprintf etc.  All text must be inside of quotes, and statements can be concatenated together using the dot (.).  
+ If allow\_unsafe\_regex is enabled and an e modifier is specified, then the right side is executed (evaluated).  This allows you to use Perl functions to perform various tasks such as convert from hex to decimal, format text using sprintf etc.  All text must be inside of quotes, and statements can be concatenated together using the dot (.).  
 
-> **Example 1:**
+ **Example 1:**
 
-> > FORMAT line before:  Authentication Failure Trap from IP address: C0 A8 1 FE  
+ > FORMAT line before:  Authentication Failure Trap from IP address: C0 A8 1 FE  
 
-> > 
+ > 
     REGEX (Address: (\w+)\s+(\w+)\s+(\w+)\s+(\w+))("address: ".hex($1).".".hex($2).".".hex($3).".".hex($4))ei  
   
-> > FORMAT line after:  Authentication Failure Trap from IP address: 192.168.1.254
+ > FORMAT line after:  Authentication Failure Trap from IP address: 192.168.1.254
 
 
-> **Example 2:**
+ **Example 2:**
 
-> > FORMAT line before:  Authentication Failure Trap from IP address: C0 A8 1 FE  
+ > FORMAT line before:  Authentication Failure Trap from IP address: C0 A8 1 FE  
   
-> > 
+ > 
     REGEX (Address: (\w+)\s+(\w+)\s+(\w+)\s+(\w+))("address:".sprintf("%03d.%03d.%03d.%03d",hex($1),hex($2),hex($3),hex($4)))ie
 
-> > FORMAT line after:  Authentication Failure Trap from IP address: 192.168.001.254
+ > FORMAT line after:  Authentication Failure Trap from IP address: 192.168.001.254
  
-> **Example 3**
+ **Example 3**
 
-> > This example is for a BGP bgpBackwardTranstion trap.  The OID for the bgpBackwardTranstion trap has the IP address of the device that transitioned appended to the end of the OID.  To create a meaningful trap message, the IP address needs to be separated from the variable OID.  Because the IP address is part of the OID variable name instead of the OID value, a REGEX expression is needed.  The following uses the $+1 variable on the FORMAT line so REGEX can parse out the IP address.
-> >
-> > FORMAT line before:  Peer:$+2  
+ > This example is for a BGP bgpBackwardTranstion trap.  The OID for the bgpBackwardTranstion trap has the IP address of the device that transitioned appended to the end of the OID.  To create a meaningful trap message, the IP address needs to be separated from the variable OID.  Because the IP address is part of the OID variable name instead of the OID value, a REGEX expression is needed.  The following uses the $+1 variable on the FORMAT line so REGEX can parse out the IP address.
+ >
+ > FORMAT line before:  Peer:$+2  
 
-> > FORMAT line after substitution, but before REGEX:  Peer:bgpPeerState.192.168.1.1:idle  
+ > FORMAT line after substitution, but before REGEX:  Peer:bgpPeerState.192.168.1.1:idle  
 
-> > 
+ > 
     REGEX (Peer:.\*\.(\d+\.\d+\.\d+\.\d+):(.\*))("Peer: $1 has transitioned to $2")e  
   
-> > FORMAT line after:  Peer: 192.168.1.1 has transitioned to idle
+ > FORMAT line after:  Peer: 192.168.1.1 has transitioned to idle
   
-> **Example 4**
-> 
-> > This example is a sample of using Perl subroutines inside of a REGEX statement.  
+ **Example 4**
+ 
+ > This example is a sample of using Perl subroutines inside of a REGEX statement.  
 
-> > FORMAT line before:  Extremely severe error has occured  
+ > FORMAT line before:  Extremely severe error has occured  
 
-> >
+ >
     REGEX (Extremely severe error has occured)(("Better get a lotto ticket!!  Here is a lotto number to try:".sprintf ("%s", lottonumber());sub lottonumber { for(my $i=0;$i<6;$i++) { $temp = $temp . " " . (int(rand 49) +1); } return $temp; } )ie  
 
-> > FORMAT line after:  Better get a lotto ticket!!  Here is a lotto number to try: 36 27 38 32 29 6
-> 
-> Note:  The REGEX expression is executed on the final translated FORMAT / EXEC line, after all variable substitutions have been completed.
-> 
->   
-> 
+ > FORMAT line after:  Better get a lotto ticket!!  Here is a lotto number to try: 36 27 38 32 29 6
+ 
+ Note:  The REGEX expression is executed on the final translated FORMAT / EXEC line, after all variable substitutions have been completed.
+ 
+   
+ 
 ## <a name="SNMPTT.CONF-SDESC"></a>SDESC
-> 
-> \[**SDESC**\]
-> 
-> Optional start of a description.  All text between this line and the line EDESC will be ignored by snmptt. This section can be used to enter comments about the trap for your own use.  If you use a SDESC, you MUST follow with a EDESC.
-> 
+ 
+ \[**SDESC**\]
+ 
+ Optional start of a description.  All text between this line and the line EDESC will be ignored by snmptt. This section can be used to enter comments about the trap for your own use.  If you use a SDESC, you MUST follow with a EDESC.
+ 
 ## <a name="SNMPTT.CONF-EDESC"></a>EDESC
-> 
-> \[**EDESC**\]
-> 
-> Used to end the description section.
-> 
-> Example:
-> 
-> >
+ 
+ \[**EDESC**\]
+ 
+ Used to end the description section.
+ 
+ Example:
+ 
+ >
     SDESC  
     Trap used when power supply fails in  
     a server.  

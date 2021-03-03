@@ -142,14 +142,14 @@ To convert all the CPQ\* files in the current folder, you can use:
 
 Unix / Linux:
 
-    for i in CPQ\*  
+    for i in CPQ*  
       do  
       /usr/local/sbin/snmpttconvertmib --in=$i --out=snmptt.conf.compaq  
     done  
 
 Windows:
 
-    for %i in (CPQ\*) do perl snmpttconvertmib --in=%i --out=snmptt.conf.compaq  
+    for %i in (CPQ*) do perl snmpttconvertmib --in=%i --out=snmptt.conf.compaq  
 
 ### How it works
    
@@ -163,7 +163,7 @@ The mib file is also searched for lines containing **TRAP-TYPE** or NOTIFICATION
 
 **SNMPTRANSLATE** is used with the following syntax to find the **OID** of the trap:
 
-    snmptranslate -IR -Ts _mib-name::__trapname_ -m mib-filename
+    snmptranslate -IR -Ts mib-name::trapname -m mib-filename
 
 Notes:
 

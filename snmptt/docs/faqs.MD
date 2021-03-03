@@ -136,7 +136,6 @@ A:  You have at least three options:
 A:  There are two Perl components for Net-SNMP:
 
 1. The Perl modules which allow you to create stand-alone Perl programs that use the 'SNMP' module (use SNMP;)
-
 2. Embedded Perl for snmpd and snmptrapd which allow you to write Perl programs that are loaded and run from inside of snmpd and snmptrapd.
 
 The Perl modules (1) are optional but recommended.  See [**Do I need the UCD-SNMP / Net-SNMP Perl module?**](Do_I_need_the_UCD-SNMP_Net-SNMP_Perl_module) for the benefits of enabling the Perl modules.  
