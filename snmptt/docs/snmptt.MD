@@ -14,7 +14,7 @@ name="GENERATOR" />
 # SNMP Trap Translator v1.5beta1
 **([SNMPTT](http://www.snmptt.org))**
 
-This file was last updated on: March 3rd, 2021
+This file was last updated on: March 5th, 2021
 
 [License](#License)
 
@@ -110,15 +110,12 @@ The MIB file contains TRAP-TYPE (SMIv1) or NOTIFICATION-TYPE (SMIv2) definitions
 
 The Net-SNMP program **snmptrapd** is an application that receives and logs SNMP trap and inform messages via TCP/IP. Following is a sample syslog entry for a Compaq cpqDa3LogDrvStatusChange trap that notifies that the drive array is rebuilding:
 
-```
-Feb 12 13:37:10 server11 snmptrapd\[25409\]: 192.168.110.192: Enterprise Specific Trap (3008) Uptime: 306 days, 23:13:24.29, .1.3.6.1.2.1.1.5.0 = SERVER08, .1.3.6.1.4.1.232.11.2.11.1.0 = 0, .1.3.6.1.4.1.232.3.2.3.1.1.4.8.1 = rebuilding(7)
-```
+    Feb 12 13:37:10 server11 snmptrapd[25409]: 192.168.110.192: Enterprise Specific Trap (3008) Uptime: 306 days, 23:13:24.29, .1.3.6.1.2.1.1.5.0 = SERVER08, .1.3.6.1.4.1.232.11.2.11.1.0 = 0, .1.3.6.1.4.1.232.3.2.3.1.1.4.8.1 = rebuilding(7)
 
 or
 
-```
-Feb 12 13:37:10 server11 snmptrapd\[25409\]: 192.168.110.192: Enterprise Specific Trap (3008) Uptime: 306 days, 23:13:24.29, sysName.0 = SERVER08, cpqHoTrapFlags.0 = 0, cpqDaLogDrvStatus.8.1 = rebuilding(7)
-```
+    Feb 12 13:37:10 server11 snmptrapd[25409]: 192.168.110.192: Enterprise Specific Trap (3008) Uptime: 306 days, 23:13:24.29, sysName.0 = SERVER08, cpqHoTrapFlags.0 = 0, cpqDaLogDrvStatus.8.1 = rebuilding(7)
+
 
 The output from snmptrapd can be changed via the -O option to display numeric or symbolic OIDs and other display options, but it generally follows the format of variable name = value, variable name = value etc.
 
@@ -1202,7 +1199,7 @@ Note: Enabling the Net-SNMP Perl module will greatly increase the startup time o
 The following command line arguments are supported:
 
     Usage:  
-        snmptt \[<options>\]  
+        snmptt [<options>]  
     Options:  
         --daemon                Start in daemon mode  
         --debug=n               Set debug level (1 or 2)  
@@ -1249,15 +1246,15 @@ Syslog entries normally start with: **date hostname snmptt\[pid\]:**
   
 To configure syslog, edit the snmptt ini file and modify the following variables:
 
-    syslog\_enable
-    syslog\_facility
-    syslog\_level
+    syslog_enable
+    syslog_facility
+    syslog_level
 
 SNMPTT system errors and messages such as startup, shutdown, trap statistics etc can be sent to syslog by editing the snmptt.ini file and modifying the following variables:
 
-    syslog\_system\_enable
-    syslog\_system\_facility
-    syslog\_system\_level
+    syslog_system_enable
+    syslog_system_facility
+    syslog_system_level
 
 Syslog system entries normally start with: **date hostname snmptt-sys\[pid\]:**
   
@@ -1367,7 +1364,7 @@ The following MySQL script can create the database and table. Permissions etc sh
     
     DROP TABLE snmptt;   
     CREATE TABLE snmptt (   
-    id INT UNSIGNED NOT NULL AUTO\_INCREMENT PRIMARY KEY,   
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,   
     eventname VARCHAR(50),   
     eventid VARCHAR(50),   
     trapoid VARCHAR(100),  
@@ -1389,8 +1386,8 @@ If logging of unknown traps to a SQL table is required, create the **snmptt\_unk
 
     USE snmptt; 
     
-    DROP TABLE snmptt\_unknown;   
-    CREATE TABLE snmptt\_unknown (   
+    DROP TABLE snmptt_unknown;   
+    CREATE TABLE snmptt_unknown (   
     trapoid VARCHAR(100),  
     enterprise VARCHAR(100),   
     community VARCHAR(20),   
@@ -1426,16 +1423,16 @@ To add a user account called '**snmptt**' with a password of '**mytrap**' for us
 
 To configure SNMPTT for PostgreSQL, modify the following variables in the snmptt.ini file.
 
-> **postgresql\_dbi\_enable**  
-> **postgresql\_dbi\_module**
-> **postgresql\_dbi\_hostport\_enable**
-> **postgresql\_dbi\_host**
-> **postgresql\_dbi\_port**  
-> **postgres****ql\_dbi\_database**  
-> **postgres****ql\_dbi\_table**
-> ****postgres****ql\_dbi\_table\_unknown**  
-> **postgres****ql\_dbi\_username**  
-> **postgres****ql\_dbi\_password**
+    postgresql_dbi_enable
+    postgresql_dbi_module
+    postgresql_dbi_hostport_enable
+    postgresql_dbi_host
+    postgresql_dbi_port
+    postgresql_dbi_database
+    postgresql_dbi_table
+    postgresql_dbi_table_unknown
+    postgresql_dbi_username
+    postgresql_dbi_password
 
 Note: Sample values are defined in the default ini file. Defining **postgresql\_dbi\_table\_unknown** is optional.
 
@@ -1505,7 +1502,7 @@ If logging of statistics to a SQL table is required, create the snmptt\_statisti
     total_unknown BIGINT);  
 
 
-    GRANT ALL ON snmptt\_statistics TO snmptt;  
+    GRANT ALL ON snmptt_statistics TO snmptt;  
     \q
 
 Note: To store the stat\_time as a real date/time (**timestamp** data type), change 'stat\_time VARCHAR(30),' to 'stat\_time timestamp,' and set **stat\_time\_format\_sql** in **snmptt.ini** to **%Y-%m-%d %H:%M:%S**.
@@ -1519,12 +1516,12 @@ SNMPTT can access ODBC data sources using either the DBD::ODBC module on Linux a
 
 To configure SNMPTT for ODBC access using the module DBD::ODBC, modify the following variables in the snmptt script.
 
-> **dbd\_odbc\_enable = 1;**  
-> **dbd\_odbc\_dsn = 'snmptt';**  
-> **dbd\_odbc\_table = 'snmptt';  
-> ****dbd\_odbc\_table\_unknown = 'snmptt';**  
-> **dbd\_odbc\_username = 'snmptt';**  
-> **dbd\_odbc\_password = 'password';**
+    dbd_odbc_enable = 1;
+    dbd_odbc_dsn = 'snmptt';
+    dbd_odbc_table = 'snmptt';
+    dbd_odbc_table_unknown = 'snmptt';
+    dbd_odbc_username = 'snmptt';
+    dbd_odbc_password = 'password';
 
 Note:   
 
@@ -1556,7 +1553,7 @@ Note: To store the traptime as a real date/time, change 'traptime character(30),
 
 If logging of unknown traps to a SQL table is required, create the snmptt\_unknown table using:  
 
-    CREATE TABLE snmptt\_unknown (
+    CREATE TABLE snmptt_unknown (
     trapoid character(100) NULL,
     enterprise character(100) NULL,
     community character(20) NULL,
@@ -1607,7 +1604,7 @@ The following MS SQL Server script can create the table inside an existing datab
     CREATE TABLE snmptt (
     eventname character(50) NULL,
     eventid  character(50) NULL,
-    trapoid** **character(50) NULL,
+    trapoid character(50) NULL,
     enterprise character(50) NULL,
     community character(20) NULL,
     hostname character(100) NULL,
@@ -1622,8 +1619,8 @@ Note: To store the traptime as a real date/time, change 'traptime character(30),
 
 If logging of unknown traps to a SQL table is required, create the snmptt\_unknown table using:  
 
-    CREATE TABLE snmptt\_unknown (
-    trapoid** **character(50) NULL,
+    CREATE TABLE snmptt_unknown (
+    trapoid character(50) NULL,
     enterprise character(50) NULL,
     community character(20) NULL,
     hostname character(100) NULL,
@@ -1636,12 +1633,12 @@ Note: To store the traptime as a real date/time, change 'traptime character(30),
 
 If logging of statistics to a SQL table is required, create the snmptt\_statistics table using:  
 
-    CREATE TABLE snmptt\_statistics (  
-    stat\_time character(30) NULL,  
-    total\_received BIGINT NULL,  
-    total\_translated BIGINT NULL,  
-    total\_ignored BIGINT NULL,  
-    total\_unknown BIGINT NULL);
+    CREATE TABLE snmptt_statistics (  
+    stat_time character(30) NULL,  
+    total_received BIGINT NULL,  
+    total_translated BIGINT NULL,  
+    total_ignored BIGINT NULL,  
+    total_unknown BIGINT NULL);
 
 Note: To store the stat\_time as a real date/time, change 'stat\_time character(30),' to the date/time data type supported by the database and and set **stat\_time\_format\_sql** in **snmptt.ini** to a compatible format. For example: **%Y-%m-%d %H:%M:%S**.
 
@@ -1674,7 +1671,7 @@ If your snmptt.conf file is getting rather large and you would like to divide it
 
 For example:
 
-    snmptt\_conf\_files = <<END  
+    snmptt_conf_files = <<END  
     /etc/snmp/snmptt.conf.generic  
     /etc/snmp/snmptt.conf.compaq  
     /etc/snmp/snmptt.conf.cisco  
@@ -1787,8 +1784,8 @@ The syntax of the snmptt.conf file  is:
  > $Ft  - tab (HT, TAB)  
  > $Fz  - Translated FORMAT line (EXEC only)  
  > $G  - Generic trap number (0 if enterprise trap)  
- > $H  - Host name of the system running SNMPTT  
  > $S  - Specific trap number (0 if generic trap)  
+ > $H  - Host name of the system running SNMPTT  
  > $N  - Event name defined in .conf file of matched entry  
  > $i  - Event OID defined in .conf file of matched entry (could be a wildcard OID)  
  > $O - Trap OID in symbolic format (**see Note 4**)  
@@ -1805,7 +1802,7 @@ The syntax of the snmptt.conf file  is:
  > $_n_  - Expand variable-binding n (1-_n_) (**see Note 2,5**)  
  > $+_n_  - Expand variable-binding n (1-_n_) in the format of _variable name:value_ (**see Note 2,3,5**)  
  > $-_n_  - Expand variable-binding n (1-_n_) in the format of _variable name (variable type):value_ (**see Note 2,3,5**)  
- > $v_n_  - Expand variable name of the variable-binding n (1-_n_)(**see Note 3**)  
+ > $v*n*  - Expand variable name of the variable-binding n (1-_n_)(**see Note 3**)  
  > $\*  - Expand all variable-bindings (**see Note 5**)  
  > $+\*  - Expand all variable-bindings in the format of _variable name:value_ (**see Note 2,3,5**)  
  > $-\*  - Expand all variable-bindings in the format of _variable name (variable type):value_ (**see Note 2,3,5**)  
@@ -1873,14 +1870,15 @@ The syntax of the snmptt.conf file  is:
  
  Optional string containing a command to execute when trap is received and arguments to pass to the program.  The EXEC lines are executed in the order that they appear.
  
- EXEC uses the same variable substitution as the FORMAT line.
+ EXEC uses the same variable substitution as the FORMAT line.  You can use **$Fz** on the EXEC line to add the translated FORMAT line instead of repeating what you already defined on FORMAT.
  
- Example:
+ Examples:
  
-    EXEC /usr/bin/qpage -f TRAP alex "$r: $x $X - NIC switchover to slot $3, port $4 from slot $5, port $6"
- 
- or
- 
+    EXEC /usr/bin/qpage -f TRAP alex "$r: $x $X - NIC switchover to slot $3, port $4 from slot $5, port $6"  
+
+    FORMAT NIC switchover to slot $3, port $4 from slot $5, port $6
+    EXEC /usr/bin/qpage -f TRAP alex "$r: $x $X - $Fz"  
+
     EXEC c:\\snmp\\pager netops "$r: $x $X - NIC switchover to slot $3, port $4 from slot $5, port $6"
  
  Note: Unlike the FORMAT line, nothing is prepended to the message.  If you would like to include the hostname and date in the page above, you must use the variables such as $r, $x and $X.  
@@ -2514,14 +2512,23 @@ Note:  To simplify the configuration, you can instead apply the service too hos
 
   
 Create an EXEC statement such as the following for each **EVENT** entry in your snmptt.conf file:  
-  
 
-    EXEC /usr/bin/curl -k -s -S -i -u _apiuser_:_password_ -H 'Accept: application/json' -X POST 'https://localhost:5665/v1/actions/process-check-result' -d '{ "type": "Service", "filter": "host.name==\\"$A\\" && service.name==\\"TRAP\\"", "exit\_status": 1, "plugin\_output": "xxxxxx", "check\_source": "$A", "pretty": true }'  
+    EXEC /usr/bin/curl -k -s -S -i -u apiuser:password -H 'Accept: application/json' -X POST 'https://localhost:5665/v1/actions/process-check-result' -d '{ "type": "Service", "filter": "host.name==\"$A\" && service.name==\"TRAP\"", "exit_status": 2, "plugin_output": "xxxxxx", "check_source": "$A", "pretty": true }'
 
-where **_apiuser_:_password_** is the API username and password, "xxxxxx" is the text for the trap using the same format as the FORMAT statement.  
+where **_apiuser_:_password_** is the API username and password, ***xxxxxx*** is the text for the trap using the same format as the FORMAT statement.  
   
-The variable substitution **$A** is used to pass the host name for **host.name** and **check\_source**, TRAP for **service.name** matches the service definition defined above, **exit\_status** of **1** represents a **WARNING**, and "xxxxxx" is the translated message from SNMPTT.  
-  
+The variable substitution **$A** is used to pass the host name for **host.name** and **check\_source**, TRAP for **service.name** matches the service definition defined above, **exit\_status** of **1** represents a **WARNING**, and **xxxxxx** is the translated message from SNMPTT.  
+
+To generate the EXEC command when using snmpttconvertmib and have it use the resulting FORMAT line, use the following:
+
+Create a file called exec-commands.txt with:
+
+    /usr/bin/curl -k -s -S -i -u apiuser:password -H 'Accept: application/json' -X POST 'https://localhost:5665/v1/actions/process-check-result' -d '{ "type": "Service", "filter": "host.name==\"$A\" && service.name==\"TRAP\"", "exit_status": 2, "plugin_output": "$Fz", "check_source": "$A", "pretty": true }'
+
+Run snmpttconvertmib using:
+
+    snmpttconvertmib --in=/usr/share/snmp/mibs/mibname.mib --out=/etc/snmp/snmptt.conf --exec_mode=1 --exec_file=exec-commands.txt
+
 An API user must be defined in api-users.conf with the permission actions/process-check-result.  Example:  
   
     object ApiUser "snmptt" {  
@@ -2611,7 +2618,7 @@ Create the **trap\_reset\_event.sh** script in **ConfDir** **/scripts** (/etc/ic
         echo "[`date +%s`] PROCESS_SERVICE_CHECK_RESULT;$HOST_NAME;$SERVICE_NAME;0;Auto-reset (`date +"%m-%d-%Y %T"`)." >> /var/run/icinga2/cmd/icinga2.cmd  
     fi  
 
-To have the TRAP service automatically cleared every 24 hours, modify the service entry to enable active checks and define a check\_interval:  
+To have the TRAP service automatically cleared 24 hours after the last trap was received, modify the service entry to enable active checks and define a check\_interval:  
   
     enable_passive_checks = 1  
     check_interval        = 87000

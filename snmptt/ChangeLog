@@ -1,3 +1,17 @@
+March 05th, 2021: Alex Burger <alex_b@users.sourceforge.net>
+- Added --exec_file to snmpttconvertmib to allow you to provide an EXEC command
+  inside of a file instad of specifying on the command line.  Useful for
+  commands that include quotes so that you don't have to worry about escaping on
+  the command line.  Also allows you to define multiple EXEC lines instead of 
+  just one.
+- Added --exec_mode to snmpttconvertmib to allow you change how the EXEC line
+  is built.  Setting to 0 will append the format line to the end of the line
+  (default).  Setting to 1 does not append the format line to the end of the
+  line.  This is useful if you have added \$Fz to the --exec line so that
+  SNMPTT can replace it with the FORMAT line.  Setting to 2 is similar to 1,
+  but instead of SNMPTT having to replace \$Fz with the FORMAT line, 
+  snmpttconvertmib will do the substitution.
+
 February 28th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - snmptt.ini can now be located in /etc/snmptt and is looked for at this
   location first.

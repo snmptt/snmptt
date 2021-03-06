@@ -112,11 +112,11 @@ For example:
 
 ## Converting a MIB file
 
-See the snmpttconvertmib help screen for all possible command line options (snmpttconvertmib --h) before converting a MIB file.  Depending on what type of information is available in the MIB file, you may want to change how the FORMAT / EXEC lines are generated.
+See the snmpttconvertmib help screen for all possible command line options (snmpttconvertmib -h) before converting a MIB file.  Depending on what type of information is available in the MIB file, you may want to change how the FORMAT / EXEC lines are generated.
 
 Before trying to convert  MIB file, you should ensure that the MIB file can be parsed by Net-SNMP
 
-1. Copy the MIB file to the UCD-SNMP / Net-SNMP mibs folder
+1. Copy the MIB file to the Net-SNMP mibs folder
 2. Type: **export MIBS=ALL** to ensure all the mibs will be read in by **snmptranslate**
 3. Make sure the MIB file can be interpreted by **snmptranslate** correctly.  Simply typing **snmptranslate** should tell you if it was able to read the mib file correctly.  If it can't, an error will be produced at the top of the help screen.
 4. Try to translate a TRAP-TYPE or NOTIFICATION-TYPE entry contained inside the MIB file.  For example, if the MIB file contains the Notification definition of 'rptrHealth NOTIFICATION-TYPE', then type:  snmptranslate rptrHealth -IR -Td.  If you get 'Unknown object identifier: xxx' then the MIB file was not found or parsed correctly.  
@@ -130,13 +130,33 @@ Running snmpttconvertmib:
 3. If you are using **UCD-SNMP**, or **Net-SNMP v5.0.1**, then add the folllowing to your snmp.conf file: **printNumericOids 1** (note:  this will affect all snmp commands).  This ensures the OIDs are returned in numerical format.  Other versions of Net-SNMP do not require this change, as **snmpttconvertmib** will use a command line switch to force it on when calling **snmptranslate**.
 4. Convert the mib file with: **snmpttconvertmib --in=_path-to-mib_ --out=_output-file-name_**.  Note:  the **output-file-name** is appended to, so remember to delete it first if needed.  
     
-Example:
+Examples:
 
-    snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaqhost  
+Convert a MIB file without defining an EXEC command:
+
+    snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq
 
 If the Net-SNMP Perl module is installed and you want more descriptive variable descriptions, add --net_snmp_perl to the command line:
 
-    snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.cong.compaq --net_snmp_perl
+    snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --net_snmp_perl
+
+Append an EXEC command.  The generated FORMAT line from the MIB will be appended to the end of the line surrounded by quotes.  You can disable the quotes by modifying the setting at the top of the snmpttconvertmib script.
+
+    snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --exec 'qpage -f TRAP notifygroup1'
+
+    Result: EXEC qpage -f TRAP notifygroup1 "A linkUp trap signifies that the SNMP entity, acting in an $*"
+   
+Same as above, but read the EXEC line from the file exec-commands.txt.  Multiple commands can be added to the file to generate multiple EXEC lines per trap.
+
+    snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --exec_file exec-commands.txt
+
+Append an EXEC command but don't add the generated FORMAT line.  The variable substitution **$Fz** is used in the --exec line which will cause SNMPTT to replace it with the generated FORMAT line when a trap arrives.
+
+    snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --exec_mode=1 --exec '/usr/bin/myscript { $Fz }'
+
+Same as above but instead of SNMPTT having to replace **$Fz** with the FORMAT line, snmpttconvertmib will do the substitution:
+
+    snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --exec_mode=2 --exec '/usr/bin/myscript { $Fz }'
 
 To convert all the CPQ\* files in the current folder, you can use:
 
