@@ -16,7 +16,7 @@ name="GENERATOR" />
 #SNMP Trap Translator Convert MIB v1.5beta1
 
 **(**[**SNMPTTCONVERTMIB**](http://www.snmptt.org)**)**  
-This file was last updated on:  November 5th, 2005
+This file was last updated on:  March 5th, 2021
 
 #License
 
