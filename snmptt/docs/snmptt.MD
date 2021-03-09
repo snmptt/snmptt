@@ -1157,7 +1157,7 @@ Unknown traps can be logged to a SQL table as described in the [Database](#Loggi
 
 ## <a name="LoggingSyslog"></a>Logging - Syslog
 
-Translated traps can be sent to syslog.  The format of the entries will be similar to above without the date (as syslogd adds the date):
+Translated traps can be sent to syslog.  The format of the entries will be similar to above without the date (as syslog adds the date):
 
     trap-oid severity category hostname translated-trap
 
@@ -1256,7 +1256,7 @@ Note:
 
 Translated and unrecognized traps can be sent to a database.  MySQL (tested under Linux), PostgreSQL (tested under Linux) and ODBC (tested under Windows) can be used.
 
-To configure unknown trap logging, edit the snmptt.ini file and modify the following variables:
+After configuring database logging below, you can also enable unknown trap logging by editing the **snmptt.ini** file and modifying the following variables:
 
     enable_unknown_trap_log
     db_unknown_trap_format
@@ -1276,7 +1276,7 @@ To configure SNMPTT for MySQL, modify the following variables in the snmptt.ini 
 
 Note:  Sample values are defined in the default ini file.  Defining mysql\_dbi\_table\_unknown is optional.
 
-The following MySQL script can create the database and table. Permissions etc should also be defined. Run '**mysql**' as root and enter:
+The following MySQL script will create the database and table. Permissions etc should also be defined. Run '**mysql**' as root and enter:
 
     CREATE DATABASE snmptt;   
     USE snmptt; 
@@ -1567,11 +1567,11 @@ All variables are inserted into the database using '**INSERT INTO**' as text inc
 # <a name="Executing-an-external-program"></a>Executing an external program
 
 
-An external program can be launched when a trap is received.  The command line is defined in the configuration file.  For example, to send a page using QPAGE ([http://www.qpage.org](http://www.qpage.org)), the following command line could be used:
+An external program can be launched when a trap is received.  The command line is defined in the **snmptt.conf** configuration file.  For example, to send a page using QPAGE ([http://www.qpage.org](http://www.qpage.org)), the following command line could be used:
 
     qpage -f TRAP notifygroup1 "$r $x $X Compaq Drive Array Spare Drive on controller $4, bus $5, bay $6 status is $3."
 
-$r is translated to the hostname, and $x is the current date, and $X is the current time (described in detail below)
+$r is translated to the hostname, $x is the current date, and $X is the current time (described in detail below).
 
 To enable or disable the execution of EXEC definitions, edit the snmptt.ini file and modify the following variable:
 
@@ -1617,7 +1617,7 @@ The syntax of the snmptt.conf file  is:
 > \[**SDESC**\]  
 > \[**EDESC**\]
 > 
- Note: Lines starting with a # will be ignored.
+ Note: Lines starting with a # are treated as comments and will be ignored.
  
  Note:  The EVENT and FORMAT line are REQUIRED.  Commands in \[\] are optional.  Do NOT include the \[\]s in the configuration file!
 
@@ -1667,9 +1667,9 @@ The syntax of the snmptt.conf file  is:
  
  * If the category is "**IGNORE**", no action will take place even if the snmptt.conf contains FORMAT and / or EXEC statements.
  
- * If the category is "**LOGONLY**", the trap will be logged as usual, but the EXEC statement will be ignored.
+ * If the category is "**LOGONLY**", the trap will be logged as usual, but the EXEC statements will be ignored.
 
- Note:   If you plan on using an external program such as Nagios for logging, paging etc, you probably do not want any traps defined with **LOGONLY** as the EXEC line would never be used to submit the passive service check.
+ Note:   If you plan on using an external program such as Nagios, you probably do not want any traps defined with **LOGONLY** as the EXEC line would never be used to submit the passive service check.
  
  **severity:**
  
@@ -1690,8 +1690,8 @@ The syntax of the snmptt.conf file  is:
  > $Be - securityEngineID (snmpEngineID) (**see Note 7**)  
  > $Bu - securityName (snmpCommunitySecurityName) (**see Note 7**)  
  > $BE - contextEngineID (snmpCommunityContextEngineID) (**see Note 7**)  
- > $c - Category  
  > $Bn - contextName (snmpCommunityContextName) (**see Note 7**)  
+ > $c - Category  
  > $C - Trap community string  
  > $D - Description text from SNMPTT.CONF or MIB file (**see Note 6**)  
  > $E - Enterprise trap OID in symbolic format  
@@ -1757,7 +1757,7 @@ The syntax of the snmptt.conf file  is:
  
  Note (3):
  
- > $v_n_, $+_n_ and $-_n_ variable names and variable type are translated into the text name by performing a lookup in the MIB file.  You must have the Net-SNMP Perl module installed for this to work and you must enable support for it by enabling **net\_snmp\_perl\_enable** in the snmptt.ini file.  If **net\_snmp\_perl\_enable** is not enabled, the $v_n_ variable will be replaced with the text 'variable_n_' where _n_ is the variable number (1+).
+ > $v*n*, $+*n* and $-*n* variable names and variable type are translated into the text name by performing a lookup in the MIB file.  You must have the Net-SNMP Perl module installed for this to work and you must enable support for it by enabling **net\_snmp\_perl\_enable** in the snmptt.ini file.  If **net\_snmp\_perl\_enable** is not enabled, the $v*n* variable will be replaced with the text 'variable*n*' where *n* is the variable number (1+).
  > 
  > For the name translation to work, you must ensure Net-SNMP is configured correctly with all the required MIBS.  If the option is enabled and the correct name is not returned, ensure Net-SNMP is correctly configured to process all the required mibs.  This is configured in the Net-SNMP **snmp.conf** file.  Alternatively, you can try setting the **mibs\_enviroment** variable in **snmptt.ini** to **ALL** (no quotes) to force all MIBS to be initialized at SNMPTT startup.
  
@@ -1787,7 +1787,7 @@ The syntax of the snmptt.conf file  is:
  
  There can be multiple EXEC lines per EVENT.
  
- Optional string containing a command to execute when trap is received and arguments to pass to the program.  The EXEC lines are executed in the order that they appear.
+ Optional string containing a command to execute when a trap is received.  The EXEC lines are executed in the order that they appear.
  
  EXEC uses the same variable substitution as the FORMAT line.  You can use **$Fz** on the EXEC line to add the translated FORMAT line instead of repeating what you already defined on FORMAT.
  
@@ -1810,7 +1810,7 @@ The syntax of the snmptt.conf file  is:
  
  There can be multiple PREEXEC lines per EVENT.
  
- Optional string containing a command to execute after a trap is received but **_before_** the FORMAT and EXEC statements are processed. The output of the external program is stored in the **$p_n_** variable where **_n_** is a number starting from 1. Multiple PREEXEC lines are permitted. The first PREEXEC stores the result of the command in **$p1**, the second in **$p2** etc. Any ending newlines are removed. The **snmptt.ini** parameter **pre\_exec\_enable** can be used to enable / disable **PREEXEC** statements.
+ Optional string containing a command to execute after a trap is received but **_before_** the FORMAT and EXEC statements are processed. The output of the external program is stored in the **$p*n*** variable where ***n*** is a number starting from 1. Multiple PREEXEC lines are permitted. The first PREEXEC stores the result of the command in **$p1**, the second in **$p2** etc. Any ending newlines are removed. The **snmptt.ini** parameter **pre\_exec\_enable** can be used to enable / disable **PREEXEC** statements.
  
  **PREEXEC** uses the same variable substitution as the FORMAT line.
  
@@ -1836,7 +1836,7 @@ The syntax of the snmptt.conf file  is:
  
  There can be multiple NODES lines per EVENT.
  
- Optional string containing any combination of host names, IP addresses, CIDR network address, network IP address ranges, or a filename.  If this keyword omitted then ALL sources will be accepted.  Each entry is checked for a match.  As soon as one match occurs, searching stops.
+ Optional string containing any combination of host names, IP addresses, CIDR network address, network IP address ranges, or a filename.  If this keyword is omitted then ALL sources will be accepted.  Each entry is checked for a match.  As soon as one match occurs, searching stops.
  
  For example, if you only wanted devices on the subnet 192.168.1.0/24 to trigger this EVENT, you could use a NODES entry of:
  
@@ -1866,7 +1866,7 @@ The syntax of the snmptt.conf file  is:
  
  Example 3:  
  
- > This example will load the file /etc/snmptt-nodes (see below), and match any hosts called fred, barney, betty, network ip addresses  192.168.1.1, 192.168.1.2, 192.168.1.3, 192.168.2.1, network range 192.168.50.0/22 or network range 192.168.60.0-192.168.61.255:  
+ > This example will load the file /etc/snmptt-nodes (see below), and match any hosts called fred, barney, betty, wilma, network ip addresses  192.168.1.1, 192.168.1.2, 192.168.1.3, 192.168.2.1, network range 192.168.50.0/22 or network range 192.168.60.0-192.168.61.255:  
  >   
     NODES /etc/snmptt-nodes
  
@@ -1903,7 +1903,7 @@ The syntax of the snmptt.conf file  is:
     
  * Do not use any spaces between network ranges as they will be interpreted as two different values.  For example, 192.168.1.1   -    192.168.1.20 will not work.  Use 192.168.1.1-192.168.1.20 instead.  
     
- * By default, NODES files are loaded when the snmptt.conf files are loaded (during startup of SNMPTT).  The snmptt.ini option dynamic\_nodes can be set to 1 to have the nodes files loaded each time an EVENT is processed.  
+ * By default, NODES files are loaded when the snmptt.conf files are loaded (during startup of SNMPTT).  The snmptt.ini option **dynamic\_nodes** can be set to 1 to have the nodes files loaded each time an EVENT is processed.  
 
  * See the section '[Name Resolution / DNS](#DNS)' for important DNS information.
 
@@ -1968,7 +1968,7 @@ The syntax of the snmptt.conf file  is:
  >
     MATCH $2: 1000-2000
 
- > Any one must match (or): $3 must be 52, or $4 must be an IP address between 192.168.1.10 and 192.168.1.20, or the severity must be 'Major':  
+ > Any one of the following must match (or): $3 must be 52, or $4 must be an IP address between 192.168.1.10 and 192.168.1.20, or the severity must be 'Major':  
   
  >
     MATCH $3: 52
@@ -2005,7 +2005,7 @@ The syntax of the snmptt.conf file  is:
  > g - replace all occurances instead of only the first  
  > e - execute the right side (eval) as code
  
- To use substitution with captures (memory parenthesis) or the e modifier, you must first enable support in the snmptt.ini file by setting allow\_unsafe\_regex to 1.  Note:  This is considered unsafe because the contents of the right expression is executed (eval) by Perl which could contain unsafe code.  If this option is enabled, **BE SURE THAT THE SNMPTT CONFIGURATION FILES ARE SECURE!**
+ To use substitution with captures (memory parenthesis) or the **e** modifier, you must first enable support in the snmptt.ini file by setting **allow\_unsafe\_regex** to 1.  Note:  This is considered unsafe because the contents of the right expression is executed (eval) by Perl which could contain unsafe code.  If this option is enabled, **BE SURE THAT THE SNMPTT CONFIGURATION FILES ARE SECURE!**
  
  Each REGEX line is processed in order from top to bottom and are accumulative.  The second REGEX operates on the results of the first REGEX etc.
  
@@ -2035,7 +2035,7 @@ The syntax of the snmptt.conf file  is:
    
  > FORMAT line after:  Alarm One and (Two) has been triggered
 
- If allow\_unsafe\_regex is enabled, then captures can be used in the replacement text.  
+ If **allow\_unsafe\_regex** is enabled, then captures can be used in the replacement text.  
 
  **Example:**
 
@@ -2046,7 +2046,7 @@ The syntax of the snmptt.conf file  is:
   
  > FORMAT line after:  Service testservice generated error 55
 
- If allow\_unsafe\_regex is enabled and an e modifier is specified, then the right side is executed (evaluated).  This allows you to use Perl functions to perform various tasks such as convert from hex to decimal, format text using sprintf etc.  All text must be inside of quotes, and statements can be concatenated together using the dot (.).  
+ If **allow\_unsafe\_regex** is enabled and an e modifier is specified, then the right side is executed (evaluated).  This allows you to use Perl functions to perform various tasks such as convert from hex to decimal, format text using sprintf etc.  All text must be inside of quotes, and statements can be concatenated together using the dot (.).  
 
  **Example 1:**
 
@@ -2099,7 +2099,7 @@ The syntax of the snmptt.conf file  is:
  
  \[**SDESC**\]
  
- Optional start of a description.  All text between this line and the line EDESC will be ignored by snmptt. This section can be used to enter comments about the trap for your own use.  If you use a SDESC, you MUST follow with a EDESC.
+ Optional start of a description.  All text between this line and the line EDESC will be ignored by SNMPTT. This section can be used to enter comments about the trap for your own use.  If you use a SDESC, you MUST follow with a EDESC.
  
 ## <a name="SNMPTT.CONF-EDESC"></a>EDESC
  
@@ -2141,7 +2141,7 @@ When there are multiple definitions of the same trap in the configuration file, 
 
 # <a name="DNS"></a>Name resolution / DNS
 
-Snmptrapd passes the IP address of the device sending the trap (host), the host name of the device sending the trap (host) (if configured to resolve host names) and the IP address of the actual SNMP agent (agent).  
+Snmptrapd passes the IP address of the device sending the trap (host name), the host name of the device sending the trap (host name, if configured to resolve host names) and the IP address of the actual SNMP agent (agent).  
   
 If the configuration setting **dns\_enable** is set to 0 (dns disabled), then the host name of the AGENT will not be available for the **$A** variable, **NODES** matches, and the hostname column in SQL databases.  The only exception to this is if the (host) IP address matches the (agent) IP address and snmptrapd is configured to resolve host names.  In that case, the host name of the (host) will be used for the (agent) host name as they are obviously the same host.  
   
@@ -2188,7 +2188,7 @@ Following is a sample of a list of files to load in **snmptt.ini:**
     /etc/snmp/snmp-compaq-hsv.conf  
     END
 
-Following is a sample of one defined traps in **/etc/snmp/snmptt-compaq.conf:**
+Following is a sample of one defined trap in **/etc/snmp/snmptt-compaq.conf:**
 
     #  
     EVENT COMPAQ_11003 .1.3.6.1.4.1.232.0.11003 "LOGONLY" Normal  
@@ -2200,7 +2200,7 @@ Following is a sample of one defined traps in **/etc/snmp/snmptt-compaq.conf:**
     EDESC  
     #
 
-Following is a sample of one defined traps in **/etc/snmp/snmptt-compaq-hsv.conf:**
+Following is a sample of one defined trap in **/etc/snmp/snmptt-compaq-hsv.conf:**
 
     #  
     EVENT mngmtAgentTrap-16025 .1.3.6.1.4.1.232.0.136016025 "Status Events" Normal  
@@ -2215,9 +2215,9 @@ Following is a sample of one defined traps in **/etc/snmp/snmptt-compaq-hsv.conf
 
 An existing HP Openview trapd.conf can be used in most cases but the file must be a VERSION 3 file.  SNMPTT does not support all the variables implemented in HPOV, but most are available.  The following variables may or may not match exactly to HPOV: $O, $o, $r, $ar, $R, $aR.
 
-Some vendors (such as Compaq and Cisco ) provide a file that can be imported in to HP Openview using an HP Openview utility.  Snmpttconvert can be used to convert the file to snmptt.conf format.
+Some vendors (such as Compaq and Cisco ) provide a file that can be imported in to HP Openview using an HP Openview utility.  snmpttconvert can be used to convert the file to snmptt.conf format.
 
-Some vendors provide a MIB file that contains TRAP or NOTIFICATION definitions.  Snmpttconvertmib can be used to convert the file to snmptt.conf format.  
+Some vendors provide a MIB file that contains TRAP or NOTIFICATION definitions.  snmpttconvertmib can be used to convert the file to snmptt.conf format.  
  
 
 # <a name="Limitations"></a>Limitations
@@ -2256,7 +2256,7 @@ Before attempting to integrate SNMPTT with Nagios, please ensure that you have a
 
 ### Nagios Passive Service Checks
 
-Passive service checks allow Nagios to process service check results that are submitted by external applications.  Using SNMPTT's EXEC statement, the received trap can be passed to Nagios using the submit\_check\_result script included with Nagios.  Once received by Nagios, Nagios will handle alerting for the trap.  
+Passive service checks allow Nagios to process service check results that are submitted by external applications.  Using SNMPTT's EXEC statement, the received trap can be passed to Nagios using the **submit\_check\_result** script included with Nagios.  Once received by Nagios, Nagios will handle alerting for the trap.  
 
 One service is defined for each Nagios host that is to receive traps from SNMPTT.  The benefits of using only one service entry is that it makes it easier to set up Nagios. Trying to define every possible trap for every host you have is not recommended.  For example, after converting the MIBS from Compaq, there are over 340 traps defined.  Trying to define this for every Compaq server would not be a good idea as 40 servers \* 340 traps = 13,600 service definitions.
 
@@ -2272,7 +2272,7 @@ When defining the service for receiving the SNMPTT translated trap, the service 
 
 ### Creating the Nagios service entry
 
-Following is a sample service entry for Nagios.  The Description column should not be included in the definition.
+Following is a sample service entry for Nagios.
  
     define service{
         host_name               server01            # Name of host
@@ -2333,11 +2333,11 @@ Using the above configuration, once a trap is received for a host, it will remai
     /bin/echo "OK: No recent traps received"  
     exit 0
   
-Be sure to create a command definition in your \*commands.cfg file.  See the 'Object configuration file options' section of the Nagios documentation.  
+Be sure to create a command definition in your **commands.cfg** file.  See the 'Object configuration file options' section of the Nagios documentation.  
   
 Nagios 2.0 introduced service and host result freshness checks.  Service freshness checks can be used to automatically reset the trap notification to an OK state by defining **check\_freshness** and **freshness\_threshold** in the service definition.  Using freshness checks is recommended over normal active checks (defined by **normal\_check\_interval**) because the next check time of a normal active check does not change when a service changes state.  Because of this, if you wanted to clear the trap after 24 hours, the last trap would be cleared some time between when it happened at 24 hours, depending on when the last active check was done.  With freshness checking, the check command will be run **freshness\_threshold** seconds after the last passive result was received.  
   
-For freshness checking to work, **normal\_check\_interval** must be set to **1**, **valid check\_period** should be set to **24x7** and the following service definitions should be added.  The third column should not be included in the definition.  
+For freshness checking to work, **normal\_check\_interval** must be set to **1**, **valid check\_period** should be set to **24x7** and the following service definitions should be added. 
 
     check_freshness         1           # Enable freshness checking
     freshness_threshold     86400       # Reset trap alert every 24 hours.
@@ -2346,7 +2346,7 @@ For freshness checking to work, **normal\_check\_interval** must be set to **1**
 
 If you have an application that sends periodic SNMP heartbeats, it is possible to use freshness checking to alert if a heartbeat has not been received.  
   
-To configure a heartbeat trap, start by creating a new service definition by following 'Creating the Nagios service entry' above, but use a new service\_description such as MyApp\_heartbeat.  Next, add / change the following service definitions.  The third column should not be included in the definition.  
+To configure a heartbeat trap, start by creating a new service definition by following 'Creating the Nagios service entry' above, but use a new service\_description such as MyApp\_heartbeat.  Next, add / change the following service definitions.  
 
     check_freshness         1                           # Enable freshness checking
     freshness_threshold     1200                        # Check freshness every 20 minutes.
@@ -2357,7 +2357,7 @@ Note:  For freshness checking to work, **normal\_check\_interval** must be set 
   
 In this example, it is assumed that the heartbeat trap is received every 15 minutes, so a freshness\_threshold of 20 minutes was selected in case the heartbeat was delayed.  
   
-Create the new myapp\_heartbeat\_alarm\_set command for Nagios:  
+Create the new **myapp\_heartbeat\_alarm\_set** command for Nagios:  
 
     #!/bin/sh  
     /bin/echo "CRITICAL: Heartbeat signal from MyApp was not received!"  
@@ -2395,7 +2395,7 @@ The downside of using only one service entry is that you will only see the last 
 
 ### Icinga Volatile Services
 
-When defining the service for receiving the SNMPTT translated trap, the service must be defined as volatile.  When a service is changed from an OK state to a non-OK state, contacts are notified.  Normally, a service in Nagios is not defined volatile which means if another service check is performed and the state is still non-OK then NO contacts are notified.  Because there is only one service entry for SNMP traps, we need to make sure we are contacted every time a trap comes in.
+When defining the service for receiving the SNMPTT translated trap, the service must be defined as volatile.  When a service is changed from an OK state to a non-OK state, contacts are notified.  Normally, a service in Icinga is not defined volatile which means if another service check is performed and the state is still non-OK then NO contacts are notified.  Because there is only one service entry for SNMP traps, we need to make sure we are contacted every time a trap comes in.
  
 
 ### Creating the Icinga service entry
@@ -2423,7 +2423,7 @@ Following is a sample service entry for Icinga.
     }
  
 
-Note:  To simplify the configuration, you can instead apply the service too hosts using 'apply Service'.  See the [Icinga SNMPTT documentation](https://icinga.com/docs/icinga-2/snapshot/doc/07-agent-based-monitoring/#snmp-traps-and-passive-check-results) for an example.
+Note:  To simplify the configuration, you can instead apply the service to hosts using an 'apply Service'.  See the [Icinga SNMPTT documentation](https://icinga.com/docs/icinga-2/snapshot/doc/07-agent-based-monitoring/#snmp-traps-and-passive-check-results) for an example.
 
   
 
@@ -2436,11 +2436,11 @@ Create an EXEC statement such as the following for each **EVENT** entry in your 
 
 where **_apiuser_:_password_** is the API username and password, ***xxxxxx*** is the text for the trap using the same format as the FORMAT statement.  
   
-The variable substitution **$A** is used to pass the host name for **host.name** and **check\_source**, TRAP for **service.name** matches the service definition defined above, **exit\_status** of **1** represents a **WARNING**, and **xxxxxx** is the translated message from SNMPTT.  
+The variable substitution **$A** is used to pass the host name for **host.name** and **check\_source**, TRAP for **service.name** matches the service definition defined above, **exit\_status** of **1** represents a **WARNING**, and **xxxxxx** is the same text used for your FORMAT line.
 
-To generate the EXEC command when using snmpttconvertmib and have it use the resulting FORMAT line, use the following:
+Instead of repeating the same text as the FORMAT line, you can instead use the **$Fz** variable in the EXEC statement.  For example, to generate the EXEC command when using snmpttconvertmib:
 
-Create a file called exec-commands.txt with:
+Create a file called exec-commands.txt with (all on one line):
 
     /usr/bin/curl -k -s -S -i -u apiuser:password -H 'Accept: application/json' -X POST 'https://localhost:5665/v1/actions/process-check-result' -d '{ "type": "Service", "filter": "host.name==\"$A\" && service.name==\"TRAP\"", "exit_status": 2, "plugin_output": "$Fz", "check_source": "$A", "pretty": true }'
 
@@ -2448,7 +2448,9 @@ Run snmpttconvertmib using:
 
     snmpttconvertmib --in=/usr/share/snmp/mibs/mibname.mib --out=/etc/snmp/snmptt.conf --exec_mode=1 --exec_file=exec-commands.txt
 
-An API user must be defined in api-users.conf with the permission actions/process-check-result.  Example:  
+Note:  Run snmpttconvertmib -h for information on the command line options.
+
+An API user must be defined in api-users.conf with the permission **actions/process-check-result**.  Example:  
   
     object ApiUser "snmptt" {  
       password = "xxxxxxxxxxxxxxx"  
@@ -2537,10 +2539,10 @@ Create the **trap\_reset\_event.sh** script in **ConfDir** **/scripts** (/etc/ic
         echo "[`date +%s`] PROCESS_SERVICE_CHECK_RESULT;$HOST_NAME;$SERVICE_NAME;0;Auto-reset (`date +"%m-%d-%Y %T"`)." >> /var/run/icinga2/cmd/icinga2.cmd  
     fi  
 
-To have the TRAP service automatically cleared 24 hours after the last trap was received, modify the service entry to enable active checks and define a check\_interval:  
+To have the TRAP service automatically cleared 20 minutes after the last trap was received, modify the service entry to enable active checks and define a check\_interval:  
   
     enable_passive_checks = 1  
-    check_interval        = 87000
+    check_interval        = 1200
   
   
 ## <a name="SEC"></a>SEC - Simple Event Correlator
@@ -2698,7 +2700,7 @@ Here is a quick breakdown of what each rule does:
    
 First rule:  
  
-* If a linkDown is received (node=x msg\_text=cisco linkdowni trap on interface x from SNMPTT), and then a linkUp is received within 20 seconds, it is considered a BOUNCE.  A new 'event' is created with the internal SEC event 'CISCO %1 INTERFACE %2 BOUNCE' is created which is passed to the other rules. 
+* If a linkDown is received (node=x msg\_text=cisco linkdown trap on interface x from SNMPTT), and then a linkUp is received within 20 seconds, it is considered a BOUNCE.  A new 'event' is created with the internal SEC event 'CISCO %1 INTERFACE %2 BOUNCE' is created which is passed to the other rules. 
 * If a linkDown is received and a linkUp is not received within 20 seconds, a new 'down' internal SEC event is created (CISCO $1 INTERFACE $2 DOWN) which is passed to the other rules.
  
 Second rule:  
@@ -2717,7 +2719,7 @@ Fourth rule:
 
 ### 4\. Create a script to pass a trap back to SNMPTT
  
-Following is a Perl script that passes the information passed from SEC back to SNMPTT by calling SNMPTTHANDLER directly.  This file is basically a modified Perl version of the shell script available on the [SEC Examples page](http://kodu.neti.ee/%7Eristo/sec/examples.html).   
+Following is a Perl script that passes the information passed from SEC back to SNMPTT by calling **snmptthandler** directly.  This file is basically a modified Perl version of the shell script available on the [SEC Examples page](http://kodu.neti.ee/%7Eristo/sec/examples.html).   
  
     #!/usr/bin/perl  
     #  
@@ -2770,13 +2772,13 @@ Following is a Perl script that passes the information passed from SEC back to S
  
 ### Overview
  
-The Windows utility Event to Trap Translator (**evntwin.exe** and **evntcmd.exe)** can be used to configure Windows to forward user selectable Event Log entries to an SNMP manager when using the Microsoft SNMP service. SNMPTT can be configured to process these traps like any other trap. If the Event to Trap Translator is not already installed on your machine, it should be available from the Microsoft Resource Kit, SMS or after installation of the Microsoft SNMP service (Windows 2000 AS and Windows XP or higher).
+The Windows utility Event to Trap Translator (**evntwin.exe** and **evntcmd.exe)** can be used to configure Windows to forward user selectable Event Log entries to an SNMP manager when using the Microsoft SNMP service. SNMPTT can be configured to process these traps like any other trap.  If the Event to Trap Translator is not already installed on your machine, it should be available from the Microsoft Resource Kit, SMS or after installation of the Microsoft SNMP service (Windows 2000 AS and Windows XP or higher).
  
 **This section will outline the basic steps to configure Windows to forward event log entries to Net-SNMP / SNMPTT when using the Microsoft SNMP server (not the Net-SNMP snmpd.exe agent).  It will not attempt to explain how evntwin.exe and evntcmd.exe function.  Documentation on using evntwin.exe and evntcmd.exe is available on the Microsoft web site and should be reviewed. You should have a functioning SNMPTT system that can at least log translated traps to a log file before attempting this.**
  
 ### SNMP Service
  
-The Windows SNMP Service is the Microsoft SNMP agent. The agent is responsible for handling SNMP requests from management stations such as queries for CPU utilization, disk space etc. The agent is also responsible for sending traps to management stations when an event occurs.
+The Windows SNMP Service is the Microsoft SNMP agent which is responsible for handling SNMP requests from management stations such as queries for CPU utilization, disk space etc. The agent is also responsible for sending traps to management stations when an event occurs.
 
 Note: The Microsoft SNMP Trap Service is used to RECEIVE SNMP traps which is similar to the Net-SNMP **snmptrapd.exe** daemon. The Microsoft SNMP Trap Service is NOT used to send traps and is not required.
  
@@ -2784,7 +2786,6 @@ Note: The Microsoft SNMP Trap Service is used to RECEIVE SNMP traps which is sim
 
 The Windows SNMP agent needs to be configured to forward traps to your Net-SNMP / SNMPTT management station. This is done using the following steps:
 
-*   Click **Start - Settings - Control Panel**
 *   Open **Administrative Tools**
 *   Open **Services**
 *   Open **Local Policies**
@@ -2834,7 +2835,6 @@ To test that the trap is received by SNMPTT, a logon failure in Windows should b
  
 Your default installation of Windows may not create Event Log entries for unsuccessful logins. To configure Windows to log all failed logins, follow these steps:
  
-*   Click **Start - Settings - Control - Panel**
 *   Open **Administrative Tools**
 *   Open **Local Security Policy**
 *   Open **Local Policies**
@@ -2864,9 +2864,9 @@ Instead of using a wildcard EVENT entry to match all Microsoft traps, it is poss
 
 To determine the trap OID that will be used for the EVENT, display the entry in **evntwin.exe** and combine the **Enterprise OID**, a **0** and the **Trap Specific ID**. For example, for the security event ID 529 used above:
  
-Enterprise OID: 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121
+> Enterprise OID: 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121
  
-Trap Specific ID: 529
+> Trap Specific ID: 529
  
 Based on the information above, the following EVENT line would be used::
  
