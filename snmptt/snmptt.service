@@ -1,0 +1,12 @@
+[Unit]
+Description=SNMP Trap Translator (SNMPTT)
+After=syslog.target network.target snmptrapd.service
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/snmptt --daemon
+RemainAfterExit=yes
+PIDFile=/var/run/snmptt.pid
+
+[Install]
+WantedBy=multi-user.target
