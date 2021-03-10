@@ -28,7 +28,8 @@ This file was last updated on: March 5th, 2021
 * [Installation](#Installation)  
     * [Overview](#Installation-Overview)  
     * [Unix](#Installation-Unix)  
-        * [General setup](#Installation-Unix-Standard)  
+        * [Package Manager](#Installation-Unix-Package)  
+        * [Manual installation](#Installation-Unix-Manual)  
         * [Net-SNMP Standard handler](#Installation-Unix-Standard)  
         * [Net-SNMP Embedded handler](#Installation-Unix-Embedded)
     * [Windows](#Installation-Windows)  
@@ -629,6 +630,12 @@ The following outlines the general steps required to install and configure SNMPT
 
 ## <a name="Installation-Unix"></a>Installation - Unix
 
+### <a name="Installation-Unix-Package"></a>Package Manager
+
+Packages are available for most Linux distributions and FreeBSD.  Check your package manager to see if they have the latest version.  If not, you can manually install using the steps below.
+
+### <a name="Installation-Unix-Manual"></a>Manual installation
+
  Steps:
 
 1. Copy **snmptt** to /usr/sbin/ and ensure it is executable (**chmod +x snmptt**):
@@ -683,7 +690,46 @@ The following outlines the general steps required to install and configure SNMPT
     or to manually start without using the startup script, use:
 
         snmptt --daemon
-   
+
+
+3. Startup scripts are included for SysVinit and SystemD systems.
+
+     1. SysVinit:  
+
+        1. Copy the script:
+
+                cp snmptt-init.d /etc/rc.d/init.d/snmptt
+
+        4. Add the service using chkconfig:
+
+                chkconfig --add snmptt
+
+        5. Configure the service to start at runlevel 2345:
+
+                chkconfig --level 2345 snmptt on
+ 
+        6. Start the service:
+
+                service snmptt start
+
+    2. Systemd:  
+
+        1. Copy the script:
+
+                cp snmptt.service /usr/lib/systemd/system/snmptt.service
+  
+        2. Enable the service:
+  
+                systemctl enable snmptt.service
+  
+        3. Start the service:
+
+                systemctl start snmptt.service
+    
+    3.  Manually starting without SystemD or SysVinit:
+
+                snmptt --daemon
+
 8. Check syslog to ensure SNMPTT started properly:
 
         grep snmptt /var/log/messages
