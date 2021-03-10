@@ -1,6 +1,6 @@
 March 05th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Added --exec_file to snmpttconvertmib to allow you to provide an EXEC command
-  inside of a file instad of specifying on the command line.  Useful for
+  inside of a file instead of specifying on the command line.  Useful for
   commands that include quotes so that you don't have to worry about escaping on
   the command line.  Also allows you to define multiple EXEC lines instead of 
   just one.
@@ -13,13 +13,14 @@ March 05th, 2021: Alex Burger <alex_b@users.sourceforge.net>
   snmpttconvertmib will do the substitution.
 
 February 28th, 2021: Alex Burger <alex_b@users.sourceforge.net>
-- snmptt.ini can now be located in /etc/snmptt and is looked for at this
+- snmptt.ini can now be located in /etc/snmptt and is searched for at this
   location first.
 
 February 22nd, 2021: Alex Burger <alex_b@users.sourceforge.net>
-- Fix a bug with daemon_uid that prevented SNMPTT from starting on FreeBSD
+- Fixed a bug with daemon_uid that prevented SNMPTT from starting on FreeBSD
   (bug 47).  Thanks to Christian Ullrich for the fix.
-- Add support for sub-second sleep.  Thanks to Tyler Leeds for the code.
+- Added support for sub-second sleep for spool folder processing.  Thanks to
+  Tyler Leeds for the code.
 - Fixed a bug where traps arriving with the hostname set to UNKNOWN were
   not being handled properly (bug 46).  Thanks to Tom Griep for the fix.
 

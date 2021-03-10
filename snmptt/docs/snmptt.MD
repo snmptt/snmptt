@@ -198,9 +198,37 @@ Note:
 
 ## **v1.5beta1** **\- xx xx, 2021**
 
-*   TBD
-*     
-    
+* Added support for sub-second sleep for spool folder processing.
+* **snmptt.ini** can now be located in **/etc/snmptt** and is searched for at this
+  location first.
+* Fixed a bug with **daemon_uid** that prevented SNMPTT from starting on FreeBSD
+  (bug 47).
+* Fixed a bug where traps arriving with the hostname set to UNKNOWN were
+  not being handled properly (bug 46).
+* Fixed a bug with **MATCH** which was preventing it from matching integers properly (bug 41).
+* Fixed a bug where the agent IP address was not handled correctly when
+  it's received from Net-SNMP as **IpAddress:x.x.x.x**.  Bug 27.
+* Fixed a race condition bug with **snmptthander** and **snmptthandler-embedded**
+  which could cause traps to be missed.  Spool files are now immediately locked
+  after creation.  If flock() is not supported, the spool file will be created
+  with a temporary filename and then renamed after closing.  Spool files must
+  now start with # otherwise they are ignored.
+* Fixed a bug with **wildcard_expansion_separator** which caused an issue when
+  using wildcard separators that were longer than one character (bug 38).
+* Documentation was converted from html to markdown to make it easier to maintain and a full review was completed.  Many improvments have been made including a new section for integrating with Icinga.
+* SNMPTTConvertMIB:
+    * Added **--exec_file** to **snmpttconvertmib** to allow you to provide an EXEC command
+    inside of a file instead of specifying on the command line.  Useful for
+    commands that include quotes so that you don't have to worry about escaping on
+    the command line.  Also allows you to define multiple EXEC lines instead of 
+    just one.
+    * Added **--exec_mode** to **snmpttconvertmib** to allow you change how the EXEC line
+    is built.  Setting to 0 will append the format line to the end of the line
+    (default).  Setting to 1 does not append the format line to the end of the
+    line.  This is useful if you have added **$Fz** to the **--exec** line so that
+    SNMPTT can replace it with the FORMAT line.  Setting to 2 is similar to 1,
+    but instead of SNMPTT having to replace **$Fz** with the FORMAT line, 
+    **snmpttconvertmib** will do the substitution.
 
 ## **v1.4.2** **\- July 23rd, 2020**
 
@@ -241,7 +269,7 @@ Note:
 *   Fixed a bug (1748512) with handling escaped quotes in a trap message.
 *   Updated snmptt-net-snmp-test to test MIB descriptions.
 *   SNMPTTConvertMIB:
-*   *   Fixed a bug (1678270) where a TRAP-TYPE / NOTIFICATION-TYPE line would not translate if it was split across two lines.
+    *   Fixed a bug (1678270) where a TRAP-TYPE / NOTIFICATION-TYPE line would not translate if it was split across two lines.
 
 ## **v1.2** **\- June 16th, 2007**
 
@@ -268,7 +296,7 @@ Note:
 *   Added information to Nagios section of documentation for using SNMP traps as heartbeats by using freshness checks.
 *   Added information to Nagios section of documentation for using freshness checks to automatically clear trap alerts.
 *   SNMPTTConvertMIB:
-*   *   Fixed a bug (1438394) where ARGUMENTS lines that have $1, $2 etc instead of %0, %1 would not translate.
+    *   Fixed a bug (1438394) where ARGUMENTS lines that have $1, $2 etc instead of %0, %1 would not translate.
     *   Fixed a bug where a --#SEVERITYMAP line would be used instead of --#SEVERITY.
 
 ## **v1.1** **\- January 17th, 2006**
@@ -286,7 +314,7 @@ Note:
 *   Fixed bug that prevented the wildcard **.\*** from being accepted on the EVENT line.
 *   Added Windows Event Log forwarding documentation to integration section.
 *   SNMPTTConvertMIB:
-*   *   Fixed a bug when **\--format\_desc=n** was used that caused extra trailing whitespaces to be added for every non existent line in the description.
+    *   Fixed a bug when **\--format\_desc=n** was used that caused extra trailing whitespaces to be added for every non existent line in the description.
     *   Fixed bug that prevented some MIBs from being accepted due to spacing in the **DEFINITIONS::= line**.
     *   Fixed bug in that prevented **\--ARGUMENTS {}** from being parsed due to spacing.
 
@@ -306,7 +334,7 @@ Note:
 *   Fixed bug with with using printing $ symbols in FORMAT and EXEC lines
 *   Added [Simple Event Correlator (SEC)](http://kodu.neti.ee/%7Eristo/sec/) integration documentation
 *   SNMPTTConvertMIB:
-*   *   Fixed bug that prevented the variable list (OBJECTS) of V2 MIB files from being converted
+    *   Fixed bug that prevented the variable list (OBJECTS) of V2 MIB files from being converted
     *   Fixed bug that caused an infinite loop processing the VARIABLES/OBJECTS section if the line in the MIB file contained spaces after the closing bracket
 
 ## **0.9** **\- November 3rd, 2003**
@@ -348,8 +376,8 @@ Note:
 *   PID file now created (/var/run/snmptt.pid or ./snmptt.pid) when running in daemon mode on Linux / Unix.  snmptt-init.d script updated to remove the pid file when shutting down snmptt.
 *   Added [Nagios](http://www.nagios.org) / Netsaint integration documentation
 *   Added contrib folder
-*   Snmpttconvertmib
-*   *   Now prints the variables contained in each trap definition unless \--no\_variables is set.  When using \--net\_snmp\_perl it will also resolve the Syntax (INTEGER, OCTETSTR etc) and Description.  If it's an INTEGER, will also print out the enumeration tags if any exist.
+*   SNMPTTConvertMIB
+    *   Now prints the variables contained in each trap definition unless \--no\_variables is set.  When using \--net\_snmp\_perl it will also resolve the Syntax (INTEGER, OCTETSTR etc) and Description.  If it's an INTEGER, will also print out the enumeration tags if any exist.
     *   Improved compatability with MIB files
 
 ## **0.7** **\- April 17th****, 2003**
@@ -366,9 +394,9 @@ Note:
     will function as expected with SNMPTT
 *   Fixed bug that prevented quoted text from being logged correctly to SQL databases
 *   Fixed bug that would prevent the translation of integer values to enumeration tags and variable name substitutions when using Net-SNMP 5.0.x
-*   Snmpttconvertmib
-*   *   FORMAT / EXEC line can now contain any of the following:
-    *   *   \--#SUMMARY or DESCRIPTION (use DESCRIPTION only if --#SUMMARY does not exist)
+*   SNMPTTConvertMIB
+    *   FORMAT / EXEC line can now contain any of the following:
+        *   \--#SUMMARY or DESCRIPTION (use DESCRIPTION only if --#SUMMARY does not exist)
         *   description or --#SUMMARY (use --#SUMMARY only if DESCRIPTION does not exist)
         *   \--#SUMMARY and DESCRIPTION
         *   DESCRIPTION and --#SUMMARY
@@ -402,7 +430,7 @@ Note:
 *   Added examples folder containg a sample snmptt.conf file and sample trap file
 *   Added FAQ section to this document
 *   Snmpttconvertmib
-*   *   Code cleanup
+    *   Code cleanup
     *   Now uses new command line arguments (snmpttconvertmib -h for help).
     *   Can now use either snmptranslate or the SNMP Perl module (Net-SNMP) to process MIB files
     *   Can now add a NODES line when converting MIB files
