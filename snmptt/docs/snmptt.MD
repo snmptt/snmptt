@@ -2366,8 +2366,20 @@ where "xxxxxx" is the text for the trap using the same format as the FORMAT stat
   
     EXEC /usr/local/nagios/libexec/eventhandlers/submit_check_result $r TRAP 1 "Drive $1 in bay $2 has failed"
 
-The variable substitution **$r** is used to pass the host name, TRAP matches the service definition defined above, 1 represents a WARNING, and "xxxxxx" is the translated message from SNMPTT.  
-  
+The variable substitution **$r** is used to pass the host name, TRAP matches the service definition defined above, 1 represents a WARNING, and "xxxxxx" is the same text used for your FORMAT line.
+
+Instead of repeating the same text as the FORMAT line, you can instead use the **$Fz** variable in the EXEC statement.  For example, to generate the EXEC command when using snmpttconvertmib:
+
+Create a file called exec-commands.txt with (all on one line):
+
+    /usr/local/nagios/libexec/eventhandlers/submit_check_result $r TRAP 1 "$Fz"
+
+Run snmpttconvertmib using:
+
+    snmpttconvertmib --in=/usr/share/snmp/mibs/mibname.mib --out=/etc/snmp/snmptt.conf --exec_mode=1 --exec_file=exec-commands.txt
+
+Note:  Run snmpttconvertmib -h for information on the command line options.
+
 You must make sure that the host definition in Nagios matches the hostname that will be passed from SNMPTT using the **$r** variable.  See the section '[Name Resolution / DNS](#DNS)' for important DNS information.  
  
 

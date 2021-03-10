@@ -13,14 +13,14 @@ name="GENERATOR" />
 <title>SNMP Trap Translator</title>
 </head>
 
-#SNMP Trap Translator Convert v1.4.2
+#SNMP Trap Translator Convert v1.5beta1
 
 **(**[**SNMPTTCONVERT**](http://www.snmptt.org)**)**  
 This file was last updated on:  August 30th, 2004
 
 #License
 
-Copyright 2002-2020 Alex Burger  
+Copyright 2002-2021 Alex Burger  
 alex\_b@users.sourceforge.net  
 4/3/2002
 
