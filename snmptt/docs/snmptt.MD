@@ -487,6 +487,7 @@ Note:
 To upgrade from v1.4.2 to v1.5beta1 you should:
 
 1.  Replace **snmptt** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
+1.  Replace **snmpttconvertmib** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
 2.  Confirm that the **snmptt** user account is a member of the appropriate groups such as **nagios** for Nagios and **icingacmd** for Icinga2.
 3.  To increase security:
     *   If you are not currently using daemon mode and are running as root, please switch to daemon mode or run as different user such as **snmptt**.

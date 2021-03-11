@@ -1,3 +1,10 @@
+March 10th, 2021: Alex Burger <alex_b@users.sourceforge.net>
+- Fix bug in readtrap function where it was not properly removing quotes
+  around strings.  If string happened to only have a starting quote, or would
+  remove it and the last character of the string.
+- Fixed bug with debug mode that was causing some debug mode output even when
+  debug mode was off.
+
 March 05th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Added --exec_file to snmpttconvertmib to allow you to provide an EXEC command
   inside of a file instead of specifying on the command line.  Useful for
