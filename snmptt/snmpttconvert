@@ -23,6 +23,7 @@
 #
 ##############################################################################
 use strict;
+use warnings;
 
 #
 # http://www.sourceforge.net/projects/snmptt

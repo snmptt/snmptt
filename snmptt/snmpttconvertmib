@@ -27,6 +27,7 @@
 #
 ###############################################################################
 use strict;
+use warnings;
 
 #
 # OPTIONS START
@@ -308,9 +309,12 @@ if ($mib_name eq '')
 if ($net_snmp_perl == 1)
 {
   require SNMP;
-  $SNMP::save_descriptions = 1;	# Need them only for looking up variable descriptions. 
-                                # Do TRAP definition by hand to be able to pull out 
-				# the SUMMARY lines
+  {
+    no warnings;
+    $SNMP::save_descriptions = 1;	# Need them only for looking up variable descriptions. 
+                                  # Do TRAP definition by hand to be able to pull out 
+			                          	# the SUMMARY lines
+  }
   &SNMP::initMib();
   
   print "\n\n*****  Using UCD-SNMP / NET-SNMP Perl module *****\n\n";

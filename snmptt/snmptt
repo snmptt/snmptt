@@ -46,6 +46,7 @@
 ##############################################################################
 #
 use strict;
+use warnings;
 
 my $snmptt_version = "1.5beta1";
 
@@ -432,6 +433,7 @@ if ($net_snmp_perl_enable == 1)
   }
   my $noperlwarning;
   if ($description_mode == 2) {
+    no warnings;  # Variable is only used once
     $SNMP::save_descriptions = 1;
   }
   &SNMP::initMib();
@@ -2549,7 +2551,12 @@ sub substitute
 
   # $D - Description from MIB file (NOT from snmptt.conf)
   if ($net_snmp_perl_enable == 1 && $description_mode == 2) {
-    my $description_temp = $SNMP::MIB{$event2[0]}->{description};
+    my $description_temp;
+    {
+      no warnings;  # Variable is only used once
+       $description_temp = $SNMP::MIB{$event2[0]}->{description};
+
+    }
     if ($description_clean == 1) {
       $description_temp =~ s/\n\s+/\n/g;
     }
