@@ -855,12 +855,14 @@ if ($daemon == 1)
     $daemon_gid .= " ";
     while( (my $name, my $passwd, my $gid, my $members_list) = getgrent() ) {
       my @members = split(" ", $members_list);
-      
-      if ($daemon_uid_name ~~ @members) {
-        if ($DEBUGGING >= 1) {
-          syslog_system("daemon_uid $daemon_uid_name found in group $name\n");
+
+      foreach my $member (@members) {
+        if ($member eq $daemon_uid_name) {
+          if ($DEBUGGING >= 1) {
+            syslog_system("daemon_uid $daemon_uid_name found in group $name\n");
+          }
+          $daemon_gid_name .= "$name ";            
         }
-        $daemon_gid_name .= "$name ";
       }
     }
     chop($daemon_gid_name);
