@@ -137,27 +137,27 @@ else
 	{
 	  my $fh_CONFIG;
       $configfile = '/etc/snmptt/snmptt.ini';
-      if( open( $fh_CONFIG, '/etc/snmptt/snmptt.ini' ) )
+      if( open( $fh_CONFIG, '<', '/etc/snmptt/snmptt.ini' ) )
       {
         $configfile = '/etc/snmp/snmptt.ini';
         close $fh_CONFIG;
       }
-      elsif( open( $fh_CONFIG, '/etc/snmp/snmptt.ini' ) )
+      elsif( open( $fh_CONFIG, '<', '/etc/snmp/snmptt.ini' ) )
       {
         $configfile = '/etc/snmp/snmptt.ini';
         close $fh_CONFIG;
       }
-      elsif ( open( $fh_CONFIG, '/etc/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '<', '/etc/snmptt.ini' ) )
       {
         $configfile = '/etc/snmptt.ini';
         close $fh_CONFIG;
       }
-      elsif ( open( $fh_CONFIG, '/usr/local/etc/snmp/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '<', '/usr/local/etc/snmp/snmptt.ini' ) )
       {
         $configfile = '/usr/local/etc/snmp/snmptt.ini';
         close $fh_CONFIG;
       }
-      elsif ( open( $fh_CONFIG, '/usr/local/etc/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '<', '/usr/local/etc/snmptt.ini' ) )
       {
         $configfile = '/usr/local/etc/snmptt.ini';
         close $fh_CONFIG;
@@ -187,7 +187,7 @@ if ($DEBUGGING >= 1)
 {
 	if ($DEBUGGING_FILE ne '') 
 	{
-		open($fh_DEBUGFILE, ">>$DEBUGGING_FILE")
+		open($fh_DEBUGFILE, ">>", $DEBUGGING_FILE)
 			or warn "Could not open debug output file ($!)";
 	
 		select $fh_DEBUGFILE;	# Change default output to debug file
@@ -209,7 +209,7 @@ if ($locking_method) {
 }
 
 my $fh_SPOOL;
-unless (open $fh_SPOOL, ">$spoolfile")
+unless (open $fh_SPOOL, ">", $spoolfile)
 {
     if ($DEBUGGING >= 1)
     {
@@ -265,7 +265,7 @@ sub loadsnmpttini {
 	##############################################################################
 
 	my $fh_CONFIG;
-	if( open( $fh_CONFIG, $configfile ) ) {
+	if( open( $fh_CONFIG, '<', $configfile ) ) {
 	  close $fh_CONFIG;
 	  $cfg = new Config::IniFiles( -file => $configfile);
 	}

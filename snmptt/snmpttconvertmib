@@ -209,7 +209,7 @@ if ($DEBUGGING >= 1)
 }
 
 my $fh_INPUTFILE;
-unless (open $fh_INPUTFILE, "<$input")
+unless (open $fh_INPUTFILE, "<", $input)
 {
   die "Cannot open input file: $!";
 }
@@ -238,7 +238,7 @@ if ($exec_file) {
   }
 
   my $fh_EXECFILE;
-  unless (open $fh_EXECFILE, "<$exec_file")
+  unless (open $fh_EXECFILE, "<", $exec_file)
   {
     die "Cannot open input file: $!";
   }
@@ -269,7 +269,7 @@ if ($exec_array[0] ne "") {
 ###################################
 # Open output file
 my $fh_OUTPUTFILE;
-unless (open $fh_OUTPUTFILE, ">>$output")
+unless (open $fh_OUTPUTFILE, ">>", $output)
 {
   die "Cannot open output file: $!";
 }
@@ -1017,7 +1017,7 @@ if (1)
     $snmptranslate_use_On = 1;
     
     my $SNMPTRANSLATE;
-    if (open $SNMPTRANSLATE, "snmptranslate -V 2>&1|")
+    if (open $SNMPTRANSLATE, "-|", "snmptranslate -V 2>&1")
     {
       my $snmptranslatever = <$SNMPTRANSLATE>;
       close $SNMPTRANSLATE;

@@ -323,7 +323,7 @@ if ($DEBUGGING >= 1)
   # Open the debug file
   if ($DEBUGGING_FILE ne '') 
   {
-    if (open $fh_DEBUGFILE, ">>$DEBUGGING_FILE")
+    if (open $fh_DEBUGFILE, ">>", $DEBUGGING_FILE)
     {
       select $fh_DEBUGFILE;	# change default output to debug file
       $debug_file_used = 1;
@@ -658,7 +658,7 @@ if ($daemon == 1)
   }
   if (-e $pid_file) {
     my $fh_OLDPID;
-    open($fh_OLDPID, "<$pid_file");
+    open($fh_OLDPID, "<", $pid_file);
     my $old_pid = <$fh_OLDPID>;
     chomp $old_pid;
     close $fh_OLDPID;
@@ -721,11 +721,11 @@ if ($daemon == 1)
 
     chdir '/'
        or die "Can't chdir to /: $!";
-    open STDIN, '/dev/null'
+    open STDIN, '<', '/dev/null'
        or die "Can't read /dev/null: $!";
-    open STDOUT, '>>/dev/null'
+    open STDOUT, '>>', '/dev/null'
        or die "Can't write to /dev/null: $!";
-    open STDERR, '>>/dev/null'
+    open STDERR, '>>', '/dev/null'
        or die "Can't write to /dev/null: $!";
 
     # We fork so we can return back to the shell or whatever started snmptt
@@ -739,14 +739,14 @@ if ($daemon == 1)
     {
       if ($daemon_uid eq '') {
         my $fh_PID;
-        if (open($fh_PID, ">$pid_file") ) {
+        if (open($fh_PID, ">", $pid_file) ) {
           print($fh_PID "$pid\n");
           close($fh_PID);
         }
         else {
           $pid_file = "$working_dir/snmptt.pid";
           
-          if (open($fh_PID, ">$pid_file") )
+          if (open($fh_PID, ">", $pid_file) )
           {
             print($fh_PID "$pid\n");
             close($fh_PID);
@@ -776,14 +776,14 @@ if ($daemon == 1)
         $SIG{TERM} = \&signal_handler_die;        # new signal for parent
         
         my $fh_PID;
-        if (open($fh_PID, ">$pid_file") ) {
+        if (open($fh_PID, ">", $pid_file) ) {
           print($fh_PID "$pid2\n");
           close($fh_PID);
         }
         else {
           $pid_file = "$working_dir/snmptt.pid";
           
-          if (open($fh_PID, ">$pid_file") )
+          if (open($fh_PID, ">", $pid_file) )
           {
             print($fh_PID "$pid2\n");
             close($fh_PID);
@@ -1191,7 +1191,7 @@ if ($daemon == 1)
 
         my $filesuccess = 1;
         my $fh_FILE;
-        unless (open $fh_FILE, $spool_directory.$file)
+        unless (open $fh_FILE, '<', $spool_directory.$file)
         {
           if ($DEBUGGING >= 1)
           {
@@ -1803,7 +1803,7 @@ sub processtrap
           $trap_attempted_to_log++;	
 
           my $fh_LOGFILE;
-          if (open $fh_LOGFILE, ">>$log_file")
+          if (open $fh_LOGFILE, ">>", $log_file)
           {
             print $fh_LOGFILE $trap_date_time." $message";
             close $fh_LOGFILE;
@@ -2865,7 +2865,7 @@ sub loadsnmpttconf
       eventlog_system("Loading $snmpttconffile",9,$eventlog_information);
     }
 
-    unless (open $fh_SNMPTTCONF, $snmpttconffile)
+    unless (open $fh_SNMPTTCONF, '<', $snmpttconffile)
     {
       warn "Could not open configuration file: $snmpttconffile ($!)";
       if ($DEBUGGING >= 1)
@@ -3919,7 +3919,7 @@ sub searchfortrap
     {
       if ($unknown_trap_log_file ne "") {
         my $fh_LOGFILE;
-        if (open $fh_LOGFILE, ">>$unknown_trap_log_file")
+        if (open $fh_LOGFILE, ">>", $unknown_trap_log_file)
         {
           print $fh_LOGFILE scalar($trap_date_time),": Unknown trap ($var[3]) received from $var[0] at: \n";
           #print out all standard variables
@@ -4176,27 +4176,27 @@ sub findsnmpttini
     {
       my $fh_CONFIG;
       $configfile = '/etc/snmptt/snmptt.ini';
-      if( open( $fh_CONFIG, '/etc/snmptt/snmptt.ini' ) )
+      if( open( $fh_CONFIG, '<', '/etc/snmptt/snmptt.ini' ) )
       {
         $configfile = '/etc/snmp/snmptt.ini';
         close $fh_CONFIG;
       }
-      elsif( open( $fh_CONFIG, '/etc/snmp/snmptt.ini' ) )
+      elsif( open( $fh_CONFIG, '<', '/etc/snmp/snmptt.ini' ) )
       {
         $configfile = '/etc/snmp/snmptt.ini';
         close $fh_CONFIG;
       }
-      elsif ( open( $fh_CONFIG, '/etc/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '<', '/etc/snmptt.ini' ) )
       {
         $configfile = '/etc/snmptt.ini';
         close $fh_CONFIG;
       }
-      elsif ( open( $fh_CONFIG, '/usr/local/etc/snmp/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '<', '/usr/local/etc/snmp/snmptt.ini' ) )
       {
         $configfile = '/usr/local/etc/snmp/snmptt.ini';
         close $fh_CONFIG;
       }
-      elsif ( open( $fh_CONFIG, '/usr/local/etc/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '<', '/usr/local/etc/snmptt.ini' ) )
       {
         $configfile = '/usr/local/etc/snmptt.ini';
         close $fh_CONFIG;
@@ -4221,7 +4221,7 @@ sub loadsnmpttini {
   my $cfg;
 
   my $fh_CONFIG;
-  if( open( $fh_CONFIG, $configfile ) ) {
+  if( open( $fh_CONFIG, '<', $configfile ) ) {
     close $fh_CONFIG;
     $cfg = new Config::IniFiles( -file => $configfile);
     if ($DEBUGGING >= 1) {
@@ -4580,7 +4580,7 @@ sub log_system {
   }
 
   my $fh_LOGSYSFILE;
-  if (open $fh_LOGSYSFILE, ">>$log_system_file")
+  if (open $fh_LOGSYSFILE, ">>", $log_system_file)
   {
     print $fh_LOGSYSFILE $log_time." $message\n";
     close $fh_LOGSYSFILE;
@@ -5378,7 +5378,7 @@ sub process_nodes
     {
       #print "!Dynamic enabled\n";
       my $fh_NODESFILE;
-      if (open $fh_NODESFILE, $a)
+      if (open $fh_NODESFILE, '<', $a)
       {
         while (defined(my $line = <$fh_NODESFILE>))
         {
@@ -6242,7 +6242,7 @@ sub reopen_debug_file {
   if ($DEBUGGING_FILE ne '')
   {
     close $fh_DEBUGFILE;
-    if (open $fh_DEBUGFILE, ">>$DEBUGGING_FILE")
+    if (open $fh_DEBUGFILE, ">>", $DEBUGGING_FILE)
     {
       select $fh_DEBUGFILE;	# change default output to debug file
       $debug_file_used = 1;
