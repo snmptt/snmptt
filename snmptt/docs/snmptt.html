@@ -179,26 +179,31 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA<br /
   not being handled properly (bug 46).</li>
 <li>Fixed a bug with <strong>MATCH</strong> which was preventing it from matching integers properly (bug 41).</li>
 <li>Fixed a bug where the agent IP address was not handled correctly when
-  it's received from Net-SNMP as <strong>IpAddress:x.x.x.x</strong>.  Bug 27.</li>
+  it was received from Net-SNMP as <strong>IpAddress:x.x.x.x</strong> (bug 27).</li>
 <li>Fixed a race condition bug with <strong>snmptthander</strong> and <strong>snmptthandler-embedded</strong>
   which could cause traps to be missed.  Spool files are now immediately locked
   after creation.  If flock() is not supported, the spool file will be created
   with a temporary filename and then renamed after closing.  Spool files must
-  now start with # otherwise they are ignored.</li>
+  now start with <strong>#</strong> otherwise they are ignored.</li>
 <li>Fixed a bug with <strong>wildcard_expansion_separator</strong> which caused an issue when
   using wildcard separators that were longer than one character (bug 38).</li>
-<li>Documentation was converted from html to markdown to make it easier to maintain and a full review was completed.  Many improvments have been made including a new section for integrating with Icinga.</li>
-<li>SNMPTTConvertMIB:<ul>
-<li>Added <strong>--exec_file</strong> to <strong>snmpttconvertmib</strong> to allow you to provide an EXEC command
+<li>Fixed a bug where quotes were not properly removed from some incoming traps.</li>
+<li>Fixed bug with debug mode that was causing some debug mode output even when
+  debug mode was off.</li>
+<li>Enabled Perl warnings to help ensure code is following best practices.</li>
+<li>Ran code against Perl::Critic to find non-optimal code.  Made various adjustments such as relacing bare words with variables and changing open() calls from two arguments to three.</li>
+<li>Documentation was converted from html to markdown to make it easier to maintain and a full review was completed.  Many improvments have been made including a new section on integrating with Icinga.</li>
+<li><strong>snmpttconvertmib</strong>:<ul>
+<li>Added <strong>--exec_file</strong> option to allow you to provide an EXEC command
 inside of a file instead of specifying on the command line.  Useful for
 commands that include quotes so that you don't have to worry about escaping on
 the command line.  Also allows you to define multiple EXEC lines instead of 
 just one.</li>
-<li>Added <strong>--exec_mode</strong> to <strong>snmpttconvertmib</strong> to allow you change how the EXEC line
-is built.  Setting to 0 will append the format line to the end of the line
-(default).  Setting to 1 does not append the format line to the end of the
+<li>Added <strong>--exec_mode</strong> option to allow you change how the EXEC line
+is built.  Setting to <strong>0</strong> will append the format line to the end of the line
+(default).  Setting to <strong>1</strong> does not append the format line to the end of the
 line.  This is useful if you have added <strong>$Fz</strong> to the <strong>--exec</strong> line so that
-SNMPTT can replace it with the FORMAT line.  Setting to 2 is similar to 1,
+SNMPTT can replace it with the FORMAT line.  Setting to <strong>2</strong> is similar to <strong>1</strong>,
 but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT line, 
 <strong>snmpttconvertmib</strong> will do the substitution.</li>
 </ul>
@@ -483,6 +488,7 @@ but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT lin
 <p>To upgrade from v1.4.2 to v1.5beta1 you should:</p>
 <ol>
 <li>Replace <strong>snmptt</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
+<li>Replace <strong>snmpttconvertmib</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
 <li>Confirm that the <strong>snmptt</strong> user account is a member of the appropriate groups such as <strong>nagios</strong> for Nagios and <strong>icingacmd</strong> for Icinga2.</li>
 <li>
 <p>To increase security:</p>

@@ -207,26 +207,31 @@ Note:
   not being handled properly (bug 46).
 * Fixed a bug with **MATCH** which was preventing it from matching integers properly (bug 41).
 * Fixed a bug where the agent IP address was not handled correctly when
-  it's received from Net-SNMP as **IpAddress:x.x.x.x**.  Bug 27.
+  it was received from Net-SNMP as **IpAddress:x.x.x.x** (bug 27).
 * Fixed a race condition bug with **snmptthander** and **snmptthandler-embedded**
   which could cause traps to be missed.  Spool files are now immediately locked
   after creation.  If flock() is not supported, the spool file will be created
   with a temporary filename and then renamed after closing.  Spool files must
-  now start with # otherwise they are ignored.
+  now start with **#** otherwise they are ignored.
 * Fixed a bug with **wildcard_expansion_separator** which caused an issue when
   using wildcard separators that were longer than one character (bug 38).
-* Documentation was converted from html to markdown to make it easier to maintain and a full review was completed.  Many improvments have been made including a new section for integrating with Icinga.
-* SNMPTTConvertMIB:
-    * Added **--exec_file** to **snmpttconvertmib** to allow you to provide an EXEC command
+* Fixed a bug where quotes were not properly removed from some incoming traps.
+* Fixed bug with debug mode that was causing some debug mode output even when
+  debug mode was off.
+* Enabled Perl warnings to help ensure code is following best practices.
+* Ran code against Perl::Critic to find non-optimal code.  Made various adjustments such as relacing bare words with variables and changing open() calls from two arguments to three.
+* Documentation was converted from html to markdown to make it easier to maintain and a full review was completed.  Many improvments have been made including a new section on integrating with Icinga.
+* **snmpttconvertmib**:
+    * Added **--exec_file** option to allow you to provide an EXEC command
     inside of a file instead of specifying on the command line.  Useful for
     commands that include quotes so that you don't have to worry about escaping on
     the command line.  Also allows you to define multiple EXEC lines instead of 
     just one.
-    * Added **--exec_mode** to **snmpttconvertmib** to allow you change how the EXEC line
-    is built.  Setting to 0 will append the format line to the end of the line
-    (default).  Setting to 1 does not append the format line to the end of the
+    * Added **--exec_mode** option to allow you change how the EXEC line
+    is built.  Setting to **0** will append the format line to the end of the line
+    (default).  Setting to **1** does not append the format line to the end of the
     line.  This is useful if you have added **$Fz** to the **--exec** line so that
-    SNMPTT can replace it with the FORMAT line.  Setting to 2 is similar to 1,
+    SNMPTT can replace it with the FORMAT line.  Setting to **2** is similar to **1**,
     but instead of SNMPTT having to replace **$Fz** with the FORMAT line, 
     **snmpttconvertmib** will do the substitution.
 
