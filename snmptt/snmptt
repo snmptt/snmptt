@@ -316,14 +316,16 @@ my $debug_file_used = 0;
 my $g_start_time = time();
 
 my $debug_file_open_error = 1;
+my $fh_DEBUGFILE;
+
 if ($DEBUGGING >= 1)
 {
   # Open the debug file
   if ($DEBUGGING_FILE ne '') 
   {
-    if (open DEBUGFILE, ">>$DEBUGGING_FILE")
+    if (open $fh_DEBUGFILE, ">>$DEBUGGING_FILE")
     {
-      select DEBUGFILE;	# change default output to debug file
+      select $fh_DEBUGFILE;	# change default output to debug file
       $debug_file_used = 1;
       $debug_file_open_error = 0;
     }
@@ -655,10 +657,11 @@ if ($daemon == 1)
     print STDOUT "PID file: $pid_file\n";
   }
   if (-e $pid_file) {
-    open(OLDPID, "<$pid_file");
-    my $old_pid = <OLDPID>;
+    my $fh_OLDPID;
+    open($fh_OLDPID, "<$pid_file");
+    my $old_pid = <$fh_OLDPID>;
     chomp $old_pid;
-    close OLDPID;
+    close $fh_OLDPID;
     
     warn("There seems to be another SNMPTT process (pid $old_pid) running.\n");
     warn("You may want to kill it and delete the .pid file ($pid_file).  Aborting...\n");
@@ -735,17 +738,18 @@ if ($daemon == 1)
     if ($pid)   # This is run in the parent process
     {
       if ($daemon_uid eq '') {
-        if (open(PID, ">$pid_file") ) {
-          print(PID "$pid\n");
-          close(PID);
+        my $fh_PID;
+        if (open($fh_PID, ">$pid_file") ) {
+          print($fh_PID "$pid\n");
+          close($fh_PID);
         }
         else {
           $pid_file = "$working_dir/snmptt.pid";
           
-          if (open(PID, ">$pid_file") )
+          if (open($fh_PID, ">$pid_file") )
           {
-            print(PID "$pid\n");
-            close(PID);
+            print($fh_PID "$pid\n");
+            close($fh_PID);
           }
         }
       }
@@ -771,17 +775,18 @@ if ($daemon == 1)
       {
         $SIG{TERM} = \&signal_handler_die;        # new signal for parent
         
-        if (open(PID, ">$pid_file") ) {
-          print(PID "$pid2\n");
-          close(PID);
+        my $fh_PID;
+        if (open($fh_PID, ">$pid_file") ) {
+          print($fh_PID "$pid2\n");
+          close($fh_PID);
         }
         else {
           $pid_file = "$working_dir/snmptt.pid";
           
-          if (open(PID, ">$pid_file") )
+          if (open($fh_PID, ">$pid_file") )
           {
-            print(PID "$pid2\n");
-            close(PID);
+            print($fh_PID "$pid2\n");
+            close($fh_PID);
           }
         }
 
@@ -948,10 +953,10 @@ if ($daemon == 1)
 
 
       if ($DEBUGGING >= 1) {
-        print DEBUGFILE "Closing debug file $DEBUGGING_FILE\n";
+        print $fh_DEBUGFILE "Closing debug file $DEBUGGING_FILE\n";
       }
       # Close debug file (if it is open) before changing users and re-open after
-      close(DEBUGFILE);
+      close($fh_DEBUGFILE);
 	  
 	    # Change owner of debug file so $daemon_uid can write to it.
 	    chown $daemon_uid, -1, $DEBUGGING_FILE;
@@ -1026,6 +1031,7 @@ if ($daemon == 1)
       #print "\n";
     }
 
+    my $fh_DIR;
     if ($spool_directory eq '')
     {
       if ($DEBUGGING >= 1)
@@ -1067,7 +1073,7 @@ if ($daemon == 1)
         eventlog_system("Unable to enter spool dir $spool_directory",3,$eventlog_error);
       }
     }
-    elsif (! (opendir(DIR, ".")))
+    elsif (! (opendir($fh_DIR, ".")))
     {
       if ($DEBUGGING >= 1)
       {
@@ -1088,7 +1094,7 @@ if ($daemon == 1)
         eventlog_system("Unable to open spool dir $spool_directory",4,$eventlog_error);
       }
     }
-    elsif (! (my @filenames = readdir(DIR)))
+    elsif (! (my @filenames = readdir($fh_DIR)))
     {
       if ($DEBUGGING >= 1)
       {
@@ -1111,7 +1117,7 @@ if ($daemon == 1)
     }
     else
     {
-      closedir(DIR);
+      closedir($fh_DIR);
 
       @filenames = sort (@filenames);   # Sort list of filenames to ensure they
                                         # are processed in the order they were
@@ -1184,7 +1190,8 @@ if ($daemon == 1)
         }
 
         my $filesuccess = 1;
-        unless (open FILE, $spool_directory.$file)
+        my $fh_FILE;
+        unless (open $fh_FILE, $spool_directory.$file)
         {
           if ($DEBUGGING >= 1)
           {
@@ -1208,7 +1215,7 @@ if ($daemon == 1)
           $filesuccess = 0;
         }
 
-        $input = 'FILE';
+        $input = $fh_FILE;
 
         my $readtrap_result = &readtrap();      # Read trap from STDIN or file
 
@@ -1231,7 +1238,7 @@ if ($daemon == 1)
         if (! ($trap_is_a_duplicate)) {			
           &searchfortrap;		# Search for trap snmptt.conf (array)
         }
-        close FILE;
+        close $fh_FILE;
 
         if ($filesuccess == 1)
         {
@@ -1781,7 +1788,7 @@ sub processtrap
 
           #if ($debug_file_used == 1)
           #{
-          #  select DEBUGFILE;
+          #  select $fh_DEBUGFILE;
           #}
         }
 
@@ -1795,10 +1802,11 @@ sub processtrap
         {
           $trap_attempted_to_log++;	
 
-          if (open LOGFILE, ">>$log_file")
+          my $fh_LOGFILE;
+          if (open $fh_LOGFILE, ">>$log_file")
           {
-            print LOGFILE $trap_date_time." $message";
-            close LOGFILE;
+            print $fh_LOGFILE $trap_date_time." $message";
+            close $fh_LOGFILE;
             $trap_successfully_logged++;
           }
           else
@@ -2836,6 +2844,7 @@ sub loadsnmpttconf
   # @snmptt_conf_files = ();
   undef %event;
   
+  my $fh_SNMPTTCONF;
   foreach my $snmpttconffile (@snmptt_conf_files)
   {
     if ($DEBUGGING >= 1)
@@ -2856,7 +2865,7 @@ sub loadsnmpttconf
       eventlog_system("Loading $snmpttconffile",9,$eventlog_information);
     }
 
-    unless (open SNMPTTCONF, $snmpttconffile)
+    unless (open $fh_SNMPTTCONF, $snmpttconffile)
     {
       warn "Could not open configuration file: $snmpttconffile ($!)";
       if ($DEBUGGING >= 1)
@@ -2880,7 +2889,7 @@ sub loadsnmpttconf
       next;
     }
     my $tempcount = 0;
-    while (<SNMPTTCONF>)
+    while (<$fh_SNMPTTCONF>)
     {
       chomp;				#remove <cr> at end of line	
       s/\015//;                       	# Remove any DOS carriage returns
@@ -3164,7 +3173,25 @@ sub loadsnmpttconf
       my $l=0;
       while (defined($event{$key}[$l+1]))
       {
-        print  "Event: $key => $event{$key}[1+$l],$event{$key}[2+$l],$event{$key}[3+$l],$event{$key}[4+$l],$event{$key}[7+$l][0]\n";
+        # 0: name of trap
+        # 1: category
+        # 2: severity
+        # 3: FORMAT string
+        # 4: EXEC string
+        # 5: NODES string
+        # 6: REGEX array
+        # 7: MATCH array
+        # 8: DESC array
+        # 9: PREEXEC string
+
+        my $trap_Name = $event{$key}[1+$l];
+        my $trap_category = $event{$key}[2+$l];
+        my $trap_severity = $event{$key}[3+$l];
+        my $trap_FORMAT = $event{$key}[4+$l];
+        #my $trap_REGEX = $event{$key}[7+$l][0];
+
+        print  "Event: $key => $trap_Name,$trap_category,$trap_severity,$trap_FORMAT\n";
+        # print  "Event: $key => $event{$key}[1+$l],$event{$key}[2+$l],$event{$key}[3+$l],$event{$key}[4+$l],$event{$key}[7+$l][0]\n";
         $l+=11;
       }
     }
@@ -3195,7 +3222,7 @@ sub loadsnmpttconf
     }
   }
 
-  close SNMPTTCONF;
+  close $fh_SNMPTTCONF;
 }
 
 sub readtrap
@@ -3891,21 +3918,22 @@ sub searchfortrap
     if ($unknown_trap_log_enable == 1)
     {
       if ($unknown_trap_log_file ne "") {
-        if (open LOGFILE, ">>$unknown_trap_log_file")
+        my $fh_LOGFILE;
+        if (open $fh_LOGFILE, ">>$unknown_trap_log_file")
         {
-          print LOGFILE scalar($trap_date_time),": Unknown trap ($var[3]) received from $var[0] at: \n";
+          print $fh_LOGFILE scalar($trap_date_time),": Unknown trap ($var[3]) received from $var[0] at: \n";
           #print out all standard variables
           for (my $i=0;$i <= $#var;$i++)
           {
-            print 	LOGFILE "Value $i: $var[$i]\n";
+            print 	$fh_LOGFILE "Value $i: $var[$i]\n";
           }
           #print out all enterprise specific variables
           for (my $i=0;$i <= $#entvar;$i++)
           {
-            print LOGFILE "Ent Value $i: $entvarname[$i]=$entvar[$i]\n";
+            print $fh_LOGFILE "Ent Value $i: $entvarname[$i]=$entvar[$i]\n";
           }
-          print LOGFILE "\n\n";
-          close LOGFILE;
+          print $fh_LOGFILE "\n\n";
+          close $fh_LOGFILE;
         }
         else
         {
@@ -4146,31 +4174,32 @@ sub findsnmpttini
   {
     if ($^O ne "MSWin32")
     {
+      my $fh_CONFIG;
       $configfile = '/etc/snmptt/snmptt.ini';
-      if( open( CONFIG, '/etc/snmptt/snmptt.ini' ) )
+      if( open( $fh_CONFIG, '/etc/snmptt/snmptt.ini' ) )
       {
         $configfile = '/etc/snmp/snmptt.ini';
-        close CONFIG;
+        close $fh_CONFIG;
       }
-      elsif( open( CONFIG, '/etc/snmp/snmptt.ini' ) )
+      elsif( open( $fh_CONFIG, '/etc/snmp/snmptt.ini' ) )
       {
         $configfile = '/etc/snmp/snmptt.ini';
-        close CONFIG;
+        close $fh_CONFIG;
       }
-      elsif ( open( CONFIG, '/etc/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '/etc/snmptt.ini' ) )
       {
         $configfile = '/etc/snmptt.ini';
-        close CONFIG;
+        close $fh_CONFIG;
       }
-      elsif ( open( CONFIG, '/usr/local/etc/snmp/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '/usr/local/etc/snmp/snmptt.ini' ) )
       {
         $configfile = '/usr/local/etc/snmp/snmptt.ini';
-        close CONFIG;
+        close $fh_CONFIG;
       }
-      elsif ( open( CONFIG, '/usr/local/etc/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '/usr/local/etc/snmptt.ini' ) )
       {
         $configfile = '/usr/local/etc/snmptt.ini';
-        close CONFIG;
+        close $fh_CONFIG;
       }
     }
     else {
@@ -4191,8 +4220,9 @@ sub loadsnmpttini {
   use Config::IniFiles;
   my $cfg;
 
-  if( open( CONFIG, $configfile ) ) {
-    close CONFIG;
+  my $fh_CONFIG;
+  if( open( $fh_CONFIG, $configfile ) ) {
+    close $fh_CONFIG;
     $cfg = new Config::IniFiles( -file => $configfile);
     if ($DEBUGGING >= 1) {
       print "Config file $configfile loaded\n";
@@ -4549,10 +4579,11 @@ sub log_system {
     $log_time = strftime $date_time_format, @localtime_array;
   }
 
-  if (open LOGSYSFILE, ">>$log_system_file")
+  my $fh_LOGSYSFILE;
+  if (open $fh_LOGSYSFILE, ">>$log_system_file")
   {
-    print LOGSYSFILE $log_time." $message\n";
-    close LOGSYSFILE;
+    print $fh_LOGSYSFILE $log_time." $message\n";
+    close $fh_LOGSYSFILE;
   }
   else
   {
@@ -5346,9 +5377,10 @@ sub process_nodes
     if ( ($a =~ /\\|\//) && !($a =~ /\d+\.\d+\.\d+\.\d+/))
     {
       #print "!Dynamic enabled\n";
-      if (open NODESFILE, $a)
+      my $fh_NODESFILE;
+      if (open $fh_NODESFILE, $a)
       {
-        while (defined(my $line = <NODESFILE>))
+        while (defined(my $line = <$fh_NODESFILE>))
         {
           chomp($line);
           # Allow comment lines starting with a #
@@ -5361,7 +5393,7 @@ sub process_nodes
             }
           }
         }
-        close NODESFILE;
+        close $fh_NODESFILE;
       }
       else
       {
@@ -6209,10 +6241,10 @@ sub sql_win32_odbc_insert {
 sub reopen_debug_file {
   if ($DEBUGGING_FILE ne '')
   {
-    close DEBUGFILE;
-    if (open DEBUGFILE, ">>$DEBUGGING_FILE")
+    close $fh_DEBUGFILE;
+    if (open $fh_DEBUGFILE, ">>$DEBUGGING_FILE")
     {
-      select DEBUGFILE;	# change default output to debug file
+      select $fh_DEBUGFILE;	# change default output to debug file
       $debug_file_used = 1;
       $debug_file_open_error = 0;
       print "Debug file $DEBUGGING_FILE re-opened under uid $daemon_uid\n";

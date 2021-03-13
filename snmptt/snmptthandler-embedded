@@ -37,6 +37,7 @@
 # 
 ##############################################################################
 use strict;
+#use warnings;
 use Getopt::Long;
 use Time::HiRes qw(gettimeofday);
 use Config::IniFiles;
@@ -159,14 +160,15 @@ sub snmptt_trap_receiver {
   my $s_pad = sprintf("%09d",$s);
   my $usec_pad = sprintf("%06d",$usec);
   
+  my $fh_DEBUGFILE;
   if ($DEBUGGING >= 1)
   {
     if ($DEBUGGING_FILE ne '') 
     {
-      open DEBUGFILE, ">>$DEBUGGING_FILE"
+      open ($fh_DEBUGFILE, ">>$DEBUGGING_FILE")
         or warn "Could not open debug output file ($!)";
       
-      select DEBUGFILE;	# Change default output to debug file
+      select $fh_DEBUGFILE;	# Change default output to debug file
     }
     
     # Print out time
@@ -185,7 +187,8 @@ sub snmptt_trap_receiver {
     $spoolfile = $spool_directory.'x#snmptt-trap-'.$s_pad.$usec_pad;
   }
   
-  unless (open SPOOL, ">$spoolfile")
+  my $fh_SPOOL;
+  unless (open $fh_SPOOL, ">$spoolfile")
   {
     if ($DEBUGGING >= 1)
     {
@@ -195,31 +198,31 @@ sub snmptt_trap_receiver {
   } 
 
   if (! $locking_method) {
-    flock SPOOL, 2 | 4;           # LOCK_EX | LOCK_NB
+    flock $fh_SPOOL, 2 | 4;           # LOCK_EX | LOCK_NB
   }
 
-  print SPOOL time()."\n";
-  print SPOOL $hostname . "\n";
-  print SPOOL $ip_address . "\n";
-  print SPOOL $uptime . "\n";
-  print SPOOL $trapname . "\n";
-  print SPOOL ".1.3.6.1.6.3.18.1.4.0 $community\n";
-  print SPOOL $other_varbinds;
+  print $fh_SPOOL time()."\n";
+  print $fh_SPOOL $hostname . "\n";
+  print $fh_SPOOL $ip_address . "\n";
+  print $fh_SPOOL $uptime . "\n";
+  print $fh_SPOOL $trapname . "\n";
+  print $fh_SPOOL ".1.3.6.1.6.3.18.1.4.0 $community\n";
+  print $fh_SPOOL $other_varbinds;
   if ($securityEngineID ne "") {
-    print SPOOL ".1.3.6.1.6.3.10.2.1.1.0 \"0x$securityEngineID\"\n";
+    print $fh_SPOOL ".1.3.6.1.6.3.10.2.1.1.0 \"0x$securityEngineID\"\n";
   }
   if ($securityName ne "") {
-    print SPOOL ".1.3.6.1.6.3.18.1.1.1.3 \"$securityName\"\n";
+    print $fh_SPOOL ".1.3.6.1.6.3.18.1.1.1.3 \"$securityName\"\n";
   }
   if ($contextEngineID ne "") {
-    print SPOOL ".1.3.6.1.6.3.18.1.1.1.4 \"0x$contextEngineID\"\n";
+    print $fh_SPOOL ".1.3.6.1.6.3.18.1.1.1.4 \"0x$contextEngineID\"\n";
   }
   if ($contextName ne "") {
-    print SPOOL ".1.3.6.1.6.3.18.1.1.1.5 \"$contextName\"\n";
+    print $fh_SPOOL ".1.3.6.1.6.3.18.1.1.1.5 \"$contextName\"\n";
   }
 
   if ($DEBUGGING >= 1) {
-    print SPOOL time()."\n";
+    print $fh_SPOOL time()."\n";
     print $hostname . "\n";
     print $ip_address . "\n";
     print $uptime . "\n";
@@ -244,7 +247,7 @@ sub snmptt_trap_receiver {
     $| = 0;
   }
 
-  close SPOOL;
+  close $fh_SPOOL;
 
   if ($locking_method) {
     # Rename
@@ -298,8 +301,9 @@ sub loadsnmpttini {
     }
   }
 
-  if( open( CONFIG, $configfile ) ) {
-    close CONFIG;
+  my $fh_CONFIG;
+  if( open( $fh_CONFIG, $configfile ) ) {
+    close $fh_CONFIG;
     $cfg = new Config::IniFiles( -file => $configfile);
   }
   else

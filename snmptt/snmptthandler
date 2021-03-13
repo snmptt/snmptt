@@ -46,6 +46,7 @@
 # 
 ##############################################################################
 use strict;
+#use warnings;
 
 # Process command line arguments
 
@@ -134,31 +135,32 @@ else
 {	
  	if ($^O ne "MSWin32")
 	{
+	  my $fh_CONFIG;
       $configfile = '/etc/snmptt/snmptt.ini';
-      if( open( CONFIG, '/etc/snmptt/snmptt.ini' ) )
+      if( open( $fh_CONFIG, '/etc/snmptt/snmptt.ini' ) )
       {
         $configfile = '/etc/snmp/snmptt.ini';
-        close CONFIG;
+        close $fh_CONFIG;
       }
-      elsif( open( CONFIG, '/etc/snmp/snmptt.ini' ) )
+      elsif( open( $fh_CONFIG, '/etc/snmp/snmptt.ini' ) )
       {
         $configfile = '/etc/snmp/snmptt.ini';
-        close CONFIG;
+        close $fh_CONFIG;
       }
-      elsif ( open( CONFIG, '/etc/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '/etc/snmptt.ini' ) )
       {
         $configfile = '/etc/snmptt.ini';
-        close CONFIG;
+        close $fh_CONFIG;
       }
-      elsif ( open( CONFIG, '/usr/local/etc/snmp/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '/usr/local/etc/snmp/snmptt.ini' ) )
       {
         $configfile = '/usr/local/etc/snmp/snmptt.ini';
-        close CONFIG;
+        close $fh_CONFIG;
       }
-      elsif ( open( CONFIG, '/usr/local/etc/snmptt.ini' ) )
+      elsif ( open( $fh_CONFIG, '/usr/local/etc/snmptt.ini' ) )
       {
         $configfile = '/usr/local/etc/snmptt.ini';
-        close CONFIG;
+        close $fh_CONFIG;
       }
     }
 	else {
@@ -180,14 +182,15 @@ my ($s, $usec) = gettimeofday;
 my $s_pad = sprintf("%09d",$s);
 my $usec_pad = sprintf("%06d",$usec);
 
+my $fh_DEBUGFILE;
 if ($DEBUGGING >= 1)
 {
 	if ($DEBUGGING_FILE ne '') 
 	{
-		open DEBUGFILE, ">>$DEBUGGING_FILE"
+		open($fh_DEBUGFILE, ">>$DEBUGGING_FILE")
 			or warn "Could not open debug output file ($!)";
 	
-		select DEBUGFILE;	# Change default output to debug file
+		select $fh_DEBUGFILE;	# Change default output to debug file
 	}
 	
 	# Print out time
@@ -205,7 +208,8 @@ if ($locking_method) {
   $spoolfile = $spool_directory.'x#snmptt-trap-'.$s_pad.$usec_pad;
 }
 
-unless (open SPOOL, ">$spoolfile")
+my $fh_SPOOL;
+unless (open $fh_SPOOL, ">$spoolfile")
 {
     if ($DEBUGGING >= 1)
     {
@@ -215,14 +219,14 @@ unless (open SPOOL, ">$spoolfile")
 }
 
 if (! $locking_method) {
-  flock SPOOL, 2 | 4;           # LOCK_EX | LOCK_NB
+  flock $fh_SPOOL, 2 | 4;           # LOCK_EX | LOCK_NB
 }
 
-print SPOOL time()."\n";
+print $fh_SPOOL time()."\n";
 
 while (defined(my $line = <>))
 {
-	print SPOOL $line;
+	print $fh_SPOOL $line;
 	
 	if ($DEBUGGING >= 1)
 	{
@@ -231,7 +235,7 @@ while (defined(my $line = <>))
 	}
 
 }
-close SPOOL;
+close $fh_SPOOL;
 
 if ($locking_method) {
   # Rename
@@ -260,8 +264,9 @@ sub loadsnmpttini {
 	#
 	##############################################################################
 
-	if( open( CONFIG, $configfile ) ) {
-	  close CONFIG;
+	my $fh_CONFIG;
+	if( open( $fh_CONFIG, $configfile ) ) {
+	  close $fh_CONFIG;
 	  $cfg = new Config::IniFiles( -file => $configfile);
 	}
 	else

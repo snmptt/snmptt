@@ -208,19 +208,21 @@ if ($DEBUGGING >= 1)
   print "\nLoading $input\n";
 }
 
-unless (open INPUTFILE, "<$input")
+my $fh_INPUTFILE;
+unless (open $fh_INPUTFILE, "<$input")
 {
   die "Cannot open input file: $!";
 }
 
 my @mibfile;
 
-while (<INPUTFILE>)
+while (<$fh_INPUTFILE>)
 {
   chomp;			# remove <cr> at end of line
   s/\015//;			# Remove any DOS carriage returns
   push(@mibfile, $_);		# add to each line to @trapconf array
 }
+close $fh_INPUTFILE;
 
 if ($DEBUGGING >= 1)
 {
@@ -235,17 +237,19 @@ if ($exec_file) {
     print "\nLoading $exec_file\n";
   }
 
-  unless (open EXECFILE, "<$exec_file")
+  my $fh_EXECFILE;
+  unless (open $fh_EXECFILE, "<$exec_file")
   {
     die "Cannot open input file: $!";
   }
 
-  while (<EXECFILE>)
+  while (<$fh_EXECFILE>)
   {
     chomp;			# remove <cr> at end of line
     s/\015//;			# Remove any DOS carriage returns
     push(@exec_array, $_);		# add to each line to @trapconf array
   }
+  close $fh_EXECFILE;
 
   if ($DEBUGGING >= 1)
   {
@@ -264,7 +268,8 @@ if ($exec_array[0] ne "") {
 
 ###################################
 # Open output file
-unless (open OUTPUTFILE, ">>$output")
+my $fh_OUTPUTFILE;
+unless (open $fh_OUTPUTFILE, ">>$output")
 {
   die "Cannot open output file: $!";
 }
@@ -310,7 +315,7 @@ if ($net_snmp_perl == 1)
 {
   require SNMP;
   {
-    no warnings;
+    no warnings;  # Variable is only used once
     $SNMP::save_descriptions = 1;	# Need them only for looking up variable descriptions. 
                                   # Do TRAP definition by hand to be able to pull out 
 			                          	# the SUMMARY lines
@@ -345,8 +350,8 @@ if (1)
       $mib_name =~ s/\s+//g;
       print "Processing MIB:         $mib_name\n";
      
-      print OUTPUTFILE "#\n#\n#\n#\n";
-      print OUTPUTFILE "MIB: $mib_name (file:$input) converted on " . scalar(localtime) . " using snmpttconvertmib $snmpttconvertmib_version\n";
+      print $fh_OUTPUTFILE "#\n#\n#\n#\n";
+      print $fh_OUTPUTFILE "MIB: $mib_name (file:$input) converted on " . scalar(localtime) . " using snmpttconvertmib $snmpttconvertmib_version\n";
       
       $currentline++; # Increment to the next line
       next;
@@ -358,8 +363,8 @@ if (1)
       $mib_name =~ s/\s+//g;
       print "\n\nProcessing MIB:         $mib_name\n";
      
-      print OUTPUTFILE "#\n#\n#\n#\n";
-      print OUTPUTFILE "MIB: $mib_name (file:$input) converted on " . scalar(localtime) . " using snmpttconvertmib $snmpttconvertmib_version\n";
+      print $fh_OUTPUTFILE "#\n#\n#\n#\n";
+      print $fh_OUTPUTFILE "MIB: $mib_name (file:$input) converted on " . scalar(localtime) . " using snmpttconvertmib $snmpttconvertmib_version\n";
       
       $currentline++; # Increment to the next line
       next;
@@ -730,8 +735,8 @@ if (1)
       chomp $trapoid;
       if ($trapoid ne "")
       {
-        print OUTPUTFILE "#\n#\n#\n";
-        print OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" $trap_severity\n";
+        print $fh_OUTPUTFILE "#\n#\n#\n";
+        print $fh_OUTPUTFILE "EVENT $trapname $trapoid \"Status Events\" $trap_severity\n";
         
         # Loop through trapsummary and replace the %s and %d etc with %1 to %n
         
@@ -879,7 +884,7 @@ if (1)
         
         if ($formatexec ne '')
         {
-          print OUTPUTFILE "FORMAT $formatexec\n";
+          print $fh_OUTPUTFILE "FORMAT $formatexec\n";
 
           if ($exec_array[0] ne "") {
             foreach my $exec (@exec_array) {
@@ -887,15 +892,15 @@ if (1)
                 next;
               }
               if ($exec_mode == 1){
-                print OUTPUTFILE "EXEC $exec\n";
+                print $fh_OUTPUTFILE "EXEC $exec\n";
               }
               elsif ($exec_mode == 2){
                 $_ = $exec;
                 $exec = &substitute2 ("\$Fz", "$formatexec");
-                print OUTPUTFILE "EXEC $exec\n";
+                print $fh_OUTPUTFILE "EXEC $exec\n";
               }
               else {
-                print OUTPUTFILE "EXEC $exec $defaultexecquote$formatexec$defaultexecquote\n";
+                print $fh_OUTPUTFILE "EXEC $exec $defaultexecquote$formatexec$defaultexecquote\n";
                 #print "1:xxxxxxxxx\n";
               }
             }
@@ -903,7 +908,7 @@ if (1)
         }
         else
         {
-          print OUTPUTFILE "FORMAT \$*\n";
+          print $fh_OUTPUTFILE "FORMAT \$*\n";
 
           if ($exec_array[0] ne "") {
             foreach my $exec (@exec_array) {
@@ -911,15 +916,15 @@ if (1)
                 next;
               }
               if ($exec_mode == 1){
-                print OUTPUTFILE "EXEC $exec\n";
+                print $fh_OUTPUTFILE "EXEC $exec\n";
               }
               elsif ($exec_mode == 2){
                 $_ = $exec;
                 $exec = &substitute2 ("\$Fz", "$formatexec");
-                print OUTPUTFILE "EXEC $exec\n";
+                print $fh_OUTPUTFILE "EXEC $exec\n";
               }
               else {
-                print OUTPUTFILE "EXEC $exec $defaultexecquote\$*$defaultexecquote\n";
+                print $fh_OUTPUTFILE "EXEC $exec $defaultexecquote\$*$defaultexecquote\n";
                 #print "2:xxxxxxxxx\n";
               }
             }
@@ -928,26 +933,26 @@ if (1)
         
         if ($nodes ne '')
         {
-          print OUTPUTFILE "NODES $nodes\n";
+          print $fh_OUTPUTFILE "NODES $nodes\n";
         }
         
         if ($no_description == 0)
         {
-          print OUTPUTFILE "SDESC\n";
-          #print OUTPUTFILE "$descriptionline1\n";
+          print $fh_OUTPUTFILE "SDESC\n";
+          #print $fh_OUTPUTFILE "$descriptionline1\n";
           for (my $i=0; $i <= $#description; $i++)
           {
-            print OUTPUTFILE "$description[$i]";
+            print $fh_OUTPUTFILE "$description[$i]";
           }
 	  
 	  # If net_snmp_perl is enabled, lookup each variable
 	  if (@variables && $no_variables == 0 && $net_snmp_perl == 1)
 	  {
-	    print OUTPUTFILE "Variables:\n";
+	    print $fh_OUTPUTFILE "Variables:\n";
 	    for (my $i=0; $i <= $#variables; $i++)
 	    {
-	      printf OUTPUTFILE "%3d: %s\n",$i+1,$variables[$i];
-	      printf OUTPUTFILE "     Syntax=\"" . $SNMP::MIB{$variables[$i]}{type} . "\"\n";
+	      printf $fh_OUTPUTFILE "%3d: %s\n",$i+1,$variables[$i];
+	      printf $fh_OUTPUTFILE "     Syntax=\"" . $SNMP::MIB{$variables[$i]}{type} . "\"\n";
 	      if (uc $SNMP::MIB{$variables[$i]}{type} =~ /INTEGER/)
 	      {
 		my $b = $SNMP::MIB{$variables[$i]}{enums};
@@ -963,25 +968,25 @@ if (1)
 		# Print out the entries in the hash
 		foreach my $c (sort keys %temphash)
 		{
-		  print OUTPUTFILE "       " . $c . ": $temphash{$c}\n";
+		  print $fh_OUTPUTFILE "       " . $c . ": $temphash{$c}\n";
 		}
 	      }
 	      if ($SNMP::MIB{$variables[$i]}{description})
 	      {
-		print OUTPUTFILE "     Descr=\"" . $SNMP::MIB{$variables[$i]}{description} . "\"\n";
+		print $fh_OUTPUTFILE "     Descr=\"" . $SNMP::MIB{$variables[$i]}{description} . "\"\n";
 	      }
 	    }
 	  }
 	  
 	  elsif (@variables ne "" && $no_variables == 0  && $net_snmp_perl == 0)
 	  {
-	    print OUTPUTFILE "Variables:\n";
+	    print $fh_OUTPUTFILE "Variables:\n";
 	    for (my $i=0; $i <= $#variables; $i++)
 	    {
-	      print OUTPUTFILE "  " . ($i+1) . ": " . $variables[$i] . "\n";
+	      print $fh_OUTPUTFILE "  " . ($i+1) . ": " . $variables[$i] . "\n";
 	    }
 	  }
-          print OUTPUTFILE "EDESC\n";
+          print $fh_OUTPUTFILE "EDESC\n";
         }
         
         $currentline--;
@@ -1011,10 +1016,11 @@ if (1)
   {
     $snmptranslate_use_On = 1;
     
-    if (open SNMPTRANSLATE, "snmptranslate -V 2>&1|")
+    my $SNMPTRANSLATE;
+    if (open $SNMPTRANSLATE, "snmptranslate -V 2>&1|")
     {
-      my $snmptranslatever = <SNMPTRANSLATE>;
-      close SNMPTRANSLATE;
+      my $snmptranslatever = <$SNMPTRANSLATE>;
+      close $SNMPTRANSLATE;
       
       chomp ($snmptranslatever);
       
@@ -1042,6 +1048,7 @@ if (1)
     print "so no translations occured.  Try another MIB file.\n\n";
   }
 }
+close $fh_OUTPUTFILE;
 
 
 # sub substitute2 (left, right)
