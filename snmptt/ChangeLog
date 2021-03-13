@@ -29,8 +29,8 @@ February 28th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 February 22nd, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a bug with daemon_uid that prevented SNMPTT from starting on FreeBSD
   (bug 47).  Thanks to Christian Ullrich for the fix.
-- Added support for sub-second sleep for spool folder processing.  Thanks to
-  Tyler Leeds for the code.
+- Added support for sub-second sleep for spool folder processing when sleep is
+  set to less than 1.  Thanks to Tyler Leeds for the code.
 - Fixed a bug where traps arriving with the hostname set to UNKNOWN were
   not being handled properly (bug 46).  Thanks to Tom Griep for the fix.
 

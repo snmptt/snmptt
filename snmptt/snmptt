@@ -2170,23 +2170,6 @@ sub processtrap
                 }
                 my $exec_thread = threads->new(\&exec_thread_sub, $command);
                 $exec_thread->detach;           # Detach and let it clean up after itself
-
-                sub exec_thread_sub {
-                  my $command = shift;
-                  $thread_exec_semaphore->down;
-
-                  if ($exec_escape == 1) {
-                    # Escape wildcard characters
-                    $command =~ s/\*/\\\*/g;
-                    $command =~ s/\?/\\\?/g;
-                  }
-                  if ($DEBUGGING >= 1)
-                  {
-                    print "EXECing command in thread:$command\n";
-                  }
-                  system $command;
-                  $thread_exec_semaphore->up;
-                }
               }
               else {
                 if ($exec_escape == 1) {
@@ -6336,5 +6319,20 @@ sub preexec_run {
       }
 }
 
+sub exec_thread_sub {
+  my $command = shift;
+  $thread_exec_semaphore->down;
 
+  if ($exec_escape == 1) {
+    # Escape wildcard characters
+    $command =~ s/\*/\\\*/g;
+    $command =~ s/\?/\\\?/g;
+  }
+  if ($DEBUGGING >= 1)
+  {
+    print "EXECing command in thread:$command\n";
+  }
+  system $command;
+  $thread_exec_semaphore->up;
+}
 
