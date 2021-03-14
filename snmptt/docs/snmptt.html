@@ -82,11 +82,12 @@ name="GENERATOR" />
 <li><a href="#Limitations">Limitations</a>  </li>
 <li><a href="#Feedback">Feedback &amp; Bugs</a>  </li>
 <li><a href="#Integration-with-other-software">Integration with other software</a>  <ul>
-<li><a href="#Nagios-Netsaint">Nagios Core</a>  </li>
+<li><a href="#Nagios-Netsaint">Nagios</a>  </li>
 <li><a href="#Icinga">Icinga</a>  </li>
+<li><a href="#Zabbix">Zabbix</a></li>
 <li><a href="#SEC">Simple Event Correlator (SEC)</a>  </li>
 <li><a href="#EventWin">Windows Event Log forwarding</a>  </li>
-<li><a href="#Hobbit">Hobbit</a></li>
+<li><a href="#Hobbit">Xymon / Hobbit</a></li>
 </ul>
 </li>
 </ul>
@@ -2378,6 +2379,8 @@ fi
 <pre><code>enable_passive_checks = 1  
 check_interval        = 1200
 </code></pre>
+<h2><a name="Zabbix"></a>Zabbix</h2>
+<p>Information on handling SNMP traps with <a href="https://www.zabbix.com">Zabbix</a> can be found in the <a href="https://www.zabbix.com/documentation/current/manual/config/items/itemtypes/snmptrap">Zabbix documentation</a>.</p>
 <h2><a name="SEC"></a>SEC - Simple Event Correlator</h2>
 <h3>Overview</h3>
 <p><a href="http://kodu.neti.ee/%7Eristo/sec/">Simple Event Correlator (SEC)</a> is a free and platform independent event correlation tool.</p>
@@ -2676,5 +2679,5 @@ FORMAT EventLog entry: $1
 <pre><code>EVENT EventLog 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121.0.529 "Regular" Normal  
 FORMAT Logon Failure: Reason: Unknown user name or bad password. User Name: $6, Domain: $7, Logon Type: $8, Logon Process: $9, Auth package: $10, Workstation name: $11
 </code></pre>
-<h2><a name="Hobbit"></a>Hobbit</h2>
-<p>Information on handling SNMP traps with <a href="http://hobbitmon.sourceforge.net/">Hobbit</a> can be found at <a href="http://cerebro.victoriacollege.edu/hobbit-trap.html">http://cerebro.victoriacollege.edu/hobbit-trap.html</a>.</p>
+<h2><a name="Hobbit"></a>Xymon / Hobbit</h2>
+<p>Information on handling SNMP traps with <a href="https://xymon.sourceforge.io/">Xymon</a> (formerly <a href="http://hobbitmon.sourceforge.net/">Hobbit</a>) can be found at <a href="http://cerebro.victoriacollege.edu/hobbit-trap.html">http://cerebro.victoriacollege.edu/hobbit-trap.html</a>.</p>

@@ -70,11 +70,12 @@ This file was last updated on: March 5th, 2021
 * [Limitations](#Limitations)  
 * [Feedback & Bugs](#Feedback)  
 * [Integration with other software](#Integration-with-other-software)  
-    * [Nagios Core](#Nagios-Netsaint)  
+    * [Nagios](#Nagios-Netsaint)  
     * [Icinga](#Icinga)  
+    * [Zabbix](#Zabbix)
     * [Simple Event Correlator (SEC)](#SEC)  
     * [Windows Event Log forwarding](#EventWin)  
-    * [Hobbit](#Hobbit)
+    * [Xymon / Hobbit](#Hobbit)
 
 
 # <a name="License"></a>License
@@ -2635,8 +2636,11 @@ To have the TRAP service automatically cleared 20 minutes after the last trap wa
   
     enable_passive_checks = 1  
     check_interval        = 1200
-  
-  
+
+## <a name="Zabbix"></a>Zabbix
+
+Information on handling SNMP traps with [Zabbix](https://www.zabbix.com) can be found in the [Zabbix documentation](https://www.zabbix.com/documentation/current/manual/config/items/itemtypes/snmptrap).
+
 ## <a name="SEC"></a>SEC - Simple Event Correlator
 
 ### Overview
@@ -2996,6 +3000,6 @@ The EVENT entry could be cleaned up using:
     EVENT EventLog 1.3.6.1.4.1.311.1.13.1.8.83.101.99.117.114.105.116.121.0.529 "Regular" Normal  
     FORMAT Logon Failure: Reason: Unknown user name or bad password. User Name: $6, Domain: $7, Logon Type: $8, Logon Process: $9, Auth package: $10, Workstation name: $11
 
-## <a name="Hobbit"></a>Hobbit
+## <a name="Hobbit"></a>Xymon / Hobbit
 
-Information on handling SNMP traps with [Hobbit](http://hobbitmon.sourceforge.net/) can be found at [http://cerebro.victoriacollege.edu/hobbit-trap.html](http://cerebro.victoriacollege.edu/hobbit-trap.html).
+Information on handling SNMP traps with [Xymon](https://xymon.sourceforge.io/) (formerly [Hobbit](http://hobbitmon.sourceforge.net/)) can be found at [http://cerebro.victoriacollege.edu/hobbit-trap.html](http://cerebro.victoriacollege.edu/hobbit-trap.html).
