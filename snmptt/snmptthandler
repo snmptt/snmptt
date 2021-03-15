@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-# SNMPTTHANDLER v1.4.1
+# SNMPTTHANDLER v1.5beta1
 #
-# Copyright 2002-2020 Alex Burger
+# Copyright 2002-2021 Alex Burger
 # alex_b@users.sourceforge.net
 # 8/26/2002
 #
@@ -246,8 +246,8 @@ if ($locking_method) {
 
 sub showversion
 {
-	printf "\nSNMPTTHANDLER v1.4\n";
-	printf "(c) 2002-2017 Alex Burger\n\n";
+	printf "\nSNMPTTHANDLER v1.5beta1\n";
+	printf "(c) 2002-2021 Alex Burger\n\n";
 }
 
 ##############################################################################

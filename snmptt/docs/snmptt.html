@@ -490,34 +490,9 @@ but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT lin
 <ol>
 <li>Replace <strong>snmptt</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
 <li>Replace <strong>snmpttconvertmib</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
-<li>Confirm that the <strong>snmptt</strong> user account is a member of the appropriate groups such as <strong>nagios</strong> for Nagios and <strong>icingacmd</strong> for Icinga2.</li>
-<li>
-<p>To increase security:</p>
-<ul>
-<li>If you are not currently using daemon mode and are running as root, please switch to daemon mode or run as different user such as <strong>snmptt</strong>.</li>
-<li>
-<p>Secure the spool folder with:</p>
-</li>
-<li>
-<p><strong>chown -R snmptt.snmptt /var/spool/snmptt</strong></p>
-</li>
-<li>
-<p><strong>chmod -R 750 /var/spool/snmptt</strong></p>
-</li>
-<li>
-<p>Secure the /etc/snmp folder with</p>
-</li>
-<li>
-<p><strong>chown -R root.root /etc/snmp</strong></p>
-</li>
-<li><strong>chmod 755 /etc/snmp</strong></li>
-<li>
-<p><strong>chmod 600 /etc/snmp/snmptt*</strong></p>
-<p>Note:  Starting with v1.5, you can use <strong>/etc/snmptt/</strong> instead of <strong>/etc/snmp/</strong> for your <strong>snmptt.ini</strong> file.</p>
-</li>
-</ul>
-</li>
+<li>Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.</li>
 </ol>
+<p>Note:  Starting with v1.5, you can use <strong>/etc/snmptt/</strong> instead of <strong>/etc/snmp/</strong> for your <strong>snmptt.ini</strong> file.</p>
 <h2><strong>v1.4 to v1.4.2</strong></h2>
 <p>To upgrade from v1.4 to v1.4,1, you should:</p>
 <ol>

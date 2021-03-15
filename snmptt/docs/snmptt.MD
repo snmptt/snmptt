@@ -494,21 +494,9 @@ To upgrade from v1.4.2 to v1.5beta1 you should:
 
 1.  Replace **snmptt** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
 1.  Replace **snmpttconvertmib** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
-2.  Confirm that the **snmptt** user account is a member of the appropriate groups such as **nagios** for Nagios and **icingacmd** for Icinga2.
-3.  To increase security:
-    *   If you are not currently using daemon mode and are running as root, please switch to daemon mode or run as different user such as **snmptt**.
-    *   Secure the spool folder with:
+1.  Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.
     
-    *   **chown -R snmptt.snmptt /var/spool/snmptt**
-    *   **chmod -R 750 /var/spool/snmptt**
-    
-    *   Secure the /etc/snmp folder with
-    
-    *   **chown -R root.root /etc/snmp**
-    *   **chmod 755 /etc/snmp**
-    *   **chmod 600 /etc/snmp/snmptt\***
-    
-        Note:  Starting with v1.5, you can use **/etc/snmptt/** instead of **/etc/snmp/** for your **snmptt.ini** file.
+Note:  Starting with v1.5, you can use **/etc/snmptt/** instead of **/etc/snmp/** for your **snmptt.ini** file.
 
 ## **v1.4 to v1.4.2**
 
