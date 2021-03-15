@@ -690,31 +690,6 @@ Packages are available for most Linux distributions and FreeBSD.  Check your pac
 
         mkdir /var/spool/snmptt/
 
-3. A startup script is included which can be used to start and stop **snmptt** on Red Hat and other systems.  Copy the script to the **init.d** directory (renaming the file during the copy):  
-  
-        cp snmptt-init.d /etc/rc.d/init.d/snmptt
-        
-4. Add the service using chkconfig:
-
-        chkconfig --add snmptt
-
-5. Configure the service to start at runlevel 2345:
-
-        chkconfig --level 2345 snmptt on
-
-6. SNMPTT will be started at the next reboot, or can be started immediately with:
-
-        service snmptt start
-
-    or
-
-        /etc/rc.d/init.d/snmptt start
-
-    or to manually start without using the startup script, use:
-
-        snmptt --daemon
-
-
 3. Startup scripts are included for SysVinit and SystemD systems.
 
      1. SysVinit:  
@@ -816,12 +791,6 @@ Steps:
 
         Note:   It is possible to configure snmptrapd to execute snmptt based on the specific trap received, but using the default option is preferred
 
-
-
-9. Start snmptrapd using the command line to ensure there are no configuration errors:
-
-        snmptrapd -On
-
 10. Permanently change snmptrapd to use the -On option by modifying the startup script:  
   
     1. Systemd:  
@@ -836,7 +805,9 @@ Steps:
   
         to:
         
-            Environment=OPTIONS="-LsdOn"
+            Environment="OPTIONS=-Lsd -On"
+
+        Note:  Move the first quote to before OPTIONS.
   
   
     2. SysVinit:  
@@ -851,13 +822,22 @@ Steps:
 
         to:
                 
-            OPTIONS="-LsdOn"
-  
+            OPTIONS="-Lsd -On"
+
     Note:  **The -On option is recommended**.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the **Net-SNMP Perl module** is not installed, then you MUST use the **-On** switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.
 
     As an alternative, you can edit the **/etc/snmp/snmp.conf** file to include the line: **printNumericOids 1. ** This setting will take effect no matter what is used on the command line.
 
-10. Follow the steps in the section [Securing SNMPTT](#SecuringSNMPTT) to ensure SNMPTT has been configured securely.
+10.  Start / restart snmptrapd using service or systemctl:
+
+        service snmptrapd restart
+        systemctl restart snmptrapd
+
+8. Check syslog to ensure SNMPTT started properly:
+
+        grep snmptrapd /var/log/messages
+
+10. Follow the steps in the section [Securing SNMPTT](#SecuringSNMPTT) to ensure SNMPTT has been configured securely.
 
  
 ### <a name="Installation-Unix-Embedded"></a>Net-SNMP Embedded handler
@@ -894,8 +874,52 @@ Steps:
     Note:  You can locate the **snmptrapd.conf** file by running:
     
         snmpconf -i
-  
 
+10. Permanently change snmptrapd to use the -On option by modifying the startup script:  
+  
+    1. Systemd:  
+  
+        Edit the unit file and add the -On option:  
+  
+            systemctl edit --full snmptrapd.service
+  
+        Change:
+
+            Environment=OPTIONS="-Lsd"
+
+        to:
+        
+            Environment="OPTIONS=-Lsd -On"
+
+        Note:  Move the first quote to before OPTIONS.
+  
+  
+    2. SysVinit:  
+  
+        Edit the **/etc/rc.d/init.d/snmptrapd** file and add **"-On"** to **OPTIONS**:
+
+            vi /etc/rc.d/init.d/snmptrapd
+
+        Change:
+
+            OPTIONS="-Lsd"
+
+        to:
+                
+            OPTIONS="-LsdOn"
+  
+    Note:  **The -On option is recommended**.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the **Net-SNMP Perl module** is not installed, then you MUST use the **-On** switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.
+
+    As an alternative, you can edit the **/etc/snmp/snmp.conf** file to include the line: **printNumericOids 1. ** This setting will take effect no matter what is used on the command line.
+
+10.  Start / restart snmptrapd using service or systemctl:
+
+        service snmptrapd restart
+        systemctl restart snmptrapd
+
+8. Check syslog to ensure SNMPTT started properly:
+
+        grep snmptrapd /var/log/messages
 
 10. Follow the steps in the section [Securing SNMPTT](#SecuringSNMPTT) to ensure SNMPTT has been configured securely.
 

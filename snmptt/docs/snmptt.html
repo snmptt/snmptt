@@ -679,32 +679,6 @@ chmod +x snmptt
 </code></pre>
 </li>
 <li>
-<p>A startup script is included which can be used to start and stop <strong>snmptt</strong> on Red Hat and other systems.  Copy the script to the <strong>init.d</strong> directory (renaming the file during the copy):  </p>
-<pre><code>cp snmptt-init.d /etc/rc.d/init.d/snmptt
-</code></pre>
-</li>
-<li>
-<p>Add the service using chkconfig:</p>
-<pre><code>chkconfig --add snmptt
-</code></pre>
-</li>
-<li>
-<p>Configure the service to start at runlevel 2345:</p>
-<pre><code>chkconfig --level 2345 snmptt on
-</code></pre>
-</li>
-<li>
-<p>SNMPTT will be started at the next reboot, or can be started immediately with:</p>
-<pre><code>service snmptt start
-</code></pre>
-<p>or</p>
-<pre><code>/etc/rc.d/init.d/snmptt start
-</code></pre>
-<p>or to manually start without using the startup script, use:</p>
-<pre><code>snmptt --daemon
-</code></pre>
-</li>
-<li>
 <p>Startup scripts are included for SysVinit and SystemD systems.</p>
 <ol>
 <li>
@@ -830,11 +804,6 @@ chmod +x /usr/sbin/snmptthandler
 </ol>
 </li>
 <li>
-<p>Start snmptrapd using the command line to ensure there are no configuration errors:</p>
-<pre><code>snmptrapd -On
-</code></pre>
-</li>
-<li>
 <p>Permanently change snmptrapd to use the -On option by modifying the startup script:  </p>
 <ol>
 <li>
@@ -846,8 +815,9 @@ chmod +x /usr/sbin/snmptthandler
 <pre><code>Environment=OPTIONS="-Lsd"
 </code></pre>
 <p>to:</p>
-<pre><code>Environment=OPTIONS="-LsdOn"
+<pre><code>Environment="OPTIONS=-Lsd -On"
 </code></pre>
+<p>Note:  Move the first quote to before OPTIONS.</p>
 </li>
 <li>
 <p>SysVinit:  </p>
@@ -858,15 +828,28 @@ chmod +x /usr/sbin/snmptthandler
 <pre><code>OPTIONS="-Lsd"
 </code></pre>
 <p>to:</p>
-<pre><code>OPTIONS="-LsdOn"
+<pre><code>OPTIONS="-Lsd -On"
 </code></pre>
 </li>
 </ol>
 <p>Note:  <strong>The -On option is recommended</strong>.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the <strong>Net-SNMP Perl module</strong> is not installed, then you MUST use the <strong>-On</strong> switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.</p>
 <p>As an alternative, you can edit the <strong>/etc/snmp/snmp.conf</strong> file to include the line: <strong>printNumericOids 1. </strong> This setting will take effect no matter what is used on the command line.</p>
 </li>
+<li>
+<p>Start / restart snmptrapd using service or systemctl:</p>
+<pre><code>service snmptrapd restart
+systemctl restart snmptrapd
+</code></pre>
+</li>
+<li>
+<p>Check syslog to ensure SNMPTT started properly:</p>
+<pre><code>grep snmptrapd /var/log/messages
+</code></pre>
+</li>
+<li>
+<p>Follow the steps in the section <a href="#SecuringSNMPTT">Securing SNMPTT</a> to ensure SNMPTT has been configured securely.</p>
+</li>
 </ol>
-<p>10. Follow the steps in the section <a href="#SecuringSNMPTT">Securing SNMPTT</a> to ensure SNMPTT has been configured securely.</p>
 <h3><a name="Installation-Unix-Embedded"></a>Net-SNMP Embedded handler</h3>
 <p>The embedded handler is a small Perl program that is loaded directly into snmptrapd when snmptrapd is started.  The limitations of this handler are:  </p>
 <ul>
@@ -898,6 +881,49 @@ chmod +x /usr/sbin/snmptthandler
 </code></pre>
 <p>Note:  You can locate the <strong>snmptrapd.conf</strong> file by running:</p>
 <pre><code>snmpconf -i
+</code></pre>
+</li>
+<li>
+<p>Permanently change snmptrapd to use the -On option by modifying the startup script:  </p>
+<ol>
+<li>
+<p>Systemd:  </p>
+<p>Edit the unit file and add the -On option:  </p>
+<pre><code>systemctl edit --full snmptrapd.service
+</code></pre>
+<p>Change:</p>
+<pre><code>Environment=OPTIONS="-Lsd"
+</code></pre>
+<p>to:</p>
+<pre><code>Environment="OPTIONS=-Lsd -On"
+</code></pre>
+<p>Note:  Move the first quote to before OPTIONS.</p>
+</li>
+<li>
+<p>SysVinit:  </p>
+<p>Edit the <strong>/etc/rc.d/init.d/snmptrapd</strong> file and add <strong>"-On"</strong> to <strong>OPTIONS</strong>:</p>
+<pre><code>vi /etc/rc.d/init.d/snmptrapd
+</code></pre>
+<p>Change:</p>
+<pre><code>OPTIONS="-Lsd"
+</code></pre>
+<p>to:</p>
+<pre><code>OPTIONS="-LsdOn"
+</code></pre>
+</li>
+</ol>
+<p>Note:  <strong>The -On option is recommended</strong>.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the <strong>Net-SNMP Perl module</strong> is not installed, then you MUST use the <strong>-On</strong> switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.</p>
+<p>As an alternative, you can edit the <strong>/etc/snmp/snmp.conf</strong> file to include the line: <strong>printNumericOids 1. </strong> This setting will take effect no matter what is used on the command line.</p>
+</li>
+<li>
+<p>Start / restart snmptrapd using service or systemctl:</p>
+<pre><code>service snmptrapd restart
+systemctl restart snmptrapd
+</code></pre>
+</li>
+<li>
+<p>Check syslog to ensure SNMPTT started properly:</p>
+<pre><code>grep snmptrapd /var/log/messages
 </code></pre>
 </li>
 <li>

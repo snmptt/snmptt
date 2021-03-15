@@ -48,9 +48,9 @@ perl -c snmptthandler-embedded
  git push --tags
 
 cd snmptt
-find . -type f | grep -v CVS | cpio -pdm ../snmptt_1.5beta1
+find . -type f | grep -v '.git' | cpio -pdm ../snmptt_1.5beta1
 cd ../snmptt_1.5beta1
-su
+sudo su
 rm -f docs/build
 rm -f docs/markdown-to-html.py
 #rm -f docs/snmptt.MD
