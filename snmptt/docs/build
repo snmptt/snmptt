@@ -26,7 +26,7 @@ snmptt_1.5beta1.tgz:
 
 -update ChangeLog with release info
 
-cd docs
+cd snmptt/docs
 ./markdown-to-html.py snmptt.MD > snmptt.html ; tidy -m -asxhtml snmptt.html
 ./markdown-to-html.py faqs.MD > faqs.html ; tidy -m -asxhtml faqs.html
 ./markdown-to-html.py snmpttconvert.MD > snmpttconvert.html ; tidy -m -asxhtml snmpttconvert.html
