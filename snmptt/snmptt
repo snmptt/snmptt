@@ -190,6 +190,7 @@ my $description_mode;
 my $description_clean;
 my $threads_enable;
 my $threads_max;
+my $ipv6_enable;
 my $date_format;
 my $time_format;
 my $date_time_format;
@@ -458,6 +459,7 @@ if ($net_snmp_perl_enable == 1)
 
 if ($dns_enable == 1)
 {
+  #eval 'require IO::Socket::IP;';
   eval 'require Socket;';
   if ($@) {
     warn $@;
@@ -466,7 +468,12 @@ if ($dns_enable == 1)
     print "for system requirements.\n\n";
     die "died";
   }
-  require Socket;
+  #require IO::Socket::IP;
+  BEGIN {
+    require Socket;
+    Socket->import( qw(getaddrinfo getnameinfo SOCK_RAW AI_NUMERICHOST));
+  }
+
   if ($DEBUGGING >= 1)
   {
     print "********** DNS enabled **********\n\n";
@@ -1569,7 +1576,8 @@ sub processtrap
          my $temp = gethostbyname($a);
          if (defined($temp))
          {
-           $temp = Socket::inet_ntoa(scalar($temp));
+           #$temp = Socket::inet_ntoa(scalar($temp));
+           $temp = name_to_ip(scalar($temp));
            if ($DEBUGGING >= 1)
            {
              print "    NODES entry ($a) resolved to: $temp\n";
@@ -2295,7 +2303,9 @@ sub substitute
     }
 
     # IPv6_TODO
-    if ($dns_enable == 1 && $resolve_value_ip_addresses == 1 && $net_snmp_perl_enable == 1)
+    #if ($dns_enable == 1 && $resolve_value_ip_addresses == 1 && $net_snmp_perl_enable == 1)
+    # Shouldn't need to check net_snmp_perl_enable - 2021/03/16 - Alex
+    if ($dns_enable == 1 && $resolve_value_ip_addresses == 1)
     {
       $val = &resolve_value_ip_addresses_sub($val);
     }
@@ -3291,8 +3301,14 @@ sub readtrap
 
   chomp($tempvar[0]=<$input>);	# hostname
   push(@rawtrap, $tempvar[0]);
-  $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_]//g;  # Remove most non alphanumeric characters
-    
+
+  if ($ipv6_enable == 1) {
+    $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:\[\]%]//g;  # Remove most non alphanumeric characters
+  }
+  else {
+    $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_]//g;  # Remove most non alphanumeric characters
+  }
+
   if ($tempvar[0] eq "") {
     if ($DEBUGGING >= 1) {
       print "  Invalid trap file.  Expected a hostname on line 2 but got nothing\n";
@@ -3303,7 +3319,13 @@ sub readtrap
   # IPv6_TODO  
   chomp($tempvar[1]=<$input>);	# ip address
   push(@rawtrap, $tempvar[1]);
-  $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]] //g;  # Remove most non alphanumeric characters
+
+  if ($ipv6_enable == 1) {
+    $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]%] //g;  # Remove most non alphanumeric characters
+  }
+  else {
+    $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]] //g;  # Remove most non alphanumeric characters
+  }
   # Example: UDP: [127.0.0.1]:38249->[127.0.0.1]:162
   # Should only be IPs, but also allow for hostname characters, just in case.
   
@@ -3318,15 +3340,80 @@ sub readtrap
   # With DNS resolution disabled in snmptrapd, some systems pass the hostname as:
   # UDP: [x.x.x.x]:161->[y.y.y.y]
   # If this is detected, use x.x.x.x as the hostname.
-  if ($tempvar[0] =~ /\[(\d+\.\d+\.\d+\.\d+)\].*?->\[(\d+\.\d+\.\d+\.\d+)\]/) {
-    $tempvar[0] = $1;
+
+  if ($ipv6_enable == 1) {
+    if ($tempvar[0] =~ /\[(\d+\.\d+\.\d+\.\d+)\].*?->\[(\d+\.\d+\.\d+\.\d+)\]/) {
+      # IPv4
+      $tempvar[0] = $1;
+    }
+    elsif ($tempvar[0] =~ /\[(.*?)\]/) {
+      # IPv6
+      # Expecting UDP/IPv6: [fe80::ec21:4113:ff2b:1234%ens160]:47685
+      if ($DEBUGGING >= 2) {
+        print "  IPv6 detected for value 0\n";
+      }
+      $tempvar[0] = $1;
+      if ($tempvar[0] =~ /(.*?)%.*/) {
+          $tempvar[0] = $1;
+      }
+    }
+    elsif ($tempvar[0] =~ /(.*?:.*)/) {
+      # IPv6
+      # Expecting: fe80::ec21:4113:ff2b:1234%ens160
+      if ($DEBUGGING >= 2) {
+        print "  IPv6 detected for value  0\n";
+      }
+      $tempvar[0] = $1;
+      if ($tempvar[0] =~ /(.*?)%.*/) {
+          $tempvar[0] = $1;
+      }
+    }
   }
+  else {
+    if ($tempvar[0] =~ /\[(\d+\.\d+\.\d+\.\d+)\].*?->\[(\d+\.\d+\.\d+\.\d+)\]/) {
+      $tempvar[0] = $1;
+    }
+  }
+  # Clean again as we should now how an IP address or host name
+  $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:]//g;  # Remove most non alphanumeric characters
 
   # IPv6_TODO
   # Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
   # out just the IP address
-  $tempvar[1] =~ /(\d+\.\d+\.\d+\.\d+)/;
-  $tempvar[1] = $1;
+  if ($ipv6_enable == 1) {
+    if ($tempvar[1] =~ /(\d+\.\d+\.\d+\.\d+)/) {
+      # IPv4
+      $tempvar[1] = $1;
+    }
+    elsif ($tempvar[1] =~ /\[(.*?)\]/) {
+      # IPv6
+      # Expecting UDP/IPv6: [fe80::ec21:4113:ff2b:1234%ens160]:47685
+      if ($DEBUGGING >= 2) {
+        print "  IPv6 detected for value 1\n";
+      }
+      $tempvar[1] = $1;
+      if ($tempvar[1] =~ /(.*?)%.*/) {
+          $tempvar[1] = $1;
+      }
+    }
+    elsif ($tempvar[1] =~ /(.*?:.*)/) {
+      # IPv6
+      # Expecting: fe80::ec21:4113:ff2b:1234%ens160
+      if ($DEBUGGING >= 2) {
+        print "  IPv6 detected for value  1\n";
+      }
+      $tempvar[1] = $1;
+      if ($tempvar[1] =~ /(.*?)%.*/) {
+          $tempvar[1] = $1;
+      }
+    }
+  }
+  else {
+    $tempvar[1] =~ /(\d+\.\d+\.\d+\.\d+)/;
+    $tempvar[1] = $1;
+  }
+  # Clean again as we should now how an IP address or host name
+  $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]] //g;  # Remove most non alphanumeric characters
 
   # Net-SNMP 5.4 has a bug which gives <UNKNOWN> for the hostname
   if ($tempvar[0] =~ /^UNKNOWN$/) {
@@ -3536,8 +3623,28 @@ sub readtrap
       # IPv6_TODO
       # Some systems pass the IP address as IpAddress:iaddress.  This will pull
       # out just the IP address.  Bug 27.
-      $var[4] =~ /(\d+\.\d+\.\d+\.\d+)/;
-      $var[4] = $1; 	  
+      if ($ipv6_enable == 1) {
+        if ($var[4] =~ /(\d+\.\d+\.\d+\.\d+)/) {
+          # IPv4
+          $var[4] = $1;
+        }
+        elsif ($var[4] =~ /(.*?\:.*)/) {
+          # IPv6
+          print "IPv6 detected\n";
+          $var[4] = $1;
+          if ($var[4] =~ /(.*?)%.*/) {
+              $var[4] = $1;
+          }
+        }
+        else {
+          $var[4] = "";
+        }
+      }
+      else {
+        if ($var[4] =~ /(\d+\.\d+\.\d+\.\d+)/) {
+          $var[4] = $1;
+        }
+      }
     }
     elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.4.0$/)	# trap community string
     {
@@ -3573,10 +3680,13 @@ sub readtrap
     }
   }
 
-  if ($dns_enable == 1 && $var[0] =~  /^\d+\.\d+\.\d+\.\d+$/) # Only if it's not already resolved
+  #if ($dns_enable == 1 && $var[0] =~  /^\d+\.\d+\.\d+\.\d+$/) # Only if it's not already resolved
+  if ($dns_enable == 1 && ($var[0] =~ /^\d+\.\d+\.\d+\.\d+$/ || $var[0] =~ /\:/)) # Only if it's not already resolved
   {
     # IPv6_TODO
-    my $temp = gethostbyaddr(Socket::inet_aton($var[0]),Socket::AF_INET());
+    #my $temp = gethostbyaddr(Socket::inet_aton($var[0]),Socket::AF_INET());
+    my $temp = ip_to_name($var[0]);
+
     if (defined ($temp))
     {
       if ($DEBUGGING >= 1)
@@ -3623,7 +3733,8 @@ sub readtrap
     $agent_dns_name = $var[4];     # Default to IP address
     if ($dns_enable == 1 && $var[4] ne '')
     {
-      my $temp = gethostbyaddr(Socket::inet_aton($var[4]),Socket::AF_INET());
+      #my $temp = gethostbyaddr(Socket::inet_aton($var[4]),Socket::AF_INET());
+      my $temp = ip_to_name($var[4]);
       if (defined ($temp))
       {
         if ($DEBUGGING >= 1)
@@ -4262,6 +4373,7 @@ sub loadsnmpttini {
   $description_clean = $cfg->val('General', 'description_clean');
   $threads_enable = $cfg->val('General', 'threads_enable');
   $threads_max = $cfg->val('General', 'threads_max');
+  $ipv6_enable = $cfg->val('General', 'ipv6_enable');
   $date_format = $cfg->val('General', 'date_format');
   $time_format = $cfg->val('General', 'time_format');
   $date_time_format = $cfg->val('General', 'date_time_format');
@@ -4407,6 +4519,7 @@ sub loadsnmpttini {
   if (! defined ($description_clean)) { $description_clean = 1} ;
   if (! defined ($threads_enable)) { $threads_enable = 0} ;
   if (! defined ($threads_max)) { $threads_max = 10} ;
+  if (! defined ($ipv6_enable)) { $ipv6_enable = 0} ;
   if (! defined ($date_format)) { $date_format = "%a %b %e %Y"} ;
   if (! defined ($time_format)) { $time_format = "%H:%M:%S"} ;
   if (! defined ($date_time_format)) { $date_time_format = ""} ;
@@ -4871,7 +4984,8 @@ sub resolve_value_ip_addresses_sub
     # Replace all ip addresses in $string with textual names if possible
     foreach my $hostname (@hostnames)
     {
-      my $temp = gethostbyaddr(Socket::inet_aton($hostname),Socket::AF_INET());
+      #my $temp = gethostbyaddr(Socket::inet_aton($hostname),Socket::AF_INET());
+      my $temp = ip_to_name($hostname);
       if (defined ($temp))
       {
         if ($DEBUGGING >= 2)
@@ -6334,5 +6448,69 @@ sub exec_thread_sub {
   }
   system $command;
   $thread_exec_semaphore->up;
+}
+
+sub ip_to_name {
+    my $ip = shift;
+
+    my $hostname = "";
+    my $err;
+    my @addrs = ();
+
+    if ($DEBUGGING >= 1) {
+        print "Converting IP $ip to DNS\n";
+    }
+
+    ( $err, @addrs ) = getaddrinfo( $ip, 0, { flags => AI_NUMERICHOST } );
+    if ($err) {
+        if ($DEBUGGING >= 1) {
+            print "Error converting IP $ip to hostname\n";
+        }
+        $hostname = undef;
+    }
+    else {
+        #$addrs[0]->{addr} = "";
+        ( $err, $hostname ) = getnameinfo( $addrs[0]->{addr} );
+        if ($err) {
+            if ($DEBUGGING >= 1) {
+                print "Error converting IP $ip to hostname\n";
+            }
+            $hostname = undef;
+        }
+    }
+    return $hostname;
+}
+
+sub name_to_ip {
+    my $hostname = shift;
+
+    my @ips = ();
+    my $err;
+    my @addrs = ();
+
+    ( $err, @addrs ) = getaddrinfo( $hostname, "", {socktype => SOCK_RAW} );
+    if ($err) {
+        if ($DEBUGGING >= 1) {
+            print "Error converting hostname $hostname to IP\n";
+        }
+        $hostname = undef;
+    }
+    else {
+        for my $addr (@addrs) {
+            ( $err, my $host ) = Socket::getnameinfo( $addr->{addr}, Socket::NI_NUMERICHOST );
+            if ($err) {
+                if ($DEBUGGING >= 1) {
+                    print "Error converting hostname $hostname to  IP\n";
+                }
+                $hostname = undef;
+                last;
+            }
+            else {
+                push(@ips, $host);
+                #print "$host\n";
+            }
+        }
+    }
+    return @ips;
 }
 
