@@ -1585,17 +1585,17 @@ sub processtrap
          next;
        }
        # IPv6_TODO_DONE
-       elsif ($a =~ /^(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IPv4 address / cidr / range
+       elsif ($ipv6_enable == 1 && $a =~ /(.*?:.*)/) # NODES entry is an IPv6 address
        {
-         #if ( $a eq $var[1])     # compare against agent ip
-         if ( checkip($var[4], $a) == 1)
+         if ( checkipv6($var[4], $a) == 1)
          {
            $nodesmatch = 1;
          }
        }
-       elsif ($ipv6_enable == 1 && $a =~ /(.*?:.*)/) # NODES entry is an IPv6 address
+       elsif ($a =~ /^(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IPv4 address / cidr / range
        {
-         if ( checkipv6($var[4], $a) == 1)
+         #if ( $a eq $var[1])     # compare against agent ip
+         if ( checkip($var[4], $a) == 1)
          {
            $nodesmatch = 1;
          }
@@ -1657,7 +1657,7 @@ sub processtrap
      }
    }
 
-    # IPV6_TODO
+    # IPV6_TODO_DONE
     # Check for MATCH entries
     if ($nodesmatch == 1 && defined($event2[7][0]))  # Only if NODES has matched and 
     {                                                 # we have some MATCH statements
@@ -3415,7 +3415,7 @@ sub readtrap
   # Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
   # out just the IP address
   if ($ipv6_enable == 1) {
-    if ($tempvar[1] =~ /(\d+\.\d+\.\d+\.\d+)/) {
+    if (($tempvar[1] =~ /(\d+\.\d+\.\d+\.\d+)/) && !($tempvar[1] =~ /(.*?:.*)/) ) {
       # IPv4
       $tempvar[1] = $1;
     }
@@ -3658,7 +3658,7 @@ sub readtrap
       # Some systems pass the IP address as IpAddress:iaddress.  This will pull
       # out just the IP address.  Bug 27.
       if ($ipv6_enable == 1) {
-        if ($var[4] =~ /(\d+\.\d+\.\d+\.\d+)/) {
+        if (($var[4] =~ /(\d+\.\d+\.\d+\.\d+)/) && !($var[4] =~ /(.*?:.*)/) ) {
           # IPv4
           $var[4] = $1;
         }
@@ -5200,7 +5200,7 @@ sub resolve_value_ipv6_addresses_sub
   return $string;    
 }
 
-#IPv6_TODO
+#IPv6_TODO_DONE
 sub match
 {
   my $match = shift;
