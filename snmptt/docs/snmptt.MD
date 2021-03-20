@@ -67,6 +67,8 @@ This file was last updated on: March 5th, 2021
     * [Sample1 SNMPTT.CONF file](#Sample1-SNMPTT.CONF-file)  
     * [Sample2 SNMPTT.CONF file](#Sample2-SNMPTT.CONF-file)  
 * [Notes](#Notes)  
+    * [trapd.conf & MIB files](#Notes-trapd.conf)  
+    * [IPv6](#Notes-ipv6)  
 * [Limitations](#Limitations)  
 * [Feedback & Bugs](#Feedback)  
 * [Integration with other software](#Integration-with-other-software)  
@@ -2007,6 +2009,8 @@ The syntax of the snmptt.conf file  is:
 
  * See the section '[Name Resolution / DNS](#DNS)' for important DNS information.
 
+ * See the section [IPv6](#Notes-ipv6) for important IPv6 information.
+
 ## <a name="SNMPTT.CONF-MATCH"></a>MATCH
 
  \[MATCH \[MODE=\[or | and\]\] | \[$n:\[!\]\[(    )\[i\] | n | n-n | > n | < n | x.x.x.x | x.x.x.x-x.x.x.x | x.x.x.x/x\]\]
@@ -2064,6 +2068,8 @@ The syntax of the snmptt.conf file  is:
  * If no MATCH MODE= line exists, it defaults to 'or'.  
   
  * There can be only one match mode per EVENT.  If multiple MATCH MODE= lines exists, the last one in the list is used.
+
+ * See the section [IPv6](#Notes-ipv6) for important IPv6 information.
 
  Examples:  
   
@@ -2323,12 +2329,19 @@ Following is a sample of one defined trap in **/etc/snmp/snmptt-compaq-hsv.conf:
 
 # <a name="Notes"></a>Notes
 
+## <a name="Notes-trapd.conf"></a>trapd.conf & MIB files
+
 An existing HP Openview trapd.conf can be used in most cases but the file must be a VERSION 3 file.  SNMPTT does not support all the variables implemented in HPOV, but most are available.  The following variables may or may not match exactly to HPOV: $O, $o, $r, $ar, $R, $aR.
 
 Some vendors (such as Compaq and Cisco ) provide a file that can be imported in to HP Openview using an HP Openview utility.  snmpttconvert can be used to convert the file to snmptt.conf format.
 
 Some vendors provide a MIB file that contains TRAP or NOTIFICATION definitions.  snmpttconvertmib can be used to convert the file to snmptt.conf format.  
- 
+
+## <a name="Notes-ipv6"></a>IPv6
+
+* For incoming traps, a simple Perl regular expression is used to detect an IPv6 address for the trap host and Agent IPs as it is assumed that Net-SNMP is passing a valid IPv6 address.  If the address has a zone index such as **%ens160** or **%1** appended to it, the zone index is removed.  Zone indexes are not removed from enterprise variable values.
+* When DNS is enabled to resolve enterprise variables, the trap host and Agent IP **(dns_enabled = 1)**, a complex regular expression is used to confirm that the IP address is valid before passing on to the **IO::Socket::IP** module for DNS resolution.  The [Dartware](https://community.helpsystems.com/forums/intermapper/miscellaneous-topics/5acc4fcf-fa83-e511-80cf-0050568460e4?_ga=2.113564423.1432958022.1523882681-2146416484.1523557976) regular expression is used.  Also see [here](https://raw.githubusercontent.com/richb-intermapper/IPv6-Regex/master/test-ipv6-regex.pl) for a test suite.
+* For **NODES** and **MATCH**, the [Net::IP](http://search.cpan.org/search?module=Net::IP) module is used as it allows you to test to see if two IP addresses are the same or if one IP address is within the range of another.  IPv6 addresses can be represented in multiple ways so this module is used to ensure that an IP address such as **2002:0000:0000:1234:abcd:ffff:c0a8:0101** is matched to its shorthand version of **2002::1234:abcd:ffff:c0a8:0101**.  When running a modified version of the test suite above against Net::IP, it was found that it only passed 316 out of 490 tests compared to Dartmouth which passed 489 out of 490.  There may be issues with matching some IP addresses passed in enterprise variables for MATCH but  NODES should not be affected as Net-SNMP should be passing a supported format for both the host and agent IP addresses.
 
 # <a name="Limitations"></a>Limitations
 

@@ -78,7 +78,11 @@ name="GENERATOR" />
 <li><a href="#Sample2-SNMPTT.CONF-file">Sample2 SNMPTT.CONF file</a>  </li>
 </ul>
 </li>
-<li><a href="#Notes">Notes</a>  </li>
+<li><a href="#Notes">Notes</a>  <ul>
+<li><a href="#Notes-trapd.conf">trapd.conf &amp; MIB files</a>  </li>
+<li><a href="#Notes-ipv6">IPv6</a>  </li>
+</ul>
+</li>
 <li><a href="#Limitations">Limitations</a>  </li>
 <li><a href="#Feedback">Feedback &amp; Bugs</a>  </li>
 <li><a href="#Integration-with-other-software">Integration with other software</a>  <ul>
@@ -1900,6 +1904,9 @@ wilma
 <li>
 <p>See the section '<a href="#DNS">Name Resolution / DNS</a>' for important DNS information.</p>
 </li>
+<li>
+<p>See the section <a href="#Notes-ipv6">IPv6</a> for important IPv6 information.</p>
+</li>
 </ul>
 <h2><a name="SNMPTT.CONF-MATCH"></a>MATCH</h2>
 <p>[MATCH [MODE=[or | and]] | [$n:[!][(    )[i] | n | n-n | &gt; n | &lt; n | x.x.x.x | x.x.x.x-x.x.x.x | x.x.x.x/x]]</p>
@@ -1958,6 +1965,9 @@ MATCH <em>$x:</em> [!] <em>x:x:x/x</em><br />
 </li>
 <li>
 <p>There can be only one match mode per EVENT.  If multiple MATCH MODE= lines exists, the last one in the list is used.</p>
+</li>
+<li>
+<p>See the section <a href="#Notes-ipv6">IPv6</a> for important IPv6 information.</p>
 </li>
 </ul>
 <p>Examples:  </p>
@@ -2150,10 +2160,16 @@ EDESC
 #
 </code></pre>
 <h1><a name="Notes"></a>Notes</h1>
+<h2><a name="Notes-trapd.conf"></a>trapd.conf &amp; MIB files</h2>
 <p>An existing HP Openview trapd.conf can be used in most cases but the file must be a VERSION 3 file.  SNMPTT does not support all the variables implemented in HPOV, but most are available.  The following variables may or may not match exactly to HPOV: $O, $o, $r, $ar, $R, $aR.</p>
 <p>Some vendors (such as Compaq and Cisco ) provide a file that can be imported in to HP Openview using an HP Openview utility.  snmpttconvert can be used to convert the file to snmptt.conf format.</p>
-<p>Some vendors provide a MIB file that contains TRAP or NOTIFICATION definitions.  snmpttconvertmib can be used to convert the file to snmptt.conf format.<br />
-</p>
+<p>Some vendors provide a MIB file that contains TRAP or NOTIFICATION definitions.  snmpttconvertmib can be used to convert the file to snmptt.conf format.  </p>
+<h2><a name="Notes-ipv6"></a>IPv6</h2>
+<ul>
+<li>For incoming traps, a simple Perl regular expression is used to detect an IPv6 address for the trap host and Agent IPs as it is assumed that Net-SNMP is passing a valid IPv6 address.  If the address has a zone index such as <strong>%ens160</strong> or <strong>%1</strong> appended to it, the zone index is removed.  Zone indexes are not removed from enterprise variable values.</li>
+<li>When DNS is enabled to resolve enterprise variables, the trap host and Agent IP <strong>(dns_enabled = 1)</strong>, a complex regular expression is used to confirm that the IP address is valid before passing on to the <strong>IO::Socket::IP</strong> module for DNS resolution.  The <a href="https://community.helpsystems.com/forums/intermapper/miscellaneous-topics/5acc4fcf-fa83-e511-80cf-0050568460e4?_ga=2.113564423.1432958022.1523882681-2146416484.1523557976">Dartware</a> regular expression is used.  Also see <a href="https://raw.githubusercontent.com/richb-intermapper/IPv6-Regex/master/test-ipv6-regex.pl">here</a> for a test suite.</li>
+<li>For <strong>NODES</strong> and <strong>MATCH</strong>, the <a href="http://search.cpan.org/search?module=Net::IP">Net::IP</a> module is used as it allows you to test to see if two IP addresses are the same or if one IP address is within the range of another.  IPv6 addresses can be represented in multiple ways so this module is used to ensure that an IP address such as <strong>2002:0000:0000:1234:abcd:ffff:c0a8:0101</strong> is matched to its shorthand version of <strong>2002::1234:abcd:ffff:c0a8:0101</strong>.  When running a modified version of the test suite above against Net::IP, it was found that it only passed 316 out of 490 tests compared to Dartmouth which passed 489 out of 490.  There may be issues with matching some IP addresses passed in enterprise variables for MATCH but  NODES should not be affected as Net-SNMP should be passing a supported format for both the host and agent IP addresses.</li>
+</ul>
 <h1><a name="Limitations"></a>Limitations</h1>
 <h2><strong>Standalone mode only:</strong></h2>
 <p>With a 450 Mhz PIII (way back in 1998) and a 9000 line snmptt.conf containing 566 unique traps (EVENTs), it took under a second to process the trap including logging and executing the qpage program.  The larger the snmptt.conf file is, the longer it will take to process.  If there are a large number of traps being received, daemon mode should be used.  If it takes 1 second to process one trap, then obviously you shouldn't try to process more than one trap per second.  Daemon mode should be used instead.</p>
