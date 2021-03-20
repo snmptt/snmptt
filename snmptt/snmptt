@@ -3387,6 +3387,7 @@ sub readtrap
         print "  IPv6 detected for value 0\n";
       }
       $tempvar[0] = $1;
+      # Remove zone index from IPv6 address
       if ($tempvar[0] =~ /(.*?)%.*/) {
           $tempvar[0] = $1;
       }
@@ -3426,6 +3427,7 @@ sub readtrap
         print "  IPv6 detected for value 1\n";
       }
       $tempvar[1] = $1;
+      # Remove zone index from IPv6 address
       if ($tempvar[1] =~ /(.*?)%.*/) {
           $tempvar[1] = $1;
       }
@@ -3666,6 +3668,7 @@ sub readtrap
           # IPv6
           print "IPv6 detected\n";
           $var[4] = $1;
+          # Remove zone index from IPv6 address
           if ($var[4] =~ /(.*?)%.*/) {
               $var[4] = $1;
           }
@@ -4827,6 +4830,7 @@ sub checkip
 
 }
 
+# IPv6_TODO_DONE
 sub checkipv6
 {
   my $node1 = $_[0];		# Should be a plain IP address
@@ -5108,7 +5112,7 @@ sub resolve_value_ipv6_addresses_sub
   my $string = $_[0];
 
   # https://raw.githubusercontent.com/richb-intermapper/IPv6-Regex/master/test-ipv6-regex.pl
-  # IPv6 regex by dartware (Stephen Ryan at Dartware)
+  # IPv6 regex by dartware (Stephen Ryan at Dartware).  Also matches if it contains a zone index (%ens160).  
   if ($string =~ /\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*/)	# If it appears to contain an IPv6 address
   {
     if ($DEBUGGING >= 2)
@@ -6647,6 +6651,7 @@ sub exec_thread_sub {
   $thread_exec_semaphore->up;
 }
 
+# IPv6 address including a zone (%ens160) will resolve fine.
 sub ip_to_name {
     my $ip = shift;
 
