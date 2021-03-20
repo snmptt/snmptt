@@ -1593,7 +1593,7 @@ sub processtrap
            $nodesmatch = 1;
          }
        }
-       elsif ($a =~ /(.*?:.*)/) # NODES entry is an IPv6 address
+       elsif ($ipv6_enable == 1 && $a =~ /(.*?:.*)/) # NODES entry is an IPv6 address
        {
          if ( checkipv6($var[4], $a) == 1)
          {
@@ -1754,11 +1754,11 @@ sub processtrap
         }
       }
     }
-    else
+    elsif ($nodesmatch == 1)
     {
       if ($DEBUGGING >= 1)
       {
-        print "  No MATCH entries defined for this entry\n";
+        print "  No MATCH entries defined for this entry.\n";
       }
       $match_found = 1;	# Default to match_found if no MATCH entries
     }
@@ -5255,7 +5255,7 @@ sub match
     }
   }
   # Match is an IPv6 address
-  elsif ($match =~ /(.*?:.*)/)
+  elsif ($ipv6_enable == 1 && $match =~ /(.*?:.*)/)
   {
     #print "IPv6 address of some sort\n";
     $result = checkipv6($value, $match);
