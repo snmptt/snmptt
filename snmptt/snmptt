@@ -5532,7 +5532,7 @@ sub strip_domain_name
   my $mode = shift;
 
   # If mode = 1, strip off all domain names leaving only the host
-  if ($mode == 1 && !($name =~ /^\d+\.\d+\.\d+\.\d+$/))
+  if ($mode == 1 && !($name =~ /^\d+\.\d+\.\d+\.\d+$/) && !($name =~ /(.*?:.*)/))
   {
     if ($name =~ /\./)      # Contain a . ?
     {
