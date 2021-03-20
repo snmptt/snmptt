@@ -1584,7 +1584,7 @@ sub processtrap
            }
          next;
        }
-       # IPv6_TODO
+       # IPv6_TODO_DONE
        elsif ($a =~ /^(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IPv4 address / cidr / range
        {
          #if ( $a eq $var[1])     # compare against agent ip
@@ -1600,7 +1600,7 @@ sub processtrap
            $nodesmatch = 1;
          }
        }
-       # IPv6_TODO
+       # IPv6_TODO_DONE
        elsif ($dns_enable == 1)	# Resolve NODES entry to IP address, and compare
        {
          my $temp = gethostbyname($a);
@@ -1657,6 +1657,7 @@ sub processtrap
      }
    }
 
+    # IPV6_TODO
     # Check for MATCH entries
     if ($nodesmatch == 1 && defined($event2[7][0]))  # Only if NODES has matched and 
     {                                                 # we have some MATCH statements
@@ -4752,7 +4753,7 @@ sub eventlog_system {
   }
 }
 
-# IPv6_TODO
+# IPv6_TODO_DONE
 sub checkip
 {
   my $node1 = $_[0];		# Should be a plain IP address
@@ -4842,9 +4843,22 @@ sub checkipv6
   }
 
   #print "node1:$node1\n";
+  #print "node2:$node2\n";
 
-  my $node1ip = new Net::IP($node1) || die;
-  my $node2ip = new Net::IP($node2) || die;
+  my $node1ip = new Net::IP($node1);
+  if (Net::IP::Error()) {
+    if ($DEBUGGING >= 1) {
+      print "  Invalid IPv6 address detected: " . Net::IP::Error() . "\n";
+    }
+    return 0;
+  }
+  my $node2ip = new Net::IP($node2);
+  if (Net::IP::Error()) {
+    if ($DEBUGGING >= 1) {
+      print "  Invalid IPv6 address detected: " . Net::IP::Error() . "\n";
+    }
+    return 0;
+  }
 
   my $result = $node1ip->overlaps($node2ip);
 
@@ -5186,6 +5200,7 @@ sub resolve_value_ipv6_addresses_sub
   return $string;    
 }
 
+#IPv6_TODO
 sub match
 {
   my $match = shift;
@@ -5239,7 +5254,19 @@ sub match
              ($result == 1 ? "true" : "false") . "\n";
     }
   }
-  # Match is an IP address
+  # Match is an IPv6 address
+  elsif ($match =~ /(.*?:.*)/)
+  {
+    #print "IPv6 address of some sort\n";
+    $result = checkipv6($value, $match);
+    $result = match_result($result, $not);
+    if ($DEBUGGING >= 1)
+    {
+      print "    IPv6 ADDRESS: value=$value, match=" . ($not == 1 ? "!$match" : "$match") . " Result=" . 
+             ($result == 1 ? "true" : "false") . "\n";
+    }
+  }
+  # Match is an IPv4 address
   elsif ($match =~ /\d+\.\d+\.\d+\.\d+/)
   {
     #print "IP address of some sort\n";
@@ -5247,7 +5274,7 @@ sub match
     $result = match_result($result, $not);
     if ($DEBUGGING >= 1)
     {
-      print "    IP ADDRESS: value=$value, match=" . ($not == 1 ? "!$match" : "$match") . " Result=" . 
+      print "    IPv4 ADDRESS: value=$value, match=" . ($not == 1 ? "!$match" : "$match") . " Result=" . 
              ($result == 1 ? "true" : "false") . "\n";
     }
   }
@@ -5622,7 +5649,7 @@ sub my_mapEnum
   return $result;
 }
 
-# IPv6_TODO
+# IPv6_TODO_DONE
 sub process_nodes
 {
   my $nodes_list = shift;

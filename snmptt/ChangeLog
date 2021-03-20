@@ -1,6 +1,6 @@
-March 17th, 2021: Alex Burger <alex_b@users.sourceforge.net>
+March 20th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Added support for IPv6.  Feature must be enabled by setting ipv6enable = 1 in
-  snmptt.ini.  Remaining features to update:  MATCH and strip_domain_name.
+  snmptt.ini.  Remaining features to update:  strip_domain_name.
 - Changed Perl module for DNS support from Socket to IO::Socket::IP and from
   functions aton/ntoa to getaddrinfo/getnameinfo to support IPv6.
 - Fixed bug with dns not working for enterprise variables of net-snmp not

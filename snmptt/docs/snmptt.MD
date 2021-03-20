@@ -147,7 +147,7 @@ Which could result in the following output:
 "Compaq Drive Array Spare Drive on controller 3, bus 0, bay 3 status is Failed."
 ```
 
-SNMPTT can log to any of the following destinations: text log, syslog, Windows Event log or a SQL database such as MySQL, PostreSQL or an ODBC accessible database such as Microsoft SQL. External programs can also be run to pass the translated trap to an email client, paging software, Nagios, Icinga etc.
+SNMPTT can log to any of the following destinations: text log, syslog, Windows Event log or a SQL database such as MySQL, PostreSQL or an ODBC accessible database such as Microsoft SQL. External programs can also be run to pass th  e translated trap to an email client, paging software, Nagios, Icinga etc.
 
 In addition to variable substitution, SNMPTT allows complex configurations allowing:
 
@@ -2033,6 +2033,8 @@ The syntax of the snmptt.conf file  is:
  > MATCH _$x:_ \[!\] _x.x.x.x_  
  > MATCH _$x:_ \[!\] _x.x.x.x-x.x.x.x_  
  > MATCH _$x:_ \[!\] _x.x.x.x/x_  
+ > MATCH _$x:_ \[!\] _x:x:x_  
+ > MATCH _$x:_ \[!\] _x:x:x/x_  
  > **  
 
  where:  
@@ -2044,8 +2046,10 @@ The syntax of the snmptt.conf file  is:
  > **&** is used to perform a bitwise AND  
  > **n** is a number  
  > **x.x.x.x** is an IP address  
- > **x.x.x.x-x.x.x.x** is an IP network address range  
- > **x.x.x.x/x** is an IP CIDR network addresss
+ > **x.x.x.x-x.x.x.x** is an IPv4 network address range  
+ > **x.x.x.x/x** is an IPv4 CIDR network addresss  
+ > **x:x:x** is an IPv6 addresss  
+ > **x:x:x/x** is an IPv6 CIDR network addresss  
 
  Notes:  
   
@@ -2074,6 +2078,12 @@ The syntax of the snmptt.conf file  is:
     MATCH $3: 52
     MATCH $4: 192.168.1.10-192.168.1.20
     MATCH $s: (Major)
+
+ > $6 must be IPv6 address 2002:0000:0000:1234:abcd:ffff:c0a8:0101 or in subnet 2002:0000:0000:1234:0000:0000:0000:0000/64:
+  
+ >
+    MATCH $6: 2002::1234:abcd:ffff:c0a8:0101
+    MATCH $6: 2002:0000:0000:1234:0000:0000:0000:0000/64
 
  > All must match (and): $3 must be greater than 20, and $5 must not contain the words alarm or critical, $6 must contain the string '(1) remaining' and $7 must contain the string 'power' which is not case sensitive:  
   
