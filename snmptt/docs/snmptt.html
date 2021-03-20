@@ -135,6 +135,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA<br /
 <li>execute external programs to send pages, emails etc</li>
 <li>perform regular expression search and replace on the translated message such as translating the variable value "Building alarm 4" to "Moisture detection alarm"</li>
 </ul>
+<p>As of SNMPTT 1.5, both IPv4 and IPv6 are supported.</p>
 <h1><a name="Downloading"></a>Downloading</h1>
 <p>SNMPTT can be downloaded from the <a href="https://sourceforge.net/projects/snmptt/files/snmptt/">Sourceforge files page</a>.  The primary git source code repository is avaialble at <a href="https://sourceforge.net/p/snmptt/git/ci/master/tree/">Sourceforge</a> and a mirror is available at <a href="https://github.com/AlexB7/snmptt">GitHub</a>.</p>
 <h1><a name="Requirements"></a>Requirements</h1>
@@ -149,7 +150,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA<br /
 <li>Required: <a href="http://search.cpan.org/search?module=Sys::Hostname">Sys::Hostname</a> module (included with most if not all distributions including ActivePerl).</li>
 <li>Required: <a href="http://search.cpan.org/search?module=File::Basename">File::Basename</a> module (included with most if not all distributions including ActivePerl).</li>
 <li>Required: <a href="http://search.cpan.org/search?module=Text::Balanced">Text::Balanced</a> module (included with most if not all distributions including ActivePerl).</li>
-<li>Optional: <a href="http://search.cpan.org/search?module=Socket">Socket</a> module (included with most if not all distributions including ActivePerl). Required for DNS translations.</li>
+<li>Optional: <a href="http://search.cpan.org/search?module=Net::IP">Net::IP</a> module. Required for IPv6 support.</li>
+<li>Optional: <a href="http://search.cpan.org/search?module=IO::Socket::IP">IO::Socket::IP</a> module (included with most if not all distributions including ActivePerl). Required for DNS translations.</li>
 <li>Optional: <a href="http://search.cpan.org/search?module=Sys::Syslog">Sys::Syslog</a> module (included with most Unix distributions). Required for Syslog support.</li>
 <li>Optional: <a href="http://search.cpan.org/search?module=DBI">DBI</a> module.  Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support.</li>
 <li>Optional: <a href="http://search.cpan.org/search?module=DBD::mysql">DBD::mysql</a> module.  Required for MySQL support.</li>
@@ -491,6 +493,7 @@ but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT lin
 <li>Replace <strong>snmptt</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
 <li>Replace <strong>snmpttconvertmib</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
 <li>Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.</li>
+<li>To enable IPv6 support, set <strong>ipv6enable = 1</strong> in <strong>snmptt.ini</strong>.</li>
 </ol>
 <p>Note:  Starting with v1.5, you can use <strong>/etc/snmptt/</strong> instead of <strong>/etc/snmp/</strong> for your <strong>snmptt.ini</strong> file.</p>
 <h2><strong>v1.4 to v1.4.2</strong></h2>
@@ -1823,6 +1826,9 @@ PREEXEC /usr/local/bin/snmpget -v 1 -Ovq -c public $aA ifDescr.$1
 <p>Optional string containing any combination of host names, IP addresses, CIDR network address, network IP address ranges, or a filename.  If this keyword is omitted then ALL sources will be accepted.  Each entry is checked for a match.  As soon as one match occurs, searching stops.</p>
 <p>For example, if you only wanted devices on the subnet 192.168.1.0/24 to trigger this EVENT, you could use a NODES entry of:</p>
 <pre><code>NODES 192.168.1.0/24
+</code></pre>
+<p>Or, if you wanted devices on IPv4 subnet 192.168.1.0/24 and IPv6 subnet 2001:db8:a::/64:</p>
+<pre><code> NODES 192.168.1.0/24 2001:db8:a::/64
 </code></pre>
 <p>If a filename is specified, it must be specified with a full path. </p>
 <p>There are two modes of operation: <strong>POS</strong> (positive - the default) and <strong>NEG</strong> (negative). If set to <strong>POS</strong>, then <strong>NODES</strong> is a 'match' if <em>any</em> of the <strong>NODES</strong> entries match. If set to <strong>NEG</strong>, then <strong>NODES</strong> is a 'match' only if <em>none</em> of the <strong>NODES</strong> entries match. To change the mode of operation, use one of the following statements:</p>

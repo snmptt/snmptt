@@ -483,6 +483,24 @@ if ($dns_enable == 1)
   }
 }
 
+if ($ipv6_enable == 1)
+{
+  eval 'require Net::IP;';
+  if ($@) {
+    warn $@;
+    print "\nCould not load the Perl module Net::IP!  If ipv6_enable\n";
+    print "is enabled then the Net::IP module is required.  Please see snmptt.html\n";
+    print "for system requirements.\n\n";
+    die "died";
+  }
+  require Net::IP;
+
+  if ($DEBUGGING >= 1)
+  {
+    print "********** ipv6_enable enabled **********\n\n";
+  }
+}
+
 if ($mysql_dbi_enable == 1)
 {
   eval 'require DBI;';
@@ -1567,10 +1585,17 @@ sub processtrap
          next;
        }
        # IPv6_TODO
-       elsif ($a =~ /^(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IP address / cidr / range
+       elsif ($a =~ /^(\d+\.\d+\.\d+\.\d+)/) # NODES entry is an IPv4 address / cidr / range
        {
          #if ( $a eq $var[1])     # compare against agent ip
          if ( checkip($var[4], $a) == 1)
+         {
+           $nodesmatch = 1;
+         }
+       }
+       elsif ($a =~ /(.*?:.*)/) # NODES entry is an IPv6 address
+       {
+         if ( checkipv6($var[4], $a) == 1)
          {
            $nodesmatch = 1;
          }
@@ -2307,7 +2332,7 @@ sub substitute
       $val = &translate_value_oids_sub($val);
     }
 
-    # IPv6_TODO
+    # IPv6_TODO_DONE
     #if ($dns_enable == 1 && $resolve_value_ip_addresses == 1 && $net_snmp_perl_enable == 1)
     # Shouldn't need to check net_snmp_perl_enable - 2021/03/16 - Alex
     if ($dns_enable == 1 && $resolve_value_ip_addresses == 1)
@@ -2496,12 +2521,12 @@ sub substitute
   #s(\$r)($var[0])g;
   &substitute2 ("\$r", $var[0]);
 
-  # IPv6_TODO
+  # IPv6_TODO_DONE
   # $A, $a - Trap agent IP address
   #s(\$aA)($var[4])g;		# IP address
   &substitute2 ("\$aA", $var[4]);
 
-  # IPv6_TODO
+  # IPv6_TODO_DONE
   #s(\$A)($agent_dns_name)g;	# hostname
   &substitute2 ("\$A", $agent_dns_name);
 
@@ -3324,7 +3349,7 @@ sub readtrap
     }
   }
   
-  # IPv6_TODO  
+  # IPv6_TODO_DONE
   chomp($tempvar[1]=<$input>);	# ip address
   push(@rawtrap, $tempvar[1]);
 
@@ -3344,7 +3369,7 @@ sub readtrap
     }
   }
 
-  # IPv6_TODO
+  # IPv6_TODO_DONE
   # With DNS resolution disabled in snmptrapd, some systems pass the hostname as:
   # UDP: [x.x.x.x]:161->[y.y.y.y]
   # If this is detected, use x.x.x.x as the hostname.
@@ -3385,7 +3410,7 @@ sub readtrap
   # Clean again as we should now how an IP address or host name
   $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:]//g;  # Remove most non alphanumeric characters
 
-  # IPv6_TODO
+  # IPv6_TODO_DONE
   # Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
   # out just the IP address
   if ($ipv6_enable == 1) {
@@ -3628,7 +3653,7 @@ sub readtrap
     {
       $var[4] = $tempvar[$i+1];
 
-      # IPv6_TODO
+      # IPv6_TODO_DONE
       # Some systems pass the IP address as IpAddress:iaddress.  This will pull
       # out just the IP address.  Bug 27.
       if ($ipv6_enable == 1) {
@@ -3691,7 +3716,7 @@ sub readtrap
   #if ($dns_enable == 1 && $var[0] =~  /^\d+\.\d+\.\d+\.\d+$/) # Only if it's not already resolved
   if ($dns_enable == 1 && ($var[0] =~ /^\d+\.\d+\.\d+\.\d+$/ || $var[0] =~ /\:/)) # Only if it's not already resolved
   {
-    # IPv6_TODO
+    # IPv6_TODO_DONE
     #my $temp = gethostbyaddr(Socket::inet_aton($var[0]),Socket::AF_INET());
     my $temp = ip_to_name($var[0]);
 
@@ -3712,7 +3737,7 @@ sub readtrap
     }
   }
 
-  # IPv6_TODO
+  # IPv6_TODO_DONE
   # If the agent IP is blank, copy the IP from the host IP.
   # var[4] would only be blank if it wasn't passed from snmptrapd, which
   # should only happen with ucd-snmp 4.2.3, which you shouldn't be using anyway!
@@ -3725,7 +3750,7 @@ sub readtrap
     }
   }
 
-  # IPv6_TODO
+  # IPv6_TODO_DONE
   # If the agent IP is the same as the host IP, then just use the host DNS name, no need
   # to look up, as it's obviously the same..
   if ($var[4] eq $var[1])
@@ -4801,6 +4826,44 @@ sub checkip
 
 }
 
+sub checkipv6
+{
+  my $node1 = $_[0];		# Should be a plain IP address
+  my $node2 = $_[1];		# Can be a plain IP address or CIDR
+
+  # Remove all white space
+  $node1 =~ s/\s*//g;
+  $node2 =~ s/\s*//g;
+
+  # Check for an exact match
+  if ($node1 eq $node2)
+  {
+    return 1;
+  }
+
+  #print "node1:$node1\n";
+
+  my $node1ip = new Net::IP($node1) || die;
+  my $node2ip = new Net::IP($node2) || die;
+
+  my $result = $node1ip->overlaps($node2ip);
+
+  #print "IPv6 overlap:\n";
+  #print "IP_A_IN_B_OVERLAP: $Net::IP::IP_A_IN_B_OVERLAP\n";
+  #print "IP_PARTIAL_OVERLAP: $Net::IP::IP_PARTIAL_OVERLAP\n";
+  #print "IP_IDENTICAL: $Net::IP::IP_IDENTICAL\n";
+  #print "\n";
+
+  if ($result == $Net::IP::IP_A_IN_B_OVERLAP || $result == $Net::IP::IP_IDENTICAL) {
+      #print "Yes: $result\n";
+      return 1;
+  }
+  else {
+      #print "No: $result\n";
+      return 0;
+  }
+}
+
 sub dec2bin {
   my $str = unpack("B8", pack("C", shift));
   #$str =~ s/^0+(?=\d)//;   # otherwise you'll get leading zeros
@@ -4826,7 +4889,7 @@ sub translate_value_oids_sub
     my $done = 1;
     my $noinf = 0;
 
-    # IPv6_TODO
+    # IPv6_TODO_DONE
     # Find any IPv4 addresses and remove from $string_temp
 
     $noinf = 0;
@@ -4930,7 +4993,7 @@ sub translate_value_oids_sub
   return $string;    
 }
 
-# IPv6_TODO
+# IPv6_TODO_DONE
 sub resolve_value_ip_addresses_sub
 {
   my $string = $_[0];
@@ -5576,7 +5639,9 @@ sub process_nodes
   foreach my $a (@nodes)
   {
     # Contain a \ or /?  Must be a filename and not an IP address / network number
-    if ( ($a =~ /\\|\//) && !($a =~ /\d+\.\d+\.\d+\.\d+/))
+    # as long as it doesn't look like an IPv6 or IPv6 address.
+    #if ( ($a =~ /\\|\//) && !($a =~ /\d+\.\d+\.\d+\.\d+/))
+    if ( ($a =~ /\\|\//) && !($a =~ /\d+\.\d+\.\d+\.\d+/) && !($a =~ /(.*?:.*)/))
     {
       #print "!Dynamic enabled\n";
       my $fh_NODESFILE;

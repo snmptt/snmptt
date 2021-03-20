@@ -155,7 +155,8 @@ In addition to variable substitution, SNMPTT allows complex configurations allow
 *   execute external programs to send pages, emails etc
 *   perform regular expression search and replace on the translated message such as translating the variable value "Building alarm 4" to "Moisture detection alarm"
 
-  
+As of SNMPTT 1.5, both IPv4 and IPv6 are supported.
+
 
 # <a name="Downloading"></a>Downloading
 
@@ -173,7 +174,8 @@ SNMPTT can be downloaded from the [Sourceforge files page](https://sourceforge.n
 *   Required: [Sys::Hostname](http://search.cpan.org/search?module=Sys::Hostname) module (included with most if not all distributions including ActivePerl).
 *   Required: [File::Basename](http://search.cpan.org/search?module=File::Basename) module (included with most if not all distributions including ActivePerl).
 *   Required: [Text::Balanced](http://search.cpan.org/search?module=Text::Balanced) module (included with most if not all distributions including ActivePerl).
-*   Optional: [Socket](http://search.cpan.org/search?module=Socket) module (included with most if not all distributions including ActivePerl). Required for DNS translations.
+*   Optional: [Net::IP](http://search.cpan.org/search?module=Net::IP) module. Required for IPv6 support.
+*   Optional: [IO::Socket::IP](http://search.cpan.org/search?module=IO::Socket::IP) module (included with most if not all distributions including ActivePerl). Required for DNS translations.
 *   Optional: [Sys::Syslog](http://search.cpan.org/search?module=Sys::Syslog) module (included with most Unix distributions). Required for Syslog support.
 *   Optional: [DBI](http://search.cpan.org/search?module=DBI) module.  Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support.
 *   Optional: [DBD::mysql](http://search.cpan.org/search?module=DBD::mysql) module.  Required for MySQL support.
@@ -495,6 +497,7 @@ To upgrade from v1.4.2 to v1.5beta1 you should:
 1.  Replace **snmptt** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
 1.  Replace **snmpttconvertmib** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
 1.  Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.
+1.  To enable IPv6 support, set **ipv6enable = 1** in **snmptt.ini**.
     
 Note:  Starting with v1.5, you can use **/etc/snmptt/** instead of **/etc/snmp/** for your **snmptt.ini** file.
 
@@ -1935,6 +1938,10 @@ The syntax of the snmptt.conf file  is:
  
     NODES 192.168.1.0/24
  
+ Or, if you wanted devices on IPv4 subnet 192.168.1.0/24 and IPv6 subnet 2001:db8:a::/64:
+ 
+     NODES 192.168.1.0/24 2001:db8:a::/64
+
  If a filename is specified, it must be specified with a full path. 
  
  There are two modes of operation: **POS** (positive - the default) and **NEG** (negative). If set to **POS**, then **NODES** is a 'match' if _any_ of the **NODES** entries match. If set to **NEG**, then **NODES** is a 'match' only if _none_ of the **NODES** entries match. To change the mode of operation, use one of the following statements:
