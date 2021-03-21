@@ -27,10 +27,15 @@ snmptt_1.5beta1.tgz:
 -update ChangeLog with release info
 
 cd snmptt/docs
-./markdown-to-html.py snmptt.MD > snmptt.html ; tidy -m -asxhtml snmptt.html
-./markdown-to-html.py faqs.MD > faqs.html ; tidy -m -asxhtml faqs.html
-./markdown-to-html.py snmpttconvert.MD > snmpttconvert.html ; tidy -m -asxhtml snmpttconvert.html
-./markdown-to-html.py snmpttconvertmib.MD > snmpttconvertmib.html ; tidy -m -asxhtml snmpttconvert.html
+./markdown-to-html.py snmptt.md > snmptt.html ; tidy -m -asxhtml snmptt.html
+./markdown-to-html.py faqs.md > faqs.html ; tidy -m -asxhtml faqs.html
+./markdown-to-html.py snmpttconvert.md > snmpttconvert.html ; tidy -m -asxhtml snmpttconvert.html
+./markdown-to-html.py snmpttconvertmib.md > snmpttconvertmib.html ; tidy -m -asxhtml snmpttconvert.html
+
+ebook-convert snmptt.html snmptt.epub
+ebook-convert faqs.html faqs.epub
+ebook-convert snmpttconvert.html snmpttconvert.epub
+ebook-convert snmpttconvertmib.html snmpttconvertmib.epub
 
 cd ..
 perl -c snmptt
@@ -53,10 +58,10 @@ cd ../snmptt_1.5beta1
 sudo su
 rm -f docs/build
 rm -f docs/markdown-to-html.py
-#rm -f docs/snmptt.MD
-#rm -f docs/faqs.MD
-#rm -f docs/snmpttconvert.MD
-#rm -f docs/snmpttconvertmib.MD
+#rm -f docs/snmptt.md
+#rm -f docs/faqs.md
+#rm -f docs/snmpttconvert.md
+#rm -f docs/snmpttconvertmib.md
 chmod -R 664 *
 chmod 775 bin
 chmod 775 contrib
