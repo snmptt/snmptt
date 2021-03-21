@@ -29,7 +29,7 @@ This file was last updated on:  July 18th, 2009
 * [How to I enable the Perl support for UCD-SNMP / Net-SNMP under Windows](#How_to_I_enable_the_Perl_support_for_UCD-SNMP)
 * [**Which trap handler should I use?  snmptthandler or snmptthandler-embedded?**](#Which_trap_handler_should_I_use)
 * [Are there any sample files to get me started?](#Are_there_any_sample_files_to_get_me_started)
-* [Why doesn't the snmptt-init.d script work with Debian?](#Why_doesn%27t_the_snmptt-init.d_script_work_with_Debian)
+* [Why doesn't the snmptt-init.d script work with Debian?](#Why_doesnt_the_snmptt-init.d_script_work_with_Debian)
 
 ## General
 
@@ -200,7 +200,7 @@ A:  Yes, the examples folder contains a sample snmptt.conf file, and a sample t
     For daemon mode, test SNMPTT by copying sample-trap.generic.daemon to the spool folder
 5.  Check the logs files etc for a sample linkDown trap
 
-**<a name="Why_doesn%27t_the_snmptt-init.d_script_work_with_Debian"></a>Q:  Why doesn't the snmptt-init.d script work with Debian?**
+**<a name="Why_doesnt_the_snmptt-init.d_script_work_with_Debian"></a>Q:  Why doesn't the snmptt-init.d script work with Debian?**
   
 The snmptt-init.d script provided with SNMPTT was written for Mandrake and RedHat.  To make the script work with Debian without requiring any re-writing of the script, copy **/etc/init.d/skeleton** to **/etc/init.d/functions**.  
 
