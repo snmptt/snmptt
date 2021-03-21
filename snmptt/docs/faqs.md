@@ -10,7 +10,7 @@
 <meta content="Mozilla/4.78 [en] (Windows NT 5.0; U) [Netscape]"
 name="GENERATOR" />
 <link rel="StyleSheet" type="text/css" href="layout1.css" />
-<title>SNMP Trap Translator v1.5beta1</title>
+<title>SNMP Trap Translator FAQ</title>
 </head>
 
 #SNMPTT FAQ / Troubleshooting
