@@ -203,6 +203,7 @@ Note:
 
 ## **v1.5beta1** **\- xx xx, 2021**
 
+* Added support for IPv6.  To enable, set **ipv6enable = 1** in snmptt.ini.
 * Added support for sub-second sleep for spool folder processing.
 * **snmptt.ini** can now be located in **/etc/snmptt** and is searched for at this
   location first.
@@ -215,14 +216,17 @@ Note:
   it was received from Net-SNMP as **IpAddress:x.x.x.x** (bug 27).
 * Fixed a race condition bug with **snmptthander** and **snmptthandler-embedded**
   which could cause traps to be missed.  Spool files are now immediately locked
-  after creation.  If flock() is not supported, the spool file will be created
-  with a temporary filename and then renamed after closing.  Spool files must
-  now start with **#** otherwise they are ignored.
+  after creation using flock().  If flock() is not supported, the spool file will be created
+  with a temporary filename and then renamed after closing.
 * Fixed a bug with **wildcard_expansion_separator** which caused an issue when
   using wildcard separators that were longer than one character (bug 38).
 * Fixed a bug where quotes were not properly removed from some incoming traps.
 * Fixed bug with debug mode that was causing some debug mode output even when
   debug mode was off.
+* Fixed a bug where DNS resolution was not working for enterprise variables 
+  when **net_snmp_perl_enable** was disabled.
+* Changed **net_snmp_perl_best_guess** default from 0 to 2 as any modern system
+  should support this.  See FAQ and snmptt.ini for details on this variable.
 * Enabled Perl warnings to help ensure code is following best practices.
 * Ran code against Perl::Critic to find non-optimal code.  Made various adjustments such as relacing bare words with variables and changing open() calls from two arguments to three.
 * Documentation was converted from html to markdown to make it easier to maintain and a full review was completed.  Many improvments have been made including a new section on integrating with Icinga.

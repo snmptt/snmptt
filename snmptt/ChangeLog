@@ -1,10 +1,14 @@
+March 21st, 2021: Alex Burger <alex_b@users.sourceforge.net>
+- Changed net_snmp_perl_best_guess default from 0 to 2 as any modern system
+  should support this.
+
 March 20th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Added support for IPv6.  Feature must be enabled by setting ipv6enable = 1 in
   snmptt.ini.
 - Changed Perl module for DNS support from Socket to IO::Socket::IP and from
   functions aton/ntoa to getaddrinfo/getnameinfo to support IPv6.
-- Fixed bug with dns not working for enterprise variables of net-snmp not
-  enabled.
+- Fixed a bug where DNS resolution was not working for enterprise variables
+  when net_snmp_perl_enable was disabled.
 
 March 13th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Used PerlCritic to check all source files.

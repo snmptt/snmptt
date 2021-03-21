@@ -82,7 +82,7 @@ GetOptions 	('version' => \$version,
 
 if ($version == 1)
 {
-  &showversion;
+  showversion();
   exit(0);
 }
 
@@ -102,7 +102,7 @@ Options:
                                          process trap file (eg: time snmptt --time)
 /;
 
-  &showversion;
+  showversionO();
   print $USAGE;
 
   exit(0);
@@ -139,18 +139,18 @@ if ($dump ==1)
 {
   $DEBUGGING = 2;
   $debugcmdline = 1;
-  &findsnmpttini;
-  &loadsnmpttini;
-  &loadsnmpttconf;		# Load SNMPTT.CONF file
+  findsnmpttini();
+  loadsnmpttini();
+  loadsnmpttconf();		# Load SNMPTT.CONF file
   print ("\n\n");
   exit(0);
 }
 
 if ($time ==1)
 {
-  &findsnmpttini;
-  &loadsnmpttini;
-  &loadsnmpttconf;		# Load SNMPTT.CONF file
+  findsnmpttini();
+  loadsnmpttini();
+  loadsnmpttconf();		# Load SNMPTT.CONF file
   exit(0);
 }
 
@@ -301,8 +301,8 @@ my @snmptt_conf_files;
 # Load config file 
 #
 
-&findsnmpttini;
-&loadsnmpttini;
+findsnmpttini();
+loadsnmpttini();
 
 ##############################################################################
 
@@ -442,7 +442,7 @@ if ($net_snmp_perl_enable == 1)
     no warnings;  # Variable is only used once
     $SNMP::save_descriptions = 1;
   }
-  &SNMP::initMib();
+  SNMP::initMib();
 
   $SNMP::best_guess = $net_snmp_perl_best_guess;
   $noperlwarning = $SNMP::best_guess;  # Just to get rid of the Perl warning that var used only once
@@ -730,7 +730,7 @@ if ($daemon == 1)
   $timetodie = 0;
   $timetologstatistics = 0;
 
-  &loadsnmpttconf;	# Load SNMPTT.CONF file
+  loadsnmpttconf();	# Load SNMPTT.CONF file
 
   # Only fork to the background if not Win32
   if (($^O ne "MSWin32") && ($daemon_fork==1))
@@ -1022,7 +1022,7 @@ if ($daemon == 1)
       # Re-open debug file (if needed) as the new user
       if ($DEBUGGING >= 1)
       {        
-        &reopen_debug_file;
+        reopen_debug_file();
       }
     }
   }
@@ -1245,7 +1245,7 @@ if ($daemon == 1)
 
         $input = $fh_FILE;
 
-        my $readtrap_result = &readtrap();      # Read trap from STDIN or file
+        my $readtrap_result = readtrap();      # Read trap from STDIN or file
 
         if ($readtrap_result == 0) {
           if ($DEBUGGING >= 1) {
@@ -1264,7 +1264,7 @@ if ($daemon == 1)
 
         # Search for trap only if it's not a duplicate.
         if (! ($trap_is_a_duplicate)) {			
-          &searchfortrap;		# Search for trap snmptt.conf (array)
+          searchfortrap();		# Search for trap snmptt.conf (array)
         }
         close $fh_FILE;
 
@@ -1300,31 +1300,31 @@ if ($daemon == 1)
 
     if ($statistics_interval > 0) {
       if (time() >= ($g_last_statistics_logged + $statistics_interval)) {
-        &log_statistics();
+        log_statistics();
       }
     }
 
     if ($mysql_dbi_enable == 1 && $mysql_ping_interval > 0) {
       if (time() >= ($g_last_mysql_ping + $mysql_ping_interval)) {
-        &mysql_ping();
+        mysql_ping();
       }
     }
 
     if ($postgresql_dbi_enable == 1 && $postgresql_ping_interval > 0) {
       if (time() >= ($g_last_postgresql_ping + $postgresql_ping_interval)) {
-        &postgresql_ping();
+        postgresql_ping();
       }
     }
 
     if ($dbd_odbc_enable == 1 && $dbd_odbc_ping_interval > 0) {
       if (time() >= ($g_last_dbd_odbc_ping + $dbd_odbc_ping_interval)) {
-        &dbd_odbc_ping();
+        dbd_odbc_ping();
       }
     }
 
     if ($timetologstatistics == 1)
     {
-      &log_statistics();
+      log_statistics();
 
       $timetologstatistics = 0;
     }
@@ -1362,8 +1362,8 @@ if ($daemon == 1)
         eventlog_system("Reloading configuration file\(s\)",8,$eventlog_information);
       }
 
-      &loadsnmpttini;		# Load ini file
-      &loadsnmpttconf;	# Load SNMPTT.CONF file
+      loadsnmpttini();		# Load ini file
+      loadsnmpttconf();	# Load SNMPTT.CONF file
       $timetoreload = 0;
     }
   }
@@ -1422,14 +1422,14 @@ else
 
   $input = 'STDIN';
 
-  &readtrap;		# Read trap from STDIN or file
+  readtrap();		# Read trap from STDIN or file
 
-  &loadsnmpttconf;	# Load SNMPTT.CONF file
+  loadsnmpttconf();	# Load SNMPTT.CONF file
 
-  &searchfortrap;		# Search for trap snmptt.conf (array)
+  searchfortrap();		# Search for trap snmptt.conf (array)
 }
 
-&close_db_connections();
+close_db_connections();
 
 exit();
 
@@ -1564,7 +1564,7 @@ sub processtrap
         @nodes2 = split /\s/, $event2[5];
       }
       else {
-        @nodes2 = &process_nodes($event2[5]);
+        @nodes2 = process_nodes($event2[5]);
       }
 
       if ($DEBUGGING >= 1)
@@ -1714,7 +1714,7 @@ sub processtrap
             {
               print "\nMATCH statement contains \$p value(s).  Executing PREEXEC line(s)...\n";
             }
-            &preexec_run;
+            preexec_run();
             $preexec_already_run = 1;
           }
         }
@@ -1790,7 +1790,7 @@ sub processtrap
       # Variable substitution for PREEXEC string
       #
       if ($preexec_already_run == 0) {
-        &preexec_run;
+        preexec_run();
         $preexec_already_run = 1;
       }
 
@@ -1810,11 +1810,11 @@ sub processtrap
         $_ = $event2[3];	# FORMAT string
 
         # Translate if enabled, and if we can
-        $receivedtrap_trans = &translate_log_trap_oid_sub($receivedtrap);
+        $receivedtrap_trans = translate_log_trap_oid_sub($receivedtrap);
 
-        $enterprise_trans = &translate_enterprise_oid_format_sub($var[6]);
+        $enterprise_trans = translate_enterprise_oid_format_sub($var[6]);
 
-        &substitute;
+        substitute();
 
         $message_short = $_;
 
@@ -2009,13 +2009,13 @@ sub processtrap
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
               print "Performing substitution on custom column: $_\n";
-              &substitute();
+              substitute();
               print "Done performing substitution on custom column: $_\n";
               $t_sql_custom_columns[$i] = $_;
             }
           }
 
-          if (&mysql_insert($mysql_dbi_table,
+          if (mysql_insert($mysql_dbi_table,
             "eventname", $event2[0],                # $N
             "eventid", $receivedtrap_entry,         # $i
             "trapoid", $receivedtrap_trans,         # $O
@@ -2054,13 +2054,13 @@ sub processtrap
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
               print "Performing substitution on custom column: $_\n";
-              &substitute();
+              substitute();
               print "Done performing substitution on custom column: $_\n";
               $t_sql_custom_columns[$i] = $_;
             }
           }
 
-          if (&postgresql_insert($postgresql_dbi_table,
+          if (postgresql_insert($postgresql_dbi_table,
             "eventname", $event2[0],                # $N
             "eventid", $receivedtrap_entry,         # $i
             "trapoid", $receivedtrap_trans,         # $O
@@ -2097,13 +2097,13 @@ sub processtrap
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
               print "Performing substitution on custom column: $_\n";
-              &substitute();
+              substitute();
               print "Done performing substitution on custom column: $_\n";
               $t_sql_custom_columns[$i] = $_;
             }
           }
 
-          if (&odbc_insert($dbd_odbc_table,
+          if (odbc_insert($dbd_odbc_table,
             "eventname", $event2[0],                # $N
             "eventid", $receivedtrap_entry,         # $i
             "trapoid", $receivedtrap_trans,         # $O
@@ -2140,13 +2140,13 @@ sub processtrap
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
               print "Performing substitution on custom column: $_\n";
-              &substitute();
+              substitute();
               print "Done performing substitution on custom column: $_\n";
               $t_sql_custom_columns[$i] = $_;
             }
           }
 
-          if (&sql_win32_odbc_insert($sql_win32_odbc_table,
+          if (sql_win32_odbc_insert($sql_win32_odbc_table,
             "eventname", $event2[0],                # $N
             "eventid", $receivedtrap_entry,         # $i
             "trapoid", $receivedtrap_trans,         # $O
@@ -2190,7 +2190,7 @@ sub processtrap
           {
             $_ = $event2[4][$i];
 
-            &substitute($message_short);
+            substitute($message_short);
 
             my $command = $_;
 
@@ -2285,13 +2285,13 @@ sub substitute
   }
 
   #s(\$\*)($temp_wildcard1)g;
-  &substitute2 ("\$\*", $temp_wildcard1);
+  substitute2 ("\$\*", $temp_wildcard1);
 
   s(\$\+\*)($temp_wildcard2)g;
-  &substitute2 ("\$\+\*", $temp_wildcard2);
+  substitute2 ("\$\+\*", $temp_wildcard2);
 
   s(\$-\*)($temp_wildcard3)g;
-  &substitute2 ("\$-\*", $temp_wildcard3);
+  substitute2 ("\$-\*", $temp_wildcard3);
 
  # $v - Names of variable-bindings 
  # Count down backwards to make sure 10 is not mistaken for $1
@@ -2305,12 +2305,12 @@ sub substitute
         $temp = $entvarname[$i-1];
       }
       #s(\$v$i)($temp)g;
-      &substitute2 ("\$v$i", $temp);
+      substitute2 ("\$v$i", $temp);
     }
     else
     {
       #s(\$v$i)($entvarname[$i-1])g;
-      &substitute2 ("\$v$i", $entvarname[$i-1]);
+      substitute2 ("\$v$i", $entvarname[$i-1]);
     }
   }
 
@@ -2330,7 +2330,7 @@ sub substitute
     # it could be translated to: 'A UPS Alarm (xupsBuildingAlarm) has cleared.'
     if ($translate_value_oids > 0 && $net_snmp_perl_enable == 1)
     {
-      $val = &translate_value_oids_sub($val);
+      $val = translate_value_oids_sub($val);
     }
 
     # IPv6_TODO_DONE
@@ -2392,7 +2392,7 @@ sub substitute
     if ($net_snmp_perl_enable == 1)
     {
       #s(\$$i)($val)g;			# $n	      
-      &substitute2 ("\$$i", $val);
+      substitute2 ("\$$i", $val);
 
       # Translate for $+n and $-n
       my $temp = my_translateObj($entvarname[$i-1],$translate_varname_oid_format);
@@ -2401,71 +2401,71 @@ sub substitute
         $temp = $entvarname[$i-1];
       }
 
-      my $temp2 = &my_getType($entvarname[$i-1]);
+      my $temp2 = my_getType($entvarname[$i-1]);
       if (!defined ($temp2))
       {
         $temp2 = "unknown";
       }
 
       #s(\$\+$i)($temp:$val)g;		# $+n
-      &substitute2 ("\$\+$i", "$temp:$val");
+      substitute2 ("\$\+$i", "$temp:$val");
 
       #s(\$-$i)($temp ($temp2):$val)g;	# $-n
-      &substitute2 ("\$-$i", "$temp ($temp2):$val");
+      substitute2 ("\$-$i", "$temp ($temp2):$val");
     }
     else
     {
       #s(\$$i)($val)g;				# $n
-      &substitute2 ("\$$i", $val);
+      substitute2 ("\$$i", $val);
 
       #s(\$\+$i)($entvarname[$i-1]:$val)g;		# $+n
-      &substitute2 ("\$\+$i", "$entvarname[$i-1]:$val");      
+      substitute2 ("\$\+$i", "$entvarname[$i-1]:$val");
 
       #s(\$-$i)($entvarname[$i-1] (unknown):$val)g;	# $-n
-      &substitute2 ("\$-$i", "$entvarname[$i-1] (unknown):$val");
+      substitute2 ("\$-$i", "$entvarname[$i-1] (unknown):$val");
     }
   }
 
   # $Be - securityEngineID (snmpEngineID)
-  &substitute2 ("\$Be", $var[7]);
+  substitute2 ("\$Be", $var[7]);
 
   # $Bu - securityName (snmpCommunitySecurityName)
-  &substitute2 ("\$Bu", $var[8]);
+  substitute2 ("\$Bu", $var[8]);
 
   # $BE - contextEngineID (snmpCommunityContextEngineID)
-  &substitute2 ("\$BE", $var[9]);
+  substitute2 ("\$BE", $var[9]);
 
   # $Bn - contextName (snmpCommunityContextName)
-  &substitute2 ("\$Bn", $var[10]);
+  substitute2 ("\$Bn", $var[10]);
 
   # $c - Category
   #s(\$c)($event2[1])g;
-  &substitute2 ("\$c", $event2[1]);
+  substitute2 ("\$c", $event2[1]);
 
   # $C - Trap community string
   #s(\$C)($var[5])g;
-  &substitute2 ("\$C", $var[5]);
+  substitute2 ("\$C", $var[5]);
 
   # $E - Enterprise trap (symbolic)
   #s(\$E)($enterprise_trans)g;
-  &substitute2 ("\$E", $enterprise_trans);
+  substitute2 ("\$E", $enterprise_trans);
 
   # $e - Enterprise trap (numerical)
   #s(\$e)($var[6])g;
-  &substitute2 ("\$e", $var[6]);
+  substitute2 ("\$e", $var[6]);
 
   # $N - Event name
   #s(\$N)($event2[0])g;
-  &substitute2 ("\$N", $event2[0]);
+  substitute2 ("\$N", $event2[0]);
 
   # $i - Event OID
   #s(\$i)($receivedtrap_entry)g;
-  &substitute2 ("\$i", $receivedtrap_entry);
+  substitute2 ("\$i", $receivedtrap_entry);
 
   # $# - Number of variable-bindings in the trap
   my $entvar_temp = $#entvar+1;
   #s(\$#)($entvar_temp)g;
-  &substitute2 ("\$#", $entvar_temp);
+  substitute2 ("\$#", $entvar_temp);
 
   # $O - Received trap (symbolic)
   if ($net_snmp_perl_enable == 1)
@@ -2479,7 +2479,7 @@ sub substitute
         print "  Translated to $temp\n";
       }
       #s(\$O)($temp)g;
-      &substitute2 ("\$O", $temp);
+      substitute2 ("\$O", $temp);
     }
     else 
     {
@@ -2488,64 +2488,64 @@ sub substitute
         print "  Could not translate - defaulting to numeric\n";
       }
       #s(\$O)($temp)g;
-      &substitute2 ("\$O", $temp);
+      substitute2 ("\$O", $temp);
     }
   }
   else
   {
     #s(\$O)($receivedtrap)g;
-    &substitute2 ("\$O", $receivedtrap);
+    substitute2 ("\$O", $receivedtrap);
   }
 
   # $o - Received trap (numerical)
   #s(\$o)($receivedtrap)g;
-  &substitute2 ("\$o", $receivedtrap);  
+  substitute2 ("\$o", $receivedtrap);
 
   # $s - Severity
   #s(\$s)($event2[2])g;
-  &substitute2 ("\$s", $event2[2]);
+  substitute2 ("\$s", $event2[2]);
 
   # $AR, $ar - IP address
   #s(\$aR)($var[1])g;
-  &substitute2 ("\$aR", $var[1]);
+  substitute2 ("\$aR", $var[1]);
 
   #s(\$ar)($var[1])g;
-  &substitute2 ("\$ar", $var[1]);
+  substitute2 ("\$ar", $var[1]);
 
   # $R, $r - Trap hostname
   #s(\$R)($var[0])g;
-  &substitute2 ("\$R", $var[0]);
+  substitute2 ("\$R", $var[0]);
 
   # $H - Host name of the system running SNMPTT
-  &substitute2 ("\$H", $snmptt_system_name);
+  substitute2 ("\$H", $snmptt_system_name);
 
   #s(\$r)($var[0])g;
-  &substitute2 ("\$r", $var[0]);
+  substitute2 ("\$r", $var[0]);
 
   # IPv6_TODO_DONE
   # $A, $a - Trap agent IP address
   #s(\$aA)($var[4])g;		# IP address
-  &substitute2 ("\$aA", $var[4]);
+  substitute2 ("\$aA", $var[4]);
 
   # IPv6_TODO_DONE
   #s(\$A)($agent_dns_name)g;	# hostname
-  &substitute2 ("\$A", $agent_dns_name);
+  substitute2 ("\$A", $agent_dns_name);
 
   # $T - Uptime
   #s(\$T)($var[2])g;
-  &substitute2 ("\$T", $var[2]);
+  substitute2 ("\$T", $var[2]);
 
   # $x - Current date
   #s(\$x)($trap_date)g;	
-  &substitute2 ("\$x", $trap_date);
+  substitute2 ("\$x", $trap_date);
 
   # $X - Current time
   #s(\$X)($trap_time)g;	
-  &substitute2 ("\$X", $trap_time);
+  substitute2 ("\$X", $trap_time);
 
   # $@ - Current time since epoch (Jan 1, 1904 for Mac, Jan 1, 1900 for most others)
   #s(\$@)($trap_date_time_epoch)g;
-  &substitute2 ("\$@", $trap_date_time_epoch);
+  substitute2 ("\$@", $trap_date_time_epoch);
 
   # iso(1) org(3) dod(6) internet(1) snmpV2(6) snmpModules(3) snmpMIB(1) snmpMIBObjects(1) 5
   # SNMPv2 Generic?  1=coldStart....5=authenticationFailure, 6=egpNeighborLoss so 0=enterprise?
@@ -2555,7 +2555,7 @@ sub substitute
 
     # $S - Specific trap number - 0
     #s(\$S)(0)g;
-    &substitute2 ("\$S", "0");
+    substitute2 ("\$S", "0");
 
     # $G - Generic trap number - last #
     my $temp = $_; 		# Save old $_
@@ -2564,7 +2564,7 @@ sub substitute
     my $temp2 = $1;
     $_ = $temp;		# Restore old $_
     #s(\$G)($temp2)g;
-    &substitute2 ("\$G", $temp2);
+    substitute2 ("\$G", $temp2);
   }
   else
   {
@@ -2577,11 +2577,11 @@ sub substitute
     my $temp2 = $1;
     $_ = $temp;		# Restore old $_
     #s(\$S)($temp2)g;
-    &substitute2 ("\$S", $temp2);
+    substitute2 ("\$S", $temp2);
 
     # $G - Generic trap number - 0
     s(\$G)(0)g;
-    &substitute2 ("\$G", "0");
+    substitute2 ("\$G", "0");
   }
 
   # $D - Description from MIB file (NOT from snmptt.conf)
@@ -2596,7 +2596,7 @@ sub substitute
       $description_temp =~ s/\n\s+/\n/g;
     }
     s(\$D)($description_temp)g;
-    &substitute2 ("\$D", $description_temp);
+    substitute2 ("\$D", $description_temp);
   }
   elsif ($description_mode == 1) {
     my $description_temp;
@@ -2607,28 +2607,28 @@ sub substitute
     if ($description_clean == 1) {
       $description_temp =~ s/\n\s+/\n/g;
     }
-    &substitute2 ("\$D", $description_temp);
+    substitute2 ("\$D", $description_temp);
   }
   else {
     #s(\$D)()g;
-    &substitute2 ("\$D", "");
+    substitute2 ("\$D", "");
   }
 
   # Formatting
   # alarm (bell)          (BEL)
-  &substitute2 ("\$Fa", "\a");
+  substitute2 ("\$Fa", "\a");
 
   # form feed             (FF)
-  &substitute2 ("\$Ff", "\f");
+  substitute2 ("\$Ff", "\f");
 
   # newline               (LF, NL)
-  &substitute2 ("\$Fn", "\n");
+  substitute2 ("\$Fn", "\n");
 
   # return                (CR)
-  &substitute2 ("\$Fr", "\r");
+  substitute2 ("\$Fr", "\r");
 
   # tab                   (HT, TAB)
-  &substitute2 ("\$Ft", "\t");
+  substitute2 ("\$Ft", "\t");
 
   # $pn - PREEXEC variables
   # preexec_var
@@ -2641,11 +2641,11 @@ sub substitute
     {
       print "\nPREEXEC variable $i: $val\n";
     }   
-    &substitute2 ("\$p$i", $val);
+    substitute2 ("\$p$i", $val);
   }
 
   # FORMAT line (only possible when doing EXEC line)
-  &substitute2 ("\$Fz", "$format_line");
+  substitute2 ("\$Fz", "$format_line");
 
   # $$ - Print a $
   s(\$\$)(\$)g;
@@ -3155,7 +3155,7 @@ sub loadsnmpttconf
         # files first so they are not loaded each time a trap is processed
         if ($dynamic_nodes == 0)
         {
-          my @nodes2 = &process_nodes($linenodes);
+          my @nodes2 = process_nodes($linenodes);
           @{ $event{$temp[2]} }[6+$countx]= "@nodes2";
         }
         else
@@ -3946,7 +3946,7 @@ sub searchfortrap
       print "Exact match of trap found in EVENT hash table\n\n";
     }
 
-    &processtrap;
+    processtrap();
   }
   else
   {
@@ -3984,7 +3984,7 @@ sub searchfortrap
       if (exists $event{$receivedtraptemp.'.*'})
       {
         $receivedtrap_entry = $receivedtraptemp.'.*';	# Set $receivedtrap to matching trap with wildcard
-        &processtrap;
+        processtrap();
         last;  # found, so stop this while loop
       }
       $counter++;
@@ -4012,7 +4012,7 @@ sub searchfortrap
       if ($unknown_trap_exec_format ne "") {        
         $_ = $unknown_trap_exec_format;
 
-        &substitute;
+        substitute();
 
         $command = $unknown_trap_exec . " \"$_\"";
       }
@@ -4084,9 +4084,9 @@ sub searchfortrap
         }
 
         # Translate if enabled, and if we can
-        $receivedtrap_trans = &translate_log_trap_oid_sub($receivedtrap);
+        $receivedtrap_trans = translate_log_trap_oid_sub($receivedtrap);
 
-        $enterprise_trans = &translate_enterprise_oid_format_sub($var[6]);
+        $enterprise_trans = translate_enterprise_oid_format_sub($var[6]);
 
         if ($net_snmp_perl_enable == 1 && $db_translate_enterprise == 1)
         {
@@ -4099,7 +4099,7 @@ sub searchfortrap
 
         $_ = $db_unknown_trap_format;
 
-        &substitute;
+        substitute();
 
         $message_short = $_;
       }
@@ -4123,13 +4123,13 @@ sub searchfortrap
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
             print "Performing substitution on custom column: $_\n";
-            &substitute();
+            substitute();
             print "Done performing substitution on custom column: $_\n";
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
 
-        &mysql_insert($mysql_dbi_table_unknown,
+        mysql_insert($mysql_dbi_table_unknown,
           "trapoid", $receivedtrap_trans,
           "enterprise", $db_enterprise,
           "community", $community,
@@ -4160,13 +4160,13 @@ sub searchfortrap
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
             print "Performing substitution on custom column: $_\n";
-            &substitute();
+            substitute();
             print "Done performing substitution on custom column: $_\n";
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
 
-        &postgresql_insert($postgresql_dbi_table_unknown,
+        postgresql_insert($postgresql_dbi_table_unknown,
           "trapoid", $receivedtrap_trans,
           "enterprise", $db_enterprise,
           "community", $community,
@@ -4196,13 +4196,13 @@ sub searchfortrap
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
             print "Performing substitution on custom column: $_\n";
-            &substitute();
+            substitute();
             print "Done performing substitution on custom column: $_\n";
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
 
-        &odbc_insert($dbd_odbc_table_unknown,
+        odbc_insert($dbd_odbc_table_unknown,
           "trapoid", $receivedtrap_trans,
           "enterprise", $db_enterprise,
           "community", $community,
@@ -4232,13 +4232,13 @@ sub searchfortrap
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
             print "Performing substitution on custom column: $_\n";
-            &substitute();
+            substitute();
             print "Done performing substitution on custom column: $_\n";
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
 
-        &sql_win32_odbc_insert($sql_win32_odbc_table_unknown,
+        sql_win32_odbc_insert($sql_win32_odbc_table_unknown,
           "trapoid", $receivedtrap_trans,
           "enterprise", $db_enterprise,
           "community", $community,
@@ -4540,7 +4540,7 @@ sub loadsnmpttini {
   if (! defined ($strip_domain)) { $strip_domain = 0} ;
   if (! defined ($net_snmp_perl_enable)) { $net_snmp_perl_enable = 0} ;
   if (! defined ($net_snmp_perl_cache_enable)) { $net_snmp_perl_cache_enable = 1} ;
-  if (! defined ($net_snmp_perl_best_guess)) { $net_snmp_perl_best_guess = 0} ;
+  if (! defined ($net_snmp_perl_best_guess)) { $net_snmp_perl_best_guess = 2} ;
   if (! defined ($translate_log_trap_oid)) { $translate_log_trap_oid = 0} ;
   if (! defined ($translate_value_oids)) { $translate_value_oids = 0} ;
   if (! defined ($resolve_value_ip_addresses)) { $resolve_value_ip_addresses = 0} ;
@@ -4671,7 +4671,7 @@ sub signal_handler_reload {
   # Daemon reload
   #
   $timetoreload = 1;
-  &reopen_debug_file;
+  reopen_debug_file();
 }
 
 sub signal_handler_die {
@@ -5227,7 +5227,7 @@ sub match
     $_ = $match_var;
     $match = $2;
     if ($DEBUGGING >= 1) {  print "     Performing substitution on MATCH variable: $match_var\n"; }
-    &substitute();
+    substitute();
     if ($DEBUGGING >= 1) {  print "     Done performing substitution on MATCH variable $match_var (converted to: $_)\n"; }
     $value = $_;
   }
@@ -5511,7 +5511,7 @@ sub my_translateObj
     $include_module = 1;
   }
 
-  $temp = &SNMP::translateObj($oid,$use_long,$include_module);
+  $temp = SNMP::translateObj($oid,$use_long,$include_module);
   if (defined ($temp))
   {
     # If it ends in a single ., chop it off
@@ -5585,9 +5585,9 @@ sub my_getType
   }
   else
   {
-    my $temp_textOID = &my_translateObj($oid,0);
+    my $temp_textOID = my_translateObj($oid,0);
     #print "temp_textOID:$temp_textOID\n";
-    my $type = &SNMP::getType($temp_textOID);
+    my $type = SNMP::getType($temp_textOID);
     if (defined($type))
     {
       #print "my_getType: symbolic\n";
@@ -5630,9 +5630,9 @@ sub my_mapEnum
   }
   else
   {
-    my $temp_textOID = &my_translateObj($oid,0);
+    my $temp_textOID = my_translateObj($oid,0);
     #print "temp_textOID:$temp_textOID\n";
-    my $enum = &SNMP::mapEnum($temp_textOID, $value);
+    my $enum = SNMP::mapEnum($temp_textOID, $value);
     if (defined($enum))
     {
       #print "my_mapEnum: symbolic\n";
@@ -5842,7 +5842,7 @@ sub log_statistics {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
     
-    &mysql_insert($mysql_dbi_table_statistics,
+    mysql_insert($mysql_dbi_table_statistics,
       "stat_time", $stat_time_temp,
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
@@ -5861,7 +5861,7 @@ sub log_statistics {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
 
-    &postgresql_insert($postgresql_dbi_table_statistics,
+    postgresql_insert($postgresql_dbi_table_statistics,
       "stat_time", $stat_time_temp,
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
@@ -5880,7 +5880,7 @@ sub log_statistics {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
 
-    &odbc_insert($dbd_odbc_table_statistics,
+    odbc_insert($dbd_odbc_table_statistics,
       "stat_time", $stat_time_temp,
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
@@ -5899,7 +5899,7 @@ sub log_statistics {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
     
-    &sql_win32_odbc_insert($sql_win32_odbc_table_statistics,
+    sql_win32_odbc_insert($sql_win32_odbc_table_statistics,
       "stat_time", $stat_time_temp,
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
@@ -5919,17 +5919,17 @@ sub signal_log_statistics {
 
 # Open connections to MySQL, PostresQL, ODBC etc
 sub create_db_connections {
-  &dbh_mysql_connect();
-  &dbh_postgresql_connect();
-  &dbh_odbc_connect();
-  &dbh_win32_odbc_connect();
+  dbh_mysql_connect();
+  dbh_postgresql_connect();
+  dbh_odbc_connect();
+  dbh_win32_odbc_connect();
 }
 
 sub close_db_connections {
-  &dbh_mysql_close();
-  &dbh_postgresql_close();
-  &dbh_odbc_close();
-  &dbh_win32_odbc_close();
+  dbh_mysql_close();
+  dbh_postgresql_close();
+  dbh_odbc_close();
+  dbh_win32_odbc_close();
 }
 
 sub dbh_mysql_close {
@@ -5967,7 +5967,7 @@ sub dbh_win32_odbc_close {
 sub dbh_mysql_connect() {
   if ($mysql_dbi_enable == 1)
   {
-    &dbh_mysql_close();
+    dbh_mysql_close();
 
     unless ($dbh_mysql = DBI->connect("DBI:mysql:database=$mysql_dbi_database;host=$mysql_dbi_host;" .
         "port=$mysql_dbi_port",$mysql_dbi_username,$mysql_dbi_password) )
@@ -6020,7 +6020,7 @@ sub dbh_postgresql_connect() {
       $connect_string = "DBI:$dbi_module:dbname=$postgresql_dbi_database;host=$postgresql_dbi_host;port=$postgresql_dbi_port";
     }
 
-    &dbh_postgresql_close();
+    dbh_postgresql_close();
 
     unless ($dbh_postgresql = DBI->connect($connect_string,$postgresql_dbi_username,$postgresql_dbi_password) )
     {
@@ -6049,7 +6049,7 @@ sub dbh_postgresql_connect() {
 sub dbh_odbc_connect() { 
   if ($dbd_odbc_enable == 1)
   {
-    &dbh_odbc_close();
+    dbh_odbc_close();
 
     unless ($dbh_odbc = DBI->connect("DBI:ODBC:$dbd_odbc_dsn",$dbd_odbc_username,$dbd_odbc_password) )
     {
@@ -6078,7 +6078,7 @@ sub dbh_odbc_connect() {
 sub dbh_win32_odbc_connect() { 
   if ($sql_win32_odbc_enable == 1)
   {
-    &dbh_win32_odbc_close();
+    dbh_win32_odbc_close();
 
     unless ($dbh_win32_odbc = new Win32::ODBC("DSN=$sql_win32_odbc_dsn","UID=$sql_win32_odbc_username","PWD=$sql_win32_odbc_password") )
     {
@@ -6101,11 +6101,11 @@ sub mysql_ping {
     if (defined ($dbh_mysql)) {
       my $rc = $dbh_mysql->ping;
       if ($dbh_mysql->{'errno'} != 0) {
-        &dbh_mysql_connect();
+        dbh_mysql_connect();
       }
     }
     else {
-      &dbh_mysql_connect();
+      dbh_mysql_connect();
     }
   }
 
@@ -6122,11 +6122,11 @@ sub postgresql_ping {
     if (defined ($dbh_postgresql)) {
       my $rc = $dbh_postgresql->ping;
       if (!$rc) { 
-        &dbh_postgresql_connect();
+        dbh_postgresql_connect();
       }
     }
     else {
-      &dbh_postgresql_connect();
+      dbh_postgresql_connect();
     }
   }
 
@@ -6143,11 +6143,11 @@ sub dbd_odbc_ping {
     if (defined ($dbh_odbc)) {
       my $rc = $dbh_odbc->ping;
       if (!$rc) { 
-        &dbd_odbc_connect();
+        dbd_odbc_connect();
       }
     }
     else {
-      &dbd_odbc_connect();
+      dbd_odbc_connect();
     }
   }
 
@@ -6199,7 +6199,7 @@ sub mysql_insert {
 
   # Make sure the connection is up
   if ($mysql_ping_on_insert == 1) {
-    &mysql_ping();
+    mysql_ping();
   }
   
   if (defined ($dbh_mysql)) {
@@ -6315,7 +6315,7 @@ sub postgresql_insert {
 
   # Make sure the connection is up
   if ($postgresql_ping_on_insert == 1) {
-    &postgresql_ping();
+    postgresql_ping();
   }
   
   if (defined ($dbh_postgresql)) {
@@ -6436,7 +6436,7 @@ sub odbc_insert {
   
   # Make sure the connection is up
    if ($dbd_odbc_ping_on_insert == 1) {
-    &dbd_odbc_ping();
+    dbd_odbc_ping();
   }
   
   if (defined ($dbh_odbc)) {
@@ -6593,7 +6593,7 @@ sub preexec_run {
             $_ = $event2[9][$i];
 
             print "Performing substitution on PREEXEC line: $_\n";
-            &substitute();
+            substitute();
             print "Done performing substitution on PREEXEC line: $_\n";
 
             my $command = $_;
