@@ -67,6 +67,8 @@ This file was last updated on: March 5th, 2021
     * [Sample1 SNMPTT.CONF file](#Sample1-SNMPTT.CONF-file)  
     * [Sample2 SNMPTT.CONF file](#Sample2-SNMPTT.CONF-file)  
 * [Notes](#Notes)  
+    * [trapd.conf & MIB files](#Notes-trapd.conf)  
+    * [IPv6](#Notes-ipv6)  
 * [Limitations](#Limitations)  
 * [Feedback & Bugs](#Feedback)  
 * [Integration with other software](#Integration-with-other-software)  
@@ -147,7 +149,7 @@ Which could result in the following output:
 "Compaq Drive Array Spare Drive on controller 3, bus 0, bay 3 status is Failed."
 ```
 
-SNMPTT can log to any of the following destinations: text log, syslog, Windows Event log or a SQL database such as MySQL, PostreSQL or an ODBC accessible database such as Microsoft SQL. External programs can also be run to pass the translated trap to an email client, paging software, Nagios, Icinga etc.
+SNMPTT can log to any of the following destinations: text log, syslog, Windows Event log or a SQL database such as MySQL, PostreSQL or an ODBC accessible database such as Microsoft SQL. External programs can also be run to pass th  e translated trap to an email client, paging software, Nagios, Icinga etc.
 
 In addition to variable substitution, SNMPTT allows complex configurations allowing:
 
@@ -155,7 +157,8 @@ In addition to variable substitution, SNMPTT allows complex configurations allow
 *   execute external programs to send pages, emails etc
 *   perform regular expression search and replace on the translated message such as translating the variable value "Building alarm 4" to "Moisture detection alarm"
 
-  
+As of SNMPTT 1.5, both IPv4 and IPv6 are supported.
+
 
 # <a name="Downloading"></a>Downloading
 
@@ -173,7 +176,8 @@ SNMPTT can be downloaded from the [Sourceforge files page](https://sourceforge.n
 *   Required: [Sys::Hostname](http://search.cpan.org/search?module=Sys::Hostname) module (included with most if not all distributions including ActivePerl).
 *   Required: [File::Basename](http://search.cpan.org/search?module=File::Basename) module (included with most if not all distributions including ActivePerl).
 *   Required: [Text::Balanced](http://search.cpan.org/search?module=Text::Balanced) module (included with most if not all distributions including ActivePerl).
-*   Optional: [Socket](http://search.cpan.org/search?module=Socket) module (included with most if not all distributions including ActivePerl). Required for DNS translations.
+*   Optional: [Net::IP](http://search.cpan.org/search?module=Net::IP) module. Required for IPv6 support.
+*   Optional: [IO::Socket::IP](http://search.cpan.org/search?module=IO::Socket::IP) module (included with most if not all distributions including ActivePerl). Required for DNS translations.
 *   Optional: [Sys::Syslog](http://search.cpan.org/search?module=Sys::Syslog) module (included with most Unix distributions). Required for Syslog support.
 *   Optional: [DBI](http://search.cpan.org/search?module=DBI) module.  Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support.
 *   Optional: [DBD::mysql](http://search.cpan.org/search?module=DBD::mysql) module.  Required for MySQL support.
@@ -495,6 +499,7 @@ To upgrade from v1.4.2 to v1.5beta1 you should:
 1.  Replace **snmptt** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
 1.  Replace **snmpttconvertmib** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
 1.  Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.
+1.  To enable IPv6 support, set **ipv6enable = 1** in **snmptt.ini**.
     
 Note:  Starting with v1.5, you can use **/etc/snmptt/** instead of **/etc/snmp/** for your **snmptt.ini** file.
 
@@ -1935,6 +1940,10 @@ The syntax of the snmptt.conf file  is:
  
     NODES 192.168.1.0/24
  
+ Or, if you wanted devices on IPv4 subnet 192.168.1.0/24 and IPv6 subnet 2001:db8:a::/64:
+ 
+     NODES 192.168.1.0/24 2001:db8:a::/64
+
  If a filename is specified, it must be specified with a full path. 
  
  There are two modes of operation: **POS** (positive - the default) and **NEG** (negative). If set to **POS**, then **NODES** is a 'match' if _any_ of the **NODES** entries match. If set to **NEG**, then **NODES** is a 'match' only if _none_ of the **NODES** entries match. To change the mode of operation, use one of the following statements:
@@ -2000,6 +2009,8 @@ The syntax of the snmptt.conf file  is:
 
  * See the section '[Name Resolution / DNS](#DNS)' for important DNS information.
 
+ * See the section [IPv6](#Notes-ipv6) for important IPv6 information.
+
 ## <a name="SNMPTT.CONF-MATCH"></a>MATCH
 
  \[MATCH \[MODE=\[or | and\]\] | \[$n:\[!\]\[(    )\[i\] | n | n-n | > n | < n | x.x.x.x | x.x.x.x-x.x.x.x | x.x.x.x/x\]\]
@@ -2026,6 +2037,8 @@ The syntax of the snmptt.conf file  is:
  > MATCH _$x:_ \[!\] _x.x.x.x_  
  > MATCH _$x:_ \[!\] _x.x.x.x-x.x.x.x_  
  > MATCH _$x:_ \[!\] _x.x.x.x/x_  
+ > MATCH _$x:_ \[!\] _x:x:x_  
+ > MATCH _$x:_ \[!\] _x:x:x/x_  
  > **  
 
  where:  
@@ -2037,8 +2050,10 @@ The syntax of the snmptt.conf file  is:
  > **&** is used to perform a bitwise AND  
  > **n** is a number  
  > **x.x.x.x** is an IP address  
- > **x.x.x.x-x.x.x.x** is an IP network address range  
- > **x.x.x.x/x** is an IP CIDR network addresss
+ > **x.x.x.x-x.x.x.x** is an IPv4 network address range  
+ > **x.x.x.x/x** is an IPv4 CIDR network addresss  
+ > **x:x:x** is an IPv6 addresss  
+ > **x:x:x/x** is an IPv6 CIDR network addresss  
 
  Notes:  
   
@@ -2054,6 +2069,8 @@ The syntax of the snmptt.conf file  is:
   
  * There can be only one match mode per EVENT.  If multiple MATCH MODE= lines exists, the last one in the list is used.
 
+ * See the section [IPv6](#Notes-ipv6) for important IPv6 information.
+
  Examples:  
   
  > $2 must be between 1000 and 2000:  
@@ -2067,6 +2084,12 @@ The syntax of the snmptt.conf file  is:
     MATCH $3: 52
     MATCH $4: 192.168.1.10-192.168.1.20
     MATCH $s: (Major)
+
+ > $6 must be IPv6 address 2002:0000:0000:1234:abcd:ffff:c0a8:0101 or in subnet 2002:0000:0000:1234:0000:0000:0000:0000/64:
+  
+ >
+    MATCH $6: 2002::1234:abcd:ffff:c0a8:0101
+    MATCH $6: 2002:0000:0000:1234:0000:0000:0000:0000/64
 
  > All must match (and): $3 must be greater than 20, and $5 must not contain the words alarm or critical, $6 must contain the string '(1) remaining' and $7 must contain the string 'power' which is not case sensitive:  
   
@@ -2306,12 +2329,19 @@ Following is a sample of one defined trap in **/etc/snmp/snmptt-compaq-hsv.conf:
 
 # <a name="Notes"></a>Notes
 
+## <a name="Notes-trapd.conf"></a>trapd.conf & MIB files
+
 An existing HP Openview trapd.conf can be used in most cases but the file must be a VERSION 3 file.  SNMPTT does not support all the variables implemented in HPOV, but most are available.  The following variables may or may not match exactly to HPOV: $O, $o, $r, $ar, $R, $aR.
 
 Some vendors (such as Compaq and Cisco ) provide a file that can be imported in to HP Openview using an HP Openview utility.  snmpttconvert can be used to convert the file to snmptt.conf format.
 
 Some vendors provide a MIB file that contains TRAP or NOTIFICATION definitions.  snmpttconvertmib can be used to convert the file to snmptt.conf format.  
- 
+
+## <a name="Notes-ipv6"></a>IPv6
+
+* For incoming traps, a simple Perl regular expression is used to detect an IPv6 address for the trap host and Agent IPs as it is assumed that Net-SNMP is passing a valid IPv6 address.  If the address has a zone index such as **%ens160** or **%1** appended to it, the zone index is removed.  Zone indexes are not removed from enterprise variable values.
+* When DNS is enabled to resolve enterprise variables, the trap host and Agent IP **(dns_enabled = 1)**, a complex regular expression is used to confirm that the IP address is valid before passing on to the **IO::Socket::IP** module for DNS resolution.  The [Dartware](https://community.helpsystems.com/forums/intermapper/miscellaneous-topics/5acc4fcf-fa83-e511-80cf-0050568460e4?_ga=2.113564423.1432958022.1523882681-2146416484.1523557976) regular expression is used.  Also see [here](https://raw.githubusercontent.com/richb-intermapper/IPv6-Regex/master/test-ipv6-regex.pl) for a test suite.
+* For **NODES** and **MATCH**, the [Net::IP](http://search.cpan.org/search?module=Net::IP) module is used as it allows you to test to see if two IP addresses are the same or if one IP address is within the range of another.  IPv6 addresses can be represented in multiple ways so this module is used to ensure that an IP address such as **2002:0000:0000:1234:abcd:ffff:c0a8:0101** is matched to its shorthand version of **2002::1234:abcd:ffff:c0a8:0101**.  When running a modified version of the test suite above against Net::IP, it was found that it only passed 316 out of 490 tests compared to Dartmouth which passed 489 out of 490.  There may be issues with matching some IP addresses passed in enterprise variables for MATCH but  NODES should not be affected as Net-SNMP should be passing a supported format for both the host and agent IP addresses.
 
 # <a name="Limitations"></a>Limitations
 
