@@ -1872,33 +1872,33 @@ sub processtrap
           $trap_attempted_to_log++;
 
           my $syslog_level_temp = 99;
-          my $temp;
+          #my $temp;
 
-          foreach $temp (@syslog_level_debug)
+          foreach my $temp (@syslog_level_debug)
           {
             if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'debug' }
           }
-          foreach $temp (@syslog_level_info)
+          foreach my $temp (@syslog_level_info)
           {
             if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'info' }
           }
-          foreach $temp (@syslog_level_notice)
+          foreach my $temp (@syslog_level_notice)
           {
             if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'notice' }
           }
-          foreach $temp (@syslog_level_warning)
+          foreach my $temp (@syslog_level_warning)
           {
             if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'warning' }
           }
-          foreach $temp (@syslog_level_err)
+          foreach my $temp (@syslog_level_err)
           {
             if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'err' }
           }
-          foreach $temp (@syslog_level_crit)
+          foreach my $temp (@syslog_level_crit)
           {
             if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'crit' }
           }
-          foreach $temp (@syslog_level_alert)
+          foreach my $temp (@syslog_level_alert)
           {
             if (lc($event2[2]) eq lc($temp)) { $syslog_level_temp = 'alert' }
           }
@@ -1928,19 +1928,19 @@ sub processtrap
           $trap_attempted_to_log++;
 
           my $eventlog_type_temp = 99;
-          my $temp;
+          #my $temp;
 
-          foreach $temp (@eventlog_type_information)
+          foreach my $temp (@eventlog_type_information)
           {
             if (lc($event2[2]) eq lc($temp)) { $eventlog_type_temp = $eventlog_information }
           }
 
-          foreach $temp (@eventlog_type_warning)
+          foreach my $temp (@eventlog_type_warning)
           {
             if (lc($event2[2]) eq lc($temp)) { $eventlog_type_temp = $eventlog_warning }
           }
 
-          foreach $temp (@eventlog_type_error)
+          foreach my $temp (@eventlog_type_error)
           {
             if (lc($event2[2]) eq lc($temp)) { $eventlog_type_temp = $eventlog_error }
           }
