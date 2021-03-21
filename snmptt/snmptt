@@ -1758,7 +1758,7 @@ sub processtrap
     {
       if ($DEBUGGING >= 1)
       {
-        print "  No MATCH entries defined for this entry.\n";
+        print "  No MATCH entries defined for this entry\n";
       }
       $match_found = 1;	# Default to match_found if no MATCH entries
     }
