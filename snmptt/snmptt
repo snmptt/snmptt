@@ -4289,6 +4289,7 @@ sub findsnmpttini
   # Load config file start
   #
   # For Linux / Unix, try in order:
+  #   /etc/snmptt/snmptt.ini
   #   /etc/snmp/snmptt.ini
   #   /etc/snmptt.ini
   #   /usr/local/etc/snmp/snmptt.ini
@@ -4309,7 +4310,7 @@ sub findsnmpttini
       $configfile = '/etc/snmptt/snmptt.ini';
       if( open( $fh_CONFIG, '<', '/etc/snmptt/snmptt.ini' ) )
       {
-        $configfile = '/etc/snmp/snmptt.ini';
+        $configfile = '/etc/snmptt/snmptt.ini';
         close $fh_CONFIG;
       }
       elsif( open( $fh_CONFIG, '<', '/etc/snmp/snmptt.ini' ) )

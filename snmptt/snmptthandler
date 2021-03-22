@@ -121,7 +121,7 @@ if ($debugfile ne '')
 #
 # Load config file start
 # 
-# For Linux / Unix, try /etc/snmp/snmptt.ini first, /etc/snmptt.ini second.
+# For Linux / Unix, try /etc/snmptt/snmptt.ini first, /etc/snmp/snmptt.ini second, /etc/snmptt.ini third.
 #
 # For Windows, try %SystemRoot%\snmptt.ini only.
 #
@@ -139,7 +139,7 @@ else
       $configfile = '/etc/snmptt/snmptt.ini';
       if( open( $fh_CONFIG, '<', '/etc/snmptt/snmptt.ini' ) )
       {
-        $configfile = '/etc/snmp/snmptt.ini';
+        $configfile = '/etc/snmptt/snmptt.ini';
         close $fh_CONFIG;
       }
       elsif( open( $fh_CONFIG, '<', '/etc/snmp/snmptt.ini' ) )

@@ -791,8 +791,9 @@ chmod +x /usr/sbin/snmptthandler
 <p>For <strong>SNMPTT daemon mode</strong>:</p>
 <ol>
 <li>
-<p>Modify (or create) the Net-SNMP <strong>snmptrapd.conf</strong> file by adding the following line:</p>
-<pre><code>traphandle default /usr/sbin/snmptthandler
+<p>Modify (or create) the Net-SNMP <strong>snmptrapd.conf</strong> file by adding the following lines:</p>
+<pre><code>disableAuthorization yes
+traphandle default /usr/sbin/snmptthandler
 </code></pre>
 <p>Note:  You can locate the <strong>snmptrapd.conf</strong> file by running:</p>
 <pre><code>snmpconf -i
@@ -804,8 +805,9 @@ chmod +x /usr/sbin/snmptthandler
 <p>For <strong>SNMPTT standlone mode</strong>: </p>
 <ol>
 <li>
-<p>Modify (or create) the Net-SNMP snmptrapd.conf file by adding the following line:</p>
-<pre><code>traphandle default /usr/sbin/snmptt
+<p>Modify (or create) the Net-SNMP snmptrapd.conf file by adding the following lines:</p>
+<pre><code>disableAuthorization yes
+traphandle default /usr/sbin/snmptt
 </code></pre>
 <p>Note:  You can locate the <strong>snmptrapd.conf</strong> file by running:</p>
 <pre><code>snmpconf -i
@@ -888,7 +890,8 @@ systemctl restart snmptrapd
 <li>
 <p>Configure snmptrapd and install the service:  </p>
 <p>Modify (or create) the Net-SNMP snmptrapd.conf file by adding the following line:</p>
-<pre><code>perl do "/usr/sbin/snmptthandler-embedded"
+<pre><code>disableAuthorization yes
+perl do "/usr/sbin/snmptthandler-embedded"
 </code></pre>
 <p>Note:  You can locate the <strong>snmptrapd.conf</strong> file by running:</p>
 <pre><code>snmpconf -i

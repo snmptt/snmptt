@@ -47,9 +47,9 @@ my $debug = '';         # Override debug level setting in snmptt.ini
                         # Set to '' to use the snmptt.ini setting or set to 1 to enable.
 
 my $ini = '';           # Override snmptt.ini file location.
-                        # Set to '' to use the default locations of /etc/snmp/snmptt.ini
-                        # and /etc/snmptt.ini for Unix and %SYSTEMROOT%\snmptt.ini for
-                        # Windows.
+                        # Set to '' to use the default locations of /etc/snmptt/snmptt.ini
+                        # /etc/snmp/snmptt.ini and /etc/snmptt.ini for Unix and 
+                        # %SYSTEMROOT%\snmptt.ini for Windows.
 
 ##############################################################################
 # Don't modify anything below this line

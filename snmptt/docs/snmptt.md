@@ -781,8 +781,9 @@ Steps:
         chmod +x /usr/sbin/snmptthandler
 
 7. For **SNMPTT daemon mode**:
-    1. Modify (or create) the Net-SNMP **snmptrapd.conf** file by adding the following line:
+    1. Modify (or create) the Net-SNMP **snmptrapd.conf** file by adding the following lines:
 
+            disableAuthorization yes
             traphandle default /usr/sbin/snmptthandler
 
         Note:  You can locate the **snmptrapd.conf** file by running:
@@ -790,8 +791,9 @@ Steps:
             snmpconf -i
 
 6. For **SNMPTT standlone mode**: 
-    1. Modify (or create) the Net-SNMP snmptrapd.conf file by adding the following line:
+    1. Modify (or create) the Net-SNMP snmptrapd.conf file by adding the following lines:
 
+            disableAuthorization yes
             traphandle default /usr/sbin/snmptt
 
         Note:  You can locate the **snmptrapd.conf** file by running:
@@ -878,6 +880,7 @@ Steps:
   
     Modify (or create) the Net-SNMP snmptrapd.conf file by adding the following line:
 
+        disableAuthorization yes
         perl do "/usr/sbin/snmptthandler-embedded"
 
     Note:  You can locate the **snmptrapd.conf** file by running:
