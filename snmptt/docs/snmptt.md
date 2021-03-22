@@ -14,7 +14,7 @@ name="GENERATOR" />
 # SNMP Trap Translator v1.5beta1
 **([SNMPTT](http://www.snmptt.org))**
 
-This file was last updated on: March 5th, 2021
+This file was last updated on: March 22nd, 2021
 
 [License](#License)
 
