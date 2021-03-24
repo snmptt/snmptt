@@ -2590,7 +2590,6 @@ sub substitute
     {
       no warnings;  # Variable is only used once
        $description_temp = $SNMP::MIB{$event2[0]}->{description};
-
     }
     if ($description_clean == 1) {
       $description_temp =~ s/\n\s+/\n/g;
@@ -4872,14 +4871,16 @@ sub checkipv6
   #print "IP_PARTIAL_OVERLAP: $Net::IP::IP_PARTIAL_OVERLAP\n";
   #print "IP_IDENTICAL: $Net::IP::IP_IDENTICAL\n";
   #print "\n";
-
-  if ($result == $Net::IP::IP_A_IN_B_OVERLAP || $result == $Net::IP::IP_IDENTICAL) {
-      #print "Yes: $result\n";
-      return 1;
-  }
-  else {
-      #print "No: $result\n";
-      return 0;
+  {
+    no warnings;
+    if ($result == $Net::IP::IP_A_IN_B_OVERLAP || $result == $Net::IP::IP_IDENTICAL) {
+        #print "Yes: $result\n";
+        return 1;
+    }
+    else {
+        #print "No: $result\n";
+        return 0;
+    }
   }
 }
 
