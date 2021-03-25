@@ -105,6 +105,23 @@ a:link {color:#09c;}
 a:visited {color:#07a;}
 a:hover {background-color:#eee;}
 
+table {
+
+	border-collapse: collapse;
+	width: 70%;
+  }
+
+  td, th {
+	border: 1px solid #aaaaaa;
+	text-align: left;
+	padding: 2px;
+	max-width: 50em;
+  }
+
+  tr:nth-child(even) {
+	background-color: #dddddd;
+  }
+
 #skip {
         display:none;
 }

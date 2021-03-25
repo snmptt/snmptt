@@ -145,28 +145,142 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA<br /
 <h1><a name="Requirements"></a>Requirements</h1>
 <ul>
 <li>Perl 5.6.1 or higher.  SNMPTT began development using 5.6.1 and although it is now developed with 5.30, it should still be backwards compatible 5.6.1.</li>
-<li>Required: <a href="http://www.net-snmp.org">Net-SNMP</a> (formerly known as UCD-SNMP).  Specifically <strong>snmptrapd.</strong></li>
-<li>Required: <a href="http://search.cpan.org/search?module=Text::ParseWords">Text::ParseWords</a> module (included with most distributions including ActivePerl)</li>
-<li>Required: <a href="http://search.cpan.org/search?module=Getopt::Long">Getopt::Long</a> module (included with most distributions including ActivePerl)</li>
-<li>Required: <a href="http://search.cpan.org/search?module=POSIX">Posix</a> module (included with most if not all distributions including ActivePerl)</li>
-<li>Required: <a href="http://search.cpan.org/search?module=Config::IniFiles">Config::IniFiles</a> module</li>
-<li>Required: <a href="http://search.cpan.org/search?module=Time::HiRes">Time::HiRes</a> module (only required when using SNMPTT in daemon mode - required by <strong>snmptthandler</strong>)</li>
-<li>Required: <a href="http://search.cpan.org/search?module=Sys::Hostname">Sys::Hostname</a> module (included with most if not all distributions including ActivePerl).</li>
-<li>Required: <a href="http://search.cpan.org/search?module=File::Basename">File::Basename</a> module (included with most if not all distributions including ActivePerl).</li>
-<li>Required: <a href="http://search.cpan.org/search?module=Text::Balanced">Text::Balanced</a> module (included with most if not all distributions including ActivePerl).</li>
-<li>Optional: <a href="http://search.cpan.org/search?module=Net::IP">Net::IP</a> module. Required for IPv6 support.</li>
-<li>Optional: <a href="http://search.cpan.org/search?module=IO::Socket::IP">IO::Socket::IP</a> module (included with most if not all distributions including ActivePerl). Required for DNS translations.</li>
-<li>Optional: <a href="http://search.cpan.org/search?module=Sys::Syslog">Sys::Syslog</a> module (included with most Unix distributions). Required for Syslog support.</li>
-<li>Optional: <a href="http://search.cpan.org/search?module=DBI">DBI</a> module.  Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support.</li>
-<li>Optional: <a href="http://search.cpan.org/search?module=DBD::mysql">DBD::mysql</a> module.  Required for MySQL support.</li>
-<li>Optional: <a href="http://search.cpan.org/search?module=DBD::PgPP">DBD::PgPP</a> or <a href="http://search.cpan.org/search?dist=DBD-Pg">DBD:Pg</a> module.  Required for PostgreSQL support.</li>
-<li>Optional: <a href="http://search.cpan.org/search?module=DBD::ODBC">DBD::ODBC</a> module.  Required for ODBC (SQL etc) access on Linux / Windows (Win32::ODBC not required if using DBD::ODBC)</li>
-<li>Optional: <a href="http://search.cpan.org/search?module=Win32::ODBC">Win32::ODBC</a> module.  Required for ODBC (SQL etc) access on Windows (DBD::ODBC not required if using Win32::ODBC)</li>
-<li>Optional: <a href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">Net-SNMP Perl module</a>.  Only required for features that perform conversions between symbolic and numeric OIDs.  Net-SNMP 5.0.8+ with <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">patch 722075</a>, or Net-SNMP 5.1.1 or higher is recommended.   This is NOT the same as the Net::SNMP module availabe from CPAN.</li>
-<li>Optional: <a href="http://search.cpan.org/search?module=threads">threads</a> and <a href="http://search.cpan.org/search?query=thread&amp;mode=all">Thread</a> module (included with most if not all distributions including ActivePerl).  Required when enabling threads for EXEC statements.</li>
-<li>Optional: <a href="http://search.cpan.org/search?module=Digest::MD5">Digest::MD5</a> module (included with most if not all distributions including ActivePerl).  Required when enabling duplicate trap detection.</li>
-<li>Optional: To use snmptthandler-embedded, Net-SNMP's snmptrapd must be compiled with embedded Perl enabled (<strong>--enable-embedded-perl</strong> configuration option)</li>
+<li>To use snmptthandler-embedded, Net-SNMP's snmptrapd must be compiled with embedded Perl enabled (<strong>--enable-embedded-perl</strong> configuration option)</li>
 </ul>
+<h2>Perl Modules</h2>
+<table>
+<thead>
+<tr>
+<th align="left">R/O</th>
+<th align="left">Program / Module</th>
+<th align="left">rpm</th>
+<th align="left">deb</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Required</td>
+<td align="left"><a href="http://www.net-snmp.org">Net-SNMP</a> (formerly known as UCD-SNMP).  Specifically <strong>snmptrapd.</strong></td>
+<td align="left">net-snmp, net-snmp-utils</td>
+<td align="left">snmp, snmptrapd</td>
+</tr>
+<tr>
+<td align="left">Required</td>
+<td align="left"><a href="http://search.cpan.org/search?module=Text::ParseWords">Text::ParseWords</a> module (included with most distributions)</td>
+<td align="left">perl-Text-ParseWords</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Required</td>
+<td align="left"><a href="http://search.cpan.org/search?module=Getopt::Long">Getopt::Long</a> module (included with most distributions)</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Required</td>
+<td align="left"><a href="http://search.cpan.org/search?module=POSIX">Posix</a> module (included with most if not all distributions)</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Required</td>
+<td align="left"><a href="http://search.cpan.org/search?module=Config::IniFiles">Config::IniFiles</a> module</td>
+<td align="left">perl-Config-IniFiles</td>
+<td align="left">libconfig-inifiles-perl</td>
+</tr>
+<tr>
+<td align="left">Required</td>
+<td align="left"><a href="http://search.cpan.org/search?module=Time::HiRes">Time::HiRes</a> module (only required when using SNMPTT in daemon mode - required by <strong>snmptthandler</strong>)</td>
+<td align="left">perl-Time-HiRes</td>
+<td align="left">libtime-hires-perl</td>
+</tr>
+<tr>
+<td align="left">Required</td>
+<td align="left"><a href="http://search.cpan.org/search?module=Sys::Hostname">Sys::Hostname</a> module (included with most if not all distributions).</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Required</td>
+<td align="left"><a href="http://search.cpan.org/search?module=File::Basename">File::Basename</a> module (included with most if not all distributions).</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Required</td>
+<td align="left"><a href="http://search.cpan.org/search?module=Text::Balanced">Text::Balanced</a> module (included with most if not all distributions).</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Optional</td>
+<td align="left"><a href="http://search.cpan.org/search?module=Net::IP">Net::IP</a> module. Required for IPv6 support.</td>
+<td align="left">perl-Net-IP</td>
+<td align="left">libnet-ip-perl</td>
+</tr>
+<tr>
+<td align="left">Optional</td>
+<td align="left"><a href="http://search.cpan.org/search?module=IO::Socket::IP">IO::Socket::IP</a> module (included with most if not all distributions). Required for DNS translations.</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Optional</td>
+<td align="left"><a href="http://search.cpan.org/search?module=Sys::Syslog">Sys::Syslog</a> module (included with most Unix distributions). Required for Syslog support.</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Optional</td>
+<td align="left"><a href="http://search.cpan.org/search?module=DBI">DBI</a> module.  Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support.</td>
+<td align="left">perl-DBI</td>
+<td align="left">libclass-dbi-perl</td>
+</tr>
+<tr>
+<td align="left">Optional</td>
+<td align="left"><a href="http://search.cpan.org/search?module=DBD::mysql">DBD::mysql</a> module.  Required for MySQL support.</td>
+<td align="left">perl-DBD-MySQL</td>
+<td align="left">libdbd-mysql-perl</td>
+</tr>
+<tr>
+<td align="left">Optional</td>
+<td align="left"><a href="http://search.cpan.org/search?module=DBD::PgPP">DBD::PgPP</a> or <a href="http://search.cpan.org/search?dist=DBD-Pg">DBD:Pg</a> module.  Required for PostgreSQL support.</td>
+<td align="left">perl-DBD-Pg</td>
+<td align="left">libdbd-pg-perl</td>
+</tr>
+<tr>
+<td align="left">Optional</td>
+<td align="left"><a href="http://search.cpan.org/search?module=DBD::ODBC">DBD::ODBC</a> module.  Required for ODBC (SQL etc) access on Linux / Windows (Win32::ODBC not required if using DBD::ODBC)</td>
+<td align="left">perl-DBD-ODBC</td>
+<td align="left">libdbd-odbc-perl</td>
+</tr>
+<tr>
+<td align="left">Optional</td>
+<td align="left"><a href="http://search.cpan.org/search?module=Win32::ODBC">Win32::ODBC</a> module.  Required for ODBC (SQL etc) access on Windows (DBD::ODBC not required if using Win32::ODBC)</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">Optional</td>
+<td align="left"><a href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">Net-SNMP Perl module</a>.  Only required for features that perform conversions between symbolic and numeric OIDs.  Net-SNMP 5.0.8+ with <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=722075&amp;group_id=12694&amp;atid=312694">patch 722075</a>, or Net-SNMP 5.1.1 or higher is recommended.   This is NOT the same as the Net::SNMP module availabe from CPAN.</td>
+<td align="left">net-snmp-perl</td>
+<td align="left">libsnmp-perl</td>
+</tr>
+<tr>
+<td align="left">Optional</td>
+<td align="left"><a href="http://search.cpan.org/search?module=threads">threads</a> and <a href="http://search.cpan.org/search?query=thread&amp;mode=all">Thread</a> module (included with most if not all distributions).  Required when enabling threads for EXEC statements.</td>
+<td align="left">perl-threads</td>
+<td align="left">libthreads-perl</td>
+</tr>
+<tr>
+<td align="left">Optional</td>
+<td align="left"><a href="http://search.cpan.org/search?module=Digest::MD5">Digest::MD5</a> module (included with most if not all distributions).  Required when enabling duplicate trap detection.</td>
+<td align="left">perl-Digest-MD5</td>
+<td align="left">libdigest-md5-perl</td>
+</tr>
+</tbody>
+</table>
+<p><br />   </p>
 <p>All development and testing was done with Linux, Windows 2000 or higher and various versions of Net-SNMP from UCD SNMP v4.2.1 to the current Net-SNMP 5.7.x release. The Windows version has been tested with both native mode and under Cygwin.</p>
 <p>SNMP V1, V2 and V3 traps have been tested.</p>
 <p>The latest version of Net-SNMP is recommended.</p>
@@ -177,7 +291,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA<br /
 <h1><a name="Whats-New"></a>What's New</h1>
 <h2><strong>v1.5beta1</strong> <strong>- xx xx, 2021</strong></h2>
 <ul>
-<li>Added support for IPv6.  To enable, set <strong>ipv6enable = 1</strong> in snmptt.ini.</li>
+<li>Added support for IPv6.  To enable, set <strong>ipv6_enable = 1</strong> in snmptt.ini.</li>
 <li>Added support for sub-second sleep for spool folder processing.</li>
 <li><strong>snmptt.ini</strong> can now be located in <strong>/etc/snmptt</strong> and is searched for at this
   location first.</li>
@@ -203,7 +317,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA<br /
   should support this.  See FAQ and snmptt.ini for details on this variable.</li>
 <li>Enabled Perl warnings to help ensure code is following best practices.</li>
 <li>Ran code against Perl::Critic to find non-optimal code.  Made various adjustments such as relacing bare words with variables and changing open() calls from two arguments to three.</li>
-<li>Documentation was converted from html to markdown to make it easier to maintain and a full review was completed.  Many improvments have been made including a new section on integrating with Icinga.</li>
+<li>Documentation was converted from html to markdown to make it easier to maintain and a full review was completed.  Many improvments have been made including a new section on integrating with Icinga.  The docs folder now contains <strong>.md</strong>, <strong>.html</strong> and <strong>.epub</strong> versions of the documentation.</li>
 <li><strong>snmpttconvertmib</strong>:<ul>
 <li>Added <strong>--exec_file</strong> option to allow you to provide an EXEC command
 inside of a file instead of specifying on the command line.  Useful for
@@ -501,9 +615,14 @@ but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT lin
 <li>Replace <strong>snmptt</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
 <li>Replace <strong>snmpttconvertmib</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
 <li>Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.</li>
-<li>To enable IPv6 support, set <strong>ipv6enable = 1</strong> in <strong>snmptt.ini</strong>.</li>
+<li>To enable IPv6 support, set <strong>ipv6_enable = 1</strong> in <strong>snmptt.ini</strong>.</li>
 </ol>
-<p>Note:  Starting with v1.5, you can use <strong>/etc/snmptt/</strong> instead of <strong>/etc/snmp/</strong> for your <strong>snmptt.ini</strong> file.</p>
+<p>Notes:  </p>
+<ol>
+<li>Starting with v1.5, you can use <strong>/etc/snmptt/</strong> instead of <strong>/etc/snmp/</strong> for your <strong>snmptt.ini</strong> file.  </li>
+<li>DNS now requires the Perl module <strong>IO::Socket::IP</strong>.  </li>
+<li>IPv6 requires the Perl module <strong>Net::IP</strong>.  </li>
+</ol>
 <h2><strong>v1.4 to v1.4.2</strong></h2>
 <p>To upgrade from v1.4 to v1.4,1, you should:</p>
 <ol>
