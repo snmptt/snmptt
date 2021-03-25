@@ -4,6 +4,8 @@ snmptt_1.5beta1.tgz:
 
 -fresh git checkout
 
+cd snmptt-git
+
 -update version and (c) date in:
         snmptt
         snmpttconvert
@@ -12,10 +14,10 @@ snmptt_1.5beta1.tgz:
         snmptthandler-embedded
         snmptt.ini
         snmptt-nt.ini
-        docs/snmptt.html
-        docs/snmpttconvert.html
-        docs/snmpttconvertmib.html
-        docs/faqs.html
+        docs/snmptt.md
+        docs/snmpttconvert.md
+        docs/snmpttconvertmib.md
+        docs/faqs.md
 
 -update docs/snmptt.html:
         Last updated date
@@ -52,7 +54,7 @@ perl -c snmptthandler-embedded
  git tag -a snmptt_1-5beta1 -m "Changed version to snmptt_1.5beta1 for release"
  git push --tags
 
-cd snmptt
+cd snmptt-git/snmptt
 find . -type f | grep -v '.git' | cpio -pdm ../snmptt_1.5beta1
 cd ../snmptt_1.5beta1
 sudo su

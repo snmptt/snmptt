@@ -16,7 +16,7 @@ name="GENERATOR" />
 #SNMPTT FAQ / Troubleshooting
 
 **([www.snmptt.org](http://www.snmptt.org))**  
-This file was last updated on:  July 18th, 2009  
+This file was last updated on: March 25th, 2021
 
 #Table of Contents
 

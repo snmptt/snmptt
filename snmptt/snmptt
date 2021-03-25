@@ -53,7 +53,7 @@ my $snmptt_version = "1.5beta1";
 sub showversion
 {
   print "\nSNMPTT $snmptt_version\n";
-  print "(c) 2002-2020 Alex Burger\n";
+  print "(c) 2002-2021 Alex Burger\n";
   print "http://snmptt.sourceforge.net\n\n";
 }
 
