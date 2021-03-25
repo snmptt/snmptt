@@ -208,7 +208,7 @@ Note:
 
 # <a name="Whats-New"></a>What's New
 
-## **v1.5beta1** **\- xx xx, 2021**
+## **v1.5beta1** **\- March 25th, 2021**
 
 * Added support for IPv6.  To enable, set **ipv6_enable = 1** in snmptt.ini.
 * Added support for sub-second sleep for spool folder processing.

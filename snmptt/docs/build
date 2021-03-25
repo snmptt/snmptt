@@ -1,8 +1,11 @@
-March xx, 2021
+March 25th, 2021
 
 snmptt_1.5beta1.tgz:
 
 -fresh git checkout
+
+-git config user.name
+-git config user.email
 
 cd snmptt-git
 
@@ -27,8 +30,10 @@ cd snmptt-git
 -update docs/build
 
 -update ChangeLog with release info
+ Changed version to snmptt_1.5beta1 for release
 
 cd snmptt/docs
+chmod +x markdown-to-html.py
 ./markdown-to-html.py snmptt.md > snmptt.html ; tidy -m -asxhtml snmptt.html
 ./markdown-to-html.py faqs.md > faqs.html ; tidy -m -asxhtml faqs.html
 ./markdown-to-html.py snmpttconvert.md > snmpttconvert.html ; tidy -m -asxhtml snmpttconvert.html
@@ -39,12 +44,17 @@ ebook-convert faqs.html faqs.epub
 ebook-convert snmpttconvert.html snmpttconvert.epub
 ebook-convert snmpttconvertmib.html snmpttconvertmib.epub
 
+# Check dates
+ll
+
 cd ..
 perl -c snmptt
 perl -c snmpttconvert
 perl -c snmpttconvertmib
 perl -c snmptthandler
 perl -c snmptthandler-embedded
+
+git commmit -a -m "
 
 -commit changes to git
 -check out fresh copy

@@ -1,3 +1,6 @@
+March 25th, 2021: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.5beta1 for release
+
 March 21st, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Changed net_snmp_perl_best_guess default from 0 to 2 as any modern system
   should support this.
