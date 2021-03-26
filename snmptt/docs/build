@@ -4,8 +4,9 @@ snmptt_1.5beta1.tgz:
 
 -fresh git checkout
 
--git config user.name
--git config user.email
+git config user.name
+git config user.email
+git config -l
 
 cd snmptt-git
 
@@ -54,17 +55,22 @@ perl -c snmpttconvertmib
 perl -c snmptthandler
 perl -c snmptthandler-embedded
 
-git commmit -a -m "
+git commit -a -m "Prepare for 1.5beta1 release"
+git push
 
--commit changes to git
 -check out fresh copy
--git config user.name
--git config user.email
+
+cd snmptt-git
+
+git config user.name
+git config user.email
+git config -l
+
 -tag with new version:
  git tag -a snmptt_1-5beta1 -m "Changed version to snmptt_1.5beta1 for release"
  git push --tags
 
-cd snmptt-git/snmptt
+cd snmptt
 find . -type f | grep -v '.git' | cpio -pdm ../snmptt_1.5beta1
 cd ../snmptt_1.5beta1
 sudo su

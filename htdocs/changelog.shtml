@@ -6,8 +6,52 @@
   </head>
   <body>
     <p class="SectionTitle">Change Log</p>
-    <u><u>v1.4.2 - July 23rd, 2020</u>
-    </u>
+
+    <u>v1.5beta1 - March 25th, 2021</u>
+    <u>v1.5beta1 - March 25th, 2021</u>
+    <ul>
+      <li>Added support for IPv6.  To enable, set <strong>ipv6_enable = 1</strong> in snmptt.ini.</li>
+      <li>Added support for sub-second sleep for spool folder processing.</li>
+      <li><strong>snmptt.ini</strong> can now be located in <strong>/etc/snmptt</strong> and is searched for at this
+        location first.</li>
+      <li>Fixed a bug with <strong>daemon_uid</strong> that prevented SNMPTT from starting on FreeBSD
+        (bug 47).</li>
+      <li>Fixed a bug where traps arriving with the hostname set to UNKNOWN were
+        not being handled properly (bug 46).</li>
+      <li>Fixed a bug with <strong>MATCH</strong> which was preventing it from matching integers properly (bug 41).</li>
+      <li>Fixed a bug where the agent IP address was not handled correctly when
+        it was received from Net-SNMP as <strong>IpAddress:x.x.x.x</strong> (bug 27).</li>
+      <li>Fixed a race condition bug with <strong>snmptthander</strong> and <strong>snmptthandler-embedded</strong>
+        which could cause traps to be missed.  Spool files are now immediately locked
+        after creation using flock().  If flock() is not supported, the spool file will be created
+        with a temporary filename and then renamed after closing.</li>
+      <li>Fixed a bug with <strong>wildcard_expansion_separator</strong> which caused an issue when
+        using wildcard separators that were longer than one character (bug 38).</li>
+      <li>Fixed a bug where quotes were not properly removed from some incoming traps.</li>
+      <li>Fixed bug with debug mode that was causing some debug mode output even when
+        debug mode was off.</li>
+      <li>Fixed a bug where DNS resolution was not working for enterprise variables 
+        when <strong>net_snmp_perl_enable</strong> was disabled.</li>
+      <li>Changed <strong>net_snmp_perl_best_guess</strong> default from 0 to 2 as any modern system
+        should support this.  See FAQ and snmptt.ini for details on this variable.</li>
+      <li>Enabled Perl warnings to help ensure code is following best practices.</li>
+      <li>Ran code against Perl::Critic to find non-optimal code.  Made various adjustments such as relacing bare words with variables and changing open() calls from two arguments to three.</li>
+      <li>Documentation was converted from html to markdown to make it easier to maintain and a full review was completed.  Many improvments have been made including a new section on integrating with Icinga.  The docs folder now contains <strong>.md</strong>, <strong>.html</strong> and <strong>.epub</strong> versions of the documentation.</li>
+      <li><strong>snmpttconvertmib</strong>:<ul>
+      <li>Added <strong>--exec_file</strong> option to allow you to provide an EXEC command
+      inside of a file instead of specifying on the command line.  Useful for
+      commands that include quotes so that you don't have to worry about escaping on
+      the command line.  Also allows you to define multiple EXEC lines instead of 
+      just one.</li>
+      <li>Added <strong>--exec_mode</strong> option to allow you change how the EXEC line
+      is built.  Setting to <strong>0</strong> will append the format line to the end of the line
+      (default).  Setting to <strong>1</strong> does not append the format line to the end of the
+      line.  This is useful if you have added <strong>$Fz</strong> to the <strong>--exec</strong> line so that
+      SNMPTT can replace it with the FORMAT line.  Setting to <strong>2</strong> is similar to <strong>1</strong>,
+      but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT line, 
+      <strong>snmpttconvertmib</strong> will do the substitution.</li></ul>    
+    </ul>
+    <u>v1.4.2 - July 23rd, 2020</u>
     <ul>
       <li>Fixed a security issue with EXEC / PREXEC / unknown_trap_exec
         that could allow malicious shell code to be executed.</li>
