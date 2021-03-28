@@ -193,25 +193,25 @@ table {
 | R/O | Program / Module | rpm | deb
 | :--- | :--- | :--- | :--- |
 | Required | [Net-SNMP](http://www.net-snmp.org) (formerly known as UCD-SNMP).  Specifically **snmptrapd.** | net-snmp, net-snmp-utils | snmp, snmptrapd |
-| Required | [Text::ParseWords](http://search.cpan.org/search?module=Text::ParseWords) module (included with most distributions) | perl-Text-ParseWords |  |
-| Required | [Getopt::Long](http://search.cpan.org/search?module=Getopt::Long) module (included with most distributions) |  |  |
+| Required | [Text::ParseWords](https://metacpan.org/pod/Text::ParseWords) module (included with most distributions) | perl-Text-ParseWords |  |
+| Required | [Getopt::Long](https://metacpan.org/pod/Getopt::Long) module (included with most distributions) |  |  |
 | Required | [Posix](http://search.cpan.org/search?module=POSIX) module (included with most if not all distributions) |  |  |
-| Required | [Config::IniFiles](http://search.cpan.org/search?module=Config::IniFiles) module | perl-Config-IniFiles | libconfig-inifiles-perl |
-| Required | [Time::HiRes](http://search.cpan.org/search?module=Time::HiRes) module (only required when using SNMPTT in daemon mode - required by **snmptthandler**) | perl-Time-HiRes | libtime-hires-perl |
-| Required | [Sys::Hostname](http://search.cpan.org/search?module=Sys::Hostname) module (included with most if not all distributions). |  |  |
-| Required | [File::Basename](http://search.cpan.org/search?module=File::Basename) module (included with most if not all distributions). |  |  |
-| Required | [Text::Balanced](http://search.cpan.org/search?module=Text::Balanced) module (included with most if not all distributions). |  |  |
-| Optional | [Net::IP](http://search.cpan.org/search?module=Net::IP) module. Required for IPv6 support. | perl-Net-IP | libnet-ip-perl |
-| Optional | [IO::Socket::IP](http://search.cpan.org/search?module=IO::Socket::IP) module (included with most if not all distributions). Required for DNS translations. |  |  |
-| Optional | [Sys::Syslog](http://search.cpan.org/search?module=Sys::Syslog) module (included with most Unix distributions). Required for Syslog support. |  |  |
-| Optional | [DBI](http://search.cpan.org/search?module=DBI) module.  Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support. | perl-DBI | libclass-dbi-perl |
-| Optional | [DBD::mysql](http://search.cpan.org/search?module=DBD::mysql) module.  Required for MySQL support. | perl-DBD-MySQL | libdbd-mysql-perl |
-| Optional | [DBD::PgPP](http://search.cpan.org/search?module=DBD::PgPP) or [DBD:Pg](http://search.cpan.org/search?dist=DBD-Pg) module.  Required for PostgreSQL support. | perl-DBD-Pg | libdbd-pg-perl |
-| Optional | [DBD::ODBC](http://search.cpan.org/search?module=DBD::ODBC) module.  Required for ODBC (SQL etc) access on Linux / Windows (Win32::ODBC not required if using DBD::ODBC) | perl-DBD-ODBC | libdbd-odbc-perl |
-| Optional | [Win32::ODBC](http://search.cpan.org/search?module=Win32::ODBC) module.  Required for ODBC (SQL etc) access on Windows (DBD::ODBC not required if using Win32::ODBC) |  |  |
-| Optional | [Net-SNMP Perl module](http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_).  Only required for features that perform conversions between symbolic and numeric OIDs.  Net-SNMP 5.0.8+ with [patch 722075](http://sourceforge.net/tracker/index.php?func=detail&aid=722075&group_id=12694&atid=312694), or Net-SNMP 5.1.1 or higher is recommended.   This is NOT the same as the Net::SNMP module availabe from CPAN. | net-snmp-perl | libsnmp-perl |
-| Optional | [threads](http://search.cpan.org/search?module=threads) and [Thread](http://search.cpan.org/search?query=thread&mode=all) module (included with most if not all distributions).  Required when enabling threads for EXEC statements. | perl-threads | libthreads-perl |
-| Optional | [Digest::MD5](http://search.cpan.org/search?module=Digest::MD5) module (included with most if not all distributions).  Required when enabling duplicate trap detection. | perl-Digest-MD5 | libdigest-md5-perl |
+| Required | [Config::IniFiles](https://metacpan.org/pod/Config::IniFiles) module | perl-Config-IniFiles | libconfig-inifiles-perl |
+| Required | [Time::HiRes](https://metacpan.org/pod/Time::HiRes) module (only required when using SNMPTT in daemon mode - required by **snmptthandler**) | perl-Time-HiRes | libtime-hires-perl |
+| Required | [Sys::Hostname](https://metacpan.org/pod/Sys::Hostname) module (included with most if not all distributions). |  |  |
+| Required | [File::Basename](https://metacpan.org/pod/File::Basename) module (included with most if not all distributions). |  |  |
+| Required | [Text::Balanced](https://metacpan.org/pod/Text::Balanced) module (included with most if not all distributions). |  |  |
+| Optional | [Net::IP](https://metacpan.org/pod/Net::IP) module. Required for IPv6 support. | perl-Net-IP | libnet-ip-perl |
+| Optional | [IO::Socket::IP](https://metacpan.org/pod/IO::Socket::IP) module (included with most if not all distributions). Required for DNS translations. |  |  |
+| Optional | [Sys::Syslog](https://metacpan.org/pod/Sys::Syslog) module (included with most Unix distributions). Required for Syslog support. |  |  |
+| Optional | [DBI](https://metacpan.org/pod/DBI) module.  Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support. | perl-DBI | libclass-dbi-perl |
+| Optional | [DBD::mysql](https://metacpan.org/pod/DBD::mysql) module.  Required for MySQL support. | perl-DBD-MySQL | libdbd-mysql-perl |
+| Optional | [DBD::PgPP](https://metacpan.org/pod/DBD::PgPP) or [DBD:Pg](https://metacpan.org/pod/DBD::Pg) module.  Required for PostgreSQL support. | perl-DBD-Pg | libdbd-pg-perl |
+| Optional | [DBD::ODBC](https://metacpan.org/pod/DBD::ODBC) module.  Required for ODBC (SQL etc) access on Linux / Windows (Win32::ODBC not required if using DBD::ODBC) | perl-DBD-ODBC | libdbd-odbc-perl |
+| Optional | [Win32::ODBC](https://metacpan.org/pod/Win32::ODBC) module.  Required for ODBC (SQL etc) access on Windows (DBD::ODBC not required if using Win32::ODBC) |  |  |
+| Optional | [Net-SNMP Perl module](http://www.net-snmp.org/FAQ.html#How_do_I_install_the_Perl_SNMP_modules_).  Only required for features that perform conversions between symbolic and numeric OIDs.  This is NOT the same as the Net::SNMP module availabe from CPAN. | net-snmp-perl | libsnmp-perl |
+| Optional | [threads](https://metacpan.org/pod/threads) and [Thread::Semaphore](https://metacpan.org/pod/Thread::Semaphore) modules (included with most if not all distributions).  Required when enabling threads for EXEC statements. | perl-threads | libthreads-perl |
+| Optional | [Digest::MD5](https://metacpan.org/pod/Digest::MD5) module (included with most if not all distributions).  Required when enabling duplicate trap detection. | perl-Digest-MD5 | libdigest-md5-perl |
 
 <br />   
 
