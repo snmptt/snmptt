@@ -1,19 +1,9 @@
 <!--#include virtual="/page-top.html" -->
 <!-- CONTENT START -->
 
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta charset="utf-8" />
-<meta content="HTML Tidy for HTML5 for Linux version 5.4.0" name=
-"generator" />
-<meta name="Author" content="Alex Burger" />
-<meta name="GENERATOR" content=
-"Mozilla/4.78 [en] (Windows NT 5.0; U) [Netscape]" />
-<link href="layout1.css" type="text/css" rel="StyleSheet" />
-<title>SNMP Trap Translator</title>
-</head>
 <body>
+<p>Click <a href="temp/snmptt.shtml">here</a> for SNMPTT v1.5beta1 documentation</p>
+
 <h1>SNMP Trap Translator v1.4.2</h1>
 <b>(<a href="http://www.snmptt.org">SNMPTT</a>)</b><br />
 This file was last updated on: July 23rd, 2020

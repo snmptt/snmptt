@@ -16,7 +16,7 @@ name="GENERATOR" />
 #SNMP Trap Translator Convert v1.5beta1
 
 **(**[**SNMPTTCONVERT**](http://www.snmptt.org)**)**  
-This file was last updated on:  August 30th, 2004
+This file was last updated on:  August 30th, 2004
 
 #License
 
@@ -31,17 +31,17 @@ the Free Software Foundation; either version 2 of the License, or
 
 This program is distributed in the hope that it will be useful,  
 but WITHOUT ANY WARRANTY; without even the implied warranty of  
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License  
 along with this program; if not, write to the Free Software  
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA  
- 
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA  
+ 
 
 #SNMPTTCONVERT
 
-Some vendors provide a file that can be imported into HP Openview using a HP Openview utiltity.  SNMPTTCONVERT is a simple Perl script which will convert one of these files into the format used by SNMPTT.  The file can contain multiple traps.
+Some vendors provide a file that can be imported into HP Openview using a HP Openview utiltity.  SNMPTTCONVERT is a simple Perl script which will convert one of these files into the format used by SNMPTT.  The file can contain multiple traps.
 
 For example, if the file ciscotrap.txt contained:
 
@@ -65,4 +65,4 @@ Executing snmpttconvert ciscotrap.txt would output:
      the power system."  
      EDESC
   
-Note:  The #EXEC line is added by default.  This can be changed by editing the SNMPTTCONVERT script.
+Note:  The #EXEC line is added by default.  This can be changed by editing the SNMPTTCONVERT script.

@@ -1,9 +1,8 @@
 <!--#include virtual="/page-top.html" -->
 <!-- CONTENT START -->
 
-<title>SNMP Trap Translator</title>
-</head>
-<body>
+<p>Click <a href="temp/snmpttconvertmib.shtml">here</a> for SNMPTT v1.5beta1 documentation</p>
+
 <h1><b>SNMP Trap Translator Convert MIB v1.4.1</b></h1>
 <b>(</b><a href=
 "http://www.snmptt.org"><b>SNMPTTCONVERTMIB</b></a><b>)</b><br />

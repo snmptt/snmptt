@@ -2,3 +2,7 @@ DirectoryIndex index.shtml index.html index.htm index.php
 AddType application/x-httpd-php .html .htm
 Options -Indexes
 
+Options +Includes
+AddType text/html .shtml
+AddOutputFilter INCLUDES .shtml
+AddType text/css .css
