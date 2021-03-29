@@ -1,3 +1,8 @@
+March 29th, 2021: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.5beta2
+- Add support for glob (wildcard) for snmptt.conf file list.  Thanks to
+  Andrew Choo.
+
 March 25th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.5beta1 for release
 
@@ -578,7 +583,7 @@ September 16th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 September 15th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Bug fix - sometimes Net-SNMP would pass a quoted line on multiple
   lines.  They are now combined into one in snmptt.  Thanks to
-  Ant�nio Cardoso.
+  Antïżœnio Cardoso.
 
 September 12th, 2003: Alex Burger <alex_b@users.sourceforge.net>
 - Fix MATCH.  sub match_result was not returning a 0 (didn't really

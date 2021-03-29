@@ -615,9 +615,11 @@ DEBUGGING_FILE_HANDLER =
 # DEBUGGING_FILE_HANDLER = c:\\snmp\\log\\snmptthandler.debug
 
 [TrapFiles]
-# A list of snmptt.conf files (this is NOT the snmptrapd.conf file).  The COMPLETE path 
-# and filename.  Ex: 'c:\\snmp\\snmptt.conf'
+# A list of snmptt.conf files (this is NOT the snmptrapd.conf file).
+# The COMPLETE path and filename.  Wildcards can also be used.
+# Ex:
+# c:\\snmp\\snmptt.conf
+# c:\\snmp\\snmptt.*.conf
 snmptt_conf_files = <<END
 c:\\snmp\\snmptt.conf
 END
-
