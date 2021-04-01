@@ -102,7 +102,7 @@ Options:
                                          process trap file (eg: time snmptt --time)
 /;
 
-  showversionO();
+  showversion();
   print $USAGE;
 
   exit(0);

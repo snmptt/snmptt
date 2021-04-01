@@ -19,6 +19,7 @@ News
     <p><b>SNMPTT v1.5beta1 has been released</b></p>
     <p>SNMPTT v1.5beta1 has been released.  This long overdue version adds IPv6 support, sub-second spool folder processing, snmpttconvertmib enhancements and many bug fixes.</p>
     <p>See the <a href="changelog.shtml">Change Log</a> for a full details.</p>
+    <p>Updated documentation is also available:  <a href="docs/temp/snmptt.shtml">SNMPTT</a> and <a href="docs/temp/snmpttconvertmib.shtml">snmpttconvertmib</a></p>
   </td>
 </tr>
 
