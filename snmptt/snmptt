@@ -215,6 +215,7 @@ my $log_system_enable;
 my $log_system_file;
 my $unknown_trap_log_enable;
 my $unknown_trap_log_file;
+my $unknown_trap_nodes_match_mode;
 my $statistics_interval;
 my $syslog_enable;
 my $syslog_facility;
@@ -631,6 +632,7 @@ my $enterprise_trans;         # Translated enterprise of received trap
 my $agent_dns_name;           # DNS name of trap received
 my $processed;                # Whether or not the trap was processed (found) to determine
                               # if it should search using wildcards and log to unknown
+my $skipped;                  # Whether or not the trap was skipped because of NODE/MATCH
 my $trap_attempted_to_log;    # To keep track of whether or not we attempted to log the trap
 my $trap_date_time;           # Date and time of the trap.  Used for log files.
 my $trap_date_time_sql;       # Date and time of the trap.  Used for SQL.
@@ -649,6 +651,7 @@ my $g_total_traps_received = 0;
 my $g_total_traps_translated = 0;
 my $g_total_traps_ignored = 0;
 my $g_total_traps_unknown = 0;
+my $g_total_traps_skipped = 0;
 my $g_last_statistics_logged = $g_start_time;
 
 # Global variables for SQL
@@ -1379,28 +1382,21 @@ if ($daemon == 1)
   {
     print "SNMPTT $snmptt_version shutdown: ",scalar(localtime),"\n\n";
     print "Total traps received:    $g_total_traps_received\n";
-    print "Total traps translated:  $g_total_traps_translated\n";                
-    print "Total traps ignored:     $g_total_traps_ignored\n";                
+    print "Total traps translated:  $g_total_traps_translated\n";
+    print "Total traps ignored:     $g_total_traps_ignored\n";
+    print "Total traps skipped:     $g_total_traps_skipped\n";
     print "Total unknown traps:     $g_total_traps_unknown\n\n";
   }
 
   if ($syslog_system_enable == 1 &&  $daemon == 1)
   {
     syslog_system("SNMPTT $snmptt_version shutdown");
-    syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");
-    #syslog_system("Total traps received:    $g_total_traps_received");
-    #syslog_system("Total traps translated:  $g_total_traps_translated");
-    #syslog_system("Total traps ignored      $g_total_traps_ignored");
-    #syslog_system("Total unknown traps:     $g_total_traps_unknown");                
+    syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
   }
   if ($log_system_enable == 1 &&  $daemon == 1)
   {
     log_system("SNMPTT $snmptt_version shutdown");
-    log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");
-    #syslog_system("Total traps received:    $g_total_traps_received");
-    #syslog_system("Total traps translated:  $g_total_traps_translated");
-    #syslog_system("Total traps ignored      $g_total_traps_ignored");
-    #syslog_system("Total unknown traps:     $g_total_traps_unknown");                
+    log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
   }
   if ($eventlog_system_enable == 1 &&  $daemon == 1)
   {
@@ -1408,6 +1404,7 @@ if ($daemon == 1)
                   "Total traps received:    $g_total_traps_received\n" . \
                   "Total traps translated:  $g_total_traps_translated\n" . \
                   "Total traps ignored:     $g_total_traps_ignored\n" . \
+                  "Total traps skipped:     $g_total_traps_skipped\n" . \
                   "Total unknown traps:     $g_total_traps_unknown\n";
 
     eventlog_system($message,1,$eventlog_information);
@@ -1769,6 +1766,10 @@ sub processtrap
       $hostmatch = 1;
       $processed = 1;
     }
+    else
+    {
+      $skipped = 1;
+    }
 
     my $message_short;
     my $message;
@@ -1908,14 +1909,10 @@ sub processtrap
             $syslog_level_temp = $syslog_level;
           }
 
-          #if (Sys::Syslog::openlog('TRAPD', '',$syslog_facility) )
-          #if (Sys::Syslog::openlog('snmptt[' . $> . ']', '',$syslog_facility) )
           eval {
             if (Sys::Syslog::openlog('snmptt', 'pid',$syslog_facility) )
             {
-              # Escape all %'s before sending to syslog.  A single % may cause syslog to hang
-              $message =~ s/%/%%/g;
-              Sys::Syslog::syslog ($syslog_level_temp, $message,1);
+              Sys::Syslog::syslog ($syslog_level_temp, "%s", $message);
               Sys::Syslog::closelog();
               $trap_successfully_logged++;
             }
@@ -2240,6 +2237,10 @@ sub processtrap
       if ($event2[1] eq "IGNORE") {
         # Statistics
         $g_total_traps_ignored++;
+      }
+      elsif ($unknown_trap_nodes_match_mode != 0)
+      {
+        $g_total_traps_skipped++;
       }
 
       if ($DEBUGGING >= 1)
@@ -3930,6 +3931,7 @@ sub searchfortrap
   # Look for matching OID
 
   $processed = 0;
+  $skipped = 0;
   $receivedtrap = $var[3];
   $receivedtrap_entry = $receivedtrap;  # Will be used to processtrap to lookup EVENT info
                                         # Changed to actual EVENT entry if using a wildcard 
@@ -3956,7 +3958,7 @@ sub searchfortrap
   }
 
   # Check for wildcard match in hash table if not already processed
-  if ($processed == 0)
+  if ($processed == 0 && $skipped == 0)
   {
     my $receivedtraptemp = $receivedtrap;
 
@@ -3991,7 +3993,8 @@ sub searchfortrap
   }
 
   # Log to unknowntraplog etc if no match was found
-  if ($processed == 0)
+  if ($processed == 0 && ($unknown_trap_nodes_match_mode == 0 || ($unknown_trap_nodes_match_mode != 0 && $skipped == 0)) )
+  #if ($processed == 0 && $skipped == 0)
   {
     if ($DEBUGGING >= 1)
     {
@@ -4433,6 +4436,7 @@ sub loadsnmpttini {
   $log_system_file = $cfg->val('Logging', 'log_system_file');
   $unknown_trap_log_enable = $cfg->val('Logging', 'unknown_trap_log_enable');
   $unknown_trap_log_file = $cfg->val('Logging', 'unknown_trap_log_file');
+  $unknown_trap_nodes_match_mode = $cfg->val('Logging', 'unknown_trap_nodes_match_mode');
   $statistics_interval = $cfg->val('Logging', 'statistics_interval');
   $syslog_enable = $cfg->val('Logging', 'syslog_enable');
   $syslog_facility = $cfg->val('Logging', 'syslog_facility');
@@ -4579,6 +4583,7 @@ sub loadsnmpttini {
   if (! defined ($log_system_file)) { $log_system_file = ''} ;
   if (! defined ($unknown_trap_log_enable)) { $unknown_trap_log_enable = 0} ;
   if (! defined ($unknown_trap_log_file)) { $unknown_trap_log_file = ''} ;
+  if (! defined ($unknown_trap_nodes_match_mode)) { $unknown_trap_nodes_match_mode = 0} ;
   if (! defined ($syslog_enable)) { $syslog_enable = 0} ;
   if (! defined ($syslog_facility)) { $syslog_facility = 'local0'} ;
   if (! defined ($statistics_interval)) { $statistics_interval = 0} ;
@@ -4683,13 +4688,10 @@ sub signal_handler_die {
 
 sub syslog_system {
   my $message = $_[0];
-  #if (Sys::Syslog::openlog('snmptt-sys[' . $> . ']', '',$syslog_system_facility) )
   eval {
     if (Sys::Syslog::openlog('snmptt-sys','pid',$syslog_system_facility) )
     {
-      # Escape all %'s before sending to syslog.  A single % may cause syslog to hang
-      $message =~ s/%/%%/g;
-      Sys::Syslog::syslog ($syslog_system_level, $message,1);
+      Sys::Syslog::syslog ($syslog_system_level, "%s", $message);
       Sys::Syslog::closelog();
     }
   };
@@ -5809,18 +5811,19 @@ sub log_statistics {
   if ($DEBUGGING >= 1)
   {
     print "Total traps received:    $g_total_traps_received\n";
-    print "Total traps translated:  $g_total_traps_translated\n";                
-    print "Total traps ignored:     $g_total_traps_ignored\n";                
+    print "Total traps translated:  $g_total_traps_translated\n";
+    print "Total traps ignored:     $g_total_traps_ignored\n";
+    print "Total traps skipped:     $g_total_traps_skipped\n";
     print "Total unknown traps:     $g_total_traps_unknown\n\n";
   }
 
   if ($syslog_system_enable == 1)  
   {
-    syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");                
+    syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
   }
   if ($log_system_enable == 1)  
   {
-    log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");                
+    log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
   }
   if ($eventlog_system_enable == 1)
   {
@@ -5828,6 +5831,7 @@ sub log_statistics {
     "Total traps received:    $g_total_traps_received\n" . \
     "Total traps translated:  $g_total_traps_translated\n" . \
     "Total traps ignored:     $g_total_traps_ignored:\n" . \
+    "Total traps skipped:     $g_total_traps_skipped:\n" . \
     "Total unknown traps:     $g_total_traps_unknown\n";
 
     eventlog_system($message,1,$eventlog_information);
@@ -5849,6 +5853,7 @@ sub log_statistics {
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
+      "total_skipped", $g_total_traps_skipped,
       "total_unknown", $g_total_traps_unknown);
   }
 
@@ -5868,6 +5873,7 @@ sub log_statistics {
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
+      "total_skipped", $g_total_traps_skipped,
       "total_unknown", $g_total_traps_unknown);
   }
 
@@ -5887,6 +5893,7 @@ sub log_statistics {
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
+      "total_skipped", $g_total_traps_skipped,
       "total_unknown", $g_total_traps_unknown);
   }
 
@@ -5906,6 +5913,7 @@ sub log_statistics {
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
+      "total_skipped", $g_total_traps_skipped,
       "total_unknown", $g_total_traps_unknown);
   }
 

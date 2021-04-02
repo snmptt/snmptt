@@ -307,6 +307,14 @@ table {
 <li>SNMPTT only requires the Net-SNMP Perl module if you want to have variable names translated into symbolic form, you want to be able to have <strong>snmptrapd</strong> pass traps using symbolic form, or you enable the options <strong>translate_integers</strong>, <strong>translate_trap_oid</strong> or <strong>translate_oids</strong>. Although not required, using the Perl module is recommended.  It is also required if you want to use the <strong>snmptthandler-embedded</strong> trap handler with snmptrapd.</li>
 </ul>
 <h1><a name="Whats-New"></a>What's New</h1>
+<h2><strong>v1.5beta2</strong> <strong>- March 25th, 2021</strong></h2>
+<ul>
+<li>Added <strong>unknown_trap_nodes_match_mode</strong> setting to allow you to change how
+  traps are handled when they do not match due to MATCH and NODES.  If set to 1,
+  traps are considered skipped instead of unknown.  Statistics now include the
+  number of skipped traps.</li>
+<li>Add support wildcards in the <strong>snmptt.ini</strong> setting <strong>snmptt_conf_files</strong>.  Example: /etc/snmp/snmptt.*.conf</li>
+</ul>
 <h2><strong>v1.5beta1</strong> <strong>- March 25th, 2021</strong></h2>
 <ul>
 <li>Added support for IPv6.  To enable, set <strong>ipv6_enable = 1</strong> in snmptt.ini.</li>
@@ -627,13 +635,28 @@ but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT lin
 <li>Initial release</li>
 </ul>
 <h1><a name="Upgrading"></a>Upgrading</h1>
+<h2><strong>v1.4.2 to v1.5beta2</strong></h2>
+<p>To upgrade from v1.4.2 to v1.5beta2 you should:</p>
+<ol>
+<li>Replace <strong>snmptt</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
+<li>Replace <strong>snmpttconvertmib</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
+<li>Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.</li>
+<li>To enable IPv6 support, set <strong>ipv6_enable = 1</strong> in <strong>snmptt.ini</strong>.</li>
+<li>If you are logging unknown traps to a SQL table (mysql_dbi_table_unknown, postgresql_dbi_table_unknown or dbd_odbc_table_unknown is defined), add a new column called total_skipped.  </li>
+</ol>
+<p>Notes:  </p>
+<ol>
+<li>Starting with v1.5, you can use <strong>/etc/snmptt/</strong> instead of <strong>/etc/snmp/</strong> for your <strong>snmptt.ini</strong> file.  </li>
+<li>DNS now requires the Perl module <strong>IO::Socket::IP</strong>.  </li>
+<li>IPv6 requires the Perl module <strong>Net::IP</strong>.  </li>
+</ol>
 <h2><strong>v1.4.2 to v1.5beta1</strong></h2>
 <p>To upgrade from v1.4.2 to v1.5beta1 you should:</p>
 <ol>
 <li>Replace <strong>snmptt</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
 <li>Replace <strong>snmpttconvertmib</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
 <li>Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.</li>
-<li>To enable IPv6 support, set <strong>ipv6_enable = 1</strong> in <strong>snmptt.ini</strong>.</li>
+<li>To enable IPv6 support, set <strong>ipv6_enable = 1</strong> in <strong>snmptt.ini</strong>. </li>
 </ol>
 <p>Notes:  </p>
 <ol>
@@ -1547,6 +1570,7 @@ stat_time VARCHAR(30),
 total_received BIGINT,  
 total_translated BIGINT,  
 total_ignored BIGINT,  
+total_skipped BIGINT,  
 total_unknown BIGINT);
 </code></pre>
 <p>Note: To store the stat_time as a real date/time (<strong>DATETIME</strong> data type), change 'stat_time VARCHAR(30),' to 'stat_time DATETIME,' and set <strong>stat_time_format_sql</strong> in <strong>snmptt.ini</strong> to <strong>%Y-%m-%d %H:%M:%S</strong>.</p>
@@ -1626,6 +1650,7 @@ stat_time VARCHAR(30),
 total_received BIGINT,  
 total_translated BIGINT,  
 total_ignored BIGINT,  
+total_skipped BIGINT,  
 total_unknown BIGINT);
 
 
@@ -1682,6 +1707,7 @@ stat_time character(30) NULL,
 total_received BIGINT NULL,  
 total_translated BIGINT NULL,  
 total_ignored BIGINT NULL,  
+total_skipped BIGINT NULL,  
 total_unknown BIGINT NULL);
 </code></pre>
 <p>Note: To store the stat_time as a real date/time, change 'stat_time character(30),' to the date/time data type supported by the database and and set <strong>stat_time_format_sql</strong> in <strong>snmptt.ini</strong> to a compatible format. For example: <strong>%Y-%m-%d %H:%M:%S</strong>.</p>
@@ -1733,6 +1759,7 @@ stat_time character(30) NULL,
 total_received BIGINT NULL,  
 total_translated BIGINT NULL,  
 total_ignored BIGINT NULL,  
+total_skipped BIGINT NULL,  
 total_unknown BIGINT NULL);
 </code></pre>
 <p>Note: To store the stat_time as a real date/time, change 'stat_time character(30),' to the date/time data type supported by the database and and set <strong>stat_time_format_sql</strong> in <strong>snmptt.ini</strong> to a compatible format. For example: <strong>%Y-%m-%d %H:%M:%S</strong>.</p>

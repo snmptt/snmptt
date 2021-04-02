@@ -227,6 +227,14 @@ Note:
 
 # <a name="Whats-New"></a>What's New
 
+## **v1.5beta2** **\- March 25th, 2021**
+
+* Added **unknown_trap_nodes_match_mode** setting to allow you to change how
+  traps are handled when they do not match due to MATCH and NODES.  If set to 1,
+  traps are considered skipped instead of unknown.  Statistics now include the
+  number of skipped traps.
+* Add support wildcards in the **snmptt.ini** setting **snmptt_conf_files**.  Example: /etc/snmp/snmptt.*.conf
+
 ## **v1.5beta1** **\- March 25th, 2021**
 
 * Added support for IPv6.  To enable, set **ipv6_enable = 1** in snmptt.ini.
@@ -522,6 +530,23 @@ Note:
 
 # <a name="Upgrading"></a>Upgrading
 
+## **v1.4.2 to v1.5beta2**
+
+To upgrade from v1.4.2 to v1.5beta2 you should:
+
+1.  Replace **snmptt** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
+1.  Replace **snmpttconvertmib** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
+1.  Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.
+1.  To enable IPv6 support, set **ipv6_enable = 1** in **snmptt.ini**.
+1.  If you are logging unknown traps to a SQL table (mysql_dbi_table_unknown, postgresql_dbi_table_unknown or dbd_odbc_table_unknown is defined), add a new column called total_skipped.  
+    
+Notes:  
+
+1.  Starting with v1.5, you can use **/etc/snmptt/** instead of **/etc/snmp/** for your **snmptt.ini** file.  
+2.  DNS now requires the Perl module **IO::Socket::IP**.  
+3.  IPv6 requires the Perl module **Net::IP**.  
+
+
 ## **v1.4.2 to v1.5beta1**
 
 To upgrade from v1.4.2 to v1.5beta1 you should:
@@ -529,7 +554,7 @@ To upgrade from v1.4.2 to v1.5beta1 you should:
 1.  Replace **snmptt** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
 1.  Replace **snmpttconvertmib** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
 1.  Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.
-1.  To enable IPv6 support, set **ipv6_enable = 1** in **snmptt.ini**.
+1.  To enable IPv6 support, set **ipv6_enable = 1** in **snmptt.ini**. 
     
 Notes:  
 
@@ -1463,6 +1488,7 @@ If logging of statistics to a SQL table is required, create the **snmptt\_statis
     total_received BIGINT,  
     total_translated BIGINT,  
     total_ignored BIGINT,  
+    total_skipped BIGINT,  
     total_unknown BIGINT);
 
 Note: To store the stat\_time as a real date/time (**DATETIME** data type), change 'stat\_time VARCHAR(30),' to 'stat\_time DATETIME,' and set **stat\_time\_format\_sql** in **snmptt.ini** to **%Y-%m-%d %H:%M:%S**.
@@ -1553,6 +1579,7 @@ If logging of statistics to a SQL table is required, create the snmptt\_statisti
     total_received BIGINT,  
     total_translated BIGINT,  
     total_ignored BIGINT,  
+    total_skipped BIGINT,  
     total_unknown BIGINT);  
 
 
@@ -1626,6 +1653,7 @@ If logging of statistics to a SQL table is required, create the snmptt\_statisti
     total_received BIGINT NULL,  
     total_translated BIGINT NULL,  
     total_ignored BIGINT NULL,  
+    total_skipped BIGINT NULL,  
     total_unknown BIGINT NULL);
 
 
@@ -1692,6 +1720,7 @@ If logging of statistics to a SQL table is required, create the snmptt\_statisti
     total_received BIGINT NULL,  
     total_translated BIGINT NULL,  
     total_ignored BIGINT NULL,  
+    total_skipped BIGINT NULL,  
     total_unknown BIGINT NULL);
 
 Note: To store the stat\_time as a real date/time, change 'stat\_time character(30),' to the date/time data type supported by the database and and set **stat\_time\_format\_sql** in **snmptt.ini** to a compatible format. For example: **%Y-%m-%d %H:%M:%S**.
