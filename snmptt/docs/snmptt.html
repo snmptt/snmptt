@@ -1410,7 +1410,7 @@ Options:
 <h2><a name="LoggingStandard"></a>Logging - Standard</h2>
 <p>Translated traps can be sent to standard output and to a log file.  The output format is:</p>
 <blockquote>
-<p><strong>date trap-oid severity category hostname translated-trap</strong></p>
+<p><strong><em>date trap-oid severity category hostname</em> - <em>translated-trap</em></strong></p>
 </blockquote>
 <p>To configure standard output or regular logging, edit the <strong>snmptt.ini</strong> file and modify the following variables:</p>
 <pre><code>stdout_enable
@@ -1426,8 +1426,9 @@ unknown_trap_log_file
 <p>Unknown traps can be logged to a SQL table as described in the <a href="#LoggingDatabase">Database</a> section.  </p>
 <h2><a name="LoggingSyslog"></a>Logging - Syslog</h2>
 <p>Translated traps can be sent to syslog.  The format of the entries will be similar to above without the date (as syslog adds the date):</p>
-<pre><code>trap-oid severity category hostname translated-trap
-</code></pre>
+<blockquote>
+<p><strong><em>trap-oid severity category hostname</em> - <em>translated-trap</em></strong></p>
+</blockquote>
 <p>Syslog entries normally start with: <strong>date hostname snmptt[pid]:</strong> </p>
 <p>To configure syslog, edit the snmptt ini file and modify the following variables:</p>
 <pre><code>syslog_enable

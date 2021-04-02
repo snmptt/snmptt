@@ -8,6 +8,10 @@ April 2nd, 2021: Alex Burger <alex_b@users.sourceforge.net>
   'Hex-STRING: ' text removed for incoming traps in snmptthandler-embedded
   along with unicode line endings (Perl 5.10 and higher).  Thanks to Andrew
   Choo for the code.
+- Added remote syslog support using the Perl module Log::Syslog::Fast and
+  Log::Syslog::Constants.
+- Added log_key_names setting to enable the creation of key=value pairs for
+  trap-OID, severity, category and hostname for text logging and syslog.
 
 March 29th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.5beta2

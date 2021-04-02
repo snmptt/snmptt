@@ -234,6 +234,7 @@ Note:
   traps are considered skipped instead of unknown.  Statistics now include the
   number of skipped traps.
 * Add support wildcards in the **snmptt.ini** setting **snmptt_conf_files**.  Example: /etc/snmp/snmptt.*.conf
+
 * **snmptthandler-embedded**:
     * Varbind types **Gauge32** and **Hex-STRING** now have the Gauge32: and Hex-STRING: text removed for incoming traps.  Unicode line endings are also removed (Perl 5.10 and higher).
 
@@ -1298,7 +1299,7 @@ The following command line arguments are supported:
 
 Translated traps can be sent to standard output and to a log file.  The output format is:
 
-> **date trap-oid severity category hostname translated-trap**
+> **_date trap-oid severity category hostname_ - _translated-trap_**
 
 To configure standard output or regular logging, edit the **snmptt.ini** file and modify the following variables:
 
@@ -1321,7 +1322,7 @@ Unknown traps can be logged to a SQL table as described in the [Database](#Loggi
 
 Translated traps can be sent to syslog.  The format of the entries will be similar to above without the date (as syslog adds the date):
 
-    trap-oid severity category hostname translated-trap
+> **_trap-oid severity category hostname_ - _translated-trap_**
 
 Syslog entries normally start with: **date hostname snmptt\[pid\]:** 
   
