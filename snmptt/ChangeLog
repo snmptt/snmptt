@@ -4,6 +4,10 @@ April 2nd, 2021: Alex Burger <alex_b@users.sourceforge.net>
   traps are considered skipped instead of unknown.  Statistics now include the
   number of skipped traps.  Thanks to Andrew Choo for the code.
 - Fixed a Perl warning issue with syslog logging.
+- Varbind types Gauge32 and Hex-STRING now have the 'Gauge32: ' and
+  'Hex-STRING: ' text removed for incoming traps in snmptthandler-embedded
+  along with unicode line endings (Perl 5.10 and higher).  Thanks to Andrew
+  Choo for the code.
 
 March 29th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.5beta2

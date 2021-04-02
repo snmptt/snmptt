@@ -234,6 +234,8 @@ Note:
   traps are considered skipped instead of unknown.  Statistics now include the
   number of skipped traps.
 * Add support wildcards in the **snmptt.ini** setting **snmptt_conf_files**.  Example: /etc/snmp/snmptt.*.conf
+* **snmptthandler-embedded**:
+    * Varbind types **Gauge32** and **Hex-STRING** now have the Gauge32: and Hex-STRING: text removed for incoming traps.  Unicode line endings are also removed (Perl 5.10 and higher).
 
 ## **v1.5beta1** **\- March 25th, 2021**
 
