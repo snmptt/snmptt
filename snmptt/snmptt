@@ -219,6 +219,7 @@ my $unknown_trap_log_file;
 my $unknown_trap_nodes_match_mode;
 my $statistics_interval;
 my $syslog_enable;
+my $syslog_format;
 my $syslog_module;
 my $syslog_remote_dest;
 my $syslog_remote_port;
@@ -1855,9 +1856,14 @@ sub processtrap
         $message_short = $_;
 
         # Default = $O $s "$c" $A - $Fz
-        $_ = $log_format;
-        substitute($message_short);
-        $message = $_ . "\n";
+        if ($log_format eq "") {
+          $message = "$receivedtrap_trans $event2[2] \"$event2[1]\" $agent_dns_name - $message_short\n";
+        }
+        else {
+          $_ = $log_format;
+          substitute($message_short);
+          $message = $_ . "\n";
+        }
 
         if ($stdout_enable == 1)
         {
@@ -1908,6 +1914,17 @@ sub processtrap
 
         if ($syslog_enable == 1)
         {
+          # Default = $O $s "$c" $A - $Fz
+          my $syslogmessage;
+          if ($syslog_format eq "") {
+            $syslogmessage = "$receivedtrap_trans $event2[2] \"$event2[1]\" $agent_dns_name - $message_short\n";
+          }
+          else {
+            $_ = $syslog_format;
+            substitute($message_short);
+            $syslogmessage = $_ . "\n";
+          }
+
           $trap_attempted_to_log++;
 
           my $syslog_level_temp = 99;
@@ -1953,7 +1970,7 @@ sub processtrap
             eval {
               if (Sys::Syslog::openlog('snmptt', 'pid',$syslog_facility) )
               {
-                Sys::Syslog::syslog ($syslog_level_temp, "%s", $message);
+                Sys::Syslog::syslog ($syslog_level_temp, "%s", $syslogmessage);
                 Sys::Syslog::closelog();
                 $trap_successfully_logged++;
               }
@@ -1975,11 +1992,14 @@ sub processtrap
                 else {
                   $logger->set_format(LOG_RFC3164);
                 }
-                $logger->send($message);
+                $logger->send($syslogmessage);
                 $trap_successfully_logged++;
               }
             };
-            warn "Cannot write to syslog: $@\n" if $@;
+            if ($@) {
+              warn "Cannot write to syslog: $@\n";
+              print "Cannot write to syslog.  Message to be logged: $syslogmessage\n" if ($DEBUGGING >= 1);
+            }
           }
         }
         if ($eventlog_enable == 1)
@@ -2516,6 +2536,11 @@ sub substitute
   # $e - Enterprise trap (numerical)
   #s(\$e)($var[6])g;
   substitute2 ("\$e", $var[6]);
+
+  # $j - Enterprise number
+  $var[6] =~ /.*\.(\d+)/;
+  my $enterpriseInteger = $1;
+  substitute2 ("\$j", $enterpriseInteger);
 
   # $N - Event name
   #s(\$N)($event2[0])g;
@@ -4502,6 +4527,7 @@ sub loadsnmpttini {
   $unknown_trap_nodes_match_mode = $cfg->val('Logging', 'unknown_trap_nodes_match_mode');
   $statistics_interval = $cfg->val('Logging', 'statistics_interval');
   $syslog_enable = $cfg->val('Logging', 'syslog_enable');
+  $syslog_format = $cfg->val('Logging', 'syslog_format');
   $syslog_module = $cfg->val('Logging', 'syslog_module');
   $syslog_remote_dest = $cfg->val('Logging', 'syslog_remote_dest');
   $syslog_remote_port = $cfg->val('Logging', 'syslog_remote_port');
@@ -4648,7 +4674,7 @@ sub loadsnmpttini {
 
   if (! defined ($stdout_enable)) { $stdout_enable = 0} ;
   if (! defined ($log_enable)) { $log_enable = 1} ;
-  if (! defined ($log_format)) { $log_format = '$O $s "$c" $A - $Fz'} ;
+  if (! defined ($log_format)) { $log_format = ''} ;
   if (! defined ($log_file)) { $log_file = ''} ;
   if (! defined ($log_system_enable)) { $log_system_enable = 0} ;
   if (! defined ($log_system_file)) { $log_system_file = ''} ;
@@ -4656,6 +4682,7 @@ sub loadsnmpttini {
   if (! defined ($unknown_trap_log_file)) { $unknown_trap_log_file = ''} ;
   if (! defined ($unknown_trap_nodes_match_mode)) { $unknown_trap_nodes_match_mode = 0} ;
   if (! defined ($syslog_enable)) { $syslog_enable = 0} ;
+  if (! defined ($syslog_format)) { $syslog_format = ''} ;
   if (! defined ($syslog_module)) { $syslog_module = 0} ;
   if (! defined ($syslog_remote_dest)) { $syslog_remote_dest = 'localhost'} ;
   if (! defined ($syslog_remote_port)) { $syslog_remote_port = 514} ;
@@ -4797,7 +4824,10 @@ sub syslog_system {
         $logger->send($message);
       }
     };
-    warn "Cannot write to syslog: $@\n" if $@;
+    if ($@) {
+      warn "Cannot write to syslog: $@\n";
+      print "Cannot write to syslog.  Message to be logged: $message\n" if ($DEBUGGING >= 1);
+    }
   }
 }
 

@@ -11,10 +11,10 @@ name="GENERATOR" />
 <title>SNMP Trap Translator</title>
 </head>
 
-# SNMP Trap Translator v1.5beta1
+# SNMP Trap Translator v1.5beta2
 **([SNMPTT](http://www.snmptt.org))**
 
-This file was last updated on: March 25th, 2021
+This file was last updated on: April 3rd, 2021
 
 [License](#License)
 
@@ -203,7 +203,8 @@ table {
 | Required | [Text::Balanced](https://metacpan.org/pod/Text::Balanced) module (included with most if not all distributions). |  |  |
 | Optional | [Net::IP](https://metacpan.org/pod/Net::IP) module. Required for IPv6 support. | perl-Net-IP | libnet-ip-perl |
 | Optional | [IO::Socket::IP](https://metacpan.org/pod/IO::Socket::IP) module (included with most if not all distributions). Required for DNS translations. |  |  |
-| Optional | [Sys::Syslog](https://metacpan.org/pod/Sys::Syslog) module (included with most Unix distributions). Required for Syslog support. |  |  |
+| Optional | [Sys::Syslog](https://metacpan.org/pod/Sys::Syslog) module (included with most Unix distributions). Required for Syslog support using Unix sockets (local syslog). |  |  |
+| Optional | [Log::Syslog::Fast](https://metacpan.org/pod/Log::Syslog::Fast) and [Log::Syslog::Constants](https://metacpan.org/pod/Log::Syslog::Constants) modules. Required for remote syslog and RFC5424 support. |  |  |
 | Optional | [DBI](https://metacpan.org/pod/DBI) module.  Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support. | perl-DBI | libclass-dbi-perl |
 | Optional | [DBD::mysql](https://metacpan.org/pod/DBD::mysql) module.  Required for MySQL support. | perl-DBD-MySQL | libdbd-mysql-perl |
 | Optional | [DBD::PgPP](https://metacpan.org/pod/DBD::PgPP) or [DBD:Pg](https://metacpan.org/pod/DBD::Pg) module.  Required for PostgreSQL support. | perl-DBD-Pg | libdbd-pg-perl |
@@ -233,8 +234,16 @@ Note:
   traps are handled when they do not match due to MATCH and NODES.  If set to 1,
   traps are considered skipped instead of unknown.  Statistics now include the
   number of skipped traps.
-* Add support wildcards in the **snmptt.ini** setting **snmptt_conf_files**.  Example: /etc/snmp/snmptt.*.conf
-
+* Add support for wildcards in the **snmptt.ini** setting **snmptt_conf_files**.  Example: /etc/snmp/snmptt.*.conf
+* Varbind types Gauge32 and Hex-STRING now have the 'Gauge32: ' and
+  'Hex-STRING: ' text removed for incoming traps in snmptthandler-embedded
+  along with unicode line endings (Perl 5.10 and higher).
+* Added **log_format** snmptt.ini setting to allow you to define the STDOUT, text log and eventlog text format.
+* Added **syslog_format** snmptt.ini setting to allow you to define the syslog text format.  This will allow you to add a structured data section for RFC5424 syslog.
+* Added variable substitution **$j** to pull out the enterprise number from the full enterprise OID.  For example, for enterprise OID .1.3.6.1.4.1.232, **$j** would
+  contain 232.
+* Added remote syslog support using the Perl module Log::Syslog::Fast which also allows you to specify the APP-NAME for RFC5424 syslog.
+  Added the following snmptt.ini settings: **syslog_module**, **syslog_remote_dest**, **syslog_remote_port**, **syslog_remote_proto**, **syslog_rfc_format**, **syslog_app** and **syslog_system_app**.
 * **snmptthandler-embedded**:
     * Varbind types **Gauge32** and **Hex-STRING** now have the Gauge32: and Hex-STRING: text removed for incoming traps.  Unicode line endings are also removed (Perl 5.10 and higher).
 
@@ -1306,6 +1315,9 @@ To configure standard output or regular logging, edit the **snmptt.ini** file an
     stdout_enable
     log_enable
     log_file
+    log_format
+
+The output format can be changed from the above default by modifying the **log_format** setting.  See snmptt.ini for details.
 
 ## <a name="LoggingUnknown"></a>Logging - Unknown traps
 
@@ -1331,6 +1343,19 @@ To configure syslog, edit the snmptt ini file and modify the following variables
     syslog_enable
     syslog_facility
     syslog_level
+    syslog_module
+    syslog_remote_dest *
+    syslog_remote_port *
+    syslog_remote_proto *
+    syslog_rfc_format *
+    syslog_app *
+    syslog_format
+
+(\*) Only applicable when using **syslog_module** = 1
+
+When using the default **syslog_module** setting of 0, syslog messages are logged to the local system using Unix sockets following the RFC3164 standard.
+
+To enable RFC5424 or remote syslog server support, set **syslog_module** to 1 and define the (*) settings.  Be sure to enable UDP or TCP syslog reception in your syslog server.  See snmptt.ini for details on each setting.
 
 SNMPTT system errors and messages such as startup, shutdown, trap statistics etc can be sent to syslog by editing the snmptt.ini file and modifying the following variables:
 
@@ -1862,13 +1887,14 @@ The syntax of the snmptt.conf file  is:
  > $C - Trap community string  
  > $D - Description text from SNMPTT.CONF or MIB file (**see Note 6**)  
  > $E - Enterprise trap OID in symbolic format  
- > $e  - Enterprise trap OID in number format  
+ > $e  - Enterprise trap OID in number format (.1.3.6.1.4.1._n_)  
+ > $j  - Enterprise number (_n_)  
  > $Fa  - alarm (bell) (BEL)  
  > $Ff  - form feed (FF)  
  > $Fn  - newline (LF, NL)  
  > $Fr  - return (CR)  
  > $Ft  - tab (HT, TAB)  
- > $Fz  - Translated FORMAT line (EXEC and log_format only)  
+ > $Fz  - Translated FORMAT line (EXEC, log_format and syslog_format only)  
  > $G  - Generic trap number (0 if enterprise trap)  
  > $S  - Specific trap number (0 if generic trap)  
  > $H  - Host name of the system running SNMPTT  
