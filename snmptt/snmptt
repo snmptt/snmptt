@@ -210,7 +210,7 @@ my $duplicate_trap_window;
 # Logging
 my $stdout_enable;
 my $log_enable;
-my $log_key_names;
+my $log_format;
 my $log_file;
 my $log_system_enable;
 my $log_system_file;
@@ -1854,12 +1854,10 @@ sub processtrap
 
         $message_short = $_;
 
-        if ($log_key_names == 0) {
-          $message = "$receivedtrap_trans $event2[2] \"$event2[1]\" $agent_dns_name - $message_short\n";
-        }
-        else {
-          $message = "Trap-OID=$receivedtrap_trans Severity=$event2[2] Category=\"$event2[1]\" Hostname=$agent_dns_name - $message_short\n";
-        }
+        # Default = $O $s "$c" $A - $Fz
+        $_ = $log_format;
+        substitute($message_short);
+        $message = $_ . "\n";
 
         if ($stdout_enable == 1)
         {
@@ -1963,7 +1961,7 @@ sub processtrap
             warn "Cannot write to syslog: $@\n" if $@;
           }
           else {  # Log::Syslog::Fast
-            my $protocol = ($syslog_remote_proto eq "UDP" ? LOG_UDP : LOG_TCP);
+            my $protocol = ($syslog_remote_proto eq "TCP" ? LOG_TCP : LOG_UDP);
             eval {
               if (my $logger = Log::Syslog::Fast->new($protocol, $syslog_remote_dest, $syslog_remote_port, get_facility($syslog_facility), 
                 get_severity($syslog_level_temp), $agent_dns_name, $syslog_app))
@@ -4495,7 +4493,7 @@ sub loadsnmpttini {
   # Logging
   $stdout_enable = $cfg->val('Logging', 'stdout_enable');
   $log_enable = $cfg->val('Logging', 'log_enable');
-  $log_key_names = $cfg->val('Logging', 'log_key_names');
+  $log_format = $cfg->val('Logging', 'log_format');
   $log_file = $cfg->val('Logging', 'log_file');
   $log_system_enable = $cfg->val('Logging', 'log_system_enable');
   $log_system_file = $cfg->val('Logging', 'log_system_file');
@@ -4650,7 +4648,7 @@ sub loadsnmpttini {
 
   if (! defined ($stdout_enable)) { $stdout_enable = 0} ;
   if (! defined ($log_enable)) { $log_enable = 1} ;
-  if (! defined ($log_key_names)) { $log_key_names = 0} ;
+  if (! defined ($log_format)) { $log_format = '$O $s "$c" $A - $Fz'} ;
   if (! defined ($log_file)) { $log_file = ''} ;
   if (! defined ($log_system_enable)) { $log_system_enable = 0} ;
   if (! defined ($log_system_file)) { $log_system_file = ''} ;
@@ -4659,7 +4657,7 @@ sub loadsnmpttini {
   if (! defined ($unknown_trap_nodes_match_mode)) { $unknown_trap_nodes_match_mode = 0} ;
   if (! defined ($syslog_enable)) { $syslog_enable = 0} ;
   if (! defined ($syslog_module)) { $syslog_module = 0} ;
-  if (! defined ($syslog_remote_dest)) { $syslog_remote_dest = "localhost"} ;
+  if (! defined ($syslog_remote_dest)) { $syslog_remote_dest = 'localhost'} ;
   if (! defined ($syslog_remote_port)) { $syslog_remote_port = 514} ;
   if (! defined ($syslog_remote_proto)) { $syslog_remote_proto = 'UDP'} ;
   if (! defined ($syslog_app)) { $syslog_app = "snmptt"} ;
@@ -4782,7 +4780,7 @@ sub syslog_system {
     }
   }
   else {  # Log::Syslog::Fast
-    my $protocol = ($syslog_remote_proto eq "UDP" ? LOG_UDP : LOG_TCP);
+    my $protocol = ($syslog_remote_proto eq "TCP" ? LOG_TCP : LOG_UDP);
     eval {
       if (my $logger = Log::Syslog::Fast->new($protocol, $syslog_remote_dest, $syslog_remote_port, get_facility($syslog_system_facility), 
         get_severity($syslog_system_level), $snmptt_system_name, $syslog_system_app))

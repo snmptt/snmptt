@@ -1868,7 +1868,7 @@ The syntax of the snmptt.conf file  is:
  > $Fn  - newline (LF, NL)  
  > $Fr  - return (CR)  
  > $Ft  - tab (HT, TAB)  
- > $Fz  - Translated FORMAT line (EXEC only)  
+ > $Fz  - Translated FORMAT line (EXEC and log_format only)  
  > $G  - Generic trap number (0 if enterprise trap)  
  > $S  - Specific trap number (0 if generic trap)  
  > $H  - Host name of the system running SNMPTT  
