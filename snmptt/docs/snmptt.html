@@ -318,11 +318,8 @@ table {
 <li>Added <strong>unknown_trap_nodes_match_mode</strong> setting to allow you to change how
   traps are handled when they do not match due to MATCH and NODES.  If set to 1,
   traps are considered skipped instead of unknown.  Statistics now include the
-  number of skipped traps.</li>
-<li>Add support for wildcards in the <strong>snmptt.ini</strong> setting <strong>snmptt_conf_files</strong>.  Example: /etc/snmp/snmptt.*.conf</li>
-<li>Varbind types Gauge32 and Hex-STRING now have the 'Gauge32: ' and
-  'Hex-STRING: ' text removed for incoming traps in snmptthandler-embedded
-  along with unicode line endings (Perl 5.10 and higher).</li>
+  number of skipped traps when enabled.</li>
+<li>Added support for wildcards for the <strong>snmptt_conf_files</strong> setting in <strong>snmptt.ini</strong>.  Example: /etc/snmp/snmptt.*.conf</li>
 <li>Added <strong>log_format</strong> snmptt.ini setting to allow you to define the STDOUT, text log and eventlog text format.</li>
 <li>Added <strong>syslog_format</strong> snmptt.ini setting to allow you to define the syslog text format.  This will allow you to add a structured data section for RFC5424 syslog.</li>
 <li>Added variable substitution <strong>$j</strong> to pull out the enterprise number from the full enterprise OID.  For example, for enterprise OID .1.3.6.1.4.1.232, <strong>$j</strong> would
@@ -661,7 +658,7 @@ but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT lin
 <li>Replace <strong>snmpttconvertmib</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
 <li>Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.</li>
 <li>To enable IPv6 support, set <strong>ipv6_enable = 1</strong> in <strong>snmptt.ini</strong>.</li>
-<li>If you are logging unknown traps to a SQL table (mysql_dbi_table_unknown, postgresql_dbi_table_unknown or dbd_odbc_table_unknown is defined), add a new column called total_skipped.  </li>
+<li>To enable skipped trap statistics, set <strong>unknown_trap_nodes_match_mode = 1</strong>.  If you are logging unknown traps to a SQL table (<strong>mysql_dbi_table_unknown</strong>, <strong>postgresql_dbi_table_unknown</strong> or <strong>dbd_odbc_table_unknown</strong> is defined), also add a new column to the database table called <strong>total_skipped</strong>.</li>
 </ol>
 <p>Notes:  </p>
 <ol>
@@ -1605,6 +1602,7 @@ total_ignored BIGINT,
 total_skipped BIGINT,  
 total_unknown BIGINT);
 </code></pre>
+<p>Note: Only include <strong>total_skipped</strong> if <strong>unknown_trap_nodes_match_mode</strong> is set to <strong>1</strong>.</p>
 <p>Note: To store the stat_time as a real date/time (<strong>DATETIME</strong> data type), change 'stat_time VARCHAR(30),' to 'stat_time DATETIME,' and set <strong>stat_time_format_sql</strong> in <strong>snmptt.ini</strong> to <strong>%Y-%m-%d %H:%M:%S</strong>.</p>
 <p>Note: The variable lengths I have chosen above should be sufficient, but they may need to be increased depending on your environment.</p>
 <p>To add a user account called '<strong>snmptt</strong>' with a password of '<strong>mytrap</strong>' for use by SNMPTT, use the following SQL statement:</p>
@@ -1685,10 +1683,10 @@ total_ignored BIGINT,
 total_skipped BIGINT,  
 total_unknown BIGINT);
 
-
 GRANT ALL ON snmptt_statistics TO snmptt;  
 \q
 </code></pre>
+<p>Note: Only include <strong>total_skipped</strong> if <strong>unknown_trap_nodes_match_mode</strong> is set to <strong>1</strong>.</p>
 <p>Note: To store the stat_time as a real date/time (<strong>timestamp</strong> data type), change 'stat_time VARCHAR(30),' to 'stat_time timestamp,' and set <strong>stat_time_format_sql</strong> in <strong>snmptt.ini</strong> to <strong>%Y-%m-%d %H:%M:%S</strong>.</p>
 <p>The variable lengths I have chosen above should be sufficient, but they may need to be increased depending on your environment.  </p>
 <h2><a name="LoggingDatabase-ODBC"></a>DBD::ODBC</h2>
@@ -1742,6 +1740,7 @@ total_ignored BIGINT NULL,
 total_skipped BIGINT NULL,  
 total_unknown BIGINT NULL);
 </code></pre>
+<p>Note: Only include <strong>total_skipped</strong> if <strong>unknown_trap_nodes_match_mode</strong> is set to <strong>1</strong>.</p>
 <p>Note: To store the stat_time as a real date/time, change 'stat_time character(30),' to the date/time data type supported by the database and and set <strong>stat_time_format_sql</strong> in <strong>snmptt.ini</strong> to a compatible format. For example: <strong>%Y-%m-%d %H:%M:%S</strong>.</p>
 <p>All variables are inserted into the database using '<strong>INSERT INTO</strong>' as text including the date and time.  The variable lengths I have chosen above should be sufficient, but they may need to be increased depending on your environment.  </p>
 <h2><a name="LoggingDatabase-Windows_ODBC"></a>Win32::ODBC</h2>
@@ -1794,6 +1793,7 @@ total_ignored BIGINT NULL,
 total_skipped BIGINT NULL,  
 total_unknown BIGINT NULL);
 </code></pre>
+<p>Note: Only include <strong>total_skipped</strong> if <strong>unknown_trap_nodes_match_mode</strong> is set to <strong>1</strong>.</p>
 <p>Note: To store the stat_time as a real date/time, change 'stat_time character(30),' to the date/time data type supported by the database and and set <strong>stat_time_format_sql</strong> in <strong>snmptt.ini</strong> to a compatible format. For example: <strong>%Y-%m-%d %H:%M:%S</strong>.</p>
 <p>All variables are inserted into the database using '<strong>INSERT INTO</strong>' as text including the date and time.  The variable lengths I have chosen above should be sufficient, but they may need to be increased depending on your environment.  </p>
 <h1><a name="Executing-an-external-program"></a>Executing an external program</h1>

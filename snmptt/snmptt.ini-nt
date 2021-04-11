@@ -316,8 +316,11 @@ unknown_trap_log_file = c:\\snmp\\log\\snmpttunknown.log
 # Set to 1 to consider traps as skipped instead of unknown if they did not
 # match an snmptt.conf entry due to NODES or MATCH.  Defaults to 0.
 # This will impact whether or not the the trap is logged to the unknown log
-# file, unknown database tables, unknown exec and also the trap statistics files
-# and statistics database tables.
+# file, unknown database tables and whether or not the unknown exec command
+# is executed.  If set to 1, skipped traps will be inlcuded in the statistics
+# output to syslog etc.  If you are using the snmptt_statistics database table,
+# 'total_skipped' will be included so make sure your table includes this
+# column.
 unknown_trap_nodes_match_mode = 0
 
 # How often in seconds statistics should be logged to syslog or the event log.

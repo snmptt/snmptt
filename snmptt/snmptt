@@ -1420,28 +1420,50 @@ if ($daemon == 1)
     print "Total traps received:    $g_total_traps_received\n";
     print "Total traps translated:  $g_total_traps_translated\n";
     print "Total traps ignored:     $g_total_traps_ignored\n";
-    print "Total traps skipped:     $g_total_traps_skipped\n";
+    if ($unknown_trap_nodes_match_mode != 0) {
+      print "Total traps skipped:     $g_total_traps_skipped\n";
+    }
     print "Total unknown traps:     $g_total_traps_unknown\n\n";
   }
 
   if ($syslog_system_enable == 1 &&  $daemon == 1)
   {
     syslog_system("SNMPTT $snmptt_version shutdown");
-    syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
+    if ($unknown_trap_nodes_match_mode != 0) {
+      syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
+    }
+    else {
+      syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");
+    }
   }
   if ($log_system_enable == 1 &&  $daemon == 1)
   {
     log_system("SNMPTT $snmptt_version shutdown");
-    log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
+    if ($unknown_trap_nodes_match_mode != 0) {
+      log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
+    }
+    else {
+      log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");
+    }
   }
   if ($eventlog_system_enable == 1 &&  $daemon == 1)
   {
-    my $message = "SNMPTT $snmptt_version shutdown\n\n" . \
-                  "Total traps received:    $g_total_traps_received\n" . \
-                  "Total traps translated:  $g_total_traps_translated\n" . \
-                  "Total traps ignored:     $g_total_traps_ignored\n" . \
-                  "Total traps skipped:     $g_total_traps_skipped\n" . \
-                  "Total unknown traps:     $g_total_traps_unknown\n";
+    my $message;
+    if ($unknown_trap_nodes_match_mode != 0) {
+      $message = "SNMPTT $snmptt_version shutdown\n\n" .
+                    "Total traps received:    $g_total_traps_received\n" .
+                    "Total traps translated:  $g_total_traps_translated\n" .
+                    "Total traps ignored:     $g_total_traps_ignored\n" .
+                    "Total traps skipped:     $g_total_traps_skipped\n" .
+                    "Total unknown traps:     $g_total_traps_unknown\n";
+    }
+    else {
+      $message = "SNMPTT $snmptt_version shutdown\n\n" .
+              "Total traps received:    $g_total_traps_received\n" .
+              "Total traps translated:  $g_total_traps_translated\n" .
+              "Total traps ignored:     $g_total_traps_ignored\n" .
+              "Total unknown traps:     $g_total_traps_unknown\n";
+    }
 
     eventlog_system($message,1,$eventlog_information);
   }
@@ -1802,8 +1824,7 @@ sub processtrap
       $hostmatch = 1;
       $processed = 1;
     }
-    else
-    {
+    elsif ($unknown_trap_nodes_match_mode != 0) {
       $skipped = 1;
     }
 
@@ -4081,7 +4102,6 @@ sub searchfortrap
 
   # Log to unknowntraplog etc if no match was found
   if ($processed == 0 && ($unknown_trap_nodes_match_mode == 0 || ($unknown_trap_nodes_match_mode != 0 && $skipped == 0)) )
-  #if ($processed == 0 && $skipped == 0)
   {
     if ($DEBUGGING >= 1)
     {
@@ -5943,26 +5963,48 @@ sub log_statistics {
     print "Total traps received:    $g_total_traps_received\n";
     print "Total traps translated:  $g_total_traps_translated\n";
     print "Total traps ignored:     $g_total_traps_ignored\n";
-    print "Total traps skipped:     $g_total_traps_skipped\n";
+    if ($unknown_trap_nodes_match_mode != 0) {
+          print "Total traps skipped:     $g_total_traps_skipped\n";
+    }
     print "Total unknown traps:     $g_total_traps_unknown\n\n";
   }
 
   if ($syslog_system_enable == 1)  
   {
-    syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
+    if ($unknown_trap_nodes_match_mode != 0) {
+      syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
+    }
+    else {
+      syslog_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");
+    }
   }
   if ($log_system_enable == 1)  
   {
-    log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
+    if ($unknown_trap_nodes_match_mode != 0) {
+      log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total traps skipped=$g_total_traps_skipped,Total unknown traps=$g_total_traps_unknown");
+    }
+    else {
+      log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");
+    }
   }
   if ($eventlog_system_enable == 1)
   {
-    my $message = "" . \
-    "Total traps received:    $g_total_traps_received\n" . \
-    "Total traps translated:  $g_total_traps_translated\n" . \
-    "Total traps ignored:     $g_total_traps_ignored:\n" . \
-    "Total traps skipped:     $g_total_traps_skipped:\n" . \
-    "Total unknown traps:     $g_total_traps_unknown\n";
+    my $message;
+    if ($unknown_trap_nodes_match_mode != 0) {
+      $message = "" .
+      "Total traps received:    $g_total_traps_received\n" .
+      "Total traps translated:  $g_total_traps_translated\n" .
+      "Total traps ignored:     $g_total_traps_ignored:\n" .
+      "Total traps skipped:     $g_total_traps_skipped:\n" .
+      "Total unknown traps:     $g_total_traps_unknown\n";
+    }
+    else {
+      $message = "" .
+      "Total traps received:    $g_total_traps_received\n" .
+      "Total traps translated:  $g_total_traps_translated\n" .
+      "Total traps ignored:     $g_total_traps_ignored:\n" .
+      "Total unknown traps:     $g_total_traps_unknown\n";
+    }
 
     eventlog_system($message,1,$eventlog_information);
   }
@@ -5978,13 +6020,23 @@ sub log_statistics {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
     
-    mysql_insert($mysql_dbi_table_statistics,
+    if ($unknown_trap_nodes_match_mode != 0) {
+      mysql_insert($mysql_dbi_table_statistics,
+        "stat_time", $stat_time_temp,
+        "total_received", $g_total_traps_received,
+        "total_translated", $g_total_traps_translated,
+        "total_ignored", $g_total_traps_ignored,
+        "total_skipped", $g_total_traps_skipped,
+        "total_unknown", $g_total_traps_unknown);
+    }
+    else {
+      mysql_insert($mysql_dbi_table_statistics,
       "stat_time", $stat_time_temp,
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
-      "total_skipped", $g_total_traps_skipped,
       "total_unknown", $g_total_traps_unknown);
+    }
   }
 
   if ($postgresql_dbi_enable == 1 && defined ($dbh_postgresql) && $postgresql_dbi_table_statistics ne "")
@@ -5998,13 +6050,23 @@ sub log_statistics {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
 
-    postgresql_insert($postgresql_dbi_table_statistics,
-      "stat_time", $stat_time_temp,
-      "total_received", $g_total_traps_received,
-      "total_translated", $g_total_traps_translated,
-      "total_ignored", $g_total_traps_ignored,
-      "total_skipped", $g_total_traps_skipped,
-      "total_unknown", $g_total_traps_unknown);
+    if ($unknown_trap_nodes_match_mode != 0) {
+      postgresql_insert($postgresql_dbi_table_statistics,
+        "stat_time", $stat_time_temp,
+        "total_received", $g_total_traps_received,
+        "total_translated", $g_total_traps_translated,
+        "total_ignored", $g_total_traps_ignored,
+        "total_skipped", $g_total_traps_skipped,
+        "total_unknown", $g_total_traps_unknown);
+    }
+    else {
+        postgresql_insert($postgresql_dbi_table_statistics,
+        "stat_time", $stat_time_temp,
+        "total_received", $g_total_traps_received,
+        "total_translated", $g_total_traps_translated,
+        "total_ignored", $g_total_traps_ignored,
+        "total_unknown", $g_total_traps_unknown);
+    }
   }
 
   if ($dbd_odbc_enable == 1 && defined ($dbh_odbc) && $dbd_odbc_table_statistics ne "")
@@ -6018,13 +6080,23 @@ sub log_statistics {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
 
-    odbc_insert($dbd_odbc_table_statistics,
-      "stat_time", $stat_time_temp,
-      "total_received", $g_total_traps_received,
-      "total_translated", $g_total_traps_translated,
-      "total_ignored", $g_total_traps_ignored,
-      "total_skipped", $g_total_traps_skipped,
-      "total_unknown", $g_total_traps_unknown);
+    if ($unknown_trap_nodes_match_mode != 0) {
+      odbc_insert($dbd_odbc_table_statistics,
+        "stat_time", $stat_time_temp,
+        "total_received", $g_total_traps_received,
+        "total_translated", $g_total_traps_translated,
+        "total_ignored", $g_total_traps_ignored,
+        "total_skipped", $g_total_traps_skipped,
+        "total_unknown", $g_total_traps_unknown);
+    }
+    else {
+        odbc_insert($dbd_odbc_table_statistics,
+        "stat_time", $stat_time_temp,
+        "total_received", $g_total_traps_received,
+        "total_translated", $g_total_traps_translated,
+        "total_ignored", $g_total_traps_ignored,
+        "total_unknown", $g_total_traps_unknown);
+    }
   }
 
   if ($sql_win32_odbc_enable == 1 && defined ($dbh_win32_odbc) && $sql_win32_odbc_table_statistics ne "")
@@ -6038,13 +6110,23 @@ sub log_statistics {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
     
-    sql_win32_odbc_insert($sql_win32_odbc_table_statistics,
+    if ($unknown_trap_nodes_match_mode != 0) {
+      sql_win32_odbc_insert($sql_win32_odbc_table_statistics,
       "stat_time", $stat_time_temp,
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
       "total_skipped", $g_total_traps_skipped,
       "total_unknown", $g_total_traps_unknown);
+    }
+    else {
+      sql_win32_odbc_insert($sql_win32_odbc_table_statistics,
+      "stat_time", $stat_time_temp,
+      "total_received", $g_total_traps_received,
+      "total_translated", $g_total_traps_translated,
+      "total_ignored", $g_total_traps_ignored,
+      "total_unknown", $g_total_traps_unknown);
+    }
   }
 
   $g_last_statistics_logged = time();

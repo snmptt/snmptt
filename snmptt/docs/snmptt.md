@@ -233,11 +233,8 @@ Note:
 * Added **unknown_trap_nodes_match_mode** setting to allow you to change how
   traps are handled when they do not match due to MATCH and NODES.  If set to 1,
   traps are considered skipped instead of unknown.  Statistics now include the
-  number of skipped traps.
-* Add support for wildcards in the **snmptt.ini** setting **snmptt_conf_files**.  Example: /etc/snmp/snmptt.*.conf
-* Varbind types Gauge32 and Hex-STRING now have the 'Gauge32: ' and
-  'Hex-STRING: ' text removed for incoming traps in snmptthandler-embedded
-  along with unicode line endings (Perl 5.10 and higher).
+  number of skipped traps when enabled.
+* Added support for wildcards for the **snmptt_conf_files** setting in **snmptt.ini**.  Example: /etc/snmp/snmptt.*.conf
 * Added **log_format** snmptt.ini setting to allow you to define the STDOUT, text log and eventlog text format.
 * Added **syslog_format** snmptt.ini setting to allow you to define the syslog text format.  This will allow you to add a structured data section for RFC5424 syslog.
 * Added variable substitution **$j** to pull out the enterprise number from the full enterprise OID.  For example, for enterprise OID .1.3.6.1.4.1.232, **$j** would
@@ -550,7 +547,7 @@ To upgrade from v1.4.2 to v1.5beta2 you should:
 1.  Replace **snmpttconvertmib** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
 1.  Backup your snmptt.ini file, replace it with the new version, and make any necessary configuration changes to it.
 1.  To enable IPv6 support, set **ipv6_enable = 1** in **snmptt.ini**.
-1.  If you are logging unknown traps to a SQL table (mysql_dbi_table_unknown, postgresql_dbi_table_unknown or dbd_odbc_table_unknown is defined), add a new column called total_skipped.  
+1.  To enable skipped trap statistics, set **unknown_trap_nodes_match_mode = 1**.  If you are logging unknown traps to a SQL table (**mysql_dbi_table_unknown**, **postgresql_dbi_table_unknown** or **dbd_odbc_table_unknown** is defined), also add a new column to the database table called **total_skipped**.
     
 Notes:  
 
@@ -1519,6 +1516,8 @@ If logging of statistics to a SQL table is required, create the **snmptt\_statis
     total_skipped BIGINT,  
     total_unknown BIGINT);
 
+Note: Only include **total_skipped** if **unknown_trap_nodes_match_mode** is set to **1**.
+
 Note: To store the stat\_time as a real date/time (**DATETIME** data type), change 'stat\_time VARCHAR(30),' to 'stat\_time DATETIME,' and set **stat\_time\_format\_sql** in **snmptt.ini** to **%Y-%m-%d %H:%M:%S**.
 
 Note: The variable lengths I have chosen above should be sufficient, but they may need to be increased depending on your environment.
@@ -1610,9 +1609,10 @@ If logging of statistics to a SQL table is required, create the snmptt\_statisti
     total_skipped BIGINT,  
     total_unknown BIGINT);  
 
-
     GRANT ALL ON snmptt_statistics TO snmptt;  
     \q
+
+Note: Only include **total_skipped** if **unknown_trap_nodes_match_mode** is set to **1**.
 
 Note: To store the stat\_time as a real date/time (**timestamp** data type), change 'stat\_time VARCHAR(30),' to 'stat\_time timestamp,' and set **stat\_time\_format\_sql** in **snmptt.ini** to **%Y-%m-%d %H:%M:%S**.
 
@@ -1684,6 +1684,7 @@ If logging of statistics to a SQL table is required, create the snmptt\_statisti
     total_skipped BIGINT NULL,  
     total_unknown BIGINT NULL);
 
+Note: Only include **total_skipped** if **unknown_trap_nodes_match_mode** is set to **1**.
 
 Note: To store the stat\_time as a real date/time, change 'stat\_time character(30),' to the date/time data type supported by the database and and set **stat\_time\_format\_sql** in **snmptt.ini** to a compatible format. For example: **%Y-%m-%d %H:%M:%S**.
 
@@ -1750,6 +1751,8 @@ If logging of statistics to a SQL table is required, create the snmptt\_statisti
     total_ignored BIGINT NULL,  
     total_skipped BIGINT NULL,  
     total_unknown BIGINT NULL);
+
+Note: Only include **total_skipped** if **unknown_trap_nodes_match_mode** is set to **1**.
 
 Note: To store the stat\_time as a real date/time, change 'stat\_time character(30),' to the date/time data type supported by the database and and set **stat\_time\_format\_sql** in **snmptt.ini** to a compatible format. For example: **%Y-%m-%d %H:%M:%S**.
 
