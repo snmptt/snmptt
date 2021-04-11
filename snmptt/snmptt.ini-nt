@@ -282,6 +282,11 @@ stdout_enable = 0
 # location
 log_enable = 1
 
+# Custom format for logging to STDOUT, text log and Event Log.  Defaults to:
+# $O $s "$c" $A - $Fz which translates to:
+# trap-oid severity category hostname - translated-trap
+log_format = 
+
 # Log file location.  The COMPLETE path and filename.  Ex: 'c:\\snmp\\log\\snmptt.log'
 log_file = c:\\snmp\\log\\snmptt.log
 
