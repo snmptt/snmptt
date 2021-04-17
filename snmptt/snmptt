@@ -5004,14 +5004,14 @@ sub checkipv6
   my $node1ip = new Net::IP($node1);
   if (Net::IP::Error()) {
     if ($DEBUGGING >= 1) {
-      print "  Invalid IPv6 address detected: " . Net::IP::Error() . "\n";
+      print "  Invalid IPv6 address detected (could be a date/time - $node1): " . Net::IP::Error() . "\n";
     }
     return 0;
   }
   my $node2ip = new Net::IP($node2);
   if (Net::IP::Error()) {
     if ($DEBUGGING >= 1) {
-      print "  Invalid IPv6 address detected: " . Net::IP::Error() . "\n";
+      print "  Invalid IPv6 address detected ($node2): " . Net::IP::Error() . "\n";
     }
     return 0;
   }
