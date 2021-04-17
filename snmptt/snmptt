@@ -397,10 +397,9 @@ if ($syslog_enable == 1 || $syslog_system_enable == 1)
       print "see snmptt.html for system requirements.\n\n";
       die "died";
     }
-    BEGIN {
-      require Log::Syslog::Fast;
-      Log::Syslog::Fast->import( qw(:all) );
-    }
+    require Log::Syslog::Fast;
+    #Log::Syslog::Fast->import( qw(:all) );
+
     eval 'require Log::Syslog::Constants;';
     if ($@) {
       warn $@;
@@ -409,10 +408,8 @@ if ($syslog_enable == 1 || $syslog_system_enable == 1)
       print "see snmptt.html for system requirements.\n\n";
       die "died";
     }
-    BEGIN {
-      require Log::Syslog::Constants;
-      Log::Syslog::Constants->import( qw(:functions) );
-    }
+    require Log::Syslog::Constants;
+    #Log::Syslog::Constants->import( qw(:functions) );
   }
 }
 
@@ -509,10 +506,8 @@ if ($dns_enable == 1)
     die "died";
   }
   #require IO::Socket::IP;
-  BEGIN {
-    require Socket;
-    Socket->import( qw(getaddrinfo getnameinfo SOCK_RAW AI_NUMERICHOST));
-  }
+  require Socket;
+  Socket->import( qw(getaddrinfo getnameinfo SOCK_RAW AI_NUMERICHOST));
 
   if ($DEBUGGING >= 1)
   {
@@ -1999,19 +1994,19 @@ sub processtrap
             warn "Cannot write to syslog: $@\n" if $@;
           }
           else {  # Log::Syslog::Fast
-            my $protocol = ($syslog_remote_proto eq "TCP" ? LOG_TCP : LOG_UDP);
+            my $protocol = ($syslog_remote_proto eq "TCP" ? Log::Syslog::Fast->LOG_TCP : Log::Syslog::Fast->LOG_UDP);
             eval {
-              if (my $logger = Log::Syslog::Fast->new($protocol, $syslog_remote_dest, $syslog_remote_port, get_facility($syslog_facility), 
-                get_severity($syslog_level_temp), $agent_dns_name, $syslog_app))
+              if (my $logger = Log::Syslog::Fast->new($protocol, $syslog_remote_dest, $syslog_remote_port, Log::Syslog::Constants::get_facility($syslog_facility), 
+                Log::Syslog::Constants::get_severity($syslog_level_temp), $agent_dns_name, $syslog_app))
               {
                 if ($syslog_rfc_format == 1) {
-                  $logger->set_format(LOG_RFC3164_LOCAL);
+                  $logger->set_format(Log::Syslog::Fast->LOG_RFC3164_LOCAL);
                 }
                 elsif ($syslog_rfc_format == 2) {
-                  $logger->set_format(LOG_RFC5424);
+                  $logger->set_format(Log::Syslog::Fast->LOG_RFC5424);
                 }
                 else {
-                  $logger->set_format(LOG_RFC3164);
+                  $logger->set_format(Log::Syslog::Fast->LOG_RFC3164);
                 }
                 $logger->send($syslogmessage);
                 $trap_successfully_logged++;
@@ -4827,19 +4822,19 @@ sub syslog_system {
     }
   }
   else {  # Log::Syslog::Fast
-    my $protocol = ($syslog_remote_proto eq "TCP" ? LOG_TCP : LOG_UDP);
+    my $protocol = ($syslog_remote_proto eq "TCP" ? Log::Syslog::Fast->LOG_TCP : Log::Syslog::Fast->LOG_UDP);
     eval {
-      if (my $logger = Log::Syslog::Fast->new($protocol, $syslog_remote_dest, $syslog_remote_port, get_facility($syslog_system_facility), 
-        get_severity($syslog_system_level), $snmptt_system_name, $syslog_system_app))
+      if (my $logger = Log::Syslog::Fast->new($protocol, $syslog_remote_dest, $syslog_remote_port, Log::Syslog::Constants::get_facility($syslog_system_facility), 
+        Log::Syslog::Constants::get_severity($syslog_system_level), $snmptt_system_name, $syslog_system_app))
       {
         if ($syslog_rfc_format == 1) {
-          $logger->set_format(LOG_RFC3164_LOCAL);
+          $logger->set_format(Log::Syslog::Fast->LOG_RFC3164_LOCAL);
         }
         elsif ($syslog_rfc_format == 2) {
-          $logger->set_format(LOG_RFC5424);
+          $logger->set_format(Log::Syslog::Fast->LOG_RFC5424);
         }
         else {
-          $logger->set_format(LOG_RFC3164);
+          $logger->set_format(Log::Syslog::Fast->LOG_RFC3164);
         }
         $logger->send($message);
       }
@@ -6886,7 +6881,7 @@ sub ip_to_name {
         print "Converting IP $ip to DNS\n";
     }
 
-    ( $err, @addrs ) = getaddrinfo( $ip, 0, { flags => AI_NUMERICHOST } );
+    ( $err, @addrs ) = getaddrinfo( $ip, 0, { flags => Socket->AI_NUMERICHOST } );
     if ($err) {
         if ($DEBUGGING >= 1) {
             print "Error converting IP $ip to hostname\n";
@@ -6913,7 +6908,7 @@ sub name_to_ip {
     my $err;
     my @addrs = ();
 
-    ( $err, @addrs ) = getaddrinfo( $hostname, "", {socktype => SOCK_RAW} );
+    ( $err, @addrs ) = getaddrinfo( $hostname, "", {socktype => Socket->SOCK_RAW} );
     if ($err) {
         if ($DEBUGGING >= 1) {
             print "Error converting hostname $hostname to IP\n";
@@ -6922,7 +6917,7 @@ sub name_to_ip {
     }
     else {
         for my $addr (@addrs) {
-            ( $err, my $host ) = Socket::getnameinfo( $addr->{addr}, Socket::NI_NUMERICHOST );
+            ( $err, my $host ) = Socket::getnameinfo( $addr->{addr}, Socket->NI_NUMERICHOST );
             if ($err) {
                 if ($DEBUGGING >= 1) {
                     print "Error converting hostname $hostname to  IP\n";
