@@ -2142,7 +2142,7 @@ The syntax of the snmptt.conf file  is:
  where:  
  
  > **or** or **and** set the default evaluation mode for ALL matches  
- > **$x** is any variable (example: $3, $A etc)  
+ > **$x** is any variable (example: $3, $A, $\* etc)  
  > **reg** is a regular expression  
  > **!** is used to negate the result (not)  
  > **&** is used to perform a bitwise AND  
