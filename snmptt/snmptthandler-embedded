@@ -124,7 +124,9 @@ sub snmptt_trap_receiver {
 
   # Cycle through all the varbinds  
   foreach my $x (@$varbinds) {
-    printf "  %-30s type=%-2d value=%s\n", $x->[0], $x->[2], $x->[1];
+    if ($DEBUGGING >= 1) {
+      printf "  %-30s type=%-2d value=%s\n", $x->[0], $x->[2], $x->[1];
+    }
 
     my $oid = "$x->[0]";
     my $value = "$x->[1]";
@@ -227,7 +229,7 @@ sub snmptt_trap_receiver {
   }
 
   if ($DEBUGGING >= 1) {
-    print $fh_SPOOL time()."\n";
+    print time()."\n";
     print $hostname . "\n";
     print $ip_address . "\n";
     print $uptime . "\n";
