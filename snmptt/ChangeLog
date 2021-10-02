@@ -6,6 +6,8 @@ Oct 2nd, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a bug with IPv6 address handling for NODES in snmptt.conf.
 - Add --preexec and --preexec_file options to snmpttconvertmib.  Feature
   request from issue #4 by Andrew Shark.
+- Fixed debug output bug with snmptthandler-embedded.  Thanks to
+  kazuo ito for the fix.  PR #1.
 
 July 19th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a bug that prevented snmptt from starting when debug mode was disabled
