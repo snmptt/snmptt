@@ -16,7 +16,7 @@ name="GENERATOR" />
 #SNMP Trap Translator Convert MIB v1.5beta1
 
 **(**[**SNMPTTCONVERTMIB**](http://www.snmptt.org)**)**  
-This file was last updated on:  March 5th, 2021
+This file was last updated on:  October 2nd, 2021
 
 #License
 
@@ -146,7 +146,7 @@ Append an EXEC command.  The generated FORMAT line from the MIB will be appended
 
     Result: EXEC qpage -f TRAP notifygroup1 "A linkUp trap signifies that the SNMP entity, acting in an $*"
    
-Same as above, but read the EXEC line from the file exec-commands.txt.  Multiple commands can be added to the file to generate multiple EXEC lines per trap.
+Same as above, but read the EXEC line(s) from the file exec-commands.txt.  Multiple commands can be added to the file to generate multiple EXEC lines per trap.
 
     snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --exec_file exec-commands.txt
 
@@ -157,6 +157,16 @@ Append an EXEC command but don't add the generated FORMAT line.  The variable su
 Same as above but instead of SNMPTT having to replace **$Fz** with the FORMAT line, snmpttconvertmib will do the substitution:
 
     snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --exec_mode=2 --exec '/usr/bin/myscript { $Fz }'
+
+Append a PREEXEC command.
+
+    snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --preexec '/usr/local/bin/snmpget -v 1 -Ovq -c public $aA ifDescr.$1'
+
+    Result: PREEXEC /usr/local/bin/snmpget -v 1 -Ovq -c public $aA ifDescr.$1
+
+Same as above, but read the PREEXEC line(s) from the file preexec-commands.txt.  Multiple commands can be added to the file to generate multiple PREEXEC lines per trap.
+
+    snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --preexec_file preexec-commands.txt
 
 To convert all the CPQ\* files in the current folder, you can use:
 

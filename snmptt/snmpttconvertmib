@@ -90,8 +90,11 @@ my $severity = 'Normal';
 my $exec = '';
 my $exec_mode = 0;
 my $exec_file = '';
+my $preexec = '';
+my $preexec_file = '';
 
 my @exec_array = ();
+my @preexec_array = ();
 
 GetOptions 	('version' => \$version,
 		'debug:i' => \$debug,
@@ -111,7 +114,9 @@ GetOptions 	('version' => \$version,
 		'no_desc_wildcard' => \$no_desc_wildcard,
 		'exec_mode=n' => \$exec_mode,
 		'exec_file=s' => \$exec_file,
-		'exec=s' => \$exec);
+		'exec=s' => \$exec,
+		'preexec_file=s' => \$preexec_file,
+		'preexec=s' => \$preexec);
 
 if ($version == 1)
 {
@@ -150,7 +155,12 @@ if (($exec ne "") && ($exec_file ne ""))
   &show_help();
   exit 1;
 }
-
+if (($preexec ne "") && ($preexec_file ne ""))
+{
+  print "\n**** Please specify either --preexec or --preexec_file, not both. ****\n";
+  &show_help();
+  exit 1;
+}
 
 # Get complete path of input file (MIB) in a portable way (needed for -m switch for snmptranslate)
 my $dirname = dirname $in;
@@ -164,7 +174,6 @@ my $output = File::Spec->catfile($dirname, $basename);
 
 if (($exec eq "") && ($exec_file eq "")) {
   push(@exec_array, $defaultexec);
-  print "5xxxxxxxxxxxx\n";
 }
 
 if ($exec ne '')
@@ -172,6 +181,11 @@ if ($exec ne '')
   #$defaultexec = $exec;
   push(@exec_array, $exec);
   print "exec: $exec\n";
+}
+if ($preexec ne '')
+{
+  push(@preexec_array, $preexec);
+  print "preexec: $preexec\n";
 }
 
 #print "nodes: $nodes\n";
@@ -194,6 +208,12 @@ if ($exec) {
 }
 if ($exec_file) {
   print "Exec file:              $exec_file\n";
+}
+if ($preexec) {
+  print "PreExec argument:       $preexec\n";
+}
+if ($preexec_file) {
+  print "PreExec file:           $preexec_file\n";
 }
 
 # Set MIBS environment variable to the filename of the MIB file (not the mib name - if a file contains
@@ -262,6 +282,43 @@ my $currentline=0;
 if ($exec_array[0] ne "") {
   print "Exec(s):              \n";
   foreach my $temp (@exec_array) {
+    print "  $temp\n";
+  }
+}
+
+###################################
+# Load preexec_file
+if ($preexec_file) {
+  if ($DEBUGGING >= 1)
+  {
+    print "\nLoading $preexec_file\n";
+  }
+
+  my $fh_PREEXECFILE;
+  unless (open $fh_PREEXECFILE, "<", $preexec_file)
+  {
+    die "Cannot open input file: $!";
+  }
+
+  while (<$fh_PREEXECFILE>)
+  {
+    chomp;			# remove <cr> at end of line
+    s/\015//;			# Remove any DOS carriage returns
+    push(@preexec_array, $_);		# add to each line to @trapconf array
+  }
+  close $fh_PREEXECFILE;
+
+  if ($DEBUGGING >= 1)
+  {
+    print "Finished loading $preexec_file\n\n";
+  }
+}
+
+my $currentline=0;
+
+if ($preexec_array[0] ne "") {
+  print "PreExec(s):              \n";
+  foreach my $temp (@preexec_array) {
     print "  $temp\n";
   }
 }
@@ -886,6 +943,15 @@ if (1)
         {
           print $fh_OUTPUTFILE "FORMAT $formatexec\n";
 
+          if ($preexec_array[0] ne "") {
+            foreach my $preexec (@preexec_array) {
+              if ($preexec eq "") {
+                next;
+              }
+              print $fh_OUTPUTFILE "PREEXEC $preexec\n";
+            }
+          }
+
           if ($exec_array[0] ne "") {
             foreach my $exec (@exec_array) {
               if ($exec eq "") {
@@ -909,6 +975,15 @@ if (1)
         else
         {
           print $fh_OUTPUTFILE "FORMAT \$*\n";
+
+          if ($preexec_array[0] ne "") {
+            foreach my $preexec (@preexec_array) {
+              if ($preexec eq "") {
+                next;
+              }
+              print $fh_OUTPUTFILE "PREEXEC $preexec\n";
+            }
+          }
 
           if ($exec_array[0] ne "") {
             foreach my $exec (@exec_array) {
@@ -1150,6 +1225,14 @@ Options:
                              will copy the converted FORMAT line in SNMPTT.
                          2 = Replace \$Fz in the --exec line with the format
                              line instead of appending to the end.
+  --preexec=command      Command line to use for PREEXEC line.  Use SINGLE quotes
+                         with Unix.  The format string will be appended to the
+                         end of the specified command, separated by a space.
+                         See below for more information on --exec.
+  --preexec_file=file    Same as --preexec but pull text from a file instead of
+                         specifying on the command line.  Useful for commands
+                         that include quotes so that you don't have to worry
+                         about escaping on the command line.
                   
   Note:  The only benefit in using the --net_snmp_perl switch (which requires
          the Net-SNMP Perl module to be installed) is that the Variables: 
