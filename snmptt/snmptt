@@ -3436,6 +3436,9 @@ sub readtrap
 
   # Pull in passed SNMP info from snmptrapd via STDIN and place in the array @tempvar
 
+  # Net-SNMP examples:
+  # UDP: [127.0.0.1]:38249->[127.0.0.1]:162
+
   chomp($tempvar[0]=<$input>);	# hostname
   push(@rawtrap, $tempvar[0]);
 
@@ -3443,32 +3446,13 @@ sub readtrap
     $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:\[\]%]//g;  # Remove most non alphanumeric characters
   }
   else {
-    $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_]//g;  # Remove most non alphanumeric characters
+    #$tempvar[0]  =~ s/[^a-zA-Z0-9.\-_]//g;  # Remove most non alphanumeric characters
+    $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:\[\]]//g;  # Remove most non alphanumeric characters
   }
 
   if ($tempvar[0] eq "") {
     if ($DEBUGGING >= 1) {
       print "  Invalid trap file.  Expected a hostname on line 2 but got nothing\n";
-      return 0;
-    }
-  }
-  
-  # IPv6_TODO_DONE
-  chomp($tempvar[1]=<$input>);	# ip address
-  push(@rawtrap, $tempvar[1]);
-
-  if ($ipv6_enable == 1) {
-    $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]%] //g;  # Remove most non alphanumeric characters
-  }
-  else {
-    $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]] //g;  # Remove most non alphanumeric characters
-  }
-  # Example: UDP: [127.0.0.1]:38249->[127.0.0.1]:162
-  # Should only be IPs, but also allow for hostname characters, just in case.
-  
-  if ($tempvar[1] eq "") {
-    if ($DEBUGGING >= 1) {
-      print "  Invalid trap file.  Expected an IP address on line 3 but got nothing\n";
       return 0;
     }
   }
@@ -3479,9 +3463,13 @@ sub readtrap
   # If this is detected, use x.x.x.x as the hostname.
 
   if ($ipv6_enable == 1) {
-    if ($tempvar[0] =~ /\[(\d+\.\d+\.\d+\.\d+)\].*?->\[(\d+\.\d+\.\d+\.\d+)\]/) {
+    if ($tempvar[0] =~ /\[(\d+\.\d+\.\d+\.\d+)\].*?-\[(\d+\.\d+\.\d+\.\d+)\]/) {  # > character is removed above
+    #if ($tempvar[0] =~ /\[(\d+\.\d+\.\d+\.\d+)\].*?->\[(\d+\.\d+\.\d+\.\d+)\]/) {
       # IPv4
       $tempvar[0] = $1;
+      if ($DEBUGGING >= 2) {
+        print "  IPv4 detected for value 0\n";
+      }
     }
     elsif ($tempvar[0] =~ /\[(.*?)\]/) {
       # IPv6
@@ -3508,12 +3496,35 @@ sub readtrap
     }
   }
   else {
-    if ($tempvar[0] =~ /\[(\d+\.\d+\.\d+\.\d+)\].*?->\[(\d+\.\d+\.\d+\.\d+)\]/) {
+    if ($tempvar[0] =~ /\[(\d+\.\d+\.\d+\.\d+)\].*?-\[(\d+\.\d+\.\d+\.\d+)\]/) {  # > character is removed above
+    #if ($tempvar[0] =~ /\[(\d+\.\d+\.\d+\.\d+)\].*?->\[(\d+\.\d+\.\d+\.\d+)\]/) {
       $tempvar[0] = $1;
     }
   }
+
   # Clean again as we should now how an IP address or host name
   $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:]//g;  # Remove most non alphanumeric characters
+
+
+  # IPv6_TODO_DONE
+  chomp($tempvar[1]=<$input>);	# ip address
+  push(@rawtrap, $tempvar[1]);
+
+  if ($ipv6_enable == 1) {
+    $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]%]//g;  # Remove most non alphanumeric characters
+  }
+  else {
+    $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]]//g;  # Remove most non alphanumeric characters
+  }
+  # Example: UDP: [127.0.0.1]:38249->[127.0.0.1]:162
+  # Should only be IPs, but also allow for hostname characters, just in case.
+
+  if ($tempvar[1] eq "") {
+    if ($DEBUGGING >= 1) {
+      print "  Invalid trap file.  Expected an IP address on line 3 but got nothing\n";
+      return 0;
+    }
+  }
 
   # IPv6_TODO_DONE
   # Some systems pass the IP address as udp:ipaddress:portnumber.  This will pull
@@ -3522,6 +3533,9 @@ sub readtrap
     if (($tempvar[1] =~ /(\d+\.\d+\.\d+\.\d+)/) && !($tempvar[1] =~ /(.*?:.*)/) ) {
       # IPv4
       $tempvar[1] = $1;
+      if ($DEBUGGING >= 2) {
+        print "  IPv4 detected for value 1\n";
+      }
     }
     elsif ($tempvar[1] =~ /\[(.*?)\]/) {
       # IPv6
@@ -3552,7 +3566,7 @@ sub readtrap
     $tempvar[1] = $1;
   }
   # Clean again as we should now how an IP address or host name
-  $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]] //g;  # Remove most non alphanumeric characters
+  $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]]//g;  # Remove most non alphanumeric characters
 
   # Net-SNMP 5.4 has a bug which gives <UNKNOWN> for the hostname
   if ($tempvar[0] =~ /^UNKNOWN$/) {
@@ -4997,14 +5011,14 @@ sub checkipv6
   #print "node2:$node2\n";
 
   my $node1ip = new Net::IP($node1);
-  if (Net::IP::Error()) {
+  if (!$node1ip) {
     if ($DEBUGGING >= 1) {
       print "  Invalid IPv6 address detected (could be a date/time - $node1): " . Net::IP::Error() . "\n";
     }
     return 0;
   }
   my $node2ip = new Net::IP($node2);
-  if (Net::IP::Error()) {
+  if (!$node1ip) {
     if ($DEBUGGING >= 1) {
       print "  Invalid IPv6 address detected ($node2): " . Net::IP::Error() . "\n";
     }
