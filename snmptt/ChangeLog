@@ -8,6 +8,9 @@ Oct 2nd, 2021: Alex Burger <alex_b@users.sourceforge.net>
   request from issue #4 by Andrew Shark.
 - Fixed debug output bug with snmptthandler-embedded.  Thanks to
   kazuo ito for the fix.  PR #1.
+- Added PREEXEC support for unknown traps.  Results are stored in the
+  variable $pun.  See the unknown_trap_preexec setting in snmptt.ini.
+  Feature request from issue #3 by Andrew Shark.
 
 July 19th, 2021: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a bug that prevented snmptt from starting when debug mode was disabled

@@ -249,6 +249,7 @@ my $eventlog_system_enable;
 # Exec
 my $exec_enable;
 my $pre_exec_enable;
+my @unknown_trap_preexec;
 my $unknown_trap_exec;
 my $unknown_trap_exec_format;
 my $exec_escape;
@@ -657,6 +658,7 @@ my @var;                      # Variables of trap received by SNMPTRAPD
 my @entvar;                   # Enterprise variable values of trap received by SNMPTRAPD
 my @entvarname;               # Enterprise variable names of trap received by SNMPTRAPD
 my @preexec_var;              # PREEXEC results
+my @unknown_trap_preexec_result;   # Unknown trap PREEXEC results
 my $receivedtrap;             # Received trap
 my $receivedtrap_trans;       # Translated version of received trap
 my $enterprise_trans;         # Translated enterprise of received trap
@@ -2747,6 +2749,18 @@ sub substitute
     substitute2 ("\$p$i", $val);
   }
 
+  # $pun - Unknown trap PREEXEC unknown_trap_preexec
+  # Count down backwards to make sure 10 is not mistaken for $1
+  for(my $i=$#unknown_trap_preexec_result+1;$i > 0; $i--)
+  {
+    my $val = $unknown_trap_preexec_result[$i-1];
+    if ($DEBUGGING >= 2)
+    {
+      print "\nUnknown trap PREEXEC variable $i: $val\n";
+    }
+    substitute2 ("\$pu$i", $val);
+  }
+
   # FORMAT line (only possible when doing EXEC line)
   substitute2 ("\$Fz", "$format_line");
 
@@ -4120,9 +4134,55 @@ sub searchfortrap
     # Statistics
     $g_total_traps_unknown++;
 
+    #
+    # unknown_trap_PREexec
+    #
+    if (@unknown_trap_preexec) {
+      for (my $i=0;$i <= $#unknown_trap_preexec;$i++) {
+        my $j=$i+1;
+        if ($DEBUGGING >= 1) {
+          print "\n\nUnknown trap PREEXEC line #$j:$unknown_trap_preexec[$i]\n";
+          print "  Performing variable substitution:\n";
+        }
+
+        my $command;
+
+        $_ = $unknown_trap_preexec[$i];
+        substitute();
+
+        $command = $_;
+
+        if ($DEBUGGING >= 1) {
+          print "\nUnknown trap variable substituted PREEXEC command #$j:$command\n";
+        }
+
+        # Execute command
+
+        if ($exec_escape == 1) {
+          # Escape wildcard characters
+          $command =~ s/\*/\\\*/g;
+          $command =~ s/\?/\\\?/g;
+        }
+        my $result = `$command`;
+        chomp $result;
+        # Remove spaces before and after
+        $result =~ /^\s*(.*?)\s*$/;
+        $result = $1;
+
+        if ($result eq '') {
+          $result = "(no output from unknown PREEXEC #$j:)\n";
+        }
+        print "\nUnknown trap variable substituted PREEXEC command output #$j:\n  $result\n";
+        push(@unknown_trap_preexec_result, $result);
+      }
+    }
+
+    #
+    # unknown_trap_exec
+    #
     if ($unknown_trap_exec ne "") {
       if ($DEBUGGING >= 1) {
-        print "\n\nUnknown trap EXEC line:\n";
+        print "\n\nUnknown trap EXEC line: $unknown_trap_exec\n";
       }
       
       my $command;
@@ -4163,6 +4223,9 @@ sub searchfortrap
       }
       system $command;
     }
+
+    # Clear unknown trap PREEXEC result so it can't be used anywhere else
+    @unknown_trap_preexec_result = ();
 
     if ($unknown_trap_log_enable == 1)
     {
@@ -4586,6 +4649,7 @@ sub loadsnmpttini {
   # Exec
   $exec_enable = $cfg->val('Exec', 'exec_enable');
   $pre_exec_enable = $cfg->val('Exec', 'pre_exec_enable');
+  @unknown_trap_preexec = $cfg->val('Exec', 'unknown_trap_preexec');
   $unknown_trap_exec = $cfg->val('Exec', 'unknown_trap_exec');
   $unknown_trap_exec_format = $cfg->val('Exec', 'unknown_trap_exec_format');
   $exec_escape = $cfg->val('Exec', 'exec_escape');

@@ -1909,6 +1909,8 @@ The syntax of the snmptt.conf file  is:
  > $i  - Event OID defined in .conf file of matched entry (could be a wildcard OID)  
  > $O - Trap OID in symbolic format (**see Note 4**)  
  > $o - Trap OID in numerical format (**see Note 4**)  
+ > $p*n* - PREEXEC result n (1-_n_)  
+ > $pu*n* - Unknown trap PREEXEC result n (1-_n_).  See **unknown_trap_preexec** setting in **snmptt.ini**.  
  > $R, $r  - Trap hostname (**see Note 1**)  
  > $aR, $ar - IP address  
  > $s  - Severity  
