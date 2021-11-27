@@ -4544,7 +4544,7 @@ sub loadsnmpttini {
   else
   {
     if ($DEBUGGING >= 0) {
-      print "Config file could not be loaded\n";
+      print "Config file ($configfile) could not be loaded\n";
     }
     exit(1);
   }

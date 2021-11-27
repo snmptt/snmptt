@@ -7,6 +7,7 @@ Type=forking
 ExecStart=/usr/sbin/snmptt --daemon
 RemainAfterExit=yes
 PIDFile=/var/run/snmptt.pid
+ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
 WantedBy=multi-user.target
