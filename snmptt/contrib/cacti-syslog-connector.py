@@ -1,4 +1,9 @@
 
+#### Create by Sean Mancini sean@seanmancini.com www.seanmancini.com
+### usage enter  /opt/snmptt_syslog.py --hostname $aA --alert "$Fz" --priority 6 --facility 2  in your cacti syslog command execution 
+## this will write the messege direct to the cacti syslog incoming table to be ingested into the syslog database
+
+
 #!/usr/bin/python3
 
 ### connect to mysql database
