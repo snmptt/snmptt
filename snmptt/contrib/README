@@ -7,4 +7,5 @@ These files are NOT supported and are meant to be used on a 'WYSIWYG' basis.
 
 FILE			DESCRIPTION
 ==============================================================================
-sendemail.sh		A script to send emails for the EXEC line
+sendemail.sh		   A script to send emails for the EXEC line
+cacti-syslog-connector.py  A script to connect SNMPTT to the Cacti Syslog plugin
