@@ -4,11 +4,12 @@ snmptt_1.5beta2.tgz:
 
 -fresh git checkout
 
+cd snmptt
+
 git config user.name
 git config user.email
 git config -l
 
-cd snmptt-git
 
 -update version and (c) date in:
         snmptt
@@ -60,7 +61,7 @@ git push
 
 -check out fresh copy
 
-cd snmptt-git
+cd snmptt
 
 git config user.name
 git config user.email
@@ -100,7 +101,7 @@ SourceForge:
 -upload file & set as default download
 -create file release, notify users
 -create news release
--post message to snmptt-users, snmptt-developer
+-post message to snmptt-users
 
 Web site:
 -create News section
@@ -108,7 +109,6 @@ Web site:
 -update Documentation pages
 -update License page
 
-
-
-
+Git mirror
+-update mirrors
 

@@ -30,8 +30,10 @@ This file was last updated on: November 27th, 2021
     * [Unix](#Installation-Unix)  
         * [Package Manager](#Installation-Unix-Package)  
         * [Manual installation](#Installation-Unix-Manual)  
-        * [Net-SNMP Standard handler](#Installation-Unix-Standard)  
-        * [Net-SNMP Embedded handler](#Installation-Unix-Embedded)
+        * [Net-SNMP handlers](#Installation-Unix-Handlers)
+            * [Net-SNMP Standard handler](#Installation-Unix-Standard)
+            * [Net-SNMP Embedded handler](#Installation-Unix-Embedded)
+        * [Testing](#Installation-Unix-Testing)
     * [Windows](#Installation-Windows)  
     * [Securing SNMPTT](#SecuringSNMPTT)  
 * [Configuration Options - snmptt.ini](#Configuration-Options)  
@@ -193,15 +195,16 @@ table {
 | R/O | Program / Module | rpm | deb
 | :--- | :--- | :--- | :--- |
 | Required | [Net-SNMP](http://www.net-snmp.org) (formerly known as UCD-SNMP).  Specifically **snmptrapd.** | net-snmp, net-snmp-utils | snmp, snmptrapd |
+| Optional | [Net-SNMP Perl module](http://www.net-snmp.org/FAQ.html#How_do_I_install_the_Perl_SNMP_modules_).  Only required for features that perform conversions between symbolic and numeric OIDs.  This is NOT the same as the Net::SNMP module availabe from CPAN. | net-snmp-perl | libsnmp-perl |
 | Required | [Text::ParseWords](https://metacpan.org/pod/Text::ParseWords) module (included with most distributions) | perl-Text-ParseWords |  |
 | Required | [Getopt::Long](https://metacpan.org/pod/Getopt::Long) module (included with most distributions) |  |  |
 | Required | [Posix](http://search.cpan.org/search?module=POSIX) module (included with most if not all distributions) |  |  |
-| Required | [Config::IniFiles](https://metacpan.org/pod/Config::IniFiles) module | perl-Config-IniFiles | libconfig-inifiles-perl |
+| Required | [Config::IniFiles](https://metacpan.org/pod/Config::IniFiles) module | perl-Config-IniFiles (EPEL, PowerTools repos)| libconfig-inifiles-perl |
 | Required | [Time::HiRes](https://metacpan.org/pod/Time::HiRes) module (only required when using SNMPTT in daemon mode - required by **snmptthandler**) | perl-Time-HiRes | libtime-hires-perl |
 | Required | [Sys::Hostname](https://metacpan.org/pod/Sys::Hostname) module (included with most if not all distributions). |  |  |
 | Required | [File::Basename](https://metacpan.org/pod/File::Basename) module (included with most if not all distributions). |  |  |
-| Required | [Text::Balanced](https://metacpan.org/pod/Text::Balanced) module (included with most if not all distributions). |  |  |
-| Optional | [Net::IP](https://metacpan.org/pod/Net::IP) module. Required for IPv6 support. | perl-Net-IP | libnet-ip-perl |
+| Required | [Text::Balanced](https://metacpan.org/pod/Text::Balanced) module (included with most if not all distributions). |perl-Text-Balanced|  |
+| Optional | [Net::IP](https://metacpan.org/pod/Net::IP) module. Required for IPv6 support. | perl-Net-IP (EPEL repo)| libnet-ip-perl |
 | Optional | [IO::Socket::IP](https://metacpan.org/pod/IO::Socket::IP) module (included with most if not all distributions). Required for DNS translations. |  |  |
 | Optional | [Sys::Syslog](https://metacpan.org/pod/Sys::Syslog) module (included with most Unix distributions). Required for Syslog support using Unix sockets (local syslog). | perl-Sys-Syslog |  |
 | Optional | [Log::Syslog::Fast](https://metacpan.org/pod/Log::Syslog::Fast) and [Log::Syslog::Constants](https://metacpan.org/pod/Log::Syslog::Constants) modules. Required for remote syslog and RFC5424 support. |  |  |
@@ -210,7 +213,6 @@ table {
 | Optional | [DBD::PgPP](https://metacpan.org/pod/DBD::PgPP) or [DBD:Pg](https://metacpan.org/pod/DBD::Pg) module.  Required for PostgreSQL support. | perl-DBD-Pg | libdbd-pg-perl |
 | Optional | [DBD::ODBC](https://metacpan.org/pod/DBD::ODBC) module.  Required for ODBC (SQL etc) access on Linux / Windows (Win32::ODBC not required if using DBD::ODBC) | perl-DBD-ODBC | libdbd-odbc-perl |
 | Optional | [Win32::ODBC](https://metacpan.org/pod/Win32::ODBC) module.  Required for ODBC (SQL etc) access on Windows (DBD::ODBC not required if using Win32::ODBC) |  |  |
-| Optional | [Net-SNMP Perl module](http://www.net-snmp.org/FAQ.html#How_do_I_install_the_Perl_SNMP_modules_).  Only required for features that perform conversions between symbolic and numeric OIDs.  This is NOT the same as the Net::SNMP module availabe from CPAN. | net-snmp-perl | libsnmp-perl |
 | Optional | [threads](https://metacpan.org/pod/threads) and [Thread::Semaphore](https://metacpan.org/pod/Thread::Semaphore) modules (included with most if not all distributions).  Required when enabling threads for EXEC statements. | perl-threads | libthreads-perl |
 | Optional | [Digest::MD5](https://metacpan.org/pod/Digest::MD5) module (included with most if not all distributions).  Required when enabling duplicate trap detection. | perl-Digest-MD5 | libdigest-md5-perl |
 
@@ -232,7 +234,7 @@ Note:
 
 * Added PREEXEC support for unknown traps.  Results are stored in the variable **$pu*n***.  See the **unknown_trap_preexec** setting in **snmptt.ini**.
 * Added **unknown_trap_nodes_match_mode** setting to allow you to change how traps are handled when they do not match due to **MATCH** and **NODES**.  If set to 1, traps are considered skipped instead of unknown.  Statistics now include the number of skipped traps when enabled.
-* Added support for wildcards for the **snmptt_conf_files** setting in **snmptt.ini**.  Example: **/etc/snmp/snmptt.*.conf**
+* Added support for wildcards for the **snmptt_conf_files** setting in **snmptt.ini**.  Example: **/etc/snmptt/snmptt.*.conf**
 * Added **log_format** **snmptt.ini** setting to allow you to define the STDOUT, text log and eventlog text format.
 * Added **syslog_format** **snmptt.ini** setting to allow you to define the syslog text format.  This will allow you to add a structured data section for RFC5424 syslog.
 * Added variable substitution **$j** to pull out the enterprise number from the full enterprise OID.  For example, for enterprise OID .1.3.6.1.4.1.232, **$j** would
@@ -733,38 +735,75 @@ Packages are available for most Linux distributions and FreeBSD.  Check your pac
 
  Steps:
 
+1. Install Net-SNMP and the Perl modules as listed int the [Requirements](#Requirements) section.
+
 1. Copy **snmptt** to /usr/sbin/ and ensure it is executable (**chmod +x snmptt**):
 
         cp snmptt /usr/sbin/
-        chmod +x snmptt
+        chmod +x /usr/sbin/snmptt
 
-3. Copy **snmptt.ini** to **/etc/snmp/** or **/etc/** and edit the options inside the file:
+1. Create snmptt user:
 
-        cp snmptt.ini /etc/snmp/
+    1.  RedHat based systems:
+
+            adduser -r snmptt
+
+    2.  Debian based systems:
+
+            adduser --system --group snmptt
+
+1. Create /etc/snmptt and set permissions.  Note: Starting with v1.5, you can use /etc/snmptt/ instead of /etc/snmp/ for your snmptt.ini file.m
+
+        mkdir /etc/snmptt
+        chown -R snmptt.snmptt /etc/snmptt
+        chmod 750 /etc/snmptt
+
+3. Copy **snmptt.ini** to **/etc/snmptt** and edit the options inside the file:
+
+        cp snmptt.ini /etc/snmptt/
 
     and
 
-        vi /etc/snmp/snmptt.ini
+        vi /etc/snmptt/snmptt.ini
 
-4. Either copy **examples/snmptt.conf.generic** to **/etc/snmp/snmptt.conf** (renaming the file during the copy) or use the touch command to create the file (**touch /etc/snmp/snmptt.conf**).
+4. Either copy **examples/snmptt.conf.generic** to **/etc/snmptt/snmptt.conf** (renaming the file during the copy) or use the touch command to create the file (**touch /etc/snmptt/snmptt.conf**).
 
-        cp examples/snmptt.conf.generic /etc/snmp/snmptt.conf
+        cp examples/snmptt.conf.generic /etc/snmptt/snmptt.conf
 
     or
 
-        touch /etc/snmp/snmptt.conf
+        touch /etc/snmptt/snmptt.conf
 
 5. Create the log folder **/var/log/snmptt/**:
 
         mkdir /var/log/snmptt
+        chown -R snmptt.snmptt /var/log/snmptt
+        chmod -R 750 /var/log/snmptt
 
 2. Create the spool folder **/var/spool/snmptt/**:
 
         mkdir /var/spool/snmptt/
+        chown -R snmptt.snmptt /var/spool/snmptt
+        chmod -R 750 /var/spool/snmptt
 
-3. Startup scripts are included for SysVinit and SystemD systems.
+3. Startup scripts are included for SystemD (uses **systemctl** to control services) and SysVinit systems.  Select one depending on your distribution.
 
-     1. SysVinit:  
+    2. Systemd:
+
+        1. Copy the script and remove executable flag if set.
+
+                cp snmptt.service /usr/lib/systemd/system/snmptt.service
+                chmod -x /usr/lib/systemd/system/snmptt.service
+
+        2. Enable the service:
+
+                systemctl enable snmptt.service
+
+        3. Start the service:
+
+                systemctl start snmptt.service
+
+     1. SysVinit:
 
         1. Copy the script:
 
@@ -782,36 +821,25 @@ Packages are available for most Linux distributions and FreeBSD.  Check your pac
 
                 service snmptt start
 
-    2. Systemd:  
-
-        1. Copy the script:
-
-                cp snmptt.service /usr/lib/systemd/system/snmptt.service
-  
-        2. Enable the service:
-  
-                systemctl enable snmptt.service
-  
-        3. Start the service:
-
-                systemctl start snmptt.service
-    
     3.  Manually starting without SystemD or SysVinit:
 
-                snmptt --daemon
+            snmptt --daemon
 
 8. Check syslog to ensure SNMPTT started properly:
 
         grep snmptt /var/log/messages
+        grep snmptt /var/log/syslog
 
     Example log messages:
 
-        snmptt-sys[31442]: SNMPTT 1.4.2 started
-        snmptt-sys[31442]: Loading /etc/snmp/snmptt.conf
-        snmptt-sys[31442]: Finished loading 89 lines from /etc/snmp/snmptt.conf
+        snmptt-sys[31442]: SNMPTT 1.5.2 started
+        snmptt-sys[31442]: Loading /etc/snmptt/snmptt.conf
+        snmptt-sys[31442]: Finished loading 64 lines from /etc/snmptt/snmptt.conf
         snmptt: PID file: /var/run/snmptt.pid
         snmptt-sys[31446]: Configured daemon_uid: snmptt
         snmptt-sys[31446]: Changing to UID: snmptt (1002), GID: snmptt (1002)
+
+    qNote: If SNMPTT doesn't start, try running it manually from the shell prompt to see if there are any missing Perl modules.
 
 8. A log rotation script is included which can be used to rotate the log files on Red Hat and other systems.  Copy the file to the logrotate.d directory (renaming the file during the copy):
 
@@ -821,9 +849,11 @@ Packages are available for most Linux distributions and FreeBSD.  Check your pac
 
         vi /etc/logrotate.d/snmptt
 
-Next we will install the Net-SNMP handler.  There are two options:  The standard handler and the embedded handler.
+### <a name="Installation-Unix-Handlers"></a>Net-SNMP handlers
 
-### <a name="Installation-Unix-Standard"></a>Net-SNMP Standard handler
+Next we will install the Net-SNMP handler.  There are two options:  The standard handler and the embedded handler.  The embedded handler is recommended.
+
+#### <a name="Installation-Unix-Standard"></a>Net-SNMP Standard handler
 
 The standard handler is a small Perl program that is called by snmptrapd each time a trap is received when using daemon mode.  The limitations of this handler are:  
 
@@ -842,6 +872,26 @@ Steps:
 
         cp snmptthandler /usr/sbin/
         chmod +x /usr/sbin/snmptthandler
+
+4.  Manually start **snmptthandler** to make sure there are no missing Perl modules:
+
+        /usr/sbin/snmptthandler
+
+    Missing Perl module example:
+
+        Can't locate Time/HiRes.pm in @INC (you may need to install the Time::HiRes module) (@INC contains: /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5) at /usr/sbin/snmptthandler-embedded line 42.
+        BEGIN failed--compilation aborted at /usr/sbin/snmptthandler-embedded line 42.
+
+    No missing Perl modules example.  Errors below can be ignored:
+
+        SNMPTTHANDLER started: Sun Feb 27 10:39:39 2022
+
+        s = 1645976379, usec = 360145
+        s_pad = 1645976379, usec_pad = 360145
+
+        Data received:
+
+    Press control-c to exit the handler.
 
 7. For **SNMPTT daemon mode**:
     1. Modify (or create) the Net-SNMP **snmptrapd.conf** file by adding the following lines:
@@ -865,11 +915,11 @@ Steps:
 
         Note:   It is possible to configure snmptrapd to execute snmptt based on the specific trap received, but using the default option is preferred
 
-10. Permanently change snmptrapd to use the -On option by modifying the startup script:  
+10. Permanently change snmptrapd to use the **-On** option by modifying the startup script:
   
     1. Systemd:  
   
-        Edit the unit file and add the -On option:  
+        Edit the unit file and add the **-On** option:
   
             systemctl edit --full snmptrapd.service
   
@@ -900,21 +950,22 @@ Steps:
 
     Note:  **The -On option is recommended**.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the **Net-SNMP Perl module** is not installed, then you MUST use the **-On** switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.
 
-    As an alternative, you can edit the **/etc/snmp/snmp.conf** file to include the line: **printNumericOids 1. ** This setting will take effect no matter what is used on the command line.
+    As an alternative, you can edit the Net-SNMP configuration file **/etc/snmp/snmp.conf** to include the line: **printNumericOids 1. ** This setting will take effect no matter what is used on the command line.
 
-10.  Start / restart snmptrapd using service or systemctl:
+10.  Start / restart snmptrapd using systemctl or service:
 
-        service snmptrapd restart
         systemctl restart snmptrapd
+        service snmptrapd restart
 
 8. Check syslog to ensure SNMPTT started properly:
 
         grep snmptrapd /var/log/messages
+        grep snmptrapd /var/log/syslog
 
 10. Follow the steps in the section [Securing SNMPTT](#SecuringSNMPTT) to ensure SNMPTT has been configured securely.
 
  
-### <a name="Installation-Unix-Embedded"></a>Net-SNMP Embedded handler
+#### <a name="Installation-Unix-Embedded"></a>Net-SNMP Embedded handler
 
   
 The embedded handler is a small Perl program that is loaded directly into snmptrapd when snmptrapd is started.  The limitations of this handler are:  
@@ -929,7 +980,7 @@ The benefits of using this handler are:
 
 Steps:
 
-1. Make sure snmptrapd has embedded Perl support enabled.  To see if it's enabled in your installation, type:
+1. Make sure **snmptrapd** has embedded Perl support enabled.  To see if it's enabled in your installation, type:
 
         snmptrapd -H 2>&1 | grep perl
     
@@ -938,23 +989,34 @@ Steps:
 3. Copy **snmptthandler-embedded** to /usr/sbin/.  It does not need to be executable as it is called directly by snmptrapd.
 
         cp snmptthandler-embedded /usr/sbin/
+        chmod +x /usr/sbin/snmptthandler-embedded
+
+4.  Manually start **snmptthandler-embedded** to make sure there are no missing Perl modules:
+
+        /usr/sbin/snmptthandler-embedded
+
+    Missing Perl module example:
+
+        Can't locate Time/HiRes.pm in @INC (you may need to install the Time::HiRes module) (@INC contains: /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5) at /usr/sbin/snmptthandler-embedded line 42.
+        BEGIN failed--compilation aborted at /usr/sbin/snmptthandler-embedded line 42.
+
+    No missing Perl modules example.  Errors below can be ignored:
+
+        Bareword "NETSNMPTRAPD_HANDLER_OK" not allowed while "strict subs" in use at /usr/sbin/snmptthandler-embedded line 264.
+        Execution of /usr/sbin/snmptthandler-embedded aborted due to compilation errors.
 
 7. Configure snmptrapd and install the service:  
   
-    Modify (or create) the Net-SNMP snmptrapd.conf file by adding the following line:
+    Modify (or create) the Net-SNMP snmptrapd.conf file by adding the lines below.  Note: You can locate the **snmptrapd.conf** file by running **snmpconf -i**.
 
         disableAuthorization yes
         perl do "/usr/sbin/snmptthandler-embedded"
 
-    Note:  You can locate the **snmptrapd.conf** file by running:
-    
-        snmpconf -i
-
-10. Permanently change snmptrapd to use the -On option by modifying the startup script:  
+10. Permanently change snmptrapd to use the **-On** option by modifying the startup script:
   
     1. Systemd:  
   
-        Edit the unit file and add the -On option:  
+        Edit the unit file and add the **-On** option:
   
             systemctl edit --full snmptrapd.service
   
@@ -985,22 +1047,79 @@ Steps:
   
     Note:  **The -On option is recommended**.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the **Net-SNMP Perl module** is not installed, then you MUST use the **-On** switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.
 
-    As an alternative, you can edit the **/etc/snmp/snmp.conf** file to include the line: **printNumericOids 1. ** This setting will take effect no matter what is used on the command line.
+    As an alternative, you can edit the Net-SNMP configuration file **/etc/snmp/snmp.conf** to include the line: **printNumericOids 1. ** This setting will take effect no matter what is used on the command line.
 
-10.  Start / restart snmptrapd using service or systemctl:
+10.  Start / restart snmptrapd using systemctl or service:
 
-        service snmptrapd restart
         systemctl restart snmptrapd
+        service snmptrapd restart
 
 8. Check syslog to ensure SNMPTT started properly:
 
         grep snmptrapd /var/log/messages
+        grep snmptrapd /var/log/syslog
 
 10. Follow the steps in the section [Securing SNMPTT](#SecuringSNMPTT) to ensure SNMPTT has been configured securely.
 
 Note:  The default snmptt.ini enables logging to snmptt.log and also syslog for both trap messages and snmptt system messages.  Change the following settings if required:  **log\_enable**, **syslog\_enable** and **syslog\_system\_enable**. 
-  
-  
+
+
+### <a name="Installation-Unix-Testing"></a>Testing
+
+1. Copy a sample trap file to the spool folder:
+
+        cp examples/'#sample-trap.generic.daemon' /var/spool/snmptt/
+
+2.  Check the snmptt.log file for the trap.  Note:  The date is from the sample trap file.
+
+        tail /var/log/snmptt/snmptt.log
+
+        Mon Aug 16 10:06:35 2004 .1.3.6.1.6.3.1.1.5.3 Normal "Status Events" router01 - Link down on interface 3.  Admin state: 2.  Operational state: 3
+
+2.  Check syslog for the trap from **snmptt**.  Note:  The date is from the sample trap file.
+
+        grep 'snmptt\[' /var/log/messages
+        grep 'snmptt\[' /var/log/syslog
+
+        Feb 27 10:29:52 server1 snmptt[83096]: .1.3.6.1.6.3.1.1.5.3 Normal "Status Events" router01 - Link down on interface 3.  Admin state: 2.  Operational state: 3
+
+3.  Generate a **linkDown** trap using **snmptrap**:
+
+        snmptrap -v 2c -c public 127.0.0.1 .1.3.6.1.6.3.1.1.5.3 .1.3.6.1.6.3.1.1.5.3 ifIndex i 2 ifAdminStatus i 1 ifOperStatus i 2
+
+2.  Check the syslog file for the trap from **snmptrapd**:
+
+        grep snmptrapd /var/log/messages
+        grep snmptrapd /var/log/syslog
+
+        Feb 27 11:04:03 bink snmptrapd[84697]: 2022-02-27 11:04:03 localhost [UDP: [127.0.0.1]:40290->[127.0.0.1]:162]:#012.1.3.6.1.6.3.1.1.4.1.0 = OID: .1.3.6.1.6.3.1.1.5.3#011.1.3.6.1.2.1.2.2.1.1 = INTEGER: 2#011.1.3.6.1.2.1.2.2.1.7 = INTEGER: up(1)#011.1.3.6.1.2.1.2.2.1.8 = INTEGER: down(2)
+
+    Note:  If you see the error 'SELinux is preventing /usr/sbin/snmptrapd from write access on the directory snmptt', then SELinux needs to be configured to allow snmptrapd to write to the spool folder.
+
+2.  Check the snmptt.log file for the trap:
+
+        tail /var/log/snmptt/snmptt.log
+
+        Sun Feb 27 11:04:03 2022 .1.3.6.1.6.3.1.1.5.3 Normal "Status Events" 127.0.0.1 - Link down on interface 2.  Admin state: 1.  Operational state: 2
+
+2.  Check syslog for the trap from **snmptt**.
+
+        grep 'snmptt\[' /var/log/messages
+        grep 'snmptt\[' /var/log/syslog
+
+        Feb 27 11:04:07 server1 snmptt[83096]: .1.3.6.1.6.3.1.1.5.3 Normal "Status Events" 127.0.0.1 - Link down on interface 2.  Admin state: 1.  Operational state: 2
+
+
+**Troubleshooting:**
+
+1.  Enable debug mode by defining both **DEBUGGING = 0** and **DEBUGGING_FILE = /var/log/snmptt/snmptt.debug** in **/etc/snmptt/snmptt.ini** and restart **snmptt**.  If the file is not created, check syslog for errors.  Either the DEBUGGING_FILE path is incorrect or there is a permissions error creating the debug log file.
+2.  Make sure permissions have been set for the various folders and files.
+3.  SELinux may interfere with **snmptrapd** and **snmptt**.  Disable or reconfigure at your own discretion.
+4.  Test running **snmptt** and the handlers as explained above to make sure there are no missing Perl modules.
+
+
+
+
 ## <a name="Installation-Windows"></a>Installation - Windows
 
 The Net-SNMP trap receiver does not currently support embedded Perl, so only the standard trap handler can be used with Windows.
@@ -1050,10 +1169,10 @@ The Net-SNMP trap receiver does not currently support embedded Perl, so only the
 
         snmptrapd -On
 
-    Note:  The -On is recommended.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If  the **Net-SNMP Perl module** is not installed, then you MUST use the -On switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.  
+    Note:  **The -On option is recommended**.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the **Net-SNMP Perl module** is not installed, then you MUST use the **-On** switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.
 
-    As an alternative, you can edit your **/etc/snmp/snmp.conf** file to include the line: **printNumericOids 1. ** This setting will take effect no matter what is used on the command line.  
-  
+    As an alternative, you can edit the Net-SNMP configuration file **/etc/snmp/snmp.conf** to include the line: **printNumericOids 1. ** This setting will take effect no matter what is used on the command line.
+
 10. Follow the steps in the section [Securing SNMPTT](#SecuringSNMPTT) to ensure SNMPTT has been configured securely.
   
 
@@ -1193,9 +1312,8 @@ Secure the /etc/snmptt folder with
 
 Grant access to the log folder:  
   
-        chown -R snmptt.snmptt /var/spool/snmptt
         chown -R snmptt.snmptt /var/log/snmptt
-        chmod -R 750 /var/spool/snmptt
+        chmod -R 750 /var/log/snmptt
  
 Note:  It is recommended that only the user running snmptrapd and the snmptt user be given permission to the spool folder.  This will prevent other users from placing files into the spool folder such as non-trap related files, or the !reload file which causes SNMPTT to reload.
 
