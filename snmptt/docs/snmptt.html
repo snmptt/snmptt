@@ -26,12 +26,12 @@ name="GENERATOR" />
 <li><a href="#Installation-Unix">Unix</a>  <ul>
 <li><a href="#Installation-Unix-Package">Package Manager</a>  </li>
 <li><a href="#Installation-Unix-Manual">Manual installation</a>  </li>
-<li><a href="#Installation-Unix-Handlers">Net-SNMP handlers</a>  <ul>
-<li><a href="#Installation-Unix-Standard">Net-SNMP Standard handler</a>  </li>
+<li><a href="#Installation-Unix-Handlers">Net-SNMP handlers</a><ul>
+<li><a href="#Installation-Unix-Standard">Net-SNMP Standard handler</a></li>
 <li><a href="#Installation-Unix-Embedded">Net-SNMP Embedded handler</a></li>
 </ul>
 </li>
-<li><a href="#Installation-Unix-Testing">Testing</a>      </li>
+<li><a href="#Installation-Unix-Testing">Testing</a></li>
 </ul>
 </li>
 <li><a href="#Installation-Windows">Windows</a>  </li>
@@ -1048,11 +1048,11 @@ traphandle default /usr/sbin/snmptt
 </ol>
 </li>
 <li>
-<p>Permanently change snmptrapd to use the <strong>-On</strong> option by modifying the startup script:  </p>
+<p>Permanently change snmptrapd to use the <strong>-On</strong> option by modifying the startup script:</p>
 <ol>
 <li>
 <p>Systemd:  </p>
-<p>Edit the unit file and add the <strong>-On</strong> option:  </p>
+<p>Edit the unit file and add the <strong>-On</strong> option:</p>
 <pre><code>systemctl edit --full snmptrapd.service
 </code></pre>
 <p>Change:</p>
@@ -1141,11 +1141,11 @@ perl do "/usr/sbin/snmptthandler-embedded"
 </code></pre>
 </li>
 <li>
-<p>Permanently change snmptrapd to use the <strong>-On</strong> option by modifying the startup script:  </p>
+<p>Permanently change snmptrapd to use the <strong>-On</strong> option by modifying the startup script:</p>
 <ol>
 <li>
 <p>Systemd:  </p>
-<p>Edit the unit file and add the <strong>-On</strong> option:  </p>
+<p>Edit the unit file and add the <strong>-On</strong> option:</p>
 <pre><code>systemctl edit --full snmptrapd.service
 </code></pre>
 <p>Change:</p>
@@ -1308,7 +1308,7 @@ notepad c:\snmp\snmptt.conf
 <pre><code>snmptrapd -On
 </code></pre>
 <p>Note:  <strong>The -On option is recommended</strong>.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the <strong>Net-SNMP Perl module</strong> is not installed, then you MUST use the <strong>-On</strong> switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.</p>
-<p>As an alternative, you can edit the Net-SNMP configuration file <strong>/etc/snmp/snmp.conf</strong> to include the line: <strong>printNumericOids 1. </strong> This setting will take effect no matter what is used on the command line.  </p>
+<p>As an alternative, you can edit the Net-SNMP configuration file <strong>/etc/snmp/snmp.conf</strong> to include the line: <strong>printNumericOids 1. </strong> This setting will take effect no matter what is used on the command line.</p>
 </li>
 <li>
 <p>Follow the steps in the section <a href="#SecuringSNMPTT">Securing SNMPTT</a> to ensure SNMPTT has been configured securely.</p>
@@ -1438,9 +1438,9 @@ link /nodefaultlib /INCREMENTAL:NO /release /nologo -base:0x60000000 -machine:i3
 <p>As with most software, SNMPTT should be run without root or administrator privileges.  Running with a non privileged account can help restrict what actions can occur when using features such as EXEC and REGEX.  </p>
 <p>For Linux and Unix, if you start SNMPTT as root, a user called 'snmptt' should be created and the <strong>snmptt.ini</strong> option <strong>daemon_uid</strong> should be set to the numerical user id (eg: 500) or textual user id (snmptt). <strong>Only define daemon_uid if starting snmptt using root.</strong>  </p>
 <p>If you start SNMPTT as a non-root user, then <strong>daemon_uid</strong> is not required (and will probably not work).  </p>
-<p>When using <strong>daemon_uid</strong> in daemon mode, there will be two SNMPTT processes. The first will run as root and will be responsible for creating the .pid file, and for cleaning up the .pid file on exit. The second process will run as the user defined by <strong>daemon_uid</strong>. If the system syslog (syslog_system_enable) is enabled, a message will be logged stating the user id has been changed. All processing from that point on will be as the new user id. This can be verified by looking the snmptt processes using <strong>ps</strong>.</p>
+<p>When using <strong>daemon_uid</strong> in daemon mode, there will be two SNMPTT processes. The first will run as root and will be responsible for creating the .pid file, and for cleaning up the .pid file on exit. The second process will run as the user defined by <strong>daemon_uid</strong>. If the system syslog (<strong>syslog_system_enable</strong>) is enabled, a message will be logged stating the user id has been changed. All processing from that point on will be as the new user id. This can be verified by looking the snmptt processes using <strong>ps</strong>.</p>
 <p>For Windows, a local or domain user account called 'snmptt' should be created.  If running as a Windows service, the service should be configured to use the snmptt user account.  Otherwise the system should be logged in locally with the snmptt account before launching SNMPTT in daemon mode.  </p>
-<p>The script snmptthandler which is called from Net-SNMP's snmptrapd will be executed in the same security context as snmptrapd.   </p>
+<p>The script <strong>snmptthandler</strong> which is called from Net-SNMP's snmptrapd will be executed in the same security context as <strong>snmptrapd</strong>.</p>
 <p>The SNMPTT user should be configured with the following permissions:</p>
 <ul>
 <li>read / delete access to spool directory to be able to read new traps, and delete processed traps</li>
@@ -1448,29 +1448,29 @@ link /nodefaultlib /INCREMENTAL:NO /release /nologo -base:0x60000000 -machine:i3
 <li>write access to log folder /var/log/snmptt/ or c:\snmp\log\.</li>
 <li>any other permissions required for EXEC statements to execute</li>
 </ul>
-<p>If snmptrapd is run as a non root / administrator, it should be configured with the following permissions:  </p>
+<p>If <strong>snmptrapd</strong> is run as a non root / administrator, it should be configured with the following permissions below.  Note:  SELinux may prevent writing to the folder.</p>
 <ul>
 <li>write access to spool directory</li>
 </ul>
-<p>Secure the spool folder with:</p>
+<p>Grant access and secure the spool folder with:</p>
 <pre><code>    chown -R snmptt.snmptt /var/spool/snmptt
     chmod -R 750 /var/spool/snmptt
 </code></pre>
-<p>Secure the /etc/snmp folder with</p>
+<p>Grant access and secure the log folder with:</p>
+<pre><code>    chown -R snmptt.snmptt /var/log/snmptt
+    chmod -R 750 /var/log/snmptt
+</code></pre>
+<p>If you are using <strong>/etc/snmp</strong> to store the SNMPTT configuration files, secure the folder with:</p>
 <pre><code>    chown -R root.root /etc/snmp
     chmod 755 /etc/snmp
     chown snmptt.snmptt /etc/snmp/snmptt*
     chmod 660 /etc/snmp/snmptt*
 </code></pre>
-<p>Note:  Starting with v1.5, you can use <strong>/etc/snmptt/</strong> instead of <strong>/etc/snmp/</strong> for your <strong>snmptt.ini</strong> file:</p>
-<p>Secure the /etc/snmptt folder with</p>
+<p>If you are using <strong>/etc/snmptt</strong> to store the SNMPTT configuration files, secure folder with:</p>
 <pre><code>    chown -R snmptt.snmptt /etc/snmptt
     chmod 750 /etc/snmptt
 </code></pre>
-<p>Grant access to the log folder:  </p>
-<pre><code>    chown -R snmptt.snmptt /var/log/snmptt
-    chmod -R 750 /var/log/snmptt
-</code></pre>
+<p>Note:  Starting with v1.5, you can use <strong>/etc/snmptt/</strong> instead of <strong>/etc/snmp/</strong> for your <strong>snmptt.ini</strong> file:</p>
 <p>Note:  It is recommended that only the user running snmptrapd and the snmptt user be given permission to the spool folder.  This will prevent other users from placing files into the spool folder such as non-trap related files, or the !reload file which causes SNMPTT to reload.</p>
 <h1><a name="Configuration-Options"></a>Configuration Options - snmptt.ini</h1>
 <p>As mentioned throughout this document, configuration options are set by editing the <strong>snmptt.ini</strong> file.</p>

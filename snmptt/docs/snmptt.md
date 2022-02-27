@@ -839,7 +839,7 @@ Packages are available for most Linux distributions and FreeBSD.  Check your pac
         snmptt-sys[31446]: Configured daemon_uid: snmptt
         snmptt-sys[31446]: Changing to UID: snmptt (1002), GID: snmptt (1002)
 
-    qNote: If SNMPTT doesn't start, try running it manually from the shell prompt to see if there are any missing Perl modules.
+    Note: If SNMPTT doesn't start, try running it manually from the shell prompt to see if there are any missing Perl modules.
 
 8. A log rotation script is included which can be used to rotate the log files on Red Hat and other systems.  Copy the file to the logrotate.d directory (renaming the file during the copy):
 
@@ -1274,11 +1274,11 @@ For Linux and Unix, if you start SNMPTT as root, a user called 'snmptt' should b
   
 If you start SNMPTT as a non-root user, then **daemon\_uid** is not required (and will probably not work).  
   
-When using **daemon\_uid** in daemon mode, there will be two SNMPTT processes. The first will run as root and will be responsible for creating the .pid file, and for cleaning up the .pid file on exit. The second process will run as the user defined by **daemon\_uid**. If the system syslog (syslog\_system\_enable) is enabled, a message will be logged stating the user id has been changed. All processing from that point on will be as the new user id. This can be verified by looking the snmptt processes using **ps**.
+When using **daemon\_uid** in daemon mode, there will be two SNMPTT processes. The first will run as root and will be responsible for creating the .pid file, and for cleaning up the .pid file on exit. The second process will run as the user defined by **daemon\_uid**. If the system syslog (**syslog\_system\_enable**) is enabled, a message will be logged stating the user id has been changed. All processing from that point on will be as the new user id. This can be verified by looking the snmptt processes using **ps**.
   
 For Windows, a local or domain user account called 'snmptt' should be created.  If running as a Windows service, the service should be configured to use the snmptt user account.  Otherwise the system should be logged in locally with the snmptt account before launching SNMPTT in daemon mode.  
   
-The script snmptthandler which is called from Net-SNMP's snmptrapd will be executed in the same security context as snmptrapd.   
+The script **snmptthandler** which is called from Net-SNMP's snmptrapd will be executed in the same security context as **snmptrapd**.
   
 The SNMPTT user should be configured with the following permissions:
 
@@ -1287,34 +1287,34 @@ The SNMPTT user should be configured with the following permissions:
 *   write access to log folder /var/log/snmptt/ or c:\\snmp\\log\\.
 *   any other permissions required for EXEC statements to execute
 
-If snmptrapd is run as a non root / administrator, it should be configured with the following permissions:  
+If **snmptrapd** is run as a non root / administrator, it should be configured with the following permissions below.  Note:  SELinux may prevent writing to the folder.
 
 *   write access to spool directory
 
-Secure the spool folder with:
+Grant access and secure the spool folder with:
 
         chown -R snmptt.snmptt /var/spool/snmptt
         chmod -R 750 /var/spool/snmptt
 
-Secure the /etc/snmp folder with
+Grant access and secure the log folder with:
+
+        chown -R snmptt.snmptt /var/log/snmptt
+        chmod -R 750 /var/log/snmptt
+
+If you are using **/etc/snmp** to store the SNMPTT configuration files, secure the folder with:
 
         chown -R root.root /etc/snmp
         chmod 755 /etc/snmp
         chown snmptt.snmptt /etc/snmp/snmptt*
         chmod 660 /etc/snmp/snmptt*
 
-Note:  Starting with v1.5, you can use **/etc/snmptt/** instead of **/etc/snmp/** for your **snmptt.ini** file:
-
-Secure the /etc/snmptt folder with
+If you are using **/etc/snmptt** to store the SNMPTT configuration files, secure folder with:
 
         chown -R snmptt.snmptt /etc/snmptt
         chmod 750 /etc/snmptt
 
-Grant access to the log folder:  
-  
-        chown -R snmptt.snmptt /var/log/snmptt
-        chmod -R 750 /var/log/snmptt
- 
+Note:  Starting with v1.5, you can use **/etc/snmptt/** instead of **/etc/snmp/** for your **snmptt.ini** file:
+
 Note:  It is recommended that only the user running snmptrapd and the snmptt user be given permission to the spool folder.  This will prevent other users from placing files into the spool folder such as non-trap related files, or the !reload file which causes SNMPTT to reload.
 
 # <a name="Configuration-Options"></a>Configuration Options - snmptt.ini
