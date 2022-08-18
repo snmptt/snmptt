@@ -1869,7 +1869,7 @@ sub processtrap
 
         $enterprise_trans = translate_enterprise_oid_format_sub($var[6]);
 
-        substitute("",0);
+        substitute();
 
         $message_short = $_;
 
@@ -1879,7 +1879,7 @@ sub processtrap
         }
         else {
           $_ = $log_format;
-          substitute($message_short,0);
+          substitute($message_short);
           $message = $_ . "\n";
         }
 
@@ -1939,7 +1939,7 @@ sub processtrap
           }
           else {
             $_ = $syslog_format;
-            substitute($message_short,0);
+            substitute($message_short);
             $syslogmessage = $_ . "\n";
           }
 
@@ -2106,7 +2106,7 @@ sub processtrap
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
               print "Performing substitution on custom column: $_\n";
-              substitute("",0);
+              substitute();
               print "Done performing substitution on custom column: $_\n";
               $t_sql_custom_columns[$i] = $_;
             }
@@ -2151,7 +2151,7 @@ sub processtrap
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
               print "Performing substitution on custom column: $_\n";
-              substitute("",0);
+              substitute();
               print "Done performing substitution on custom column: $_\n";
               $t_sql_custom_columns[$i] = $_;
             }
@@ -2194,7 +2194,7 @@ sub processtrap
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
               print "Performing substitution on custom column: $_\n";
-              substitute("",0);
+              substitute();
               print "Done performing substitution on custom column: $_\n";
               $t_sql_custom_columns[$i] = $_;
             }
@@ -2237,7 +2237,7 @@ sub processtrap
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
               print "Performing substitution on custom column: $_\n";
-              substitute("",0);
+              substitute();
               print "Done performing substitution on custom column: $_\n";
               $t_sql_custom_columns[$i] = $_;
             }
@@ -2287,7 +2287,7 @@ sub processtrap
           {
             $_ = $event2[4][$i];
 
-            substitute($message_short,1);
+            substitute($message_short);
 
             my $command = $_;
 
@@ -2361,7 +2361,6 @@ sub processtrap
 sub substitute
 {
   my $format_line = shift;      # Used for $Fz variable substitution for EXEC line.
-  my $escape_ent_vars = shift;
 
   # Perform substitution on $_ variable
 
@@ -4150,7 +4149,7 @@ sub searchfortrap
         my $command;
 
         $_ = $unknown_trap_preexec[$i];
-        substitute("",1);
+        substitute();
 
         $command = $_;
 
@@ -4192,7 +4191,7 @@ sub searchfortrap
       if ($unknown_trap_exec_format ne "") {        
         $_ = $unknown_trap_exec_format;
 
-        substitute("",1);
+        substitute();
 
         $command = $unknown_trap_exec . " \"$_\"";
       }
@@ -4282,7 +4281,7 @@ sub searchfortrap
 
         $_ = $db_unknown_trap_format;
 
-        substitute("",0);
+        substitute();
 
         $message_short = $_;
       }
@@ -4306,7 +4305,7 @@ sub searchfortrap
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
             print "Performing substitution on custom column: $_\n";
-            substitute("",0);
+            substitute();
             print "Done performing substitution on custom column: $_\n";
             $t_sql_custom_columns_unknown[$i] = $_;
           }
@@ -4343,7 +4342,7 @@ sub searchfortrap
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
             print "Performing substitution on custom column: $_\n";
-            substitute("",0);
+            substitute();
             print "Done performing substitution on custom column: $_\n";
             $t_sql_custom_columns_unknown[$i] = $_;
           }
@@ -4379,7 +4378,7 @@ sub searchfortrap
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
             print "Performing substitution on custom column: $_\n";
-            substitute("",0);
+            substitute();
             print "Done performing substitution on custom column: $_\n";
             $t_sql_custom_columns_unknown[$i] = $_;
           }
@@ -4415,7 +4414,7 @@ sub searchfortrap
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
             print "Performing substitution on custom column: $_\n";
-            substitute("",0);
+            substitute();
             print "Done performing substitution on custom column: $_\n";
             $t_sql_custom_columns_unknown[$i] = $_;
           }
@@ -5456,7 +5455,7 @@ sub match
     $_ = $match_var;
     $match = $2;
     if ($DEBUGGING >= 1) {  print "     Performing substitution on MATCH variable: $match_var\n"; }
-    substitute("",0);
+    substitute();
     if ($DEBUGGING >= 1) {  print "     Done performing substitution on MATCH variable $match_var (converted to: $_)\n"; }
     $value = $_;
   }
@@ -6890,7 +6889,7 @@ sub preexec_run {
             $_ = $event2[9][$i];
 
             print "Performing substitution on PREEXEC line: $_\n";
-            substitute("",1);
+            substitute();
             print "Done performing substitution on PREEXEC line: $_\n";
 
             my $command = $_;
