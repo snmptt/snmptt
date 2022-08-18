@@ -12,6 +12,9 @@ git config -l
 
 
 -update version and (c) date in:
+        INSTALL
+        README
+        snmptt-net-snmp-test
         snmptt
         snmpttconvert
         snmpttconvertmib
@@ -23,6 +26,10 @@ git config -l
         docs/snmpttconvert.md
         docs/snmpttconvertmib.md
         docs/faqs.md
+
+grep -i copyright *
+cd docs
+grep -i copyright *
 
 -update docs/snmptt.md:
         Last updated date

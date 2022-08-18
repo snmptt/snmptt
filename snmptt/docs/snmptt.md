@@ -84,7 +84,7 @@ This file was last updated on: August 17th, 2022
 
 # <a name="License"></a>License
 
-Copyright 2002-2021 Alex Burger  
+Copyright 2002-2022 Alex Burger  
 alex\_b@users.sourceforge.net  
 4/3/2002
 

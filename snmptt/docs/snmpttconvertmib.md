@@ -20,7 +20,7 @@ This file was last updated on:  October 2nd, 2021
 
 #License
 
-Copyright 2002-2021 Alex Burger  
+Copyright 2002-2022 Alex Burger  
 alex\_b@users.sourceforge.net  
 4/3/2002
 
