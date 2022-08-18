@@ -11,10 +11,10 @@ name="GENERATOR" />
 <title>SNMP Trap Translator</title>
 </head>
 
-# SNMP Trap Translator v1.5beta2
+# SNMP Trap Translator v1.5
 **([SNMPTT](http://www.snmptt.org))**
 
-This file was last updated on: November 27th, 2021
+This file was last updated on: August 17th, 2022
 
 [License](#License)
 
@@ -230,7 +230,7 @@ Note:
 
 # <a name="Whats-New"></a>What's New
 
-## **v1.5beta2** **\- November 27th, 2021**
+## **v1.5** **\- August 17th, 2022**
 
 * Added PREEXEC support for unknown traps.  Results are stored in the variable **$pu*n***.  See the **unknown_trap_preexec** setting in **snmptt.ini**.
 * Added **unknown_trap_nodes_match_mode** setting to allow you to change how traps are handled when they do not match due to **MATCH** and **NODES**.  If set to 1, traps are considered skipped instead of unknown.  Statistics now include the number of skipped traps when enabled.
@@ -243,16 +243,7 @@ Note:
   Added the following **snmptt.ini** settings: **syslog_module**, **syslog_remote_dest**, **syslog_remote_port**, **syslog_remote_proto**, **syslog_rfc_format**, **syslog_app** and **syslog_system_app**.
 * Added **--preexec** and **-preexec_file** options to s**nmpttconvertmib**.
 * Added reload support to the **snmptt.service** systemd file.  This will allow you to use the **'systemctl reload snmptt'** command to reload the configuration.
-* Fixed a bug that prevented snmptt from starting when debug mode was disabled (bug 48).
-* Fixed debug output bug with snmptthandler-embedded (PR 1).
-* Fixed a bug with IPv6 address handling for NODES in snmptt.conf.
-* Fixed a bug that prevented the hostname from being extraced when IPv6 is disabled and the hostname is passed from Net-SNMP as UDP: [x.x.x.x]:xxxx->[x.x.x.x]:xxxx.
 * Updated documentation on securing SNMPTT to ensure the snmptt user has read access to the configuration files.  This is required when issuing a reload.
-* **snmptthandler-embedded**:
-    * Varbind types **Gauge32** and **Hex-STRING** now have the Gauge32: and Hex-STRING: text removed for incoming traps.  Unicode line endings are also removed (Perl 5.10 and higher).
-
-## **v1.5beta1** **\- March 25th, 2021**
-
 * Added support for IPv6.  To enable, set **ipv6_enable = 1** in **snmptt.ini**.
 * Added support for sub-second sleep for spool folder processing.
 * **snmptt.ini** can now be located in **/etc/snmptt** and is searched for at this
@@ -275,11 +266,17 @@ Note:
   debug mode was off.
 * Fixed a bug where DNS resolution was not working for enterprise variables 
   when **net_snmp_perl_enable** was disabled.
+* Fixed a bug that prevented snmptt from starting when debug mode was disabled (bug 48).
+* Fixed debug output bug with snmptthandler-embedded (PR 1).
+* Fixed a bug with IPv6 address handling for NODES in snmptt.conf.
+* Fixed a bug that prevented the hostname from being extraced when IPv6 is disabled and the hostname is passed from Net-SNMP as UDP: [x.x.x.x]:xxxx->[x.x.x.x]:xxxx.
 * Changed **net_snmp_perl_best_guess** default from 0 to 2 as any modern system
   should support this.  See FAQ and **snmptt.ini** for details on this variable.
 * Enabled Perl warnings to help ensure code is following best practices.
 * Ran code against Perl::Critic to find non-optimal code.  Made various adjustments such as relacing bare words with variables and changing open() calls from two arguments to three.
 * Documentation was converted from html to markdown to make it easier to maintain and a full review was completed.  Many improvments have been made including a new section on integrating with Icinga.  The docs folder now contains **.md**, **.html** and **.epub** versions of the documentation.
+* **snmptthandler-embedded**:
+    * Varbind types **Gauge32** and **Hex-STRING** now have the Gauge32: and Hex-STRING: text removed for incoming traps.  Unicode line endings are also removed (Perl 5.10 and higher).
 * **snmpttconvertmib**:
     * Added **--exec_file** option to allow you to provide an EXEC command
     inside of a file instead of specifying on the command line.  Useful for
@@ -546,25 +543,18 @@ Note:
 
 # <a name="Upgrading"></a>Upgrading
 
-## **v1.5beta1 to v1.5beta2**
+## **v1.4.2 to v1.5beta1**
 
-To upgrade from v1.5beta1 to v1.5beta2 you should:
+To upgrade from v1.4.2 to v1.5 you should:
 
 1.  Replace **snmptt** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
 1.  Replace **snmptthandler-embedded** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
+1.  Replace **snmpttconvertmib** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
 1.  For systemd systems, replace the **snmptt.service** service file with the new version.
 1.  Backup your **snmptt.ini** file, replace it with the new version, and make any necessary configuration changes to it.
 1.  Secure your **/etc/snmp** or **/etc/snmptt** folder as described in the **Securing SNMPTT** section of the documentation.
-
-## **v1.4.2 to v1.5beta1**
-
-To upgrade from v1.4.2 to v1.5beta1 you should:
-
-1.  Replace **snmptt** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
-1.  Replace **snmpttconvertmib** with the new version.  Make sure the file is executable (**chmod +x _filename_**).
-1.  Backup your **snmptt.ini** file, replace it with the new version, and make any necessary configuration changes to it.
 1.  To enable IPv6 support, set **ipv6_enable = 1** in **snmptt.ini**. 
-    
+   
 Notes:  
 
 1.  Starting with v1.5, you can use **/etc/snmptt/** instead of **/etc/snmp/** for your **snmptt.ini** file.  

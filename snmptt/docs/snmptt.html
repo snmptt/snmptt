@@ -10,9 +10,9 @@ name="GENERATOR" />
 <link rel="StyleSheet" type="text/css" href="layout1.css" />
 <title>SNMP Trap Translator</title>
 </head></p>
-<h1>SNMP Trap Translator v1.5beta2</h1>
+<h1>SNMP Trap Translator v1.5</h1>
 <p><strong>(<a href="http://www.snmptt.org">SNMPTT</a>)</strong></p>
-<p>This file was last updated on: November 27th, 2021</p>
+<p>This file was last updated on: August 17th, 2022</p>
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <ul>
@@ -173,138 +173,138 @@ table {
 <table>
 <thead>
 <tr>
-<th align="left">R/O</th>
-<th align="left">Program / Module</th>
-<th align="left">rpm</th>
-<th align="left">deb</th>
+<th style="text-align: left;">R/O</th>
+<th style="text-align: left;">Program / Module</th>
+<th style="text-align: left;">rpm</th>
+<th style="text-align: left;">deb</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">Required</td>
-<td align="left"><a href="http://www.net-snmp.org">Net-SNMP</a> (formerly known as UCD-SNMP).  Specifically <strong>snmptrapd.</strong></td>
-<td align="left">net-snmp, net-snmp-utils</td>
-<td align="left">snmp, snmptrapd</td>
+<td style="text-align: left;">Required</td>
+<td style="text-align: left;"><a href="http://www.net-snmp.org">Net-SNMP</a> (formerly known as UCD-SNMP).  Specifically <strong>snmptrapd.</strong></td>
+<td style="text-align: left;">net-snmp, net-snmp-utils</td>
+<td style="text-align: left;">snmp, snmptrapd</td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="http://www.net-snmp.org/FAQ.html#How_do_I_install_the_Perl_SNMP_modules_">Net-SNMP Perl module</a>.  Only required for features that perform conversions between symbolic and numeric OIDs.  This is NOT the same as the Net::SNMP module availabe from CPAN.</td>
-<td align="left">net-snmp-perl</td>
-<td align="left">libsnmp-perl</td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="http://www.net-snmp.org/FAQ.html#How_do_I_install_the_Perl_SNMP_modules_">Net-SNMP Perl module</a>.  Only required for features that perform conversions between symbolic and numeric OIDs.  This is NOT the same as the Net::SNMP module availabe from CPAN.</td>
+<td style="text-align: left;">net-snmp-perl</td>
+<td style="text-align: left;">libsnmp-perl</td>
 </tr>
 <tr>
-<td align="left">Required</td>
-<td align="left"><a href="https://metacpan.org/pod/Text::ParseWords">Text::ParseWords</a> module (included with most distributions)</td>
-<td align="left">perl-Text-ParseWords</td>
-<td align="left"></td>
+<td style="text-align: left;">Required</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/Text::ParseWords">Text::ParseWords</a> module (included with most distributions)</td>
+<td style="text-align: left;">perl-Text-ParseWords</td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">Required</td>
-<td align="left"><a href="https://metacpan.org/pod/Getopt::Long">Getopt::Long</a> module (included with most distributions)</td>
-<td align="left"></td>
-<td align="left"></td>
+<td style="text-align: left;">Required</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/Getopt::Long">Getopt::Long</a> module (included with most distributions)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">Required</td>
-<td align="left"><a href="http://search.cpan.org/search?module=POSIX">Posix</a> module (included with most if not all distributions)</td>
-<td align="left"></td>
-<td align="left"></td>
+<td style="text-align: left;">Required</td>
+<td style="text-align: left;"><a href="http://search.cpan.org/search?module=POSIX">Posix</a> module (included with most if not all distributions)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">Required</td>
-<td align="left"><a href="https://metacpan.org/pod/Config::IniFiles">Config::IniFiles</a> module</td>
-<td align="left">perl-Config-IniFiles (EPEL, PowerTools repos)</td>
-<td align="left">libconfig-inifiles-perl</td>
+<td style="text-align: left;">Required</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/Config::IniFiles">Config::IniFiles</a> module</td>
+<td style="text-align: left;">perl-Config-IniFiles (EPEL, PowerTools repos)</td>
+<td style="text-align: left;">libconfig-inifiles-perl</td>
 </tr>
 <tr>
-<td align="left">Required</td>
-<td align="left"><a href="https://metacpan.org/pod/Time::HiRes">Time::HiRes</a> module (only required when using SNMPTT in daemon mode - required by <strong>snmptthandler</strong>)</td>
-<td align="left">perl-Time-HiRes</td>
-<td align="left">libtime-hires-perl</td>
+<td style="text-align: left;">Required</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/Time::HiRes">Time::HiRes</a> module (only required when using SNMPTT in daemon mode - required by <strong>snmptthandler</strong>)</td>
+<td style="text-align: left;">perl-Time-HiRes</td>
+<td style="text-align: left;">libtime-hires-perl</td>
 </tr>
 <tr>
-<td align="left">Required</td>
-<td align="left"><a href="https://metacpan.org/pod/Sys::Hostname">Sys::Hostname</a> module (included with most if not all distributions).</td>
-<td align="left"></td>
-<td align="left"></td>
+<td style="text-align: left;">Required</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/Sys::Hostname">Sys::Hostname</a> module (included with most if not all distributions).</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">Required</td>
-<td align="left"><a href="https://metacpan.org/pod/File::Basename">File::Basename</a> module (included with most if not all distributions).</td>
-<td align="left"></td>
-<td align="left"></td>
+<td style="text-align: left;">Required</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/File::Basename">File::Basename</a> module (included with most if not all distributions).</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">Required</td>
-<td align="left"><a href="https://metacpan.org/pod/Text::Balanced">Text::Balanced</a> module (included with most if not all distributions).</td>
-<td align="left">perl-Text-Balanced</td>
-<td align="left"></td>
+<td style="text-align: left;">Required</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/Text::Balanced">Text::Balanced</a> module (included with most if not all distributions).</td>
+<td style="text-align: left;">perl-Text-Balanced</td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="https://metacpan.org/pod/Net::IP">Net::IP</a> module. Required for IPv6 support.</td>
-<td align="left">perl-Net-IP (EPEL repo)</td>
-<td align="left">libnet-ip-perl</td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/Net::IP">Net::IP</a> module. Required for IPv6 support.</td>
+<td style="text-align: left;">perl-Net-IP (EPEL repo)</td>
+<td style="text-align: left;">libnet-ip-perl</td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="https://metacpan.org/pod/IO::Socket::IP">IO::Socket::IP</a> module (included with most if not all distributions). Required for DNS translations.</td>
-<td align="left"></td>
-<td align="left"></td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/IO::Socket::IP">IO::Socket::IP</a> module (included with most if not all distributions). Required for DNS translations.</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="https://metacpan.org/pod/Sys::Syslog">Sys::Syslog</a> module (included with most Unix distributions). Required for Syslog support using Unix sockets (local syslog).</td>
-<td align="left">perl-Sys-Syslog</td>
-<td align="left"></td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/Sys::Syslog">Sys::Syslog</a> module (included with most Unix distributions). Required for Syslog support using Unix sockets (local syslog).</td>
+<td style="text-align: left;">perl-Sys-Syslog</td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="https://metacpan.org/pod/Log::Syslog::Fast">Log::Syslog::Fast</a> and <a href="https://metacpan.org/pod/Log::Syslog::Constants">Log::Syslog::Constants</a> modules. Required for remote syslog and RFC5424 support.</td>
-<td align="left"></td>
-<td align="left"></td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/Log::Syslog::Fast">Log::Syslog::Fast</a> and <a href="https://metacpan.org/pod/Log::Syslog::Constants">Log::Syslog::Constants</a> modules. Required for remote syslog and RFC5424 support.</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="https://metacpan.org/pod/DBI">DBI</a> module.  Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support.</td>
-<td align="left">perl-DBI</td>
-<td align="left">libclass-dbi-perl</td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/DBI">DBI</a> module.  Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support.</td>
+<td style="text-align: left;">perl-DBI</td>
+<td style="text-align: left;">libclass-dbi-perl</td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="https://metacpan.org/pod/DBD::mysql">DBD::mysql</a> module.  Required for MySQL support.</td>
-<td align="left">perl-DBD-MySQL</td>
-<td align="left">libdbd-mysql-perl</td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/DBD::mysql">DBD::mysql</a> module.  Required for MySQL support.</td>
+<td style="text-align: left;">perl-DBD-MySQL</td>
+<td style="text-align: left;">libdbd-mysql-perl</td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="https://metacpan.org/pod/DBD::PgPP">DBD::PgPP</a> or <a href="https://metacpan.org/pod/DBD::Pg">DBD:Pg</a> module.  Required for PostgreSQL support.</td>
-<td align="left">perl-DBD-Pg</td>
-<td align="left">libdbd-pg-perl</td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/DBD::PgPP">DBD::PgPP</a> or <a href="https://metacpan.org/pod/DBD::Pg">DBD:Pg</a> module.  Required for PostgreSQL support.</td>
+<td style="text-align: left;">perl-DBD-Pg</td>
+<td style="text-align: left;">libdbd-pg-perl</td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="https://metacpan.org/pod/DBD::ODBC">DBD::ODBC</a> module.  Required for ODBC (SQL etc) access on Linux / Windows (Win32::ODBC not required if using DBD::ODBC)</td>
-<td align="left">perl-DBD-ODBC</td>
-<td align="left">libdbd-odbc-perl</td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/DBD::ODBC">DBD::ODBC</a> module.  Required for ODBC (SQL etc) access on Linux / Windows (Win32::ODBC not required if using DBD::ODBC)</td>
+<td style="text-align: left;">perl-DBD-ODBC</td>
+<td style="text-align: left;">libdbd-odbc-perl</td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="https://metacpan.org/pod/Win32::ODBC">Win32::ODBC</a> module.  Required for ODBC (SQL etc) access on Windows (DBD::ODBC not required if using Win32::ODBC)</td>
-<td align="left"></td>
-<td align="left"></td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/Win32::ODBC">Win32::ODBC</a> module.  Required for ODBC (SQL etc) access on Windows (DBD::ODBC not required if using Win32::ODBC)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="https://metacpan.org/pod/threads">threads</a> and <a href="https://metacpan.org/pod/Thread::Semaphore">Thread::Semaphore</a> modules (included with most if not all distributions).  Required when enabling threads for EXEC statements.</td>
-<td align="left">perl-threads</td>
-<td align="left">libthreads-perl</td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/threads">threads</a> and <a href="https://metacpan.org/pod/Thread::Semaphore">Thread::Semaphore</a> modules (included with most if not all distributions).  Required when enabling threads for EXEC statements.</td>
+<td style="text-align: left;">perl-threads</td>
+<td style="text-align: left;">libthreads-perl</td>
 </tr>
 <tr>
-<td align="left">Optional</td>
-<td align="left"><a href="https://metacpan.org/pod/Digest::MD5">Digest::MD5</a> module (included with most if not all distributions).  Required when enabling duplicate trap detection.</td>
-<td align="left">perl-Digest-MD5</td>
-<td align="left">libdigest-md5-perl</td>
+<td style="text-align: left;">Optional</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/Digest::MD5">Digest::MD5</a> module (included with most if not all distributions).  Required when enabling duplicate trap detection.</td>
+<td style="text-align: left;">perl-Digest-MD5</td>
+<td style="text-align: left;">libdigest-md5-perl</td>
 </tr>
 </tbody>
 </table>
@@ -317,7 +317,7 @@ table {
 <li>SNMPTT only requires the Net-SNMP Perl module if you want to have variable names translated into symbolic form, you want to be able to have <strong>snmptrapd</strong> pass traps using symbolic form, or you enable the options <strong>translate_integers</strong>, <strong>translate_trap_oid</strong> or <strong>translate_oids</strong>. Although not required, using the Perl module is recommended.  It is also required if you want to use the <strong>snmptthandler-embedded</strong> trap handler with snmptrapd.</li>
 </ul>
 <h1><a name="Whats-New"></a>What's New</h1>
-<h2><strong>v1.5beta2</strong> <strong>- November 27th, 2021</strong></h2>
+<h2><strong>v1.5</strong> <strong>- August 17th, 2022</strong></h2>
 <ul>
 <li>Added PREEXEC support for unknown traps.  Results are stored in the variable <strong>$pu<em>n</em></strong>.  See the <strong>unknown_trap_preexec</strong> setting in <strong>snmptt.ini</strong>.</li>
 <li>Added <strong>unknown_trap_nodes_match_mode</strong> setting to allow you to change how traps are handled when they do not match due to <strong>MATCH</strong> and <strong>NODES</strong>.  If set to 1, traps are considered skipped instead of unknown.  Statistics now include the number of skipped traps when enabled.</li>
@@ -330,18 +330,7 @@ table {
   Added the following <strong>snmptt.ini</strong> settings: <strong>syslog_module</strong>, <strong>syslog_remote_dest</strong>, <strong>syslog_remote_port</strong>, <strong>syslog_remote_proto</strong>, <strong>syslog_rfc_format</strong>, <strong>syslog_app</strong> and <strong>syslog_system_app</strong>.</li>
 <li>Added <strong>--preexec</strong> and <strong>-preexec_file</strong> options to s<strong>nmpttconvertmib</strong>.</li>
 <li>Added reload support to the <strong>snmptt.service</strong> systemd file.  This will allow you to use the <strong>'systemctl reload snmptt'</strong> command to reload the configuration.</li>
-<li>Fixed a bug that prevented snmptt from starting when debug mode was disabled (bug 48).</li>
-<li>Fixed debug output bug with snmptthandler-embedded (PR 1).</li>
-<li>Fixed a bug with IPv6 address handling for NODES in snmptt.conf.</li>
-<li>Fixed a bug that prevented the hostname from being extraced when IPv6 is disabled and the hostname is passed from Net-SNMP as UDP: [x.x.x.x]:xxxx-&gt;[x.x.x.x]:xxxx.</li>
 <li>Updated documentation on securing SNMPTT to ensure the snmptt user has read access to the configuration files.  This is required when issuing a reload.</li>
-<li><strong>snmptthandler-embedded</strong>:<ul>
-<li>Varbind types <strong>Gauge32</strong> and <strong>Hex-STRING</strong> now have the Gauge32: and Hex-STRING: text removed for incoming traps.  Unicode line endings are also removed (Perl 5.10 and higher).</li>
-</ul>
-</li>
-</ul>
-<h2><strong>v1.5beta1</strong> <strong>- March 25th, 2021</strong></h2>
-<ul>
 <li>Added support for IPv6.  To enable, set <strong>ipv6_enable = 1</strong> in <strong>snmptt.ini</strong>.</li>
 <li>Added support for sub-second sleep for spool folder processing.</li>
 <li><strong>snmptt.ini</strong> can now be located in <strong>/etc/snmptt</strong> and is searched for at this
@@ -364,11 +353,19 @@ table {
   debug mode was off.</li>
 <li>Fixed a bug where DNS resolution was not working for enterprise variables 
   when <strong>net_snmp_perl_enable</strong> was disabled.</li>
+<li>Fixed a bug that prevented snmptt from starting when debug mode was disabled (bug 48).</li>
+<li>Fixed debug output bug with snmptthandler-embedded (PR 1).</li>
+<li>Fixed a bug with IPv6 address handling for NODES in snmptt.conf.</li>
+<li>Fixed a bug that prevented the hostname from being extraced when IPv6 is disabled and the hostname is passed from Net-SNMP as UDP: [x.x.x.x]:xxxx-&gt;[x.x.x.x]:xxxx.</li>
 <li>Changed <strong>net_snmp_perl_best_guess</strong> default from 0 to 2 as any modern system
   should support this.  See FAQ and <strong>snmptt.ini</strong> for details on this variable.</li>
 <li>Enabled Perl warnings to help ensure code is following best practices.</li>
 <li>Ran code against Perl::Critic to find non-optimal code.  Made various adjustments such as relacing bare words with variables and changing open() calls from two arguments to three.</li>
 <li>Documentation was converted from html to markdown to make it easier to maintain and a full review was completed.  Many improvments have been made including a new section on integrating with Icinga.  The docs folder now contains <strong>.md</strong>, <strong>.html</strong> and <strong>.epub</strong> versions of the documentation.</li>
+<li><strong>snmptthandler-embedded</strong>:<ul>
+<li>Varbind types <strong>Gauge32</strong> and <strong>Hex-STRING</strong> now have the Gauge32: and Hex-STRING: text removed for incoming traps.  Unicode line endings are also removed (Perl 5.10 and higher).</li>
+</ul>
+</li>
 <li><strong>snmpttconvertmib</strong>:<ul>
 <li>Added <strong>--exec_file</strong> option to allow you to provide an EXEC command
 inside of a file instead of specifying on the command line.  Useful for
@@ -660,21 +657,15 @@ but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT lin
 <li>Initial release</li>
 </ul>
 <h1><a name="Upgrading"></a>Upgrading</h1>
-<h2><strong>v1.5beta1 to v1.5beta2</strong></h2>
-<p>To upgrade from v1.5beta1 to v1.5beta2 you should:</p>
+<h2><strong>v1.4.2 to v1.5beta1</strong></h2>
+<p>To upgrade from v1.4.2 to v1.5 you should:</p>
 <ol>
 <li>Replace <strong>snmptt</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
 <li>Replace <strong>snmptthandler-embedded</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
+<li>Replace <strong>snmpttconvertmib</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
 <li>For systemd systems, replace the <strong>snmptt.service</strong> service file with the new version.</li>
 <li>Backup your <strong>snmptt.ini</strong> file, replace it with the new version, and make any necessary configuration changes to it.</li>
 <li>Secure your <strong>/etc/snmp</strong> or <strong>/etc/snmptt</strong> folder as described in the <strong>Securing SNMPTT</strong> section of the documentation.</li>
-</ol>
-<h2><strong>v1.4.2 to v1.5beta1</strong></h2>
-<p>To upgrade from v1.4.2 to v1.5beta1 you should:</p>
-<ol>
-<li>Replace <strong>snmptt</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
-<li>Replace <strong>snmpttconvertmib</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
-<li>Backup your <strong>snmptt.ini</strong> file, replace it with the new version, and make any necessary configuration changes to it.</li>
 <li>To enable IPv6 support, set <strong>ipv6_enable = 1</strong> in <strong>snmptt.ini</strong>. </li>
 </ol>
 <p>Notes:  </p>
@@ -2265,7 +2256,7 @@ MATCH <em>$x:</em> [!] <em>(reg) [i]</em><br />
 MATCH <em>$x:</em> [!] <em>n</em><br />
 MATCH <em>$x:</em> [!] <em>n-n</em><br />
 MATCH <em>$x:</em> [!] <em>&lt; n</em><br />
-MATCH <em>$x:</em> [!] <em>> n</em><br />
+MATCH <em>$x:</em> [!] <em>&gt; n</em><br />
 MATCH <em>$x:</em> [!] &amp; <em>n</em><br />
 MATCH <em>$x:</em> [!] <em>x.x.x.x</em><br />
 MATCH <em>$x:</em> [!] <em>x.x.x.x-x.x.x.x</em><br />

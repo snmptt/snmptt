@@ -1,5 +1,8 @@
+Aug 17, 2022: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.5 for release.
+
 Nov 27, 2021: Alex Burger <alex_b@users.sourceforge.net>
-- Changed version to snmptt_1.5beta2 for release
+- Changed version to snmptt_1.5beta2 for release.
 - Added reload support to the snmptt.service systemd file.  This will allow 
   you to use the 'systemctl reload snmptt' command to re-load the configuration.
 - Updated documentation on securing SNMPTT to ensure the snmptt user has read
