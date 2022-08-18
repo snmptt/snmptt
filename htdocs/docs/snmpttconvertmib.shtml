@@ -1,275 +1,161 @@
 <!--#include virtual="/page-top.html" -->
 <!-- CONTENT START -->
 
-<p>Click <a href="temp/snmpttconvertmib.shtml">here</a> for SNMPTT v1.5beta1 documentation</p>
-
-<h1><b>SNMP Trap Translator Convert MIB v1.4.1</b></h1>
-<b>(</b><a href=
-"http://www.snmptt.org"><b>SNMPTTCONVERTMIB</b></a><b>)</b><br />
-This file was last updated on:&nbsp; November 5th, 2005
-<h2><b>License</b></h2>
-<p>Copyright 2002-2020 Alex Burger<br />
+<h1>SNMP Trap Translator Convert MIB v1.5</h1>
+<p><strong>(</strong><a href="http://www.snmptt.org"><strong>SNMPTTCONVERTMIB</strong></a><strong>)</strong><br />
+This file was last updated on:  October 2nd, 2021</p>
+<h1>License</h1>
+<p>Copyright 2002-2022 Alex Burger<br />
 alex_b@users.sourceforge.net<br />
 4/3/2002</p>
-<p>This program is free software; you can redistribute it and/or
-modify<br />
-it under the terms of the GNU General Public License as published
-by<br />
-the Free Software Foundation; either version 2 of the License,
-or<br />
+<p>This program is free software; you can redistribute it and/or modify<br />
+it under the terms of the GNU General Public License as published by<br />
+the Free Software Foundation; either version 2 of the License, or<br />
 (at your option) any later version.</p>
-<p>This program is distributed in the hope that it will be
-useful,<br />
-but WITHOUT ANY WARRANTY; without even the implied warranty
-of<br />
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.&nbsp; See
-the<br />
+<p>This program is distributed in the hope that it will be useful,<br />
+but WITHOUT ANY WARRANTY; without even the implied warranty of<br />
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the<br />
 GNU General Public License for more details.</p>
-<p>You should have received a copy of the GNU General Public
-License<br />
+<p>You should have received a copy of the GNU General Public License<br />
 along with this program; if not, write to the Free Software<br />
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA&nbsp;
-02111-1307&nbsp; USA &nbsp; <span style="font-weight: bold;"><br />
-<br /></span></p>
-<h2>SNMPTTCONVERTMIB</h2>
-<p><b>SNMPTTCONVERTMIB</b> is a Perl script which will read a MIB
-file and convert the <b>TRAP-TYPE</b> (v1) or
-<b>NOTIFICATION-TYPE</b> (v2) definitions into a configuration file
-readable by <b>SNMPTT</b>.</p>
-<p>For example, if the file <b>CPQHOST.mib</b> (v1) contained:</p>
-<blockquote>CPQHOST-MIB DEFINITIONS ::= BEGIN
-<p>&nbsp;&nbsp;&nbsp; IMPORTS<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-enterprises&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-FROM RFC1155-SMI<br />
-.<br />
-.<br />
-. (lines removed)<br />
-.<br />
-.<br />
-&nbsp;&nbsp;&nbsp; cpqHo2NicSwitchoverOccurred2 TRAP-TYPE<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENTERPRISE compaq<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VARIABLES { sysName,
-cpqHoTrapFlags, cpqHoIfPhysMapSlot,<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-cpqHoIfPhysMapPort, cpqHoIfPhysMapSlot,<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-cpqHoIfPhysMapPort }<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DESCRIPTION<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-"This trap will be sent any time the configured redundant NIC<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-becomes the active NIC."</p>
-<p>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
---#TYPE "Status Trap"<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
---#SUMMARY "NIC switchover to slot %s, port %s from slot %s, port
-%s."<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
---#ARGUMENTS {2, 3, 4, 5}<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
---#SEVERITY MAJOR<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
---#TIMEINDEX 99<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ::= 11010<br />
-&nbsp;</p>
-</blockquote>
-Executing <b>snmpttconvertmib CPQHOST.mib snmptt.conf</b> would
-APPEND to the end of the <b>snmptt.conf</b> file (specified on the
-command line):
-<blockquote>#<br />
-#<br />
-#<br />
-EVENT cpqHo2NicSwitchoverOccurred2 .1.3.6.1.4.1.232.0.11010 "Status
-Events" Normal<br />
-FORMAT Status Trap: NIC switchover to slot $3, port $4 from slot
-$5, port $6.<br />
-#EXEC qpage -f TRAP notifygroup1 "Status Trap: NIC switchover to
-slot $3, port $4 from slot $5, port $6."<br />
-SDESC<br />
-This trap will be sent any time the configured redundant NIC<br />
-becomes the active NIC.<br />
-EDESC</blockquote>
-<p><br />
-Notes:</p>
-<blockquote>To specifiy an EXEC statement, use the <span style=
-"font-weight: bold;">--exec=</span> command line
-option.&nbsp;&nbsp;
-<p>To prevent the --#TYPE text from being prepended to the
---#SUMMARY line, change <b>$prepend_type</b> to <b>0</b> in the
-<b>SNMPTTCONVERTMIB</b> script.</p>
-<p>See the help screen for more options (<span style=
-"font-weight: bold;">snmpttconvertmib --h</span>).</p>
-</blockquote>
-<h3>Requirements</h3>
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA    </p>
+<h1>SNMPTTCONVERTMIB</h1>
+<p><strong>SNMPTTCONVERTMIB</strong> is a Perl script which will read a MIB file and convert the <strong>TRAP-TYPE</strong> (v1) or <strong>NOTIFICATION-TYPE</strong> (v2) definitions into a configuration file readable by <strong>SNMPTT</strong>.</p>
+<p>For example, if the file <strong>CPQHOST.mib</strong> (v1) contained:</p>
+<pre><code>CPQHOST-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS  
+        enterprises             FROM RFC1155-SMI  
+.  
+.  
+. (lines removed)  
+.  
+.  
+    cpqHo2NicSwitchoverOccurred2 TRAP-TYPE  
+        ENTERPRISE compaq  
+        VARIABLES { sysName, cpqHoTrapFlags, cpqHoIfPhysMapSlot,  
+                    cpqHoIfPhysMapPort, cpqHoIfPhysMapSlot,  
+                    cpqHoIfPhysMapPort }  
+        DESCRIPTION  
+            "This trap will be sent any time the configured redundant NIC  
+            becomes the active NIC."
+
+             --#TYPE "Status Trap"  
+             --#SUMMARY "NIC switchover to slot %s, port %s from slot %s, port %s."  
+             --#ARGUMENTS {2, 3, 4, 5}  
+             --#SEVERITY MAJOR  
+             --#TIMEINDEX 99  
+        ::= 11010
+</code></pre>
+<p>Executing <strong>snmpttconvertmib CPQHOST.mib snmptt.conf</strong> would APPEND to the end of the <strong>snmptt.conf</strong> file (specified on the command line):</p>
+<pre><code>#  
+#  
+#  
+EVENT cpqHo2NicSwitchoverOccurred2 .1.3.6.1.4.1.232.0.11010 "Status Events" Normal  
+FORMAT Status Trap: NIC switchover to slot $3, port $4 from slot $5, port $6.  
+#EXEC qpage -f TRAP notifygroup1 "Status Trap: NIC switchover to slot $3, port $4 from slot $5, port $6."  
+SDESC  
+This trap will be sent any time the configured redundant NIC  
+becomes the active NIC.  
+EDESC
+</code></pre>
+<p>Notes:</p>
 <ul>
-<li>UCD-SNMP / Net-SNMP <a href=
-"http://www.net-snmp.org/man/snmptranslate.html"><b>snmptranslate</b></a>
-utility</li>
-<li><span style="font-weight: bold;">Optional</span>: UCD-SNMP /
-Net-SNMP <b style="font-weight: bold;"><a href=
-"http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">
-Perl module</a></b><br /></li>
+<li>To specifiy an EXEC statement, use the --exec= command line option.  </li>
+<li>To prevent the --#TYPE text from being prepended to the --#SUMMARY line, change <strong>$prepend_type</strong> to <strong>0</strong> in the <strong>SNMPTTCONVERTMIB</strong> script.</li>
+<li>See the help screen for more options (snmpttconvertmib --h).</li>
 </ul>
-<p>Snmpttconvertmib converts a MIB file using the <span style=
-"font-weight: bold;">snmptranslate</span> utility.&nbsp;</p>
-<p>If the Net-SNMP Perl module is enabled using <span style=
-"font-weight: bold;">--net_snmp_perl</span> on the command line, it
-can provide more detailed variable descriptions in the DESC sestion
-if available such as:</p>
+<h2>Requirements</h2>
+<ul>
+<li>Net-SNMP <a href="http://www.net-snmp.org/man/snmptranslate.html"><strong>snmptranslate</strong></a> utility</li>
+<li><strong>Optional</strong>: Net-SNMP <strong><a href="http://www.net-snmp.org/FAQ.html#Where_can_I_get_the_perl_SNMP_package_">Perl module</a></strong>  </li>
+</ul>
+<p>Snmpttconvertmib converts a MIB file using the snmptranslate utility. </p>
+<p>If the Net-SNMP Perl module is enabled using <strong>--net_snmp_perl</strong> on the command line, it can provide more detailed variable descriptions in the DESC sestion if available such as:</p>
 <ul>
 <li>variable syntax</li>
 <li>variable description</li>
 <li>variable enums</li>
 </ul>
 <p>For example:</p>
-<div style="margin-left: 40px;">2: globalStatus<br />
-&nbsp;&nbsp; Syntax="INTEGER"<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2: ok<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4: failure<br />
-&nbsp;&nbsp; Descr="Current status of the entire library
-system"</div>
-<p><b><br /></b></p>
-<h3>Converting a MIB file</h3>
-<p>See the <span style="font-weight: bold;">snmpttconvertmib</span>
-help screen for all possible command line options (<span style=
-"font-weight: bold;">snmpttconvertmib --h</span>) before converting
-a MIB file.&nbsp; Depending on what type of information is
-available in the MIB file, you may want to change how the FORMAT /
-EXEC lines are generated.</p>
-<p>Before trying to convert&nbsp; MIB file, you should ensure that
-the MIB file can be parsed by Net-SNMP</p>
+<pre><code>2: globalStatus  
+   Syntax="INTEGER"  
+      2: ok  
+      4: failure  
+   Descr="Current status of the entire library system"
+</code></pre>
+<h2>Converting a MIB file</h2>
+<p>See the snmpttconvertmib help screen for all possible command line options (snmpttconvertmib -h) before converting a MIB file.  Depending on what type of information is available in the MIB file, you may want to change how the FORMAT / EXEC lines are generated.</p>
+<p>Before trying to convert  MIB file, you should ensure that the MIB file can be parsed by Net-SNMP</p>
 <ol>
-<li>Copy the MIB file to the UCD-SNMP / Net-SNMP mibs folder</li>
-<li>Type: <b>export MIBS=ALL</b> to ensure all the mibs will be
-read in by <b>snmptranslate</b></li>
-<li>Make sure the MIB file can be interpreted by
-<b>snmptranslate</b> correctly.&nbsp; Simply typing
-<b>snmptranslate</b> should tell you if it was able to read the mib
-file correctly.&nbsp; If it can't, an error will be produced at the
-top of the help screen.</li>
-<li>Try to translate a <span style=
-"font-weight: bold;">TRAP-TYPE</span> or <span style=
-"font-weight: bold;">NOTIFICATION-TYPE</span> entry contained
-inside the MIB file.&nbsp; For example, if the MIB file contains
-the Notification definition of '<span style=
-"font-weight: bold;">rptrHealth NOTIFICATION-TYPE</span>', then
-type:&nbsp; <span style="font-weight: bold;">snmptranslate
-rptrHealth -IR -Td</span>.&nbsp; If you get '<span style=
-"font-weight: bold;">Unknown object identifier: xxx'</span> then
-the MIB file was not found or parsed correctly.<br /></li>
+<li>Copy the MIB file to the Net-SNMP mibs folder</li>
+<li>Type: <strong>export MIBS=ALL</strong> to ensure all the mibs will be read in by <strong>snmptranslate</strong></li>
+<li>Make sure the MIB file can be interpreted by <strong>snmptranslate</strong> correctly.  Simply typing <strong>snmptranslate</strong> should tell you if it was able to read the mib file correctly.  If it can't, an error will be produced at the top of the help screen.</li>
+<li>Try to translate a TRAP-TYPE or NOTIFICATION-TYPE entry contained inside the MIB file.  For example, if the MIB file contains the Notification definition of 'rptrHealth NOTIFICATION-TYPE', then type:  snmptranslate rptrHealth -IR -Td.  If you get 'Unknown object identifier: xxx' then the MIB file was not found or parsed correctly.  </li>
 </ol>
-<p><span style="font-weight: bold;">Running
-snmpttconvertmib</span>:<br />
-&nbsp;</p>
+<p>Running snmpttconvertmib:  </p>
 <ol>
-<li>Make sure the MIB file has been successfully installed (see
-above)<br /></li>
-<li>Edit the options between OPTIONS START and OPTIONS END in
-snmpttconvertmib if needed<br /></li>
-<li>If you are using <b>UCD-SNMP</b>, or <b>Net-SNMP
-v5.0.<span style="text-decoration: underline;">1</span></b>, then
-add the folllowing to your snmp.conf file: <b>printNumericOids
-1</b> (note:&nbsp; this will affect all snmp commands).&nbsp; This
-ensures the OIDs are returned in numerical format.&nbsp; Other
-versions of Net-SNMP do not require this change, as
-<b>snmpttconvertmib</b> will use a command line switch to force it
-on when calling <b>snmptranslate</b>.</li>
-<li>Convert the mib file with: <b>snmpttconvertmib
---in=<i>path-to-mib</i> --out=<i>output-file-name</i></b>.&nbsp;
-Note:&nbsp; the <b>output-file-name</b> is appended to, so remember
-to delete it first if needed.<br /></li>
+<li>Make sure the MIB file has been successfully installed (see above)  </li>
+<li>Edit the options between OPTIONS START and OPTIONS END in snmpttconvertmib if needed  </li>
+<li>If you are using <strong>UCD-SNMP</strong>, or <strong>Net-SNMP v5.0.1</strong>, then add the folllowing to your snmp.conf file: <strong>printNumericOids 1</strong> (note:  this will affect all snmp commands).  This ensures the OIDs are returned in numerical format.  Other versions of Net-SNMP do not require this change, as <strong>snmpttconvertmib</strong> will use a command line switch to force it on when calling <strong>snmptranslate</strong>.</li>
+<li>Convert the mib file with: <strong>snmpttconvertmib --in=<em>path-to-mib</em> --out=<em>output-file-name</em></strong>.  Note:  the <strong>output-file-name</strong> is appended to, so remember to delete it first if needed.  </li>
 </ol>
-<div style="margin-left: 40px;">Example:</div>
-<blockquote style="margin-left: 80px;"><b>snmpttconvertmib
---in=/usr/share/snmp/mibs/CPQHOST.mib
---out=/etc/snmp/snmptt.conf.compaqhost<br /></b></blockquote>
-<div style="margin-left: 40px;">If the Net-SNMP Perl module is
-installed and you want more descriptive variable descriptions, add
-<span style="font-weight: bold;">--net_snmp_perl</span> to the
-command line:</div>
-<blockquote style="margin-left: 80px;"><b>snmpttconvertmib
---in=/usr/share/snmp/mibs/CPQHOST.mib
---out=/etc/snmp/snmptt.cong.compaq
---net_snmp_perl<br /></b></blockquote>
-<br />
-<div style="margin-left: 40px;">To convert all the CPQ* files in
-the current folder, you can use:</div>
-<br />
-<div style="margin-left: 40px;">Unix / Linux:</div>
-<blockquote style="margin-left: 80px;"><b>for i in CPQ*<br />
-&gt; do<br />
-&gt; /usr/local/sbin/snmpttconvertmib --in=$i
---out=snmptt.conf.compaq<br />
-&gt; done<br />
-<br /></b></blockquote>
-<div style="margin-left: 40px;">Windows:</div>
-<blockquote style="margin-left: 80px;"><b>for %i in (CPQ*) do perl
-snmpttconvertmib --in=%i --out=snmptt.conf.compaq<br />
-<br /></b></blockquote>
-<blockquote style="margin-left: 80px;"></blockquote>
+<p>Examples:</p>
+<p>Convert a MIB file without defining an EXEC command:</p>
+<pre><code>snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq
+</code></pre>
+<p>If the Net-SNMP Perl module is installed and you want more descriptive variable descriptions, add --net_snmp_perl to the command line:</p>
+<pre><code>snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --net_snmp_perl
+</code></pre>
+<p>Append an EXEC command.  The generated FORMAT line from the MIB will be appended to the end of the line surrounded by quotes.  You can disable the quotes by modifying the setting at the top of the snmpttconvertmib script.</p>
+<pre><code>snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --exec 'qpage -f TRAP notifygroup1'
+
+Result: EXEC qpage -f TRAP notifygroup1 "A linkUp trap signifies that the SNMP entity, acting in an $*"
+</code></pre>
+<p>Same as above, but read the EXEC line(s) from the file exec-commands.txt.  Multiple commands can be added to the file to generate multiple EXEC lines per trap.</p>
+<pre><code>snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --exec_file exec-commands.txt
+</code></pre>
+<p>Append an EXEC command but don't add the generated FORMAT line.  The variable substitution <strong>$Fz</strong> is used in the --exec line which will cause SNMPTT to replace it with the generated FORMAT line when a trap arrives.</p>
+<pre><code>snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --exec_mode=1 --exec '/usr/bin/myscript { $Fz }'
+</code></pre>
+<p>Same as above but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT line, snmpttconvertmib will do the substitution:</p>
+<pre><code>snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --exec_mode=2 --exec '/usr/bin/myscript { $Fz }'
+</code></pre>
+<p>Append a PREEXEC command.</p>
+<pre><code>snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --preexec '/usr/local/bin/snmpget -v 1 -Ovq -c public $aA ifDescr.$1'
+
+Result: PREEXEC /usr/local/bin/snmpget -v 1 -Ovq -c public $aA ifDescr.$1
+</code></pre>
+<p>Same as above, but read the PREEXEC line(s) from the file preexec-commands.txt.  Multiple commands can be added to the file to generate multiple PREEXEC lines per trap.</p>
+<pre><code>snmpttconvertmib --in=/usr/share/snmp/mibs/CPQHOST.mib --out=/etc/snmp/snmptt.conf.compaq --preexec_file preexec-commands.txt
+</code></pre>
+<p>To convert all the CPQ* files in the current folder, you can use:</p>
+<p>Unix / Linux:</p>
+<pre><code>for i in CPQ*  
+  do  
+  /usr/local/sbin/snmpttconvertmib --in=$i --out=snmptt.conf.compaq  
+done
+</code></pre>
+<p>Windows:</p>
+<pre><code>for %i in (CPQ*) do perl snmpttconvertmib --in=%i --out=snmptt.conf.compaq
+</code></pre>
 <h3>How it works</h3>
-<p>&nbsp;<br />
-Some MIB files contain <b>--#SUMMARY</b> and <b>--#ARGUMENTS</b>
-lines which are used by Novell's Network Management system.&nbsp;
-These MIB files convert very well to <b>SNMPTT</b> as they contain
-detailed information that can be used on the <b>FORMAT</b> and
-<b>EXEC</b> lines.&nbsp; Compaq's MIBs usually have these
-lines.</p>
-<p>Other MIBS contain only a <b>DESCRIPTION</b> section where the
-first line contains the <b>FORMAT</b> string.&nbsp; In some MIBS,
-this line also contains variables similar to the <b>--#SUMMARY</b>
-lines.</p>
-<p>The mib file is searched for the name of the MIB file.&nbsp;
-This should be at the top of the file and contain <span style=
-"font-style: italic;">'</span><span style=
-"font-weight: bold;"><span style="font-style: italic;">name</span>
-DEFINITIONS ::=BEGIN</span>'.&nbsp; This name will be used when
-looking up the TRAP / NOTIFICATION to ensure the correct MIB file
-is accessed.</p>
-<p>The mib file is also searched for lines containing
-<b>TRAP-TYPE</b> or NOTIFICATION-TYPE.&nbsp; If it finds one that
-appears to be a valid trap definition, it reads in the following
-lines until a ::= is found while looking for the <b>DESCRIPTION</b>
-section.&nbsp; It then looks for the <b>--#SUMMARY</b> and
-<b>--#ARGUMENTS</b> line if enabled.</p>
-<p><b>SNMPTRANSLATE</b> is used with the following syntax to find
-the <b>OID</b> of the trap:</p>
-<p><b>snmptranslate -IR -Ts <i>mib-name::</i><i>trapname</i> -m
-<span style="font-style: italic;">mib-filename</span></b></p>
-<p>Note: If&nbsp; Net-SNMP 5.0.2 or newer is detected, the command
-line also includes the -On switch.&nbsp; See the <a href=
-"file:///h:/cvs/snmptt/readme.html#FAQ-Troubleshooting">FAQ</a>.</p>
-<p><span style="font-weight: bold;">*</span> If <b>--#SUMMARY</b>
-and <b>--#ARGUMENTS</b> are found, the <b>%<i>letter</i></b>
-variables are replaced with <b>$<i>number</i></b> variables based
-on the values lists in the <b>--#ARGUMENTS</b> section incremented
-by 1 (ARGUMENTS starts with 0, SNMPTT starts with 1).&nbsp; This
-will be used to define the <b>FORMAT</b> and <b>EXEC</b> lines.</p>
-<p><span style="font-weight: bold;">*</span> If there is no
-<b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, but the first line
-of the <b>DESCRIPTION</b> contains <b>%<i>letter</i></b> variables,
-then that line will be used to define the <b>FORMAT</b> and
-<b>EXEC</b> lines.&nbsp; The <b>%<i>letter</i></b> variables are
-replaced with <b>$<i>number</i></b> variables starting at 1 and
-going up.</p>
-<p><span style="font-weight: bold;">*</span> If there is no
-<b>--#SUMMARY</b> and <b>--#ARGUMENTS</b> lines, and the first line
-of the <b>DESCRIPTION</b> does not contain <b>%<i>letter</i></b>
-variables, then that line will be sed to define the <b>FORMAT</b>
-and <b>EXEC</b> lines followed by a <b>$*</b> which will dump all
-received variables.</p>
-<p><span style="font-weight: bold;">*</span> If the entry contains
-variables, the variables are listed in the DESC
-section.&nbsp;&nbsp; If <span style=
-"font-weight: bold;">--net_snmp_perl</span> is specified, the
-syntax, description and enums for each variable is used.</p>
-<p style="font-weight: bold;">* Note:&nbsp; This can be changed by
-specifying a --format=n command line option.&nbsp; See the
-snmpttconvertmib help screen for all possible command line options
-(snmpttconvertmib --h).</p>
-<br />
+<p>Some MIB files contain <strong>--#SUMMARY</strong> and <strong>--#ARGUMENTS</strong> lines which are used by Novell's Network Management system.  These MIB files convert very well to <strong>SNMPTT</strong> as they contain detailed information that can be used on the <strong>FORMAT</strong> and <strong>EXEC</strong> lines.  Compaq's MIBs usually have these lines.</p>
+<p>Other MIBS contain only a <strong>DESCRIPTION</strong> section where the first line contains the <strong>FORMAT</strong> string.  In some MIBS, this line also contains variables similar to the <strong>--#SUMMARY</strong> lines.</p>
+<p>The mib file is searched for the name of the MIB file.  This should be at the top of the file and contain 'name DEFINITIONS ::=BEGIN'.  This name will be used when looking up the TRAP / NOTIFICATION to ensure the correct MIB file is accessed.</p>
+<p>The mib file is also searched for lines containing <strong>TRAP-TYPE</strong> or NOTIFICATION-TYPE.  If it finds one that appears to be a valid trap definition, it reads in the following lines until a ::= is found while looking for the <strong>DESCRIPTION</strong> section.  It then looks for the <strong>--#SUMMARY</strong> and <strong>--#ARGUMENTS</strong> line if enabled.</p>
+<p><strong>SNMPTRANSLATE</strong> is used with the following syntax to find the <strong>OID</strong> of the trap:</p>
+<pre><code>snmptranslate -IR -Ts mib-name::trapname -m mib-filename
+</code></pre>
+<p>Notes:</p>
+<ul>
+<li>If  Net-SNMP 5.0.2 or newer is detected, the command line also includes the -On switch.  See the <a href="file:///h:/cvs/snmptt/readme.html#FAQ-Troubleshooting">FAQ</a>.</li>
+<li>If <strong>--#SUMMARY</strong> and <strong>--#ARGUMENTS</strong> are found, the <strong>%<em>letter</em></strong> variables are replaced with <strong>$<em>number</em></strong> variables based on the values lists in the <strong>--#ARGUMENTS</strong> section incremented by 1 (ARGUMENTS starts with 0, SNMPTT starts with 1).  This will be used to define the <strong>FORMAT</strong> and <strong>EXEC</strong> lines.</li>
+<li>If there is no <strong>--#SUMMARY</strong> and <strong>--#ARGUMENTS</strong> lines, but the first line of the <strong>DESCRIPTION</strong> contains <strong>%<em>letter</em></strong> variables, then that line will be used to define the <strong>FORMAT</strong> and <strong>EXEC</strong> lines.  The <strong>%<em>letter</em></strong> variables are replaced with <strong>$<em>number</em></strong> variables starting at 1 and going up.</li>
+<li>If there is no <strong>--#SUMMARY</strong> and <strong>--#ARGUMENTS</strong> lines, and the first line of the <strong>DESCRIPTION</strong> does not contain <strong>%<em>letter</em></strong> variables, then that line will be sed to define the <strong>FORMAT</strong> and <strong>EXEC</strong> lines followed by a <strong>$*</strong> which will dump all received variables.</li>
+<li>If the entry contains variables, the variables are listed in the DESC section.   If --net_snmp_perl is specified, the syntax, description and enums for each variable is used.</li>
+<li>Note:  This can be changed by specifying a --format=n command line option.  See the snmpttconvertmib help screen for all possible command line options (snmpttconvertmib --h).</li>
+</ul>
 
 <!-- CONTENT END -->
 <!--#include virtual="/page-bottom.shtml" -->
