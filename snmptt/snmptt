@@ -194,8 +194,10 @@ my $ipv6_enable;
 my $date_format;
 my $time_format;
 my $date_time_format;
+my $date_time_utc;
 my $date_time_format_sql;
 my $stat_time_format_sql;
+my $date_time_utc_sql;
 
 # DaemonMode
 my $daemon_fork;
@@ -349,7 +351,7 @@ if ($DEBUGGING >= 1)
   }
 
   # print out time
-  print "********** SNMPTT $snmptt_version started: ",scalar(localtime($g_start_time))," **********\n\n";
+  print "********** SNMPTT $snmptt_version started: ",scalar(get_time($g_start_time))," **********\n\n";
   if ($sleep < 1) {
     print "Note: snmptt.ini sleep setting is less than 1 so \'Sleeping for x seconds\' will be supressed in the debug log.\n\n";
   }
@@ -1086,7 +1088,7 @@ if ($daemon == 1)
       my $duplicate_traps_current_time = time();
       foreach my $key (sort keys %duplicate_traps)
       {
-        #print "Previous trap digest: $key: " . localtime($duplicate_traps{$key}) . "\n";
+        #print "Previous trap digest: $key: " . get_time($duplicate_traps{$key}) . "\n";
         if ($duplicate_traps{$key} < $duplicate_traps_current_time - $duplicate_trap_window) {
           # Purge the record
           delete $duplicate_traps{$key};
@@ -1414,7 +1416,7 @@ if ($daemon == 1)
 
   if ($DEBUGGING >= 1)
   {
-    print "SNMPTT $snmptt_version shutdown: ",scalar(localtime),"\n\n";
+    print "SNMPTT $snmptt_version shutdown: ",scalar(get_time()),"\n\n";
     print "Total traps received:    $g_total_traps_received\n";
     print "Total traps translated:  $g_total_traps_translated\n";
     print "Total traps ignored:     $g_total_traps_ignored\n";
@@ -3386,7 +3388,7 @@ sub readtrap
 
   if ($DEBUGGING >= 2) 
   {
-    print "Reading trap.  Current time: " . scalar(localtime()). "\n";
+    print "Reading trap.  Current time: " . scalar(get_time()). "\n";
   }
 
   if ( $daemon == 1)
@@ -3410,17 +3412,17 @@ sub readtrap
   my @localtime_array;
   if ( $daemon == 1 && $use_trap_time == 1 )	# Daemon mode only
   {
-    @localtime_array = localtime($trap_date_time_epoch);
+    @localtime_array = get_time($trap_date_time_epoch);
 
     if ($date_time_format eq "") {
-      $trap_date_time = localtime($trap_date_time_epoch);
+      $trap_date_time = get_time($trap_date_time_epoch);
     }
     else {
       $trap_date_time = strftime $date_time_format, @localtime_array;
     }
 
     if ($date_time_format_sql eq "") {
-      $trap_date_time_sql = localtime($trap_date_time_epoch);
+      $trap_date_time_sql = get_time($trap_date_time_epoch);
     }
     else {
       $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array;
@@ -3429,17 +3431,17 @@ sub readtrap
   }
   else  # Standalone mode
   {
-    @localtime_array = localtime();
+    @localtime_array = get_time();
 
     if ($date_time_format eq "") {
-      $trap_date_time = localtime();
+      $trap_date_time = get_time();
     }
     else {
       $trap_date_time = strftime $date_time_format, @localtime_array;
     }
 
     if ($date_time_format_sql eq "") {
-      $trap_date_time_sql = localtime();
+      $trap_date_time_sql = get_time();
     }
     else {
       $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array;
@@ -4598,6 +4600,7 @@ sub loadsnmpttini {
   $date_format = $cfg->val('General', 'date_format');
   $time_format = $cfg->val('General', 'time_format');
   $date_time_format = $cfg->val('General', 'date_time_format');
+  $date_time_utc = $cfg->val('General', 'date_time_utc');
 
   # DaemonMode
   $daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -4709,6 +4712,7 @@ sub loadsnmpttini {
 
   $date_time_format_sql = $cfg->val('SQL', 'date_time_format_sql');
   $stat_time_format_sql = $cfg->val('SQL', 'stat_time_format_sql');
+  $date_time_utc_sql = $cfg->val('SQL', 'date_time_utc_sql');
   
   # Debugging
   if ($debugcmdline == 0) {
@@ -4758,6 +4762,8 @@ sub loadsnmpttini {
   if (! defined ($date_time_format)) { $date_time_format = ""} ;
   if (! defined ($date_time_format_sql)) { $date_time_format_sql = ""} ;
   if (! defined ($stat_time_format_sql)) { $stat_time_format_sql = ""} ;
+  if (! defined ($date_time_utc)) { $date_time_utc = 0} ;
+  if (! defined ($date_time_utc_sql)) { $date_time_utc_sql = 0} ;
 
   if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
   if (! defined ($daemon_uid)) { $daemon_uid = ''} ;
@@ -4931,11 +4937,11 @@ sub syslog_system {
 sub log_system {
   my $message = $_[0];
 
-  my @localtime_array = localtime();
+  my @localtime_array = get_time();
   my $log_time;
 
   if ($date_time_format eq "") {
-    $log_time = localtime();
+    $log_time = get_time();
   }
   else {
     $log_time = strftime $date_time_format, @localtime_array;
@@ -6091,10 +6097,10 @@ sub log_statistics {
     my $stat_time_temp;
 
     if ($stat_time_format_sql eq "") {
-      $stat_time_temp = localtime();
+      $stat_time_temp = get_time_sql();
     }
     else {
-      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+      $stat_time_temp = strftime $stat_time_format_sql, get_time_sql();
     }
 
     my @t_sql_custom_columns_statistics = ();
@@ -6137,10 +6143,10 @@ sub log_statistics {
     my $stat_time_temp;
 
     if ($stat_time_format_sql eq "") {
-      $stat_time_temp = localtime();
+      $stat_time_temp = get_time_sql();
     }
     else {
-      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+      $stat_time_temp = strftime $stat_time_format_sql, get_time_sql();
     }
 
     my @t_sql_custom_columns_statistics = ();
@@ -6183,10 +6189,10 @@ sub log_statistics {
     my $stat_time_temp;
 
     if ($stat_time_format_sql eq "") {
-      $stat_time_temp = localtime();
+      $stat_time_temp = get_time_sql();
     }
     else {
-      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+      $stat_time_temp = strftime $stat_time_format_sql, get_time_sql();
     }
 
     my @t_sql_custom_columns_statistics = ();
@@ -6229,10 +6235,10 @@ sub log_statistics {
     my $stat_time_temp;
 
     if ($stat_time_format_sql eq "") {
-      $stat_time_temp = localtime();
+      $stat_time_temp = get_time_sql();
     }
     else {
-      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+      $stat_time_temp = strftime $stat_time_format_sql, get_time_sql();
     }
 
     my @t_sql_custom_columns_statistics = ();
@@ -7080,3 +7086,45 @@ sub name_to_ip {
     return @ips;
 }
 
+
+sub get_time {
+  my $t_time = shift;
+
+  if ($t_time == "") {
+    if ($date_time_utc == 1) {
+        return gmtime();
+    }
+    else {
+        return localtime();
+    }
+  }
+  else {
+    if ($date_time_utc == 1) {
+        return gmtime($t_time);
+    }
+    else {
+        return localtime($t_time);
+    }
+  }
+}
+
+sub get_time_sql {
+  my $t_time = shift;
+
+  if ($t_time == "") {
+    if ($date_time_utc_sql == 1) {
+        return gmtime();
+    }
+    else {
+        return localtime();
+    }
+  }
+  else {
+    if ($date_time_utc_sql == 1) {
+        return gmtime($t_time);
+    }
+    else {
+        return localtime($t_time);
+    }
+  }
+}
