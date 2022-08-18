@@ -1,3 +1,8 @@
+Aug 18, 2022: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.5.1beta1
+- Fixed bug with Windows where events were always loged to the Windows event log
+  even if eventlog_enable was set to 0.
+
 Aug 17, 2022: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.5 for release.
 

@@ -4791,7 +4791,7 @@ sub loadsnmpttini {
   if (! defined ($syslog_system_facility)) { $syslog_system_facility = 'local0'} ;
   if (! defined ($syslog_system_level)) { $syslog_system_level = 'warning'} ;
   if (! defined ($eventlog_enable)) { $eventlog_enable = 0} ;
-  if (! defined ($eventlog_enable)) { $eventlog_enable = 'WARNING'} ;
+  if (! defined ($eventlog_type)) { $eventlog_type = 'WARNING'} ;
   if (! defined ($eventlog_system_enable)) { $eventlog_system_enable = 0} ;	
   if (! defined ($exec_enable)) { $exec_enable = 1} ;
   if (! defined ($pre_exec_enable)) { $pre_exec_enable = 1} ;
