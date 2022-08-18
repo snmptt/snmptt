@@ -388,6 +388,11 @@ END
 sql_custom_columns_unknown = <<END
 END
 
+# List of custom SQL column names and values for the table for statistics
+# (defined by *_table_unknown below).  See sql_custom_columns for the format.
+sql_custom_columns_statistics = <<END
+END
+
 # MySQL: Set to 1 to enable logging to a MySQL database via DBI (Linux / Windows)
 # This requires DBI:: and DBD::mysql
 mysql_dbi_enable = 0

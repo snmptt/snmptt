@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# SNMPTT 1.5
+# SNMPTT 1.5.1beta1
 #
 # Copyright 2002-2022 Alex Burger
 # alex_b@users.sourceforge.net
@@ -303,6 +303,7 @@ my $sql_win32_odbc_password;
 
 my @sql_custom_columns;
 my @sql_custom_columns_unknown;
+my @sql_custom_columns_statistics;
 
 # TrapFiles
 my @snmptt_conf_files;
@@ -4704,6 +4705,7 @@ sub loadsnmpttini {
 
   @sql_custom_columns = $cfg->val('SQL', 'sql_custom_columns');
   @sql_custom_columns_unknown = $cfg->val('SQL', 'sql_custom_columns_unknown');
+  @sql_custom_columns_statistics = $cfg->val('SQL', 'sql_custom_columns_statistics');
 
   $date_time_format_sql = $cfg->val('SQL', 'date_time_format_sql');
   $stat_time_format_sql = $cfg->val('SQL', 'stat_time_format_sql');
@@ -4849,6 +4851,7 @@ sub loadsnmpttini {
   if (! defined ($sql_win32_odbc_password)) { $sql_win32_odbc_password = ''} ;
   if (! (@sql_custom_columns)) { @sql_custom_columns = ()} ;
   if (! (@sql_custom_columns_unknown)) { @sql_custom_columns_unknown = ()} ;
+  if (! (@sql_custom_columns_statistics)) { @sql_custom_columns_statistics = ()} ;
   if (! defined ($DEBUGGING)) { $DEBUGGING = 0} ;
   if (! defined ($DEBUGGING_FILE)) { $DEBUGGING_FILE = ''} ;
 
@@ -6093,6 +6096,20 @@ sub log_statistics {
     else {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
+
+    my @t_sql_custom_columns_statistics = ();
+
+    if (@sql_custom_columns_statistics) {
+      @t_sql_custom_columns_statistics = @sql_custom_columns_statistics;
+
+      for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
+        $_ = $t_sql_custom_columns_statistics[$i];
+        print "Performing substitution on custom column: $_\n";
+        substitute();
+        print "Done performing substitution on custom column: $_\n";
+        $t_sql_custom_columns_statistics[$i] = $_;
+      }
+    }
     
     if ($unknown_trap_nodes_match_mode != 0) {
       mysql_insert($mysql_dbi_table_statistics,
@@ -6101,7 +6118,8 @@ sub log_statistics {
         "total_translated", $g_total_traps_translated,
         "total_ignored", $g_total_traps_ignored,
         "total_skipped", $g_total_traps_skipped,
-        "total_unknown", $g_total_traps_unknown);
+        "total_unknown", $g_total_traps_unknown,
+        @t_sql_custom_columns_statistics);
     }
     else {
       mysql_insert($mysql_dbi_table_statistics,
@@ -6109,7 +6127,8 @@ sub log_statistics {
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
-      "total_unknown", $g_total_traps_unknown);
+      "total_unknown", $g_total_traps_unknown,
+      @t_sql_custom_columns_statistics);
     }
   }
 
@@ -6124,6 +6143,20 @@ sub log_statistics {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
 
+    my @t_sql_custom_columns_statistics = ();
+
+    if (@sql_custom_columns_statistics) {
+      @t_sql_custom_columns_statistics = @sql_custom_columns_statistics;
+
+      for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
+        $_ = $t_sql_custom_columns_statistics[$i];
+        print "Performing substitution on custom column: $_\n";
+        substitute();
+        print "Done performing substitution on custom column: $_\n";
+        $t_sql_custom_columns_statistics[$i] = $_;
+      }
+    }
+
     if ($unknown_trap_nodes_match_mode != 0) {
       postgresql_insert($postgresql_dbi_table_statistics,
         "stat_time", $stat_time_temp,
@@ -6131,7 +6164,8 @@ sub log_statistics {
         "total_translated", $g_total_traps_translated,
         "total_ignored", $g_total_traps_ignored,
         "total_skipped", $g_total_traps_skipped,
-        "total_unknown", $g_total_traps_unknown);
+        "total_unknown", $g_total_traps_unknown,
+        @t_sql_custom_columns_statistics);
     }
     else {
         postgresql_insert($postgresql_dbi_table_statistics,
@@ -6139,7 +6173,8 @@ sub log_statistics {
         "total_received", $g_total_traps_received,
         "total_translated", $g_total_traps_translated,
         "total_ignored", $g_total_traps_ignored,
-        "total_unknown", $g_total_traps_unknown);
+        "total_unknown", $g_total_traps_unknown,
+        @t_sql_custom_columns_statistics);
     }
   }
 
@@ -6154,6 +6189,20 @@ sub log_statistics {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
 
+    my @t_sql_custom_columns_statistics = ();
+
+    if (@sql_custom_columns_statistics) {
+      @t_sql_custom_columns_statistics = @sql_custom_columns_statistics;
+
+      for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
+        $_ = $t_sql_custom_columns_statistics[$i];
+        print "Performing substitution on custom column: $_\n";
+        substitute();
+        print "Done performing substitution on custom column: $_\n";
+        $t_sql_custom_columns_statistics[$i] = $_;
+      }
+    }
+
     if ($unknown_trap_nodes_match_mode != 0) {
       odbc_insert($dbd_odbc_table_statistics,
         "stat_time", $stat_time_temp,
@@ -6161,7 +6210,8 @@ sub log_statistics {
         "total_translated", $g_total_traps_translated,
         "total_ignored", $g_total_traps_ignored,
         "total_skipped", $g_total_traps_skipped,
-        "total_unknown", $g_total_traps_unknown);
+        "total_unknown", $g_total_traps_unknown,
+        @t_sql_custom_columns_statistics);
     }
     else {
         odbc_insert($dbd_odbc_table_statistics,
@@ -6169,7 +6219,8 @@ sub log_statistics {
         "total_received", $g_total_traps_received,
         "total_translated", $g_total_traps_translated,
         "total_ignored", $g_total_traps_ignored,
-        "total_unknown", $g_total_traps_unknown);
+        "total_unknown", $g_total_traps_unknown,
+        @t_sql_custom_columns_statistics);
     }
   }
 
@@ -6183,7 +6234,21 @@ sub log_statistics {
     else {
       $stat_time_temp = strftime $stat_time_format_sql, localtime();
     }
-    
+
+    my @t_sql_custom_columns_statistics = ();
+
+    if (@sql_custom_columns_statistics) {
+      @t_sql_custom_columns_statistics = @sql_custom_columns_statistics;
+
+      for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
+        $_ = $t_sql_custom_columns_statistics[$i];
+        print "Performing substitution on custom column: $_\n";
+        substitute();
+        print "Done performing substitution on custom column: $_\n";
+        $t_sql_custom_columns_statistics[$i] = $_;
+      }
+    }
+
     if ($unknown_trap_nodes_match_mode != 0) {
       sql_win32_odbc_insert($sql_win32_odbc_table_statistics,
       "stat_time", $stat_time_temp,
@@ -6191,7 +6256,8 @@ sub log_statistics {
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
       "total_skipped", $g_total_traps_skipped,
-      "total_unknown", $g_total_traps_unknown);
+      "total_unknown", $g_total_traps_unknown,
+      @t_sql_custom_columns_statistics);
     }
     else {
       sql_win32_odbc_insert($sql_win32_odbc_table_statistics,
@@ -6199,7 +6265,8 @@ sub log_statistics {
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
-      "total_unknown", $g_total_traps_unknown);
+      "total_unknown", $g_total_traps_unknown,
+      @t_sql_custom_columns_statistics);
     }
   }
 
