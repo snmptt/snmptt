@@ -328,13 +328,12 @@ table {
   contain 232.</li>
 <li>Added remote syslog support using the Perl module Log::Syslog::Fast which also allows you to specify the APP-NAME for RFC5424 syslog.
   Added the following <strong>snmptt.ini</strong> settings: <strong>syslog_module</strong>, <strong>syslog_remote_dest</strong>, <strong>syslog_remote_port</strong>, <strong>syslog_remote_proto</strong>, <strong>syslog_rfc_format</strong>, <strong>syslog_app</strong> and <strong>syslog_system_app</strong>.</li>
-<li>Added <strong>--preexec</strong> and <strong>-preexec_file</strong> options to s<strong>nmpttconvertmib</strong>.</li>
 <li>Added reload support to the <strong>snmptt.service</strong> systemd file.  This will allow you to use the <strong>'systemctl reload snmptt'</strong> command to reload the configuration.</li>
-<li>Updated documentation on securing SNMPTT to ensure the snmptt user has read access to the configuration files.  This is required when issuing a reload.</li>
 <li>Added support for IPv6.  To enable, set <strong>ipv6_enable = 1</strong> in <strong>snmptt.ini</strong>.</li>
 <li>Added support for sub-second sleep for spool folder processing.</li>
 <li><strong>snmptt.ini</strong> can now be located in <strong>/etc/snmptt</strong> and is searched for at this
   location first.</li>
+<li>Updated documentation on securing SNMPTT to ensure the snmptt user has read access to the configuration files.  This is required when issuing a reload.</li>
 <li>Fixed a bug with <strong>daemon_uid</strong> that prevented SNMPTT from starting on FreeBSD
   (bug 47).</li>
 <li>Fixed a bug where traps arriving with the hostname set to UNKNOWN were
@@ -379,6 +378,7 @@ line.  This is useful if you have added <strong>$Fz</strong> to the <strong>--ex
 SNMPTT can replace it with the FORMAT line.  Setting to <strong>2</strong> is similar to <strong>1</strong>,
 but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT line, 
 <strong>snmpttconvertmib</strong> will do the substitution.</li>
+<li>Added <strong>--preexec</strong> and <strong>-preexec_file</strong> options.</li>
 </ul>
 </li>
 </ul>

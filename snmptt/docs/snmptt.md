@@ -241,13 +241,12 @@ Note:
   contain 232.
 * Added remote syslog support using the Perl module Log::Syslog::Fast which also allows you to specify the APP-NAME for RFC5424 syslog.
   Added the following **snmptt.ini** settings: **syslog_module**, **syslog_remote_dest**, **syslog_remote_port**, **syslog_remote_proto**, **syslog_rfc_format**, **syslog_app** and **syslog_system_app**.
-* Added **--preexec** and **-preexec_file** options to s**nmpttconvertmib**.
 * Added reload support to the **snmptt.service** systemd file.  This will allow you to use the **'systemctl reload snmptt'** command to reload the configuration.
-* Updated documentation on securing SNMPTT to ensure the snmptt user has read access to the configuration files.  This is required when issuing a reload.
 * Added support for IPv6.  To enable, set **ipv6_enable = 1** in **snmptt.ini**.
 * Added support for sub-second sleep for spool folder processing.
 * **snmptt.ini** can now be located in **/etc/snmptt** and is searched for at this
   location first.
+* Updated documentation on securing SNMPTT to ensure the snmptt user has read access to the configuration files.  This is required when issuing a reload.
 * Fixed a bug with **daemon_uid** that prevented SNMPTT from starting on FreeBSD
   (bug 47).
 * Fixed a bug where traps arriving with the hostname set to UNKNOWN were
@@ -290,6 +289,8 @@ Note:
     SNMPTT can replace it with the FORMAT line.  Setting to **2** is similar to **1**,
     but instead of SNMPTT having to replace **$Fz** with the FORMAT line, 
     **snmpttconvertmib** will do the substitution.
+    * Added **--preexec** and **-preexec_file** options.
+
 
 ## **v1.4.2** **\- July 23rd, 2020**
 
