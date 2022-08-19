@@ -5,7 +5,9 @@ Aug 18, 2022: Alex Burger <alex_b@users.sourceforge.net>
 - Added ability to add custom columns to *_table_statistics tables.  See
   sql_custom_columns_statistics snmptt.ini option.
 - Added support for UTC time.  See snmptt.ini options date_time_utc and 
-  #date_time_utc_sql.
+  date_time_utc_sql.
+- Added dns_normalise_case snmptt.ini option to convert host names to upper
+  or lower case.
 
 Aug 17, 2022: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.5 for release.

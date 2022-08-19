@@ -169,6 +169,7 @@ my $snmptt_system_name;
 #my $daemon;
 my $multiple_event;
 my $dns_enable;
+my $dns_normalise_case;
 my $strip_domain;
 my @strip_domain_list;
 my $net_snmp_perl_enable;
@@ -3929,6 +3930,19 @@ sub readtrap
     }
   }
 
+  if ($dns_normalise_case == 1) {
+    $agent_dns_name = lc $agent_dns_name;
+    if ($DEBUGGING >= 2) {
+      print "Agent host name changed to lower case: $agent_dns_name\n\n";
+    }
+  }
+  elsif ($dns_normalise_case == 2) {
+    $agent_dns_name = uc $agent_dns_name;
+    if ($DEBUGGING >= 2) {
+      print "Agent host name changed to upper case: $agent_dns_name\n\n";
+    }
+  }
+
   if ($strip_domain)
   {
     $var[0] = strip_domain_name($var[0], $strip_domain);
@@ -3938,6 +3952,19 @@ sub readtrap
   if ($DEBUGGING >= 1)
   {
     print "Trap received from $tempvar[0]: $tempvar[5]\n";
+  }
+
+  if ($dns_normalise_case == 1) {
+    $var[0] = lc $var[0];
+    if ($DEBUGGING >= 2) {
+      print "\nValue 0 host name changed to lower case: $var[0]\n\n";
+    }
+  }
+  elsif ($dns_normalise_case == 2) {
+    $var[0] = uc $var[0];
+    if ($DEBUGGING >= 2) {
+      print "\nValue 0 host name changed to upper case: $var[0]\n\n";
+    }
   }
 
   if ($DEBUGGING >= 2)
@@ -4579,6 +4606,7 @@ sub loadsnmpttini {
   $snmptt_system_name = $cfg->val('General', 'snmptt_system_name');
   $multiple_event = $cfg->val('General', 'multiple_event');
   $dns_enable = $cfg->val('General', 'dns_enable');
+  $dns_normalise_case = $cfg->val('General', 'dns_normalise_case');
   $strip_domain = $cfg->val('General', 'strip_domain');
   @strip_domain_list = $cfg->val('General', 'strip_domain_list');
   $net_snmp_perl_enable = $cfg->val('General', 'net_snmp_perl_enable');
@@ -4741,6 +4769,7 @@ sub loadsnmpttini {
   }
   if (! defined ($multiple_event)) { $multiple_event = 0} ;
   if (! defined ($dns_enable)) { $dns_enable = 0} ;
+  if (! defined ($dns_normalise_case)) { $dns_normalise_case = 0} ;
   if (! defined ($strip_domain)) { $strip_domain = 0} ;
   if (! defined ($net_snmp_perl_enable)) { $net_snmp_perl_enable = 0} ;
   if (! defined ($net_snmp_perl_cache_enable)) { $net_snmp_perl_cache_enable = 1} ;
@@ -7053,6 +7082,21 @@ sub ip_to_name {
             }
             $hostname = undef;
         }
+    }
+
+    if ($hostname) {
+      if ($dns_normalise_case == 1) {
+        $hostname = lc $hostname;
+        if ($DEBUGGING >= 2) {
+          print "  Host name changed to lower case: $hostname\n\n";
+        }
+      }
+      elsif ($dns_normalise_case == 2) {
+        $hostname = uc $hostname;
+        if ($DEBUGGING >= 2) {
+          print "  Host name changed to upper case: $hostname\n\n";
+        }
+      }
     }
     return $hostname;
 }
