@@ -3410,6 +3410,8 @@ sub readtrap
   }
 
   my @localtime_array;
+  my @localtime_array_sql;
+
   if ( $daemon == 1 && $use_trap_time == 1 )	# Daemon mode only
   {
     @localtime_array = get_time($trap_date_time_epoch);
@@ -3422,10 +3424,11 @@ sub readtrap
     }
 
     if ($date_time_format_sql eq "") {
-      $trap_date_time_sql = get_time($trap_date_time_epoch);
+      $trap_date_time_sql = get_time_sql($trap_date_time_epoch);
     }
     else {
-      $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array;
+      @localtime_array_sql = get_time_sql($trap_date_time_epoch);
+      $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array_sql;
     }
     
   }
@@ -3441,10 +3444,11 @@ sub readtrap
     }
 
     if ($date_time_format_sql eq "") {
-      $trap_date_time_sql = get_time();
+      $trap_date_time_sql = get_time_sql();
     }
     else {
-      $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array;
+      @localtime_array_sql = get_time_sql($trap_date_time_epoch);
+      $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array_sql;
     }
   }
 
