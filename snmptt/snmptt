@@ -7090,7 +7090,7 @@ sub name_to_ip {
 sub get_time {
   my $t_time = shift;
 
-  if ($t_time == "") {
+  if ($t_time eq "") {
     if ($date_time_utc == 1) {
         return gmtime();
     }
@@ -7111,7 +7111,7 @@ sub get_time {
 sub get_time_sql {
   my $t_time = shift;
 
-  if ($t_time == "") {
+  if ($t_time eq "") {
     if ($date_time_utc_sql == 1) {
         return gmtime();
     }
