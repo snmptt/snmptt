@@ -230,6 +230,13 @@ threads_max = 10
 # Example:  %a %b %e %Y %H:%M:%S
 #date_time_format = 
 
+# Set to 1 to use UTC time for all date stamps.  For SQL, see
+# date_time_utc_sql.
+#date_time_utc = 0
+
+# Set to 1 to enable IPv6 support
+ipv6_enable = 1
+
 [DaemonMode]
 # Set to 1 to have snmptt fork to the background when run in daemon mode
 # Ignored by Windows.  See documentation
@@ -592,6 +599,9 @@ sql_win32_odbc_password = password
 # be changed to follow a standard that is supported by the SQL server.
 # Example:  For a MySQL DATETIME, use %Y-%m-%d %H:%M:%S.
 #stat_time_format_sql = 
+
+# Set to 1 to use UTC time for all SQL date stamps.
+#date_time_utc_sql = 0
 
 [Exec]
 
