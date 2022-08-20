@@ -1118,12 +1118,12 @@ The Net-SNMP trap receiver does not currently support embedded Perl, so only the
 1. Create the directory c:\\snmp and copy **snmptt** and **snmptthandler** to it.
 
         md c:\snmp
-        copy snmptt c:\snmpt\
+        copy snmptt c:\snmp\
         copy snmptthandler c:\snmp\
 
 2. Copy **snmptt.ini-nt** to **%SystemRoot%\\snmptt.ini** (c:\\windows\\snmptt.ini) and edit the options inside the file.
 
-        cp snmptt.ini-nt %SystemRoot%\snmptt.ini
+        copy snmptt.ini-nt %SystemRoot%\snmptt.ini
 
 3. Either copy examples\\snmptt.conf.generic to c:\\snmp\\snmptt.conf (renaming the file during the copy) or create the file using notepad.
 
