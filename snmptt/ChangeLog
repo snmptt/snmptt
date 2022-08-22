@@ -1,3 +1,7 @@
+Aug 22, 2022: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed 'No such signal: SIGUSR1' error with Windows.  Signals are now only
+  enabled if they exist (issue #11).
+
 Aug 18, 2022: Alex Burger <alex_b@users.sourceforge.net>
 - Changed version to snmptt_1.5.1beta1
 - Fixed bug with Windows where events were always loged to the Windows event log

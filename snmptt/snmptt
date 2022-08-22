@@ -760,11 +760,17 @@ if ($daemon == 1)
     }
   }
 
-  $SIG{HUP} = \&signal_handler_reload;
+  if (exists ($SIG{HUP})) {
+    $SIG{HUP} = \&signal_handler_reload;
+  }
 
-  $SIG{TERM} = \&signal_handler_die;
+  if (exists ($SIG{TERM})) {
+    $SIG{TERM} = \&signal_handler_die;
+  }
 
-  $SIG{USR1} = \&signal_log_statistics;
+  if (exists ($SIG{USR1})) {
+    $SIG{USR1} = \&signal_log_statistics;
+  }
 
   $timetoreload = 0;
   $timetodie = 0;
