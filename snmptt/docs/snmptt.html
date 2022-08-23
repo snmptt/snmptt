@@ -1245,13 +1245,13 @@ Feb 27 11:04:07 server1 snmptt[83096]: .1.3.6.1.6.3.1.1.5.3 Normal "Status Event
 <li>
 <p>Create the directory c:\snmp and copy <strong>snmptt</strong> and <strong>snmptthandler</strong> to it.</p>
 <pre><code>md c:\snmp
-copy snmptt c:\snmpt\
+copy snmptt c:\snmp\
 copy snmptthandler c:\snmp\
 </code></pre>
 </li>
 <li>
 <p>Copy <strong>snmptt.ini-nt</strong> to <strong>%SystemRoot%\snmptt.ini</strong> (c:\windows\snmptt.ini) and edit the options inside the file.</p>
-<pre><code>cp snmptt.ini-nt %SystemRoot%\snmptt.ini
+<pre><code>copy snmptt.ini-nt %SystemRoot%\snmptt.ini
 </code></pre>
 </li>
 <li>
@@ -1728,7 +1728,7 @@ total_unknown BIGINT);
 <p>Note: To store the stat_time as a real date/time (<strong>DATETIME</strong> data type), change 'stat_time VARCHAR(30),' to 'stat_time DATETIME,' and set <strong>stat_time_format_sql</strong> in <strong>snmptt.ini</strong> to <strong>%Y-%m-%d %H:%M:%S</strong>.</p>
 <p>Note: The variable lengths I have chosen above should be sufficient, but they may need to be increased depending on your environment.</p>
 <p>To add a user account called '<strong>snmptt</strong>' with a password of '<strong>mytrap</strong>' for use by SNMPTT, use the following SQL statement:</p>
-<pre><code>GRANT ALL PRIVILEGES ON \*.\* TO 'snmptt'@'localhost' IDENTIFIED BY 'mytrap';
+<pre><code>GRANT ALL PRIVILEGES ON *.* TO 'snmptt'@'localhost' IDENTIFIED BY 'mytrap';
 </code></pre>
 <h2><a name="LoggingDatabase-PostgreSQL"></a>DBD::PgPP (PostgreSQL)</h2>
 <p>To configure SNMPTT for PostgreSQL, modify the following variables in the snmptt.ini file.</p>

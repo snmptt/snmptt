@@ -1638,7 +1638,7 @@ Note: The variable lengths I have chosen above should be sufficient, but they ma
 
 To add a user account called '**snmptt**' with a password of '**mytrap**' for use by SNMPTT, use the following SQL statement:
 
-    GRANT ALL PRIVILEGES ON \*.\* TO 'snmptt'@'localhost' IDENTIFIED BY 'mytrap';
+    GRANT ALL PRIVILEGES ON *.* TO 'snmptt'@'localhost' IDENTIFIED BY 'mytrap';
 
 ## <a name="LoggingDatabase-PostgreSQL"></a>DBD::PgPP (PostgreSQL)
 
