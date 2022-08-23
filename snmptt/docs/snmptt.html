@@ -12,7 +12,7 @@ name="GENERATOR" />
 </head></p>
 <h1>SNMP Trap Translator v1.5</h1>
 <p><strong>(<a href="http://www.snmptt.org">SNMPTT</a>)</strong></p>
-<p>This file was last updated on: August 17th, 2022</p>
+<p>This file was last updated on: August 23rd, 2022</p>
 <p><a href="#License">License</a></p>
 <p><a href="#What-is-it">SNMPTT</a></p>
 <ul>
@@ -51,7 +51,7 @@ name="GENERATOR" />
 <li><a href="#LoggingSyslog">Syslog</a>  </li>
 <li><a href="#LoggingEventLog">Windows EventLog</a>  </li>
 <li><a href="#LoggingDatabase">Database</a>  <ul>
-<li><a href="#LoggingDatabase-MySQL">MySQL</a>  </li>
+<li><a href="#LoggingDatabase-MySQL">MySQL / MariaDB</a>  </li>
 <li><a href="#LoggingDatabase-PostgreSQL">PostgreSQL</a>  </li>
 <li><a href="#LoggingDatabase-ODBC">ODBC</a>  </li>
 <li><a href="#LoggingDatabase-Windows_ODBC">Windows ODBC</a>  </li>
@@ -135,7 +135,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA  </p>
 <p><code>FORMAT Compaq Drive Array Spare Drive on controller $4, bus $5, bay $6 status is $3.</code></p>
 <p>Which could result in the following output:</p>
 <p><code>"Compaq Drive Array Spare Drive on controller 3, bus 0, bay 3 status is Failed."</code></p>
-<p>SNMPTT can log to any of the following destinations: text log, syslog, Windows Event log or a SQL database such as MySQL, PostreSQL or an ODBC accessible database such as Microsoft SQL. External programs can also be run to pass th  e translated trap to an email client, paging software, Nagios, Icinga etc.</p>
+<p>SNMPTT can log to any of the following destinations: text log, syslog, Windows Event log or a SQL database such as MySQL, MariaDB, PostreSQL or an ODBC accessible database such as Microsoft SQL. External programs can also be run to pass th  e translated trap to an email client, paging software, Nagios, Icinga etc.</p>
 <p>In addition to variable substitution, SNMPTT allows complex configurations allowing:</p>
 <ul>
 <li>the ability to accept or reject a trap based on the host name, ip address, network range, or variable values inside of the trap enterprise variables</li>
@@ -144,7 +144,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA  </p>
 </ul>
 <p>As of SNMPTT 1.5, both IPv4 and IPv6 are supported.</p>
 <h1><a name="Downloading"></a>Downloading</h1>
-<p>SNMPTT can be downloaded from the <a href="https://sourceforge.net/projects/snmptt/files/snmptt/">Sourceforge files page</a>.  The primary git source code repository is avaialble at <a href="https://sourceforge.net/p/snmptt/git/ci/master/tree/">Sourceforge</a> and a mirror is available at <a href="https://github.com/AlexB7/snmptt">GitHub</a>.</p>
+<p>SNMPTT can be downloaded from the <a href="https://sourceforge.net/projects/snmptt/files/snmptt/">Sourceforge files page</a>.  The primary git source code repository is available at <a href="https://github.com/snmptt/snmptt">GitHub</a> and a mirror is available at <a href="https://sourceforge.net/p/snmptt/git/ci/master/tree/">Sourceforge</a>.</p>
 <h1><a name="Requirements"></a>Requirements</h1>
 <ul>
 <li>Perl 5.6.1 or higher.  SNMPTT began development using 5.6.1 and although it is now developed with 5.30, it should still be backwards compatible 5.6.1.</li>
@@ -272,7 +272,7 @@ table {
 </tr>
 <tr>
 <td style="text-align: left;">Optional</td>
-<td style="text-align: left;"><a href="https://metacpan.org/pod/DBD::mysql">DBD::mysql</a> module.  Required for MySQL support.</td>
+<td style="text-align: left;"><a href="https://metacpan.org/pod/DBD::mysql">DBD::mysql</a> module.  Required for MySQL / MariaDB support.</td>
 <td style="text-align: left;">perl-DBD-MySQL</td>
 <td style="text-align: left;">libdbd-mysql-perl</td>
 </tr>
@@ -657,7 +657,7 @@ but instead of SNMPTT having to replace <strong>$Fz</strong> with the FORMAT lin
 <li>Initial release</li>
 </ul>
 <h1><a name="Upgrading"></a>Upgrading</h1>
-<h2><strong>v1.4.2 to v1.5beta1</strong></h2>
+<h2><strong>v1.4.2 to v1.5</strong></h2>
 <p>To upgrade from v1.4.2 to v1.5 you should:</p>
 <ol>
 <li>Replace <strong>snmptt</strong> with the new version.  Make sure the file is executable (<strong>chmod +x <em>filename</em></strong>).</li>
@@ -1306,8 +1306,21 @@ notepad c:\snmp\snmptt.conf
 </li>
 </ol>
 <p><strong>Windows EventLog:</strong></p>
-<p>If you have enabled Windows Event Log support, then you must install an Event Message File to prevent "Event Message Not Found" messages from appearing in the Event Log.  Microsoft Knowledge Base article KB166902 contains information on this error.</p>
-<p>The Event Message File is aincluded with SNMPTT is a pre-compiled binary DLL.  To compile the DLL yourself, see 'Compiling' below.</p>
+<p>If you have enabled Windows Event Log support, then you must install an Event Message File to prevent "Event Message Not Found" messages from appearing in the Event Log.  Microsoft Knowledge Base article <a href="https://docs.microsoft.com/en-us/troubleshoot/windows/win32/troubleshoot-event-message-not-found">KB166902</a> contains information on this error.  Example message:</p>
+<pre><code>The description for Event ID 0 from source SNMPTT cannot be found. Either the component that raises this event is not installed on your local computer or the installation is corrupted. You can install or repair the component on the local computer.
+
+If the event originated on another computer, the display information had to be saved with the event.
+
+The following information was included with the event:
+
+SNMPTT started
+
+The message resource is present but the message was not found in the message table
+</code></pre>
+<p>With the DLL:</p>
+<pre><code>SNMPTT started
+</code></pre>
+<p>The Event Message File is included with SNMPTT is a pre-compiled binary DLL and works on both 64-bit and 32-bit Windows.  To compile the DLL yourself, see 'Compiling' below.</p>
 <p>To install the DLL:</p>
 <ol>
 <li>
@@ -1391,7 +1404,7 @@ link /nodefaultlib /INCREMENTAL:NO /release /nologo -base:0x60000000 -machine:i3
 </li>
 <li>
 <p>Install the SNMPTT service using:</p>
-<pre><code>instsrv SNMPTT c:\windows\\system32\srvany.exe
+<pre><code>instsrv SNMPTT c:\windows\system32\srvany.exe
 </code></pre>
 </li>
 <li>
@@ -1658,13 +1671,13 @@ EventID 19: PostgreSQL error: Unable to perform INSERT INTO (EXECUTE)  </p>
 <p>To prevent "Event Message Not Found" messages in the Event Viewer, an Event Message File must be used.  For information on installing the message file, see the <a href="#Installation%20-%20Windows">Installation section for Windows</a>.</p>
 </blockquote>
 <h2><a name="LoggingDatabase"></a>Logging - Database</h2>
-<p>Translated and unrecognized traps can be sent to a database.  MySQL (tested under Linux), PostgreSQL (tested under Linux) and ODBC (tested under Windows) can be used.</p>
+<p>Translated and unrecognized traps can be sent to a database.  MySQL / MariaDB (tested under Linux), PostgreSQL (tested under Linux) and ODBC (tested under Windows) can be used.</p>
 <p>After configuring database logging below, you can also enable unknown trap logging by editing the <strong>snmptt.ini</strong> file and modifying the following variables:</p>
 <pre><code>enable_unknown_trap_log
 db_unknown_trap_format
 </code></pre>
-<h2><a name="LoggingDatabase-MySQL"></a>DBD::MySQL</h2>
-<p>To configure SNMPTT for MySQL, modify the following variables in the snmptt.ini file.</p>
+<h2><a name="LoggingDatabase-MySQL"></a>DBD::MySQL (MySQL / MariaDB)</h2>
+<p>To configure SNMPTT for MySQL / MariaDB, modify the following variables in the snmptt.ini file.</p>
 <pre><code>mysql_dbi_enable
 mysql_dbi_host
 mysql_dbi_port
@@ -1675,7 +1688,7 @@ mysql_dbi_username
 mysql_dbi_password
 </code></pre>
 <p>Note:  Sample values are defined in the default ini file.  Defining mysql_dbi_table_unknown is optional.</p>
-<p>The following MySQL script will create the database and table. Permissions etc should also be defined. Run '<strong>mysql</strong>' as root and enter:</p>
+<p>The following MySQL / MariaDB script will create the database and table. Permissions etc should also be defined. Run '<strong>mysql</strong>' as root and enter:</p>
 <pre><code>CREATE DATABASE snmptt;   
 USE snmptt;
 
@@ -2085,11 +2098,11 @@ $-*  - Expand all variable-bindings in the format of <em>variable name (variable
 <blockquote>
 <p><strong><em>date time trap-OID severity category hostname - format</em></strong></p>
 </blockquote>
-<p>For all other log files except MySQL, DBD::ODBC and Win32::ODBC, the output will be formatted as:</p>
+<p>For all other log files except MySQL / MariaDB, DBD::ODBC and Win32::ODBC, the output will be formatted as:</p>
 <blockquote>
 <p><strong><em>trap-OID severity category hostname - format</em></strong></p>
 </blockquote>
-<p>For MySQL, DBD::ODBC and Win32::ODBC, the <strong>formatline</strong> column will contain only the <strong>format</strong> text.</p>
+<p>For MySQL / MariaDB, DBD::ODBC and Win32::ODBC, the <strong>formatline</strong> column will contain only the <strong>format</strong> text.</p>
 </blockquote>
 <p>Note (1):</p>
 <blockquote>

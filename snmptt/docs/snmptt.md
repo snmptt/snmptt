@@ -14,7 +14,7 @@ name="GENERATOR" />
 # SNMP Trap Translator v1.5
 **([SNMPTT](http://www.snmptt.org))**
 
-This file was last updated on: August 17th, 2022
+This file was last updated on: August 23rd, 2022
 
 [License](#License)
 
@@ -47,7 +47,7 @@ This file was last updated on: August 17th, 2022
     * [Syslog](#LoggingSyslog)  
     * [Windows EventLog](#LoggingEventLog)  
     * [Database](#LoggingDatabase)  
-        * [MySQL](#LoggingDatabase-MySQL)  
+        * [MySQL / MariaDB](#LoggingDatabase-MySQL)
         * [PostgreSQL](#LoggingDatabase-PostgreSQL)  
         * [ODBC](#LoggingDatabase-ODBC)  
         * [Windows ODBC](#LoggingDatabase-Windows_ODBC)  
@@ -151,7 +151,7 @@ Which could result in the following output:
 "Compaq Drive Array Spare Drive on controller 3, bus 0, bay 3 status is Failed."
 ```
 
-SNMPTT can log to any of the following destinations: text log, syslog, Windows Event log or a SQL database such as MySQL, PostreSQL or an ODBC accessible database such as Microsoft SQL. External programs can also be run to pass th  e translated trap to an email client, paging software, Nagios, Icinga etc.
+SNMPTT can log to any of the following destinations: text log, syslog, Windows Event log or a SQL database such as MySQL, MariaDB, PostreSQL or an ODBC accessible database such as Microsoft SQL. External programs can also be run to pass th  e translated trap to an email client, paging software, Nagios, Icinga etc.
 
 In addition to variable substitution, SNMPTT allows complex configurations allowing:
 
@@ -164,7 +164,7 @@ As of SNMPTT 1.5, both IPv4 and IPv6 are supported.
 
 # <a name="Downloading"></a>Downloading
 
-SNMPTT can be downloaded from the [Sourceforge files page](https://sourceforge.net/projects/snmptt/files/snmptt/).  The primary git source code repository is avaialble at [Sourceforge](https://sourceforge.net/p/snmptt/git/ci/master/tree/) and a mirror is available at [GitHub](https://github.com/AlexB7/snmptt).
+SNMPTT can be downloaded from the [Sourceforge files page](https://sourceforge.net/projects/snmptt/files/snmptt/).  The primary git source code repository is available at [GitHub](https://github.com/snmptt/snmptt) and a mirror is available at [Sourceforge](https://sourceforge.net/p/snmptt/git/ci/master/tree/).
 
 # <a name="Requirements"></a>Requirements
 
@@ -209,7 +209,7 @@ table {
 | Optional | [Sys::Syslog](https://metacpan.org/pod/Sys::Syslog) module (included with most Unix distributions). Required for Syslog support using Unix sockets (local syslog). | perl-Sys-Syslog |  |
 | Optional | [Log::Syslog::Fast](https://metacpan.org/pod/Log::Syslog::Fast) and [Log::Syslog::Constants](https://metacpan.org/pod/Log::Syslog::Constants) modules. Required for remote syslog and RFC5424 support. |  |  |
 | Optional | [DBI](https://metacpan.org/pod/DBI) module.  Required for DBD::MySQL, DBD::PgPP and DBD::ODBC support. | perl-DBI | libclass-dbi-perl |
-| Optional | [DBD::mysql](https://metacpan.org/pod/DBD::mysql) module.  Required for MySQL support. | perl-DBD-MySQL | libdbd-mysql-perl |
+| Optional | [DBD::mysql](https://metacpan.org/pod/DBD::mysql) module.  Required for MySQL / MariaDB support. | perl-DBD-MySQL | libdbd-mysql-perl |
 | Optional | [DBD::PgPP](https://metacpan.org/pod/DBD::PgPP) or [DBD:Pg](https://metacpan.org/pod/DBD::Pg) module.  Required for PostgreSQL support. | perl-DBD-Pg | libdbd-pg-perl |
 | Optional | [DBD::ODBC](https://metacpan.org/pod/DBD::ODBC) module.  Required for ODBC (SQL etc) access on Linux / Windows (Win32::ODBC not required if using DBD::ODBC) | perl-DBD-ODBC | libdbd-odbc-perl |
 | Optional | [Win32::ODBC](https://metacpan.org/pod/Win32::ODBC) module.  Required for ODBC (SQL etc) access on Windows (DBD::ODBC not required if using Win32::ODBC) |  |  |
@@ -544,7 +544,7 @@ Note:
 
 # <a name="Upgrading"></a>Upgrading
 
-## **v1.4.2 to v1.5beta1**
+## **v1.4.2 to v1.5**
 
 To upgrade from v1.4.2 to v1.5 you should:
 
@@ -1169,9 +1169,23 @@ The Net-SNMP trap receiver does not currently support embedded Perl, so only the
 
 **Windows EventLog:**
 
-If you have enabled Windows Event Log support, then you must install an Event Message File to prevent "Event Message Not Found" messages from appearing in the Event Log.  Microsoft Knowledge Base article KB166902 contains information on this error.
+If you have enabled Windows Event Log support, then you must install an Event Message File to prevent "Event Message Not Found" messages from appearing in the Event Log.  Microsoft Knowledge Base article [KB166902](https://docs.microsoft.com/en-us/troubleshoot/windows/win32/troubleshoot-event-message-not-found) contains information on this error.  Example message:
 
-The Event Message File is aincluded with SNMPTT is a pre-compiled binary DLL.  To compile the DLL yourself, see 'Compiling' below.
+    The description for Event ID 0 from source SNMPTT cannot be found. Either the component that raises this event is not installed on your local computer or the installation is corrupted. You can install or repair the component on the local computer.
+
+    If the event originated on another computer, the display information had to be saved with the event.
+
+    The following information was included with the event:
+
+    SNMPTT started
+
+    The message resource is present but the message was not found in the message table
+
+With the DLL:
+
+    SNMPTT started
+
+The Event Message File is included with SNMPTT is a pre-compiled binary DLL and works on both 64-bit and 32-bit Windows.  To compile the DLL yourself, see 'Compiling' below.
 
 To install the DLL:
 
@@ -1235,7 +1249,7 @@ To configure SNMPTT as a service under Windows, follow these steps.  More inform
 
 3. Install the SNMPTT service using:
 
-        instsrv SNMPTT c:\windows\\system32\srvany.exe
+        instsrv SNMPTT c:\windows\system32\srvany.exe
 
 4. Configure the service:
 
@@ -1553,16 +1567,16 @@ Note:
 
 ## <a name="LoggingDatabase"></a>Logging - Database
 
-Translated and unrecognized traps can be sent to a database.  MySQL (tested under Linux), PostgreSQL (tested under Linux) and ODBC (tested under Windows) can be used.
+Translated and unrecognized traps can be sent to a database.  MySQL / MariaDB (tested under Linux), PostgreSQL (tested under Linux) and ODBC (tested under Windows) can be used.
 
 After configuring database logging below, you can also enable unknown trap logging by editing the **snmptt.ini** file and modifying the following variables:
 
     enable_unknown_trap_log
     db_unknown_trap_format
 
-## <a name="LoggingDatabase-MySQL"></a>DBD::MySQL
+## <a name="LoggingDatabase-MySQL"></a>DBD::MySQL (MySQL / MariaDB)
 
-To configure SNMPTT for MySQL, modify the following variables in the snmptt.ini file.
+To configure SNMPTT for MySQL / MariaDB, modify the following variables in the snmptt.ini file.
 
     mysql_dbi_enable
     mysql_dbi_host
@@ -1575,7 +1589,7 @@ To configure SNMPTT for MySQL, modify the following variables in the snmptt.ini 
 
 Note:  Sample values are defined in the default ini file.  Defining mysql\_dbi\_table\_unknown is optional.
 
-The following MySQL script will create the database and table. Permissions etc should also be defined. Run '**mysql**' as root and enter:
+The following MySQL / MariaDB script will create the database and table. Permissions etc should also be defined. Run '**mysql**' as root and enter:
 
     CREATE DATABASE snmptt;   
     USE snmptt; 
@@ -2052,11 +2066,11 @@ The syntax of the snmptt.conf file  is:
  > 
  > > **_date time trap-OID severity category hostname - format_**
  > 
- > For all other log files except MySQL, DBD::ODBC and Win32::ODBC, the output will be formatted as:
+ > For all other log files except MySQL / MariaDB, DBD::ODBC and Win32::ODBC, the output will be formatted as:
  > 
  > > **_trap-OID severity category hostname - format_**
  > 
- > For MySQL, DBD::ODBC and Win32::ODBC, the **formatline** column will contain only the **format** text.
+ > For MySQL / MariaDB, DBD::ODBC and Win32::ODBC, the **formatline** column will contain only the **format** text.
  
  Note (1):
  
