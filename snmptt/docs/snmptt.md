@@ -2499,7 +2499,9 @@ The host name may resolve to the Fully Qualified Domain Name (FQDN).  For exampl
 
 To allow IP addresses to be resolved to host names, PTR records must exist in DNS or the local hosts file must contain all hosts.  
   
-It is recommended that either DNS be installed on the machine running SNMPTT / snmptrapd or a local hosts file be configured will all devices.  DNS should be configured as a secondary (authoritive) for the domains that it will receive traps from.  This will reduce network resolution traffic, speed up resolution, and remove the dependency of the network for DNS.  If a local DNS or hosts file is not used, then the entire network management station could become useless during a DNS / remote network outage and could cause false alarms for network management software.  
+It is recommended that either DNS be installed on the machine running SNMPTT / snmptrapd or a local hosts file be configured will all devices.  DNS should be configured as a secondary (authoritive) for the domains that it will receive traps from.  This will reduce network resolution traffic, speed up resolution, and remove the dependency of the network for DNS.  If a local DNS or hosts file is not used, then the entire network management station could become useless during a DNS / remote network outage and could cause false alarms for network management software.
+
+The **snmptt.ini** setting **dns_normalise_case** can be used to force all DNS results to lower or upper case.
   
 # <a name="Sample-SNMPTT.CONF-file"></a>Sample SNMPTT.CONF files
   
@@ -2594,7 +2596,7 @@ The program called by SNMPTT (EXEC) blocks SNMPTT.  If you call a program that d
 
 Please send me any comments - good or bad - to alex\_b@users.sourceforge.net.  If you have any problems including converting trap files, please send me an email and include the file you are trying to convert and I will try to take a look at it.
 
-Please also send any bug reports, patches or improvements so I can fix / add them and add it to the next release.  You can also use Sourceforge for [bugs](http://sourceforge.net/tracker/?group_id=51473&atid=463393) and [feature requests](http://sourceforge.net/tracker/?atid=463396&group_id=51473&func=browse).  
+Please also send any bug reports, patches or improvements so I can fix / add them and add it to the next release.  You can also use the [GitHub issue tracker](https://github.com/snmptt/snmptt/issues) or Sourceforge [bugs](http://sourceforge.net/tracker/?group_id=51473&atid=463393) and [feature requests](http://sourceforge.net/tracker/?atid=463396&group_id=51473&func=browse).  
  
 
 # <a name="Integration-with-other-software"></a>Integration with other software

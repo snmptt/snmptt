@@ -51,7 +51,7 @@ name="GENERATOR" />
 <li><a href="#LoggingSyslog">Syslog</a>  </li>
 <li><a href="#LoggingEventLog">Windows EventLog</a>  </li>
 <li><a href="#LoggingDatabase">Database</a>  <ul>
-<li><a href="#LoggingDatabase-MySQL">MySQL / MariaDB</a>  </li>
+<li><a href="#LoggingDatabase-MySQL">MySQL / MariaDB</a></li>
 <li><a href="#LoggingDatabase-PostgreSQL">PostgreSQL</a>  </li>
 <li><a href="#LoggingDatabase-ODBC">ODBC</a>  </li>
 <li><a href="#LoggingDatabase-Windows_ODBC">Windows ODBC</a>  </li>
@@ -2455,7 +2455,8 @@ EDESC
 <p>If the configuration setting <strong>dns_enable</strong> is set to 1 (dns enabled), then the host name of both the host and the AGENT will be resolved via DNS.  <strong>NODES</strong> entries will also be resolved to IP addresses before performing matches.  </p>
 <p>The host name may resolve to the Fully Qualified Domain Name (FQDN).  For example: barney.bedrock.com.  Adding an entry for the host in your /etc/hosts file or %systemroot%\system32\drivers\etc\hosts may result in the short name being used instead (barney).  You can also enable the <strong>strip_domain</strong> / <strong>strip_domain_list</strong> options to have SNMPTT strip the domain of any FQDN host.  See the <strong>snmptt.ini</strong> file for details.</p>
 <p>To allow IP addresses to be resolved to host names, PTR records must exist in DNS or the local hosts file must contain all hosts.  </p>
-<p>It is recommended that either DNS be installed on the machine running SNMPTT / snmptrapd or a local hosts file be configured will all devices.  DNS should be configured as a secondary (authoritive) for the domains that it will receive traps from.  This will reduce network resolution traffic, speed up resolution, and remove the dependency of the network for DNS.  If a local DNS or hosts file is not used, then the entire network management station could become useless during a DNS / remote network outage and could cause false alarms for network management software.  </p>
+<p>It is recommended that either DNS be installed on the machine running SNMPTT / snmptrapd or a local hosts file be configured will all devices.  DNS should be configured as a secondary (authoritive) for the domains that it will receive traps from.  This will reduce network resolution traffic, speed up resolution, and remove the dependency of the network for DNS.  If a local DNS or hosts file is not used, then the entire network management station could become useless during a DNS / remote network outage and could cause false alarms for network management software.</p>
+<p>The <strong>snmptt.ini</strong> setting <strong>dns_normalise_case</strong> can be used to force all DNS results to lower or upper case.</p>
 <h1><a name="Sample-SNMPTT.CONF-file"></a>Sample SNMPTT.CONF files</h1>
 <h2><a name="Sample1-SNMPTT.CONF-file"></a>Sample1</h2>
 <p>Note: The examples folder also contains a sample snmptt.conf file.</p>
@@ -2525,7 +2526,7 @@ EDESC
 <p>The program called by SNMPTT (EXEC) blocks SNMPTT.  If you call a program that does not return, SNMPTT will be left waiting.  In standalone mode, this would cause snmptrapd to wait forever also.  </p>
 <h1><a name="Feedback"></a>Feedback &amp; Bugs</h1>
 <p>Please send me any comments - good or bad - to alex_b@users.sourceforge.net.  If you have any problems including converting trap files, please send me an email and include the file you are trying to convert and I will try to take a look at it.</p>
-<p>Please also send any bug reports, patches or improvements so I can fix / add them and add it to the next release.  You can also use Sourceforge for <a href="http://sourceforge.net/tracker/?group_id=51473&amp;atid=463393">bugs</a> and <a href="http://sourceforge.net/tracker/?atid=463396&amp;group_id=51473&amp;func=browse">feature requests</a>.  </p>
+<p>Please also send any bug reports, patches or improvements so I can fix / add them and add it to the next release.  You can also use the <a href="https://github.com/snmptt/snmptt/issues">GitHub issue tracker</a> or Sourceforge <a href="http://sourceforge.net/tracker/?group_id=51473&amp;atid=463393">bugs</a> and <a href="http://sourceforge.net/tracker/?atid=463396&amp;group_id=51473&amp;func=browse">feature requests</a>.  </p>
 <h1><a name="Integration-with-other-software"></a>Integration with other software</h1>
 <h2><a name="Nagios-Netsaint"></a>Nagios</h2>
 <h3>Overview</h3>
