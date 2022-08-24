@@ -48,7 +48,7 @@
 use strict;
 use warnings;
 
-my $snmptt_version = "1.5";
+my $snmptt_version = "1.5.1beta1";
 
 sub showversion
 {
@@ -1027,9 +1027,11 @@ if ($daemon == 1)
 
 
       if ($DEBUGGING >= 1) {
-        print $fh_DEBUGFILE "Closing debug file $DEBUGGING_FILE\n";
-        # Close debug file (if it is open) before changing users and re-open after
-        close($fh_DEBUGFILE);
+        if (defined ($fh_DEBUGFILE)) {
+          print $fh_DEBUGFILE "Closing debug file $DEBUGGING_FILE\n";
+          # Close debug file (if it is open) before changing users and re-open after
+          close($fh_DEBUGFILE);
+        }
       }
 	  
 	    # Change owner of debug file so $daemon_uid can write to it.
@@ -2403,37 +2405,36 @@ sub substitute
 
   # Wildcards - $*, $+*, $-*
   # Expand to $1 $2 $3 etc
-  my $temp_wildcard1 = ();
-  my $temp_wildcard2 = ();
-  my $temp_wildcard3 = ();
-  for(my $i=1;$i <= $#entvar+1; $i++)
-  {
-    $temp_wildcard1 = $temp_wildcard1 . "\$$i" . $wildcard_expansion_separator;
-    $temp_wildcard2 = $temp_wildcard2 . "\$\+$i" . $wildcard_expansion_separator;
-    $temp_wildcard3 = $temp_wildcard3 . "\$-$i" . $wildcard_expansion_separator;
-  }
+  # Only if we have at least one enterprise variable
+  if ($#entvar+1) {
+    my $temp_wildcard1 = "";
+    my $temp_wildcard2 = "";
+    my $temp_wildcard3 = "";
+    for(my $i=1;$i <= $#entvar+1; $i++)
+    {
+      $temp_wildcard1 = $temp_wildcard1 . "\$$i" . $wildcard_expansion_separator;
+      $temp_wildcard2 = $temp_wildcard2 . "\$\+$i" . $wildcard_expansion_separator;
+      $temp_wildcard3 = $temp_wildcard3 . "\$-$i" . $wildcard_expansion_separator;
+    }
 
-  # Trim off last wildcard separator
-  # TODO: Bug? Should it be checking $temp_wildcard1, $temp_wildcard2 or $temp_wildcard3 is defined?
-  if (defined ( $temp_wildcard1) )
-  {
+    # Trim off last wildcard separator
     my $end_trim = length($wildcard_expansion_separator);
     $temp_wildcard1 = substr($temp_wildcard1,0,-$end_trim);
     $temp_wildcard2 = substr($temp_wildcard2,0,-$end_trim);
     $temp_wildcard3 = substr($temp_wildcard3,0,-$end_trim);
+
+    #s(\$\*)($temp_wildcard1)g;
+    substitute2 ("\$\*", $temp_wildcard1);
+
+    s(\$\+\*)($temp_wildcard2)g;
+    substitute2 ("\$\+\*", $temp_wildcard2);
+
+    s(\$-\*)($temp_wildcard3)g;
+    substitute2 ("\$-\*", $temp_wildcard3);
   }
 
-  #s(\$\*)($temp_wildcard1)g;
-  substitute2 ("\$\*", $temp_wildcard1);
-
-  s(\$\+\*)($temp_wildcard2)g;
-  substitute2 ("\$\+\*", $temp_wildcard2);
-
-  s(\$-\*)($temp_wildcard3)g;
-  substitute2 ("\$-\*", $temp_wildcard3);
-
- # $v - Names of variable-bindings 
- # Count down backwards to make sure 10 is not mistaken for $1
+  # $v - Names of variable-bindings
+  # Count down backwards to make sure 10 is not mistaken for $1
   for(my $i=$#entvarname+1;$i > 0; $i--)
   {
     if ($net_snmp_perl_enable == 1)
@@ -2800,7 +2801,9 @@ sub substitute
   }
 
   # FORMAT line (only possible when doing EXEC line)
-  substitute2 ("\$Fz", "$format_line");
+  if (defined($format_line)) {
+    substitute2 ("\$Fz", "$format_line");
+  }
 
   # $$ - Print a $
   s(\$\$)(\$)g;
@@ -7018,54 +7021,51 @@ sub preexec_run {
         print "\n\nPREEXEC line(s):\n";
       }
 
-      if (defined ($event2[9][0])) # if PREEXEC string has been defined
+      if (defined ($event2[9][0]))
       {
-        print "PREEXEC defined\n";
-        if (defined ($event2[9][0]))
+        #print "PREEXEC defined\n";
+        for (my $i=0; defined($event2[9][$i]); $i++)
         {
-          for (my $i=0; defined($event2[9][$i]); $i++)
+          $_ = $event2[9][$i];
+
+          print "Performing substitution on PREEXEC line: $_\n";
+          substitute();
+          print "Done performing substitution on PREEXEC line: $_\n";
+
+          my $command = $_;
+
+          if ($pre_exec_enable == 1)
           {
-            $_ = $event2[9][$i];
-
-            print "Performing substitution on PREEXEC line: $_\n";
-            substitute();
-            print "Done performing substitution on PREEXEC line: $_\n";
-
-            my $command = $_;
-
-            if ($pre_exec_enable == 1)
+            if ($DEBUGGING >= 1)
             {
-              if ($DEBUGGING >= 1)
-              {
-                print "PREEXEC command: $command\n";
-              }
-              # Execute command
-
-              if ($exec_escape == 1) {
-                # Escape wildcard characters
-                $command =~ s/\*/\\\*/g;
-                $command =~ s/\?/\\\?/g;
-              }
-              my $result = `$command`;
-              chomp $result;
-              # Remove spaces before and after
-              $result =~ /^\s*(.*?)\s*$/;
-              $result = $1;
-
-              if ($result eq '') {
-                $result = "(no output from PREEXEC)\n";
-              }
-              print "        command output: $result\n";
-              push (@preexec_var, $result);
+              print "PREEXEC command: $command\n";
             }
+            # Execute command
+
+            if ($exec_escape == 1) {
+              # Escape wildcard characters
+              $command =~ s/\*/\\\*/g;
+              $command =~ s/\?/\\\?/g;
+            }
+            my $result = `$command`;
+            chomp $result;
+            # Remove spaces before and after
+            $result =~ /^\s*(.*?)\s*$/;
+            $result = $1;
+
+            if ($result eq '') {
+              $result = "(no output from PREEXEC)\n";
+            }
+            print "        command output: $result\n";
+            push (@preexec_var, $result);
           }
         }
-        else
+      }
+      else
+      {
+        if ($DEBUGGING >= 1)
         {
-          if ($DEBUGGING >= 1)
-          {
-            print "  PREEXEC line not defined\n";
-          }
+          print "  PREEXEC line not defined\n";
         }
       }
 }
