@@ -2117,9 +2117,13 @@ sub processtrap
             
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
-              print "Performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Performing substitution on custom column: $_\n";
+              }
               substitute();
-              print "Done performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Done performing substitution on custom column: $_\n";
+              }
               $t_sql_custom_columns[$i] = $_;
             }
           }
@@ -2162,9 +2166,13 @@ sub processtrap
             
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
-              print "Performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Performing substitution on custom column: $_\n";
+              }
               substitute();
-              print "Done performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Done performing substitution on custom column: $_\n";
+              }
               $t_sql_custom_columns[$i] = $_;
             }
           }
@@ -2205,9 +2213,13 @@ sub processtrap
             
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
-              print "Performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Performing substitution on custom column: $_\n";
+              }
               substitute();
-              print "Done performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Done performing substitution on custom column: $_\n";
+              }
               $t_sql_custom_columns[$i] = $_;
             }
           }
@@ -2248,9 +2260,13 @@ sub processtrap
             
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
-              print "Performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Performing substitution on custom column: $_\n";
+              }
               substitute();
-              print "Done performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Done performing substitution on custom column: $_\n";
+              }                
               $t_sql_custom_columns[$i] = $_;
             }
           }
@@ -4374,9 +4390,13 @@ sub searchfortrap
             
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
-            print "Performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Performing substitution on custom column: $_\n";
+            }
             substitute();
-            print "Done performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Done performing substitution on custom column: $_\n";
+            }
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
@@ -4411,9 +4431,13 @@ sub searchfortrap
             
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
-            print "Performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Performing substitution on custom column: $_\n";
+            }
             substitute();
-            print "Done performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Done performing substitution on custom column: $_\n";
+            }
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
@@ -4447,9 +4471,13 @@ sub searchfortrap
             
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
-            print "Performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Performing substitution on custom column: $_\n";
+            }
             substitute();
-            print "Done performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Done performing substitution on custom column: $_\n";
+            }
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
@@ -4483,9 +4511,13 @@ sub searchfortrap
             
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
-            print "Performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Performing substitution on custom column: $_\n";
+            }
             substitute();
-            print "Done performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Done performing substitution on custom column: $_\n";
+            }
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
@@ -6179,9 +6211,13 @@ sub log_statistics {
 
       for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
         $_ = $t_sql_custom_columns_statistics[$i];
-        print "Performing substitution on custom column: $_\n";
+        if ($DEBUGGING >= 1) {
+          print "Performing substitution on custom column: $_\n";
+        }
         substitute_sql_stat();
-        print "Done performing substitution on custom column: $_\n";
+        if ($DEBUGGING >= 1) {
+          print "Done performing substitution on custom column: $_\n";
+        }
         $t_sql_custom_columns_statistics[$i] = $_;
       }
     }
@@ -6225,9 +6261,13 @@ sub log_statistics {
 
       for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
         $_ = $t_sql_custom_columns_statistics[$i];
-        print "Performing substitution on custom column: $_\n";
+        if ($DEBUGGING >= 1) {
+          print "Performing substitution on custom column: $_\n";
+        }
         substitute_sql_stat();
-        print "Done performing substitution on custom column: $_\n";
+        if ($DEBUGGING >= 1) {
+          print "Done performing substitution on custom column: $_\n";
+        }
         $t_sql_custom_columns_statistics[$i] = $_;
       }
     }
@@ -6271,9 +6311,13 @@ sub log_statistics {
 
       for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
         $_ = $t_sql_custom_columns_statistics[$i];
-        print "Performing substitution on custom column: $_\n";
+        if ($DEBUGGING >= 1) {
+          print "Performing substitution on custom column: $_\n";
+        }
         substitute_sql_stat();
-        print "Done performing substitution on custom column: $_\n";
+        if ($DEBUGGING >= 1) {
+          print "Done performing substitution on custom column: $_\n";
+        }
         $t_sql_custom_columns_statistics[$i] = $_;
       }
     }
@@ -6317,9 +6361,13 @@ sub log_statistics {
 
       for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
         $_ = $t_sql_custom_columns_statistics[$i];
-        print "Performing substitution on custom column: $_\n";
+        if ($DEBUGGING >= 1) {
+          print "Performing substitution on custom column: $_\n";
+        }
         substitute_sql_stat();
-        print "Done performing substitution on custom column: $_\n";
+        if ($DEBUGGING >= 1) {
+          print "Done performing substitution on custom column: $_\n";
+        }
         $t_sql_custom_columns_statistics[$i] = $_;
       }
     }
@@ -7028,9 +7076,13 @@ sub preexec_run {
         {
           $_ = $event2[9][$i];
 
-          print "Performing substitution on PREEXEC line: $_\n";
+          if ($DEBUGGING >= 1) {
+            print "Performing substitution on PREEXEC line: $_\n";
+          }
           substitute();
-          print "Done performing substitution on PREEXEC line: $_\n";
+          if ($DEBUGGING >= 1) {
+            print "Done performing substitution on PREEXEC line: $_\n";
+          }
 
           my $command = $_;
 
