@@ -1,3 +1,7 @@
+Sept 3, 2022: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed a bug with snmptthandler-embedded that prevented spool files from being
+   created properly when snmptrapd isn't using the -On option (bug #49).
+
 Aug 24, 2022: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed some uninitialized value warnings (issue #11).  Also fixed debug output
   for PREEXEC.
