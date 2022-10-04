@@ -479,7 +479,7 @@ if (1)
         print "Split line TRAP-TYPE / NOTIFICATION-TYPE found ($1).\n";
       }
       
-      # If the TRAP-TYPE / NOTIFICATION-TYPE line starts with white space, it's probably a import line, so ignore
+      # If the TRAP-TYPE / NOTIFICATION-TYPE line starts with white space, it's probably an import line, so ignore
       elsif ( $line =~ /^\s+TRAP-TYPE.*/ ||
            $line =~ /^\s+NOTIFICATION-TYPE.*/  ||
            $line =~ /^.*,.*NOTIFICATION-TYPE.*/ )
@@ -490,6 +490,16 @@ if (1)
         next;
       }
       
+      # If multiple words exists before TRAP-TYPE / NOTIFICATION-TYPE, it's probably a comment line, so ignore
+      elsif ( $line =~ /\S+\s+\S+\s+TRAP-TYPE.*/ ||
+           $line =~ /\S+\s+\S+\s+NOTIFICATION-TYPE.*/ )
+      {
+        print "skipping a TRAP-TYPE / NOTIFICATION-TYPE line - probably a comment line.\n";
+        $currentline++; # Increment to the next line
+        $line = $mibfile[$currentline]; # Get next line
+        next;
+      }
+
       # Remove beginning and trailing white space
       $trapname =~ /\s*([A-Za-z0-9_-]+)\s*/;
       $trapname = $1;
