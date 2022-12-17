@@ -7000,26 +7000,48 @@ sub sql_win32_odbc_insert {
   #print "sql_statement: $sql_statement\n";
    
   if (defined ($dbh_win32_odbc)) {
-    if (defined ($dbh_win32_odbc->Sql($sql_statement)))
-    {
-      my $msg = "Win32::ODBC error: Unable to perform INSERT INTO: ".Win32::ODBC::Error();
-      warn $msg, "\n";
-
-      if ($DEBUGGING >= 1)
+    my $dbh_win32_odbc_retries = 3;
+    while ($dbh_win32_odbc_retries) {
+      if (defined ($dbh_win32_odbc->Sql($sql_statement))) # Error
       {
-        print $msg, "\n";
+        my $msg = "Win32::ODBC error: Unable to perform INSERT INTO: ".Win32::ODBC::Error();
+        warn $msg, "\n";
+
+        if ($DEBUGGING >= 1)
+        {
+          print $msg, "\n";
+        }
+
+        if ($eventlog_system_enable == 1)
+        {
+          eventlog_system($msg,17,$eventlog_error);
+        }
+
+        if (Win32::ODBC::Error() =~ /Communication link failure/i) {
+          my $msg = "Attempting to re-open Win32::ODBC connection";
+          warn $msg, "\n";
+
+          if ($DEBUGGING >= 1)
+          {
+            print $msg, "\n";
+          }
+
+          if ($eventlog_system_enable == 1)
+          {
+            eventlog_system($msg,17,$eventlog_error);
+          }
+
+          dbh_win32_odbc_close();
+          dbh_win32_odbc_connect();
+        }
+        $dbh_win32_odbc_retries--;
+        sleep 0.1;
       }
-
-      if ($eventlog_system_enable == 1)
-      {
-        eventlog_system($msg,17,$eventlog_error);
+      else { # No error
+        return 1;
       }
     }
-    else
-    {
-      return 1;
-    }
-  return 0;
+    return 0;
   }
 }
 
