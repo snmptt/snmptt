@@ -7017,7 +7017,7 @@ sub sql_win32_odbc_insert {
           eventlog_system($msg,17,$eventlog_error);
         }
 
-        if (Win32::ODBC::Error() =~ /Communication link failure/i) {
+        if ( (Win32::ODBC::Error() =~ /Communication link failure/i) || (Win32::ODBC::Error() =~ /connection is broken/i) ) {
           my $msg = "Attempting to re-open Win32::ODBC connection";
           warn $msg, "\n";
 
