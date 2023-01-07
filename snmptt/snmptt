@@ -7016,26 +7016,23 @@ sub sql_win32_odbc_insert {
         {
           eventlog_system($msg,17,$eventlog_error);
         }
+        
+        my $msg = "Attempting to re-open Win32::ODBC connection";
+        warn $msg, "\n";
 
-        if ( (Win32::ODBC::Error() =~ /Communication link failure/i) || 
-              (Win32::ODBC::Error() =~ /connection was forcibly closed/i) ||
-              (Win32::ODBC::Error() =~ /connection is broken/i) ) {
-          my $msg = "Attempting to re-open Win32::ODBC connection";
-          warn $msg, "\n";
-
-          if ($DEBUGGING >= 1)
-          {
-            print $msg, "\n";
-          }
-
-          if ($eventlog_system_enable == 1)
-          {
-            eventlog_system($msg,17,$eventlog_error);
-          }
-
-          dbh_win32_odbc_close();
-          dbh_win32_odbc_connect();
+        if ($DEBUGGING >= 1)
+        {
+          print $msg, "\n";
         }
+
+        if ($eventlog_system_enable == 1)
+        {
+          eventlog_system($msg,17,$eventlog_error);
+        }
+
+        dbh_win32_odbc_close();
+        dbh_win32_odbc_connect();
+        
         $dbh_win32_odbc_retries--;
         sleep 0.1;
       }
