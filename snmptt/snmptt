@@ -5944,8 +5944,10 @@ sub my_mapEnum
   my $oid = shift;
   my $value = shift;
 
+  my $oid_value = $oid . "-" . $value;
+
   # Check cache first
-  my $my_mapEnum_cache_value = $my_mapEnum_cache{$oid};
+  my $my_mapEnum_cache_value = $my_mapEnum_cache{$oid_value};
   if ($my_mapEnum_cache_value) {
     if ($DEBUGGING >= 2)
     {      
@@ -5986,7 +5988,7 @@ sub my_mapEnum
   }
   # Update cache if net_snmp_perl_cache_enable is enabled.
   if ($net_snmp_perl_cache_enable == 1) {
-    $my_mapEnum_cache{$oid} = $result;
+    $my_mapEnum_cache{$oid_value} = $result;
   }
 
   return $result;
@@ -7017,7 +7019,7 @@ sub sql_win32_odbc_insert {
           eventlog_system($msg,17,$eventlog_error);
         }
         
-        my $msg = "Attempting to re-open Win32::ODBC connection";
+        $msg = "Attempting to re-open Win32::ODBC connection";
         warn $msg, "\n";
 
         if ($DEBUGGING >= 1)
