@@ -1,5 +1,5 @@
 #
-# SNMPTT v1.5beta2 Configuration File
+# SNMPTT v1.5 Configuration File
 #
 # Windows NT
 #
@@ -36,6 +36,11 @@ multiple_event = 1
 # Set to 0 to disable DNS resolution
 # Set to 1 to enable DNS resolution
 dns_enable = 0
+
+# Set to 1 to convert all host names resolved from IP addresses to lower case.
+# Set to 2 to convert all host names resolved from IP addresses to upper case.
+# Set to 0 to not modify host names (default)
+dns_normalise_case = 0
 
 # Set to 0 to enable the use of FQDN (Fully Qualified Domain Names).  If a host name is
 # passed to SNMPTT that contains a domain name, it will not be altered in any way by
@@ -230,6 +235,13 @@ threads_max = 10
 # Example:  %a %b %e %Y %H:%M:%S
 #date_time_format = 
 
+# Set to 1 to use UTC time for all date stamps.  For SQL, see
+# date_time_utc_sql.
+#date_time_utc = 0
+
+# Set to 1 to enable IPv6 support
+ipv6_enable = 1
+
 [DaemonMode]
 # Set to 1 to have snmptt fork to the background when run in daemon mode
 # Ignored by Windows.  See documentation
@@ -386,6 +398,11 @@ END
 # List of custom SQL column names and values for the table of unknown traps
 # (defined by *_table_unknown below).  See sql_custom_columns for the format.
 sql_custom_columns_unknown = <<END
+END
+
+# List of custom SQL column names and values for the table for statistics
+# (defined by *_table_unknown below).  See sql_custom_columns for the format.
+sql_custom_columns_statistics = <<END
 END
 
 # MySQL: Set to 1 to enable logging to a MySQL database via DBI (Linux / Windows)
@@ -587,6 +604,9 @@ sql_win32_odbc_password = password
 # be changed to follow a standard that is supported by the SQL server.
 # Example:  For a MySQL DATETIME, use %Y-%m-%d %H:%M:%S.
 #stat_time_format_sql = 
+
+# Set to 1 to use UTC time for all SQL date stamps.
+#date_time_utc_sql = 0
 
 [Exec]
 

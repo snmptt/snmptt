@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-# SNMPTTCONVERTMIB v1.5beta2
+# SNMPTTCONVERTMIB v1.5
 #
-# Copyright 2002-2021 Alex Burger
+# Copyright 2002-2022 Alex Burger
 # alex_b@users.sourceforge.net
 #
 # 8/14/2002
@@ -36,6 +36,10 @@ use warnings;
 # Can also set on the command line with --exec='string'
 my $defaultexec = '';
 
+# Set this to '' to have no default EXEC line added, or modify as needed.
+# Can also set on the command line with --exec='string'
+my $defaultpreexec = '';
+
 # Choose what type of quotes (if any) you want around the SUMMARY text pulled from the MIB.
 #$defaultexecquote = '';		# no quotes
 #$defaultexecquote = "\'";		# single (') quotes
@@ -51,7 +55,7 @@ my $prepend_type = 1;
 #############################################################################
 #
 
-my $snmpttconvertmib_version = "v1.5beta2";
+my $snmpttconvertmib_version = "v1.5";
 
 sub showversion
 {
@@ -174,6 +178,9 @@ my $output = File::Spec->catfile($dirname, $basename);
 
 if (($exec eq "") && ($exec_file eq "")) {
   push(@exec_array, $defaultexec);
+}
+if (($preexec eq "") && ($preexec_file eq "")) {
+  push(@preexec_array, $defaultpreexec);
 }
 
 if ($exec ne '')

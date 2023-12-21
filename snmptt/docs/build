@@ -1,16 +1,20 @@
-November 27th, 2021
+Aug 17th, 2022
 
-snmptt_1.5beta2.tgz:
+snmptt_1.5.tgz:
 
 -fresh git checkout
+
+cd snmptt
 
 git config user.name
 git config user.email
 git config -l
 
-cd snmptt-git
 
 -update version and (c) date in:
+        INSTALL
+        README
+        snmptt-net-snmp-test
         snmptt
         snmpttconvert
         snmpttconvertmib
@@ -23,7 +27,11 @@ cd snmptt-git
         docs/snmpttconvertmib.md
         docs/faqs.md
 
--update docs/snmptt.html:
+grep -i copyright *
+cd docs
+grep -i copyright *
+
+-update docs/snmptt.md:
         Last updated date
         What's new date and text
         Upgrading date and text
@@ -31,7 +39,7 @@ cd snmptt-git
 -update docs/build
 
 -update ChangeLog with release info
- Changed version to snmptt_1.5beta2 for release
+ Changed version to snmptt_1.5 for release.
 
 cd snmptt/docs
 chmod +x markdown-to-html.py
@@ -55,24 +63,24 @@ perl -c snmpttconvertmib
 perl -c snmptthandler
 perl -c snmptthandler-embedded
 
-git commit -a -m "Prepare for 1.5beta2 release"
+git commit -a -m "Prepare for 1.5 release"
 git push
 
 -check out fresh copy
 
-cd snmptt-git
+cd snmptt
 
 git config user.name
 git config user.email
 git config -l
 
 -tag with new version:
- git tag -a snmptt_1-5beta2 -m "Changed version to snmptt_1.5beta2 for release"
+ git tag -a snmptt_1-5 -m "Changed version to snmptt_1.5 for release"
  git push --tags
 
 cd snmptt
-find . -type f | grep -v '.git' | cpio -pdm ../snmptt_1.5beta2
-cd ../snmptt_1.5beta2
+find . -type f | grep -v '.git' | cpio -pdm ../snmptt_1.5
+cd ../snmptt_1.5
 sudo su
 rm -f docs/build
 rm -f docs/markdown-to-html.py
@@ -93,14 +101,14 @@ chmod +x snmptt-net-snmp-test
 chmod +x snmptt-init.d
 chown root.root * -R
 cd ..
-chmod 775 snmptt_1.5beta2
-tar cvfz snmptt_1.5beta2.tgz snmptt_1.5beta2
+chmod 775 snmptt_1.5
+tar cvfz snmptt_1.5.tgz snmptt_1.5
 
 SourceForge:
 -upload file & set as default download
 -create file release, notify users
 -create news release
--post message to snmptt-users, snmptt-developer
+-post message to snmptt-users
 
 Web site:
 -create News section
@@ -108,7 +116,6 @@ Web site:
 -update Documentation pages
 -update License page
 
-
-
-
+Git mirror
+-update mirrors
 

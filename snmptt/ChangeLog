@@ -1,5 +1,44 @@
+Mar 12, 2023: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed a bug with net_snmp_perl_cache_enable that resulted in integer values
+  only being correct the first time they are used. An example is an interface
+  admin state being translated as 'down' (2) and when it comes back up (1), it
+  still shows as 'down' (2) (issue #18).
+
+Dec 17, 2022: Alex Burger <alex_b@users.sourceforge.net>
+- If an error is generated when inserting into a database table using
+  Win32::ODBC, it now retries three times.  If the error is "Communication link
+  failure" then it also attempts to re-connect to the database server
+  (issue #17).
+
+Sept 3, 2022: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed a bug with snmptthandler-embedded that prevented spool files from being
+   created properly when snmptrapd isn't using the -On option (bug #49).
+- Fixed undefined variables warnings for preexec in snmpttconvertmib.
+
+Aug 24, 2022: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed some uninitialized value warnings (issue #11).  Also fixed debug output
+  for PREEXEC.
+
+Aug 22, 2022: Alex Burger <alex_b@users.sourceforge.net>
+- Fixed 'No such signal: SIGUSR1' error with Windows.  Signals are now only
+  enabled if they exist (issue #11).
+
+Aug 18, 2022: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.5.1beta1
+- Fixed bug with Windows where events were always loged to the Windows event log
+  even if eventlog_enable was set to 0 (issue #7).
+- Added ability to add custom columns to *_table_statistics tables.  See
+  sql_custom_columns_statistics snmptt.ini option.
+- Added support for UTC time.  See snmptt.ini options date_time_utc and 
+  date_time_utc_sql.
+- Added dns_normalise_case snmptt.ini option to convert host names to upper
+  or lower case.
+
+Aug 17, 2022: Alex Burger <alex_b@users.sourceforge.net>
+- Changed version to snmptt_1.5 for release.
+
 Nov 27, 2021: Alex Burger <alex_b@users.sourceforge.net>
-- Changed version to snmptt_1.5beta2 for release
+- Changed version to snmptt_1.5beta2 for release.
 - Added reload support to the snmptt.service systemd file.  This will allow 
   you to use the 'systemctl reload snmptt' command to re-load the configuration.
 - Updated documentation on securing SNMPTT to ensure the snmptt user has read

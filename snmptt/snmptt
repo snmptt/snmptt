@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-# SNMPTT 1.5beta2
+# SNMPTT 1.5.1beta1
 #
-# Copyright 2002-2021 Alex Burger
+# Copyright 2002-2022 Alex Burger
 # alex_b@users.sourceforge.net
 # 4/11/2002
 #
@@ -48,7 +48,7 @@
 use strict;
 use warnings;
 
-my $snmptt_version = "1.5beta2";
+my $snmptt_version = "1.5.1beta1";
 
 sub showversion
 {
@@ -169,6 +169,7 @@ my $snmptt_system_name;
 #my $daemon;
 my $multiple_event;
 my $dns_enable;
+my $dns_normalise_case;
 my $strip_domain;
 my @strip_domain_list;
 my $net_snmp_perl_enable;
@@ -194,8 +195,10 @@ my $ipv6_enable;
 my $date_format;
 my $time_format;
 my $date_time_format;
+my $date_time_utc;
 my $date_time_format_sql;
 my $stat_time_format_sql;
+my $date_time_utc_sql;
 
 # DaemonMode
 my $daemon_fork;
@@ -303,6 +306,7 @@ my $sql_win32_odbc_password;
 
 my @sql_custom_columns;
 my @sql_custom_columns_unknown;
+my @sql_custom_columns_statistics;
 
 # TrapFiles
 my @snmptt_conf_files;
@@ -348,7 +352,7 @@ if ($DEBUGGING >= 1)
   }
 
   # print out time
-  print "********** SNMPTT $snmptt_version started: ",scalar(localtime($g_start_time))," **********\n\n";
+  print "********** SNMPTT $snmptt_version started: ",scalar(get_time($g_start_time))," **********\n\n";
   if ($sleep < 1) {
     print "Note: snmptt.ini sleep setting is less than 1 so \'Sleeping for x seconds\' will be supressed in the debug log.\n\n";
   }
@@ -756,11 +760,17 @@ if ($daemon == 1)
     }
   }
 
-  $SIG{HUP} = \&signal_handler_reload;
+  if (exists ($SIG{HUP})) {
+    $SIG{HUP} = \&signal_handler_reload;
+  }
 
-  $SIG{TERM} = \&signal_handler_die;
+  if (exists ($SIG{TERM})) {
+    $SIG{TERM} = \&signal_handler_die;
+  }
 
-  $SIG{USR1} = \&signal_log_statistics;
+  if (exists ($SIG{USR1})) {
+    $SIG{USR1} = \&signal_log_statistics;
+  }
 
   $timetoreload = 0;
   $timetodie = 0;
@@ -1017,9 +1027,11 @@ if ($daemon == 1)
 
 
       if ($DEBUGGING >= 1) {
-        print $fh_DEBUGFILE "Closing debug file $DEBUGGING_FILE\n";
-        # Close debug file (if it is open) before changing users and re-open after
-        close($fh_DEBUGFILE);
+        if (defined ($fh_DEBUGFILE)) {
+          print $fh_DEBUGFILE "Closing debug file $DEBUGGING_FILE\n";
+          # Close debug file (if it is open) before changing users and re-open after
+          close($fh_DEBUGFILE);
+        }
       }
 	  
 	    # Change owner of debug file so $daemon_uid can write to it.
@@ -1085,7 +1097,7 @@ if ($daemon == 1)
       my $duplicate_traps_current_time = time();
       foreach my $key (sort keys %duplicate_traps)
       {
-        #print "Previous trap digest: $key: " . localtime($duplicate_traps{$key}) . "\n";
+        #print "Previous trap digest: $key: " . get_time($duplicate_traps{$key}) . "\n";
         if ($duplicate_traps{$key} < $duplicate_traps_current_time - $duplicate_trap_window) {
           # Purge the record
           delete $duplicate_traps{$key};
@@ -1413,7 +1425,7 @@ if ($daemon == 1)
 
   if ($DEBUGGING >= 1)
   {
-    print "SNMPTT $snmptt_version shutdown: ",scalar(localtime),"\n\n";
+    print "SNMPTT $snmptt_version shutdown: ",scalar(get_time()),"\n\n";
     print "Total traps received:    $g_total_traps_received\n";
     print "Total traps translated:  $g_total_traps_translated\n";
     print "Total traps ignored:     $g_total_traps_ignored\n";
@@ -2105,9 +2117,13 @@ sub processtrap
             
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
-              print "Performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Performing substitution on custom column: $_\n";
+              }
               substitute();
-              print "Done performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Done performing substitution on custom column: $_\n";
+              }
               $t_sql_custom_columns[$i] = $_;
             }
           }
@@ -2150,9 +2166,13 @@ sub processtrap
             
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
-              print "Performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Performing substitution on custom column: $_\n";
+              }
               substitute();
-              print "Done performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Done performing substitution on custom column: $_\n";
+              }
               $t_sql_custom_columns[$i] = $_;
             }
           }
@@ -2193,9 +2213,13 @@ sub processtrap
             
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
-              print "Performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Performing substitution on custom column: $_\n";
+              }
               substitute();
-              print "Done performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Done performing substitution on custom column: $_\n";
+              }
               $t_sql_custom_columns[$i] = $_;
             }
           }
@@ -2236,9 +2260,13 @@ sub processtrap
             
             for (my $i = 1; $i <= $#t_sql_custom_columns; $i+=2) {
               $_ = $t_sql_custom_columns[$i];
-              print "Performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Performing substitution on custom column: $_\n";
+              }
               substitute();
-              print "Done performing substitution on custom column: $_\n";
+              if ($DEBUGGING >= 1) {
+                print "Done performing substitution on custom column: $_\n";
+              }                
               $t_sql_custom_columns[$i] = $_;
             }
           }
@@ -2358,6 +2386,33 @@ sub processtrap
   } #while defined..
 }
 
+sub substitute_sql_stat
+{
+  my $format_line = shift;      # Used for $Fz variable substitution for EXEC line.
+
+  # $H - Host name of the system running SNMPTT
+  substitute2 ("\$H", $snmptt_system_name);
+
+  # Formatting
+  # alarm (bell)          (BEL)
+  substitute2 ("\$Fa", "\a");
+
+  # form feed             (FF)
+  substitute2 ("\$Ff", "\f");
+
+  # newline               (LF, NL)
+  substitute2 ("\$Fn", "\n");
+
+  # return                (CR)
+  substitute2 ("\$Fr", "\r");
+
+  # tab                   (HT, TAB)
+  substitute2 ("\$Ft", "\t");
+
+  # $$ - Print a $
+  s(\$\$)(\$)g;
+}
+
 sub substitute
 {
   my $format_line = shift;      # Used for $Fz variable substitution for EXEC line.
@@ -2366,36 +2421,36 @@ sub substitute
 
   # Wildcards - $*, $+*, $-*
   # Expand to $1 $2 $3 etc
-  my $temp_wildcard1 = ();
-  my $temp_wildcard2 = ();
-  my $temp_wildcard3 = ();
-  for(my $i=1;$i <= $#entvar+1; $i++)
-  {
-    $temp_wildcard1 = $temp_wildcard1 . "\$$i" . $wildcard_expansion_separator;
-    $temp_wildcard2 = $temp_wildcard2 . "\$\+$i" . $wildcard_expansion_separator;
-    $temp_wildcard3 = $temp_wildcard3 . "\$-$i" . $wildcard_expansion_separator;
-  }
+  # Only if we have at least one enterprise variable
+  if ($#entvar+1) {
+    my $temp_wildcard1 = "";
+    my $temp_wildcard2 = "";
+    my $temp_wildcard3 = "";
+    for(my $i=1;$i <= $#entvar+1; $i++)
+    {
+      $temp_wildcard1 = $temp_wildcard1 . "\$$i" . $wildcard_expansion_separator;
+      $temp_wildcard2 = $temp_wildcard2 . "\$\+$i" . $wildcard_expansion_separator;
+      $temp_wildcard3 = $temp_wildcard3 . "\$-$i" . $wildcard_expansion_separator;
+    }
 
-  # Trim off last wildcard separator
-  if (defined ( $temp_wildcard1) )
-  {
+    # Trim off last wildcard separator
     my $end_trim = length($wildcard_expansion_separator);
     $temp_wildcard1 = substr($temp_wildcard1,0,-$end_trim);
     $temp_wildcard2 = substr($temp_wildcard2,0,-$end_trim);
     $temp_wildcard3 = substr($temp_wildcard3,0,-$end_trim);
+
+    #s(\$\*)($temp_wildcard1)g;
+    substitute2 ("\$\*", $temp_wildcard1);
+
+    s(\$\+\*)($temp_wildcard2)g;
+    substitute2 ("\$\+\*", $temp_wildcard2);
+
+    s(\$-\*)($temp_wildcard3)g;
+    substitute2 ("\$-\*", $temp_wildcard3);
   }
 
-  #s(\$\*)($temp_wildcard1)g;
-  substitute2 ("\$\*", $temp_wildcard1);
-
-  s(\$\+\*)($temp_wildcard2)g;
-  substitute2 ("\$\+\*", $temp_wildcard2);
-
-  s(\$-\*)($temp_wildcard3)g;
-  substitute2 ("\$-\*", $temp_wildcard3);
-
- # $v - Names of variable-bindings 
- # Count down backwards to make sure 10 is not mistaken for $1
+  # $v - Names of variable-bindings
+  # Count down backwards to make sure 10 is not mistaken for $1
   for(my $i=$#entvarname+1;$i > 0; $i--)
   {
     if ($net_snmp_perl_enable == 1)
@@ -2762,7 +2817,9 @@ sub substitute
   }
 
   # FORMAT line (only possible when doing EXEC line)
-  substitute2 ("\$Fz", "$format_line");
+  if (defined($format_line)) {
+    substitute2 ("\$Fz", "$format_line");
+  }
 
   # $$ - Print a $
   s(\$\$)(\$)g;
@@ -3384,7 +3441,7 @@ sub readtrap
 
   if ($DEBUGGING >= 2) 
   {
-    print "Reading trap.  Current time: " . scalar(localtime()). "\n";
+    print "Reading trap.  Current time: " . scalar(get_time()). "\n";
   }
 
   if ( $daemon == 1)
@@ -3398,7 +3455,7 @@ sub readtrap
       }
     }
      
-    $trap_date_time_epoch =~ s/[^0-9]//g;  # Remove non numeric characters
+    $trap_date_time_epoch =~ s/[^0-9]//g;  # Sanitize / Remove non numeric characters
   }
   else
   {
@@ -3406,41 +3463,45 @@ sub readtrap
   }
 
   my @localtime_array;
+  my @localtime_array_sql;
+
   if ( $daemon == 1 && $use_trap_time == 1 )	# Daemon mode only
   {
-    @localtime_array = localtime($trap_date_time_epoch);
+    @localtime_array = get_time($trap_date_time_epoch);
 
     if ($date_time_format eq "") {
-      $trap_date_time = localtime($trap_date_time_epoch);
+      $trap_date_time = get_time($trap_date_time_epoch);
     }
     else {
       $trap_date_time = strftime $date_time_format, @localtime_array;
     }
 
     if ($date_time_format_sql eq "") {
-      $trap_date_time_sql = localtime($trap_date_time_epoch);
+      $trap_date_time_sql = get_time_sql($trap_date_time_epoch);
     }
     else {
-      $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array;
+      @localtime_array_sql = get_time_sql($trap_date_time_epoch);
+      $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array_sql;
     }
     
   }
   else  # Standalone mode
   {
-    @localtime_array = localtime();
+    @localtime_array = get_time();
 
     if ($date_time_format eq "") {
-      $trap_date_time = localtime();
+      $trap_date_time = get_time();
     }
     else {
       $trap_date_time = strftime $date_time_format, @localtime_array;
     }
 
     if ($date_time_format_sql eq "") {
-      $trap_date_time_sql = localtime();
+      $trap_date_time_sql = get_time_sql();
     }
     else {
-      $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array;
+      @localtime_array_sql = get_time_sql($trap_date_time_epoch);
+      $trap_date_time_sql = strftime $date_time_format_sql, @localtime_array_sql;
     }
   }
 
@@ -3457,11 +3518,11 @@ sub readtrap
   push(@rawtrap, $tempvar[0]);
 
   if ($ipv6_enable == 1) {
-    $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:\[\]%]//g;  # Remove most non alphanumeric characters
+    $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:\[\]%]//g;  # Sanitize / Remove most non alphanumeric characters
   }
   else {
-    #$tempvar[0]  =~ s/[^a-zA-Z0-9.\-_]//g;  # Remove most non alphanumeric characters
-    $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:\[\]]//g;  # Remove most non alphanumeric characters
+    #$tempvar[0]  =~ s/[^a-zA-Z0-9.\-_]//g;  # Sanitize / Remove most non alphanumeric characters
+    $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:\[\]]//g;  # Sanitize / Remove most non alphanumeric characters
   }
 
   if ($tempvar[0] eq "") {
@@ -3517,7 +3578,7 @@ sub readtrap
   }
 
   # Clean again as we should now how an IP address or host name
-  $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:]//g;  # Remove most non alphanumeric characters
+  $tempvar[0]  =~ s/[^a-zA-Z0-9.\-_:]//g;  # Sanitize / Remove most non alphanumeric characters
 
 
   # IPv6_TODO_DONE
@@ -3525,10 +3586,10 @@ sub readtrap
   push(@rawtrap, $tempvar[1]);
 
   if ($ipv6_enable == 1) {
-    $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]%]//g;  # Remove most non alphanumeric characters
+    $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]%]//g;  # Sanitize / Remove most non alphanumeric characters
   }
   else {
-    $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]]//g;  # Remove most non alphanumeric characters
+    $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]]//g;  # Sanitize / Remove most non alphanumeric characters
   }
   # Example: UDP: [127.0.0.1]:38249->[127.0.0.1]:162
   # Should only be IPs, but also allow for hostname characters, just in case.
@@ -3580,7 +3641,7 @@ sub readtrap
     $tempvar[1] = $1;
   }
   # Clean again as we should now how an IP address or host name
-  $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]]//g;  # Remove most non alphanumeric characters
+  $tempvar[1]  =~ s/[^a-zA-Z0-9.\-_:\[\]]//g;  # Sanitize / Remove most non alphanumeric characters
 
   # Net-SNMP 5.4 has a bug which gives <UNKNOWN> for the hostname
   if ($tempvar[0] =~ /^UNKNOWN$/) {
@@ -3608,7 +3669,7 @@ sub readtrap
     chomp ($temp2);       # Variable VALUE
     chomp ($line);
 
-    my $variable_fix;
+    my $variable_fix = 0;
     if ($linenum == 1)
     {
       if (defined($temp2) )	# Check if line 1 contains 'variable value' or just 'value'  
@@ -3624,7 +3685,7 @@ sub readtrap
     if ($variable_fix == 0 )    # We received variable name and value
     {
       # Clean up variable NAME
-      $temp1  =~ s/[^a-zA-Z0-9.:\-_]//g;  # Remove most non alphanumeric characters
+      $temp1  =~ s/[^a-zA-Z0-9.:\-_]//g;  # Sanitize / Remove most non alphanumeric characters
       # Examples:
       # .1.3.6.1.2.1.1.3.0
       # SNMPv2-SMI::enterprises.9.9.187.0.1 ....
@@ -3667,7 +3728,7 @@ sub readtrap
 	  
       # Clean up variable VALUE
       $temp2 =~ s(`)(')g;	#` Replace any back ticks with regular single quote
-      $temp2  =~ s/[^a-zA-Z0-9 !"#%'()+,\-_.:\/=\@{}~\\]//g;  # Remove most non alphanumeric characters
+      $temp2  =~ s/[^a-zA-Z0-9 !"#%'()+,\-_.:\/=\@{}~\\]//g;  # Sanitize / Remove most non alphanumeric characters
 	  
         push(@tempvar, $temp1);
         push(@tempvar, $temp2);
@@ -3730,7 +3791,7 @@ sub readtrap
         	  
       # Clean up variable VALUE
       $temp2 =~ s(`)(')g;	#` Replace any back ticks with regular single quote
-      $temp2  =~ s/[^a-zA-Z0-9 !"#%'()+,\-_.:\/=\@{}~\\]//g;  # Remove most non alphanumeric characters
+      $temp2  =~ s/[^a-zA-Z0-9 !"#%'()+,\-_.:\/=\@{}~\\]//g;  # Sanitize / Remove most non alphanumeric characters
 
       push(@tempvar, $temp1);
       push(@tempvar, $temp2);	  
@@ -3921,6 +3982,19 @@ sub readtrap
     }
   }
 
+  if ($dns_normalise_case == 1) {
+    $agent_dns_name = lc $agent_dns_name;
+    if ($DEBUGGING >= 2) {
+      print "Agent host name changed to lower case: $agent_dns_name\n\n";
+    }
+  }
+  elsif ($dns_normalise_case == 2) {
+    $agent_dns_name = uc $agent_dns_name;
+    if ($DEBUGGING >= 2) {
+      print "Agent host name changed to upper case: $agent_dns_name\n\n";
+    }
+  }
+
   if ($strip_domain)
   {
     $var[0] = strip_domain_name($var[0], $strip_domain);
@@ -3930,6 +4004,19 @@ sub readtrap
   if ($DEBUGGING >= 1)
   {
     print "Trap received from $tempvar[0]: $tempvar[5]\n";
+  }
+
+  if ($dns_normalise_case == 1) {
+    $var[0] = lc $var[0];
+    if ($DEBUGGING >= 2) {
+      print "\nValue 0 host name changed to lower case: $var[0]\n\n";
+    }
+  }
+  elsif ($dns_normalise_case == 2) {
+    $var[0] = uc $var[0];
+    if ($DEBUGGING >= 2) {
+      print "\nValue 0 host name changed to upper case: $var[0]\n\n";
+    }
   }
 
   if ($DEBUGGING >= 2)
@@ -4303,9 +4390,13 @@ sub searchfortrap
             
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
-            print "Performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Performing substitution on custom column: $_\n";
+            }
             substitute();
-            print "Done performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Done performing substitution on custom column: $_\n";
+            }
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
@@ -4340,9 +4431,13 @@ sub searchfortrap
             
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
-            print "Performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Performing substitution on custom column: $_\n";
+            }
             substitute();
-            print "Done performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Done performing substitution on custom column: $_\n";
+            }
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
@@ -4376,9 +4471,13 @@ sub searchfortrap
             
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
-            print "Performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Performing substitution on custom column: $_\n";
+            }
             substitute();
-            print "Done performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Done performing substitution on custom column: $_\n";
+            }
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
@@ -4412,9 +4511,13 @@ sub searchfortrap
             
           for (my $i = 1; $i <= $#t_sql_custom_columns_unknown; $i+=2) {
             $_ = $t_sql_custom_columns_unknown[$i];
-            print "Performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Performing substitution on custom column: $_\n";
+            }
             substitute();
-            print "Done performing substitution on custom column: $_\n";
+            if ($DEBUGGING >= 1) {
+              print "Done performing substitution on custom column: $_\n";
+            }
             $t_sql_custom_columns_unknown[$i] = $_;
           }
         }
@@ -4571,6 +4674,7 @@ sub loadsnmpttini {
   $snmptt_system_name = $cfg->val('General', 'snmptt_system_name');
   $multiple_event = $cfg->val('General', 'multiple_event');
   $dns_enable = $cfg->val('General', 'dns_enable');
+  $dns_normalise_case = $cfg->val('General', 'dns_normalise_case');
   $strip_domain = $cfg->val('General', 'strip_domain');
   @strip_domain_list = $cfg->val('General', 'strip_domain_list');
   $net_snmp_perl_enable = $cfg->val('General', 'net_snmp_perl_enable');
@@ -4596,6 +4700,7 @@ sub loadsnmpttini {
   $date_format = $cfg->val('General', 'date_format');
   $time_format = $cfg->val('General', 'time_format');
   $date_time_format = $cfg->val('General', 'date_time_format');
+  $date_time_utc = $cfg->val('General', 'date_time_utc');
 
   # DaemonMode
   $daemon_fork = $cfg->val('DaemonMode', 'daemon_fork');
@@ -4703,9 +4808,11 @@ sub loadsnmpttini {
 
   @sql_custom_columns = $cfg->val('SQL', 'sql_custom_columns');
   @sql_custom_columns_unknown = $cfg->val('SQL', 'sql_custom_columns_unknown');
+  @sql_custom_columns_statistics = $cfg->val('SQL', 'sql_custom_columns_statistics');
 
   $date_time_format_sql = $cfg->val('SQL', 'date_time_format_sql');
   $stat_time_format_sql = $cfg->val('SQL', 'stat_time_format_sql');
+  $date_time_utc_sql = $cfg->val('SQL', 'date_time_utc_sql');
   
   # Debugging
   if ($debugcmdline == 0) {
@@ -4730,6 +4837,7 @@ sub loadsnmpttini {
   }
   if (! defined ($multiple_event)) { $multiple_event = 0} ;
   if (! defined ($dns_enable)) { $dns_enable = 0} ;
+  if (! defined ($dns_normalise_case)) { $dns_normalise_case = 0} ;
   if (! defined ($strip_domain)) { $strip_domain = 0} ;
   if (! defined ($net_snmp_perl_enable)) { $net_snmp_perl_enable = 0} ;
   if (! defined ($net_snmp_perl_cache_enable)) { $net_snmp_perl_cache_enable = 1} ;
@@ -4755,6 +4863,8 @@ sub loadsnmpttini {
   if (! defined ($date_time_format)) { $date_time_format = ""} ;
   if (! defined ($date_time_format_sql)) { $date_time_format_sql = ""} ;
   if (! defined ($stat_time_format_sql)) { $stat_time_format_sql = ""} ;
+  if (! defined ($date_time_utc)) { $date_time_utc = 0} ;
+  if (! defined ($date_time_utc_sql)) { $date_time_utc_sql = 0} ;
 
   if (! defined ($daemon_fork)) { $daemon_fork = 1} ;
   if (! defined ($daemon_uid)) { $daemon_uid = ''} ;
@@ -4790,7 +4900,7 @@ sub loadsnmpttini {
   if (! defined ($syslog_system_facility)) { $syslog_system_facility = 'local0'} ;
   if (! defined ($syslog_system_level)) { $syslog_system_level = 'warning'} ;
   if (! defined ($eventlog_enable)) { $eventlog_enable = 0} ;
-  if (! defined ($eventlog_enable)) { $eventlog_enable = 'WARNING'} ;
+  if (! defined ($eventlog_type)) { $eventlog_type = 'WARNING'} ;
   if (! defined ($eventlog_system_enable)) { $eventlog_system_enable = 0} ;	
   if (! defined ($exec_enable)) { $exec_enable = 1} ;
   if (! defined ($pre_exec_enable)) { $pre_exec_enable = 1} ;
@@ -4848,6 +4958,7 @@ sub loadsnmpttini {
   if (! defined ($sql_win32_odbc_password)) { $sql_win32_odbc_password = ''} ;
   if (! (@sql_custom_columns)) { @sql_custom_columns = ()} ;
   if (! (@sql_custom_columns_unknown)) { @sql_custom_columns_unknown = ()} ;
+  if (! (@sql_custom_columns_statistics)) { @sql_custom_columns_statistics = ()} ;
   if (! defined ($DEBUGGING)) { $DEBUGGING = 0} ;
   if (! defined ($DEBUGGING_FILE)) { $DEBUGGING_FILE = ''} ;
 
@@ -4927,11 +5038,11 @@ sub syslog_system {
 sub log_system {
   my $message = $_[0];
 
-  my @localtime_array = localtime();
+  my @localtime_array = get_time();
   my $log_time;
 
   if ($date_time_format eq "") {
-    $log_time = localtime();
+    $log_time = get_time();
   }
   else {
     $log_time = strftime $date_time_format, @localtime_array;
@@ -5833,8 +5944,10 @@ sub my_mapEnum
   my $oid = shift;
   my $value = shift;
 
+  my $oid_value = $oid . "-" . $value;
+
   # Check cache first
-  my $my_mapEnum_cache_value = $my_mapEnum_cache{$oid};
+  my $my_mapEnum_cache_value = $my_mapEnum_cache{$oid_value};
   if ($my_mapEnum_cache_value) {
     if ($DEBUGGING >= 2)
     {      
@@ -5875,7 +5988,7 @@ sub my_mapEnum
   }
   # Update cache if net_snmp_perl_cache_enable is enabled.
   if ($net_snmp_perl_cache_enable == 1) {
-    $my_mapEnum_cache{$oid} = $result;
+    $my_mapEnum_cache{$oid_value} = $result;
   }
 
   return $result;
@@ -6087,10 +6200,28 @@ sub log_statistics {
     my $stat_time_temp;
 
     if ($stat_time_format_sql eq "") {
-      $stat_time_temp = localtime();
+      $stat_time_temp = get_time_sql();
     }
     else {
-      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+      $stat_time_temp = strftime $stat_time_format_sql, get_time_sql();
+    }
+
+    my @t_sql_custom_columns_statistics = ();
+
+    if (@sql_custom_columns_statistics) {
+      @t_sql_custom_columns_statistics = @sql_custom_columns_statistics;
+
+      for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
+        $_ = $t_sql_custom_columns_statistics[$i];
+        if ($DEBUGGING >= 1) {
+          print "Performing substitution on custom column: $_\n";
+        }
+        substitute_sql_stat();
+        if ($DEBUGGING >= 1) {
+          print "Done performing substitution on custom column: $_\n";
+        }
+        $t_sql_custom_columns_statistics[$i] = $_;
+      }
     }
     
     if ($unknown_trap_nodes_match_mode != 0) {
@@ -6100,7 +6231,8 @@ sub log_statistics {
         "total_translated", $g_total_traps_translated,
         "total_ignored", $g_total_traps_ignored,
         "total_skipped", $g_total_traps_skipped,
-        "total_unknown", $g_total_traps_unknown);
+        "total_unknown", $g_total_traps_unknown,
+        @t_sql_custom_columns_statistics);
     }
     else {
       mysql_insert($mysql_dbi_table_statistics,
@@ -6108,7 +6240,8 @@ sub log_statistics {
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
-      "total_unknown", $g_total_traps_unknown);
+      "total_unknown", $g_total_traps_unknown,
+      @t_sql_custom_columns_statistics);
     }
   }
 
@@ -6117,10 +6250,28 @@ sub log_statistics {
     my $stat_time_temp;
 
     if ($stat_time_format_sql eq "") {
-      $stat_time_temp = localtime();
+      $stat_time_temp = get_time_sql();
     }
     else {
-      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+      $stat_time_temp = strftime $stat_time_format_sql, get_time_sql();
+    }
+
+    my @t_sql_custom_columns_statistics = ();
+
+    if (@sql_custom_columns_statistics) {
+      @t_sql_custom_columns_statistics = @sql_custom_columns_statistics;
+
+      for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
+        $_ = $t_sql_custom_columns_statistics[$i];
+        if ($DEBUGGING >= 1) {
+          print "Performing substitution on custom column: $_\n";
+        }
+        substitute_sql_stat();
+        if ($DEBUGGING >= 1) {
+          print "Done performing substitution on custom column: $_\n";
+        }
+        $t_sql_custom_columns_statistics[$i] = $_;
+      }
     }
 
     if ($unknown_trap_nodes_match_mode != 0) {
@@ -6130,7 +6281,8 @@ sub log_statistics {
         "total_translated", $g_total_traps_translated,
         "total_ignored", $g_total_traps_ignored,
         "total_skipped", $g_total_traps_skipped,
-        "total_unknown", $g_total_traps_unknown);
+        "total_unknown", $g_total_traps_unknown,
+        @t_sql_custom_columns_statistics);
     }
     else {
         postgresql_insert($postgresql_dbi_table_statistics,
@@ -6138,7 +6290,8 @@ sub log_statistics {
         "total_received", $g_total_traps_received,
         "total_translated", $g_total_traps_translated,
         "total_ignored", $g_total_traps_ignored,
-        "total_unknown", $g_total_traps_unknown);
+        "total_unknown", $g_total_traps_unknown,
+        @t_sql_custom_columns_statistics);
     }
   }
 
@@ -6147,10 +6300,28 @@ sub log_statistics {
     my $stat_time_temp;
 
     if ($stat_time_format_sql eq "") {
-      $stat_time_temp = localtime();
+      $stat_time_temp = get_time_sql();
     }
     else {
-      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+      $stat_time_temp = strftime $stat_time_format_sql, get_time_sql();
+    }
+
+    my @t_sql_custom_columns_statistics = ();
+
+    if (@sql_custom_columns_statistics) {
+      @t_sql_custom_columns_statistics = @sql_custom_columns_statistics;
+
+      for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
+        $_ = $t_sql_custom_columns_statistics[$i];
+        if ($DEBUGGING >= 1) {
+          print "Performing substitution on custom column: $_\n";
+        }
+        substitute_sql_stat();
+        if ($DEBUGGING >= 1) {
+          print "Done performing substitution on custom column: $_\n";
+        }
+        $t_sql_custom_columns_statistics[$i] = $_;
+      }
     }
 
     if ($unknown_trap_nodes_match_mode != 0) {
@@ -6160,7 +6331,8 @@ sub log_statistics {
         "total_translated", $g_total_traps_translated,
         "total_ignored", $g_total_traps_ignored,
         "total_skipped", $g_total_traps_skipped,
-        "total_unknown", $g_total_traps_unknown);
+        "total_unknown", $g_total_traps_unknown,
+        @t_sql_custom_columns_statistics);
     }
     else {
         odbc_insert($dbd_odbc_table_statistics,
@@ -6168,7 +6340,8 @@ sub log_statistics {
         "total_received", $g_total_traps_received,
         "total_translated", $g_total_traps_translated,
         "total_ignored", $g_total_traps_ignored,
-        "total_unknown", $g_total_traps_unknown);
+        "total_unknown", $g_total_traps_unknown,
+        @t_sql_custom_columns_statistics);
     }
   }
 
@@ -6177,12 +6350,30 @@ sub log_statistics {
     my $stat_time_temp;
 
     if ($stat_time_format_sql eq "") {
-      $stat_time_temp = localtime();
+      $stat_time_temp = get_time_sql();
     }
     else {
-      $stat_time_temp = strftime $stat_time_format_sql, localtime();
+      $stat_time_temp = strftime $stat_time_format_sql, get_time_sql();
     }
-    
+
+    my @t_sql_custom_columns_statistics = ();
+
+    if (@sql_custom_columns_statistics) {
+      @t_sql_custom_columns_statistics = @sql_custom_columns_statistics;
+
+      for (my $i = 1; $i <= $#t_sql_custom_columns_statistics; $i+=2) {
+        $_ = $t_sql_custom_columns_statistics[$i];
+        if ($DEBUGGING >= 1) {
+          print "Performing substitution on custom column: $_\n";
+        }
+        substitute_sql_stat();
+        if ($DEBUGGING >= 1) {
+          print "Done performing substitution on custom column: $_\n";
+        }
+        $t_sql_custom_columns_statistics[$i] = $_;
+      }
+    }
+
     if ($unknown_trap_nodes_match_mode != 0) {
       sql_win32_odbc_insert($sql_win32_odbc_table_statistics,
       "stat_time", $stat_time_temp,
@@ -6190,7 +6381,8 @@ sub log_statistics {
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
       "total_skipped", $g_total_traps_skipped,
-      "total_unknown", $g_total_traps_unknown);
+      "total_unknown", $g_total_traps_unknown,
+      @t_sql_custom_columns_statistics);
     }
     else {
       sql_win32_odbc_insert($sql_win32_odbc_table_statistics,
@@ -6198,7 +6390,8 @@ sub log_statistics {
       "total_received", $g_total_traps_received,
       "total_translated", $g_total_traps_translated,
       "total_ignored", $g_total_traps_ignored,
-      "total_unknown", $g_total_traps_unknown);
+      "total_unknown", $g_total_traps_unknown,
+      @t_sql_custom_columns_statistics);
     }
   }
 
@@ -6809,26 +7002,47 @@ sub sql_win32_odbc_insert {
   #print "sql_statement: $sql_statement\n";
    
   if (defined ($dbh_win32_odbc)) {
-    if (defined ($dbh_win32_odbc->Sql($sql_statement)))
-    {
-      my $msg = "Win32::ODBC error: Unable to perform INSERT INTO: ".Win32::ODBC::Error();
-      warn $msg, "\n";
-
-      if ($DEBUGGING >= 1)
+    my $dbh_win32_odbc_retries = 3;
+    while ($dbh_win32_odbc_retries) {
+      if (defined ($dbh_win32_odbc->Sql($sql_statement))) # Error
       {
-        print $msg, "\n";
+        my $msg = "Win32::ODBC error: Unable to perform INSERT INTO: ".Win32::ODBC::Error();
+        warn $msg, "\n";
+
+        if ($DEBUGGING >= 1)
+        {
+          print $msg, "\n";
+        }
+
+        if ($eventlog_system_enable == 1)
+        {
+          eventlog_system($msg,17,$eventlog_error);
+        }
+        
+        $msg = "Attempting to re-open Win32::ODBC connection";
+        warn $msg, "\n";
+
+        if ($DEBUGGING >= 1)
+        {
+          print $msg, "\n";
+        }
+
+        if ($eventlog_system_enable == 1)
+        {
+          eventlog_system($msg,17,$eventlog_error);
+        }
+
+        dbh_win32_odbc_close();
+        dbh_win32_odbc_connect();
+        
+        $dbh_win32_odbc_retries--;
+        sleep 0.1;
       }
-
-      if ($eventlog_system_enable == 1)
-      {
-        eventlog_system($msg,17,$eventlog_error);
+      else { # No error
+        return 1;
       }
     }
-    else
-    {
-      return 1;
-    }
-  return 0;
+    return 0;
   }
 }
 
@@ -6878,54 +7092,55 @@ sub preexec_run {
         print "\n\nPREEXEC line(s):\n";
       }
 
-      if (defined ($event2[9][0])) # if PREEXEC string has been defined
+      if (defined ($event2[9][0]))
       {
-        print "PREEXEC defined\n";
-        if (defined ($event2[9][0]))
+        #print "PREEXEC defined\n";
+        for (my $i=0; defined($event2[9][$i]); $i++)
         {
-          for (my $i=0; defined($event2[9][$i]); $i++)
-          {
-            $_ = $event2[9][$i];
+          $_ = $event2[9][$i];
 
+          if ($DEBUGGING >= 1) {
             print "Performing substitution on PREEXEC line: $_\n";
-            substitute();
+          }
+          substitute();
+          if ($DEBUGGING >= 1) {
             print "Done performing substitution on PREEXEC line: $_\n";
+          }
 
-            my $command = $_;
+          my $command = $_;
 
-            if ($pre_exec_enable == 1)
+          if ($pre_exec_enable == 1)
+          {
+            if ($DEBUGGING >= 1)
             {
-              if ($DEBUGGING >= 1)
-              {
-                print "PREEXEC command: $command\n";
-              }
-              # Execute command
-
-              if ($exec_escape == 1) {
-                # Escape wildcard characters
-                $command =~ s/\*/\\\*/g;
-                $command =~ s/\?/\\\?/g;
-              }
-              my $result = `$command`;
-              chomp $result;
-              # Remove spaces before and after
-              $result =~ /^\s*(.*?)\s*$/;
-              $result = $1;
-
-              if ($result eq '') {
-                $result = "(no output from PREEXEC)\n";
-              }
-              print "        command output: $result\n";
-              push (@preexec_var, $result);
+              print "PREEXEC command: $command\n";
             }
+            # Execute command
+
+            if ($exec_escape == 1) {
+              # Escape wildcard characters
+              $command =~ s/\*/\\\*/g;
+              $command =~ s/\?/\\\?/g;
+            }
+            my $result = `$command`;
+            chomp $result;
+            # Remove spaces before and after
+            $result =~ /^\s*(.*?)\s*$/;
+            $result = $1;
+
+            if ($result eq '') {
+              $result = "(no output from PREEXEC)\n";
+            }
+            print "        command output: $result\n";
+            push (@preexec_var, $result);
           }
         }
-        else
+      }
+      else
+      {
+        if ($DEBUGGING >= 1)
         {
-          if ($DEBUGGING >= 1)
-          {
-            print "  PREEXEC line not defined\n";
-          }
+          print "  PREEXEC line not defined\n";
         }
       }
 }
@@ -6976,6 +7191,21 @@ sub ip_to_name {
             $hostname = undef;
         }
     }
+
+    if ($hostname) {
+      if ($dns_normalise_case == 1) {
+        $hostname = lc $hostname;
+        if ($DEBUGGING >= 2) {
+          print "  Host name changed to lower case: $hostname\n\n";
+        }
+      }
+      elsif ($dns_normalise_case == 2) {
+        $hostname = uc $hostname;
+        if ($DEBUGGING >= 2) {
+          print "  Host name changed to upper case: $hostname\n\n";
+        }
+      }
+    }
     return $hostname;
 }
 
@@ -7012,3 +7242,45 @@ sub name_to_ip {
     return @ips;
 }
 
+
+sub get_time {
+  my $t_time = shift;
+
+  if (!defined($t_time)) {
+    if ($date_time_utc == 1) {
+        return gmtime();
+    }
+    else {
+        return localtime();
+    }
+  }
+  else {
+    if ($date_time_utc == 1) {
+        return gmtime($t_time);
+    }
+    else {
+        return localtime($t_time);
+    }
+  }
+}
+
+sub get_time_sql {
+  my $t_time = shift;
+
+  if (!defined($t_time)) {
+    if ($date_time_utc_sql == 1) {
+        return gmtime();
+    }
+    else {
+        return localtime();
+    }
+  }
+  else {
+    if ($date_time_utc_sql == 1) {
+        return gmtime($t_time);
+    }
+    else {
+        return localtime($t_time);
+    }
+  }
+}
