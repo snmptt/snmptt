@@ -7,6 +7,7 @@
 ## this will write the message directly to the cacti syslog incoming table to be ingested into the syslog database
 
 
+#!/usr/bin/python3
 
 
 ### connect to mysql database
@@ -16,6 +17,8 @@ import mysql.connector
 import sys
 from datetime import datetime
 import argparse
+import dotenv
+import os
 
 
 # Define Arguments for variables from snmptt
@@ -39,11 +42,14 @@ if args.priority is not None: ({'Alert priority': args.priority}) #device templa
 
 ### connect to database
 try:
+    ### read database credentials from .env file
+    ### create .env file in same directory as script
+    dotenv.load_dotenv(dotenv.find_dotenv())
     db = mysql.connector.connect(
-        host = "localhost",
-        user = "",
-        passwd = "",
-        database = ""
+        host=os.getenv("MYSQL_HOST"),
+        user=os.getenv("MYSQL_USER"),
+        passwd=os.getenv("MYSQL_PASS"),
+        database=os.getenv("MYSQL_DB")
     )
 
     ### create cursor
