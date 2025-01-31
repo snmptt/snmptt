@@ -1322,15 +1322,19 @@ if ($daemon == 1)
 
           $filesuccess = 0;
         }
-        
-        my $lock_status = acquire_lock($fh_FILE, 5);
-        if ($lock_status == 0) {
-          if ($DEBUGGING >= 1)
-          {
-            print "Could not acquire flock read lock\n";
+
+
+        if ($locking_method == 0)
+        {
+          my $lock_status = acquire_lock($fh_FILE, 5);
+          if ($lock_status == 0) {
+            if ($DEBUGGING >= 1)
+            {
+              print "Could not acquire flock read lock\n";
+            }
+            warn "Could not acquire flock read lock\n";
           }
-          warn "Could not acquire flock read lock\n";
-        }
+         }
         
 
         $input = $fh_FILE;
