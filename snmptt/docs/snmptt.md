@@ -10,7 +10,7 @@ name="GENERATOR" />
 <link rel="StyleSheet" type="text/css" href="layout1.css" />
 <title>SNMP Trap Translator</title>
 </head>
-
+<!-- END_HTML -->
 # SNMP Trap Translator v1.5
 **([SNMPTT](http://www.snmptt.org))**
 
@@ -941,7 +941,7 @@ Steps:
 
     Note:  **The -On option is recommended**.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the **Net-SNMP Perl module** is not installed, then you MUST use the **-On** switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.
 
-    As an alternative, you can edit the Net-SNMP configuration file **/etc/snmp/snmp.conf** to include the line: **printNumericOids 1. ** This setting will take effect no matter what is used on the command line.
+     As an alternative, you can edit the Net-SNMP configuration file **/etc/snmp/snmp.conf** to include the line: **printNumericOids 1**.  This setting will take effect no matter what is used on the command line.
 
 10.  Start / restart snmptrapd using systemctl or service:
 
@@ -1038,7 +1038,7 @@ Steps:
   
     Note:  **The -On option is recommended**.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the **Net-SNMP Perl module** is not installed, then you MUST use the **-On** switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.
 
-    As an alternative, you can edit the Net-SNMP configuration file **/etc/snmp/snmp.conf** to include the line: **printNumericOids 1. ** This setting will take effect no matter what is used on the command line.
+    As an alternative, you can edit the Net-SNMP configuration file **/etc/snmp/snmp.conf** to include the line: **printNumericOids 1**. This setting will take effect no matter what is used on the command line.
 
 10.  Start / restart snmptrapd using systemctl or service:
 
@@ -1103,7 +1103,7 @@ Note:  The default snmptt.ini enables logging to snmptt.log and also syslog for 
 
 **Troubleshooting:**
 
-1.  Enable debug mode by defining both **DEBUGGING = 0** and **DEBUGGING_FILE = /var/log/snmptt/snmptt.debug** in **/etc/snmptt/snmptt.ini** and restart **snmptt**.  If the file is not created, check syslog for errors.  Either the DEBUGGING_FILE path is incorrect or there is a permissions error creating the debug log file.
+1.  Enable debug mode by defining both **DEBUGGING = 1** or **DEBUGGING = 2** and **DEBUGGING_FILE = /var/log/snmptt/snmptt.debug** in **/etc/snmptt/snmptt.ini** and restart **snmptt**.  If the file is not created, check syslog for errors.  Either the DEBUGGING_FILE path is incorrect or there is a permissions error creating the debug log file.
 2.  Make sure permissions have been set for the various folders and files.
 3.  SELinux may interfere with **snmptrapd** and **snmptt**.  Disable or reconfigure at your own discretion.
 4.  Test running **snmptt** and the handlers as explained above to make sure there are no missing Perl modules.
@@ -1162,7 +1162,7 @@ The Net-SNMP trap receiver does not currently support embedded Perl, so only the
 
     Note:  **The -On option is recommended**.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the **Net-SNMP Perl module** is not installed, then you MUST use the **-On** switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.
 
-    As an alternative, you can edit the Net-SNMP configuration file **/etc/snmp/snmp.conf** to include the line: **printNumericOids 1. ** This setting will take effect no matter what is used on the command line.
+    As an alternative, you can edit the Net-SNMP configuration file **/etc/snmp/snmp.conf** to include the line: **printNumericOids 1**. This setting will take effect no matter what is used on the command line.
 
 10. Follow the steps in the section [Securing SNMPTT](#SecuringSNMPTT) to ensure SNMPTT has been configured securely.
   

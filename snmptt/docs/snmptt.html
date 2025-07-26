@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<p><html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="utf-8" />
 <meta name="generator" content=
@@ -9,7 +9,8 @@
 name="GENERATOR" />
 <link rel="StyleSheet" type="text/css" href="layout1.css" />
 <title>SNMP Trap Translator</title>
-</head></p>
+</head>
+
 <h1>SNMP Trap Translator v1.5</h1>
 <p><strong>(<a href="http://www.snmptt.org">SNMPTT</a>)</strong></p>
 <p>This file was last updated on: August 23rd, 2022</p>
@@ -1068,7 +1069,7 @@ traphandle default /usr/sbin/snmptt
 </li>
 </ol>
 <p>Note:  <strong>The -On option is recommended</strong>.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the <strong>Net-SNMP Perl module</strong> is not installed, then you MUST use the <strong>-On</strong> switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.</p>
-<p>As an alternative, you can edit the Net-SNMP configuration file <strong>/etc/snmp/snmp.conf</strong> to include the line: <strong>printNumericOids 1. </strong> This setting will take effect no matter what is used on the command line.</p>
+<p>As an alternative, you can edit the Net-SNMP configuration file <strong>/etc/snmp/snmp.conf</strong> to include the line: <strong>printNumericOids 1</strong>.  This setting will take effect no matter what is used on the command line.</p>
 </li>
 <li>
 <p>Start / restart snmptrapd using systemctl or service:</p>
@@ -1161,7 +1162,7 @@ perl do "/usr/sbin/snmptthandler-embedded"
 </li>
 </ol>
 <p>Note:  <strong>The -On option is recommended</strong>.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the <strong>Net-SNMP Perl module</strong> is not installed, then you MUST use the <strong>-On</strong> switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.</p>
-<p>As an alternative, you can edit the Net-SNMP configuration file <strong>/etc/snmp/snmp.conf</strong> to include the line: <strong>printNumericOids 1. </strong> This setting will take effect no matter what is used on the command line.</p>
+<p>As an alternative, you can edit the Net-SNMP configuration file <strong>/etc/snmp/snmp.conf</strong> to include the line: <strong>printNumericOids 1</strong>. This setting will take effect no matter what is used on the command line.</p>
 </li>
 <li>
 <p>Start / restart snmptrapd using systemctl or service:</p>
@@ -1234,7 +1235,7 @@ Feb 27 11:04:07 server1 snmptt[83096]: .1.3.6.1.6.3.1.1.5.3 Normal "Status Event
 </ol>
 <p><strong>Troubleshooting:</strong></p>
 <ol>
-<li>Enable debug mode by defining both <strong>DEBUGGING = 0</strong> and <strong>DEBUGGING_FILE = /var/log/snmptt/snmptt.debug</strong> in <strong>/etc/snmptt/snmptt.ini</strong> and restart <strong>snmptt</strong>.  If the file is not created, check syslog for errors.  Either the DEBUGGING_FILE path is incorrect or there is a permissions error creating the debug log file.</li>
+<li>Enable debug mode by defining both <strong>DEBUGGING = 1</strong> or <strong>DEBUGGING = 2</strong> and <strong>DEBUGGING_FILE = /var/log/snmptt/snmptt.debug</strong> in <strong>/etc/snmptt/snmptt.ini</strong> and restart <strong>snmptt</strong>.  If the file is not created, check syslog for errors.  Either the DEBUGGING_FILE path is incorrect or there is a permissions error creating the debug log file.</li>
 <li>Make sure permissions have been set for the various folders and files.</li>
 <li>SELinux may interfere with <strong>snmptrapd</strong> and <strong>snmptt</strong>.  Disable or reconfigure at your own discretion.</li>
 <li>Test running <strong>snmptt</strong> and the handlers as explained above to make sure there are no missing Perl modules.</li>
@@ -1299,7 +1300,7 @@ notepad c:\snmp\snmptt.conf
 <pre><code>snmptrapd -On
 </code></pre>
 <p>Note:  <strong>The -On option is recommended</strong>.  This will make snmptrapd pass OIDs in numeric form and prevent SNMPTT from having to translate the symbolic name to numerical form.  If the <strong>Net-SNMP Perl module</strong> is not installed, then you MUST use the <strong>-On</strong> switch.  Depending on the version of Net-SNMP, some symbolic names may not translate correctly.  See the FAQ for more info.</p>
-<p>As an alternative, you can edit the Net-SNMP configuration file <strong>/etc/snmp/snmp.conf</strong> to include the line: <strong>printNumericOids 1. </strong> This setting will take effect no matter what is used on the command line.</p>
+<p>As an alternative, you can edit the Net-SNMP configuration file <strong>/etc/snmp/snmp.conf</strong> to include the line: <strong>printNumericOids 1</strong>. This setting will take effect no matter what is used on the command line.</p>
 </li>
 <li>
 <p>Follow the steps in the section <a href="#SecuringSNMPTT">Securing SNMPTT</a> to ensure SNMPTT has been configured securely.</p>

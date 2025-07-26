@@ -12,7 +12,7 @@ name="GENERATOR" />
 <link rel="StyleSheet" type="text/css" href="layout1.css" />
 <title>SNMP Trap Translator FAQ</title>
 </head>
-
+<!-- END_HTML -->
 #SNMPTT FAQ / Troubleshooting
 
 **([www.snmptt.org](http://www.snmptt.org))**  

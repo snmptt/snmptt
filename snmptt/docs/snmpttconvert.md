@@ -12,7 +12,7 @@ name="GENERATOR" />
 <link rel="StyleSheet" type="text/css" href="layout1.css" />
 <title>SNMP Trap Translator Convert</title>
 </head>
-
+<!-- END_HTML -->
 #SNMP Trap Translator Convert v1.5
 
 **(**[**SNMPTTCONVERT**](http://www.snmptt.org)**)**  
