@@ -320,6 +320,38 @@ findsnmpttini();
 loadsnmpttini();
 
 ##############################################################################
+#
+#  File locking
+#
+
+my $locking_method = 0;
+
+eval 'require Fcntl;';
+if ($@) {
+  $locking_method = 1;
+  warn $@;
+  print "\nFile locking not available.  Rename method will be used for spool file.\n";
+}
+else {
+  require Fcntl;
+}
+
+sub acquire_lock {
+    my ($fh,$timeout) = @_;
+    my $returnval = 0;
+    for (my $i = 0; $i < ($timeout / 0.2); $i++){
+        #Attempt to acquire a shared lock.  
+        $returnval = flock($fh, 1 | 4);
+        if ($returnval < 1){
+            select(undef, undef, undef, 0.2);
+        } else {
+            return($returnval);
+        }
+    }
+    return(0)
+}
+
+###############################################################################
 
 use Text::ParseWords;
 use POSIX qw(strftime);
@@ -1290,6 +1322,20 @@ if ($daemon == 1)
 
           $filesuccess = 0;
         }
+
+
+        if ($locking_method == 0)
+        {
+          my $lock_status = acquire_lock($fh_FILE, 5);
+          if ($lock_status == 0) {
+            if ($DEBUGGING >= 1)
+            {
+              print "Could not acquire flock read lock\n";
+            }
+            warn "Could not acquire flock read lock\n";
+          }
+         }
+        
 
         $input = $fh_FILE;
 
