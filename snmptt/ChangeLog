@@ -1,7 +1,8 @@
 Jul 26, 2025: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a bug where snmptt may try to read a spool file that is currently locked
   by snmptthandler or snmpttthandler-embedded.  This can happen when there is a
-  large number of traps being processed.  Thanks to tyleeds for the fix. PR #25.
+  large number of traps being processed.  Thanks to tyleeds for the fix (PR #25).
+- Fixed undefined variable warning for preexec in snmptt (issue #4).
 
 Mar 12, 2023: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a bug with net_snmp_perl_cache_enable that resulted in integer values

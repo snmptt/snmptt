@@ -980,7 +980,6 @@ Steps:
 3. Copy **snmptthandler-embedded** to /usr/sbin/.  It does not need to be executable as it is called directly by snmptrapd.
 
         cp snmptthandler-embedded /usr/sbin/
-        chmod +x /usr/sbin/snmptthandler-embedded
 
 4.  Manually start **snmptthandler-embedded** to make sure there are no missing Perl modules:
 

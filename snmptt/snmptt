@@ -3060,6 +3060,7 @@ sub substitute
 sub substitute2 {
   my $left = shift;
   my $right = shift;
+  $right = '' unless defined $right;
 
   my $string_r = reverse $_;
   my $left_r = reverse $left;
