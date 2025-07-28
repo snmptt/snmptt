@@ -1,5 +1,0 @@
-User-agent: *
-Disallow: /refer
-Disallow: /docs-temp/*
-
-
