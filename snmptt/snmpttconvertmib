@@ -60,7 +60,7 @@ my $snmpttconvertmib_version = "v1.5";
 sub showversion
 {
   print "\nSNMPTTCONVERTMIB $snmpttconvertmib_version\n";
-  print "(c) 2002-2021 Alex Burger\n";
+  print "(c) 2002-2025 Alex Burger\n";
   print "http://snmptt.sourceforge.net\n\n";
 }
 
@@ -81,6 +81,7 @@ my $help = 0;
 my $net_snmp_perl = 0;
 my $in = '';
 my $out = '';
+my $overwrite = 0;
 my $nodes = '';
 my $no_description = 0;
 my $no_variables = 0;
@@ -105,6 +106,7 @@ GetOptions 	('version' => \$version,
 		'help' => \$help,
 		'in=s' => \$in,
 		'out=s' => \$out,
+    'overwrite' => \$overwrite,
 		'net_snmp_perl' => \$net_snmp_perl,
 		'nodes=s' => \$nodes,
 		'no_description' => \$no_description,
@@ -209,7 +211,14 @@ check_snmptranslate_version();
 
 print "severity: $severity\n";
 print "\nFile to load is:        $input\n";
-print "File to APPEND TO:      $output\n";
+if ($overwrite == 1)
+{
+  print "File to OVERWRITE:      $output\n";
+}
+else
+{
+  print "File to APPEND TO:      $output\n";
+}
 if ($exec) {
   print "Exec argument:          $exec\n";
 }
@@ -333,9 +342,21 @@ if ($preexec_array[0] ne "") {
 ###################################
 # Open output file
 my $fh_OUTPUTFILE;
-unless (open $fh_OUTPUTFILE, ">>", $output)
+if ($overwrite == 0)
 {
-  die "Cannot open output file: $!";
+  # Append to the file
+  unless (open $fh_OUTPUTFILE, ">>", $output)
+  {
+    die "Cannot open output file: $!";
+  }
+}
+else
+{
+  # Overwrite the file
+  unless (open $fh_OUTPUTFILE, ">", $output)
+  {
+    die "Cannot open output file: $!";
+  }
 }
 ###################################
 
@@ -439,11 +460,13 @@ if (1)
     # eg: 'mngmtAgentTrap-23003 TRAP-TYPE';
     # eg: 'ciscoSystemClockChanged NOTIFICATION-TYPE';
     if ( $line =~ /(.*)\s*TRAP-TYPE.*/ || 
-         $line =~ /(.*)\s*(?<!--)NOTIFICATION-TYPE.*/ )
-    {     
-      my $trapname = $1;
+         $line =~ /(.*)\s*NOTIFICATION-TYPE.*/ )
+    {
+      # Line may be a TRAP-TYPE or NOTIFICATION-TYPE definition.
 
+      my $trapname = $1;
       my $trapversion;
+
       if ( $line =~ /TRAP-TYPE/ )
       {
         $trapversion = 'TRAP';
@@ -452,16 +475,6 @@ if (1)
       {
         $trapversion = 'NOTIFICATION';
       }
-      
-      # Make sure it doesn't start with a --.  If it does, it's a comment line..  Skip it
-      if ($line =~/.*--.*TRAP-TYPE/ || $line =~/.*--.*NOTIFICATION-TYPE/)
-      {
-	# Comment line
-
-	$currentline++; # Increment to the next line
-	$line = $mibfile[$currentline]; # Get next line
-	next;
-      }
 
       my $enterprisefound = 0;
       
@@ -469,17 +482,47 @@ if (1)
 
       print "#\n";
 
+      # If line follows the SMIv2/ASN.1 identifier rules
+      if ($line =~ /^\s*([A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])\s+NOTIFICATION-TYPE\b/ ||
+          $line =~ /^\s*([A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])\s+TRAP-TYPE\b/) {
+        # ^\s*	                                  Match optional leading whitespace
+        # ([A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])     Capture group: valid SMIv2 identifier (must start with a letter, can contain alphanumerics and hyphens, cannot end in a hyphen)
+        # \s+NOTIFICATION-TYPE                    Require a space then the keyword
+        # \b                                      Ensure it is a whole word (not part of another identifier) / Ensure the keyword ends cleanly
+        $trapname = $1;
+        print "SMIv2/ASN.1 valid TRAP/NOTIFICATION line detected for ($1).\n";
+      }
+
+      # Make sure it doesn't start with a --.  If it does, it's a comment line..  Skip it
+      elsif ($line =~/.*--.*TRAP-TYPE/ || $line =~/.*--.*NOTIFICATION-TYPE/) {
+        $currentline++; # Increment to the next line
+        $line = $mibfile[$currentline]; # Get next line
+        next;
+      }
+
       # Sometimes the TRAP-TYPE / NOTIFICATION-TYPE will appear on the line following the trap name
       # Look for xxx-TYPE with nothing (white space allowed) around it and a previous line with only a single word
       # with whitespace around it.
-      if ( ($currentline > 0 && $line =~ /^\s*TRAP-TYPE\s*$/ && $mibfile[$currentline-1] =~ /^\s*(\S+)\s*$/) ||
+      # This pattern is common in SMIv1 MIB modules, where the TRAP-TYPE macro is used. Here’s a canonical example drawn from RFC 1215:
+      # Example:
+      # myLinkDown
+      #     TRAP-TYPE
+      #         ENTERPRISE  myEnterprise
+      #         VARIABLES   { ifIndex }
+      #         DESCRIPTION
+      #                "A myLinkDown trap signifies that the sending
+      #                 SNMP application entity recognizes a failure
+      #                 in one of the communications links represented
+      #                 in the agent's configuration."
+      #         ::= 2
+      elsif ( ($currentline > 0 && $line =~ /^\s*TRAP-TYPE\s*$/ && $mibfile[$currentline-1] =~ /^\s*(\S+)\s*$/) ||
            ($currentline > 0 && $line =~ /^\s*NOTIFICATION-TYPE\s*$/ && $mibfile[$currentline-1] =~ /^\s*(\S+)\s*$/) ) {
         # We should have found the trap name
         $trapname = $1;
         print "Split line TRAP-TYPE / NOTIFICATION-TYPE found ($1).\n";
       }
       
-      # If the TRAP-TYPE / NOTIFICATION-TYPE line starts with white space, it's probably a import line, so ignore
+      # If the last check didn't pass and the line starts with whitespace and then TRAP-TYPE / NOTIFICATION-TYPE, it's probably a import line, so ignore
       elsif ( $line =~ /^\s+TRAP-TYPE.*/ ||
            $line =~ /^\s+NOTIFICATION-TYPE.*/  ||
            $line =~ /^.*,.*NOTIFICATION-TYPE.*/ )
@@ -489,12 +532,19 @@ if (1)
         $line = $mibfile[$currentline]; # Get next line
         next;
       }
+
+      # If the line does not match the TRAP-TYPE / NOTIFICATION-TYPE pattern, skip it
+      else {
+        print "Skipping a TRAP-TYPE / NOTIFICATION-TYPE on line $currentline as it does not match expected pattern.\n";
+        $currentline++; # Increment to the next line
+        $line = $mibfile[$currentline]; # Get next line
+        next;
+      }
       
       # Remove beginning and trailing white space
       $trapname =~ /\s*([A-Za-z0-9_-]+)\s*/;
       $trapname = $1;
-      
-      
+
       print "Line: $currentline\n";
       if ($trapversion eq 'TRAP')
       {
@@ -531,10 +581,10 @@ if (1)
         # Only applies to SNMPv1 TRAPs
         # (SNMPv2 NOTIFICATIONS have the enterprise in the ::= line)
 	
-	$traptype = "";
-	$trapsummary = "";
-	@description = ();
-	$trap_severity = $severity;
+        $traptype = "";
+        $trapsummary = "";
+        @description = ();
+        $trap_severity = $severity;
 	
         if ($line3 =~ /ENTERPRISE\s+(.*)/)
         {
@@ -544,50 +594,50 @@ if (1)
 
         if ( ($line3 =~ /VARIABLES(.*)/s) || ($line3 =~ /OBJECTS(.*)/s) )
         {
-	  # If there is more text after the word VARIABLES or OBJECTS, assume it's the start of
-	  # the variable list
-	  my $templine = "";
-	  if ($1 ne "")
+          # If there is more text after the word VARIABLES or OBJECTS, assume it's the start of
+          # the variable list
+          my $templine = "";
+          if ($1 ne "")
+                {
+                  $templine = $templine . $1;
+                  $templine =~ s/--.*//; # Remove any trailing comments
+          }
+
+          if ($templine =~ /\}/)	# Contains a }, so we're done
           {
-            $templine = $templine . $1;
-            $templine =~ s/--.*//; # Remove any trailing comments
-	  }
-	  
-	  if ($templine =~ /\}/)	# Contains a }, so we're done
-	  {
-	    # DONE!
-	  }
-	  else
-	  {
-	    $currentline++; # Increment to the next line
-	    my $line4 = $mibfile[$currentline];
-            $line4 =~ s/--.*//; # Remove any trailing comments
-	    my $keepdigging = 1;
-	    while (($currentline <= $#mibfile) && ($keepdigging == 1))
-	    {
-              $templine = $templine . $line4;
-	      if ($line4 =~ /\}/)	# Contains a }, so we're done
-	      {
-		$keepdigging = 0;
-	      }
-	      else
-	      {
-		$currentline++; # Increment to the next line
-		$line4 = $mibfile[$currentline];
+            # DONE!
+          }
+          else
+          {
+            $currentline++; # Increment to the next line
+            my $line4 = $mibfile[$currentline];
+                  $line4 =~ s/--.*//; # Remove any trailing comments
+            my $keepdigging = 1;
+            while (($currentline <= $#mibfile) && ($keepdigging == 1))
+            {
+                    $templine = $templine . $line4;
+              if ($line4 =~ /\}/)	# Contains a }, so we're done
+              {
+                $keepdigging = 0;
+              }
+              else
+              {
+                $currentline++; # Increment to the next line
+                $line4 = $mibfile[$currentline];
                 $line4 =~ s/--.*//; # Remove any trailing comments
-	      }
-	    }
-	  }
-	  $templine =~ s/\s//g;	# Remove any white space
-	  $templine =~ /\{(.*)\}/; # Remove brackets
-	  @variables = split /\,/, $1;
-	  print "Variables: @variables\n";
-	}
+              }
+            }
+          }
+          $templine =~ s/\s//g;	# Remove any white space
+          $templine =~ /\{(.*)\}/; # Remove brackets
+          @variables = split /\,/, $1;
+          print "Variables: @variables\n";
+        }
 	
         if ($line3 =~ /DESCRIPTION(.*)/s)
         {
           my $temp1 = 0;
-         
+
           # Start of DESCRIPTION
           
           #print "SDESC\n";
@@ -640,7 +690,6 @@ if (1)
             # If next line is a --#SUMMARY, pull out the information and place in $summary
             if ($line4 =~ /--#SUMMARY(.*)/)
             {
-              
               # Pull out text and remove beginning and trailing white space and quotes
               if ($line4 =~ /\s*--#SUMMARY\s*(.*)\s*/)
               {
@@ -677,7 +726,6 @@ if (1)
                 }
                 #print "argument $i: $arguments[$i]\n";
               }
-
               
               #for(my $i=0;$i <= $#arguments;$i++)
               #{
@@ -689,7 +737,7 @@ if (1)
               $line4 = $mibfile[$currentline];
               next;
             }
-	    # If next line is a --#SEVERITY, pull out the information and place in $trap_severity
+            # If next line is a --#SEVERITY, pull out the information and place in $trap_severity
             if ($line4 =~ /--#SEVERITY\s+(.*)/ && ! ($line4 =~ /--#SEVERITYMAP/))
             {
               # Pull out text and remove beginning and trailing white space and quotes
@@ -702,10 +750,10 @@ if (1)
                 
                 #print ("2\n");
                 if ($no_severity == 0)
-		{
-		  $trap_severity = $_;
-		}
-                #print "Severity: $trap_severity \n";
+                {
+                  $trap_severity = $_;
+                }
+                  #print "Severity: $trap_severity \n";
               }
               # Increment to next line and continue with the loop
               $currentline++; # Increment to the next line
@@ -778,22 +826,22 @@ if (1)
       my $trap_lookup;
       if ($mib_name eq '')
       {
-	$trap_lookup = $trapname;
+	      $trap_lookup = $trapname;
       }
       else
       {
-	$trap_lookup = "$mib_name\:\:$trapname";
+	      $trap_lookup = "$mib_name\:\:$trapname";
       }
       print "Looking up via snmptranslate: $trap_lookup\n";
       
       my $trapoid;
       if ($snmptranslate_use_On == 1)
       {
-	$trapoid = `snmptranslate -IR -Ts -On $trap_lookup`;
+	      $trapoid = `snmptranslate -IR -Ts -On $trap_lookup`;
       }
       else
       {
-	$trapoid = `snmptranslate -IR -Ts $trap_lookup`;
+	      $trapoid = `snmptranslate -IR -Ts $trap_lookup`;
       }
       
       chomp $trapoid;
@@ -1027,47 +1075,47 @@ if (1)
             print $fh_OUTPUTFILE "$description[$i]";
           }
 	  
-	  # If net_snmp_perl is enabled, lookup each variable
-	  if (@variables && $no_variables == 0 && $net_snmp_perl == 1)
-	  {
-	    print $fh_OUTPUTFILE "Variables:\n";
-	    for (my $i=0; $i <= $#variables; $i++)
-	    {
-	      printf $fh_OUTPUTFILE "%3d: %s\n",$i+1,$variables[$i];
-	      printf $fh_OUTPUTFILE "     Syntax=\"" . $SNMP::MIB{$variables[$i]}{type} . "\"\n";
-	      if (uc $SNMP::MIB{$variables[$i]}{type} =~ /INTEGER/)
-	      {
-		my $b = $SNMP::MIB{$variables[$i]}{enums};
-		my %hash = %$b;
-		my $i = 1;
-		
-		# Create a new copy of the hash swapping the key and the value
-		my %temphash = ();
-		while ((my $key, my $value) = each %hash)
-		{
-		  $temphash{$value} = $key;
-		}
-		# Print out the entries in the hash
-		foreach my $c (sort keys %temphash)
-		{
-		  print $fh_OUTPUTFILE "       " . $c . ": $temphash{$c}\n";
-		}
-	      }
-	      if ($SNMP::MIB{$variables[$i]}{description})
-	      {
-		print $fh_OUTPUTFILE "     Descr=\"" . $SNMP::MIB{$variables[$i]}{description} . "\"\n";
-	      }
-	    }
-	  }
+          # If net_snmp_perl is enabled, lookup each variable
+          if (@variables && $no_variables == 0 && $net_snmp_perl == 1)
+          {
+            print $fh_OUTPUTFILE "Variables:\n";
+            for (my $i=0; $i <= $#variables; $i++)
+            {
+              printf $fh_OUTPUTFILE "%3d: %s\n",$i+1,$variables[$i];
+              printf $fh_OUTPUTFILE "     Syntax=\"" . $SNMP::MIB{$variables[$i]}{type} . "\"\n";
+              if (uc $SNMP::MIB{$variables[$i]}{type} =~ /INTEGER/)
+              {
+                my $b = $SNMP::MIB{$variables[$i]}{enums};
+                my %hash = %$b;
+                my $i = 1;
+
+                # Create a new copy of the hash swapping the key and the value
+                my %temphash = ();
+                while ((my $key, my $value) = each %hash)
+                {
+                  $temphash{$value} = $key;
+                }
+                # Print out the entries in the hash
+                foreach my $c (sort keys %temphash)
+                {
+                  print $fh_OUTPUTFILE "       " . $c . ": $temphash{$c}\n";
+                }
+              }
+              if ($SNMP::MIB{$variables[$i]}{description})
+              {
+                print $fh_OUTPUTFILE "     Descr=\"" . $SNMP::MIB{$variables[$i]}{description} . "\"\n";
+              }
+            }
+          }
 	  
-	  elsif (@variables ne "" && $no_variables == 0  && $net_snmp_perl == 0)
-	  {
-	    print $fh_OUTPUTFILE "Variables:\n";
-	    for (my $i=0; $i <= $#variables; $i++)
-	    {
-	      print $fh_OUTPUTFILE "  " . ($i+1) . ": " . $variables[$i] . "\n";
-	    }
-	  }
+        elsif (@variables ne "" && $no_variables == 0  && $net_snmp_perl == 0)
+        {
+          print $fh_OUTPUTFILE "Variables:\n";
+          for (my $i=0; $i <= $#variables; $i++)
+          {
+            print $fh_OUTPUTFILE "  " . ($i+1) . ": " . $variables[$i] . "\n";
+          }
+        }
           print $fh_OUTPUTFILE "EDESC\n";
         }
         
@@ -1079,11 +1127,11 @@ if (1)
       $total_translations++;
       if ($trapoid eq '')
       {
-	$failed_translations++;
+	      $failed_translations++;
       }
       else
       {
-	$successful_translations++;
+	      $successful_translations++;
       }
       
       #print "\@description is ", $#description,"\n";
@@ -1185,6 +1233,8 @@ Options:
   --net_snmp_perl        Enable NET-SNMP Perl integration (see below)
   --in=filename          Input file
   --out=filename         Output file
+  --overwrite            Overwrite the output file if it exists.
+                         Default is to append to the file if it exists.
   --nodes=name or file   If specified, will insert a NODES line after FORMAT
                          or EXEC. The host name(s) separated by spaces, or
                          the name of the nodes file.  Use quotes for multiple
