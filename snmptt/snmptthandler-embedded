@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-# SNMPTTHANDLER-EMBEDDED 1.5
+# SNMPTTHANDLER-EMBEDDED 1.5.1beta1
 #
-# Copyright 2009-2022 Alex Burger
+# Copyright 2009-2025 Alex Burger
 # alex_b@users.sourceforge.net
 # 5/17/2009
 #
@@ -58,7 +58,8 @@ my $DEBUGGING;
 my $DEBUGGING_FILE;
 my $configfile;
 my $spool_directory;
-my $locking_method = 0;         # 0 = flock, 1 = rename
+my $locking_method = 0; # 0 = flock, 1 = rename
+my $engine_id_hex = 0;  # Default to 0, prepend 0x to engine ID in spool file
 
 if ($debug >= 1)
 {
@@ -215,14 +216,26 @@ sub snmptt_trap_receiver {
   print $fh_SPOOL $trapname . "\n";
   print $fh_SPOOL ".1.3.6.1.6.3.18.1.4.0 $community\n";
   print $fh_SPOOL $other_varbinds;
+
+  my $engine_id_prepend;
+  if ($engine_id_hex) {
+    # Do not prepend 0x to engine ID
+    $engine_id_prepend = "";
+  }
+  else {
+    # Prepend 0x to engine ID
+    # This is the default behavior.
+    $engine_id_prepend = "0x";
+  }
+
   if ($securityEngineID ne "") {
-    print $fh_SPOOL ".1.3.6.1.6.3.10.2.1.1.0 \"0x$securityEngineID\"\n";
+    print $fh_SPOOL ".1.3.6.1.6.3.10.2.1.1.0 \"$engine_id_prepend$securityEngineID\"\n";
   }
   if ($securityName ne "") {
     print $fh_SPOOL ".1.3.6.1.6.3.18.1.1.1.3 \"$securityName\"\n";
   }
   if ($contextEngineID ne "") {
-    print $fh_SPOOL ".1.3.6.1.6.3.18.1.1.1.4 \"0x$contextEngineID\"\n";
+    print $fh_SPOOL ".1.3.6.1.6.3.18.1.1.1.4 \"$engine_id_prepend$contextEngineID\"\n";
   }
   if ($contextName ne "") {
     print $fh_SPOOL ".1.3.6.1.6.3.18.1.1.1.5 \"$contextName\"\n";
@@ -237,13 +250,13 @@ sub snmptt_trap_receiver {
     print ".1.3.6.1.6.3.18.1.4.0 $community\n";
     print $other_varbinds;
     if ($securityEngineID ne "") {
-      print ".1.3.6.1.6.3.10.2.1.1.0 \"0x$securityEngineID\"\n";
+      print ".1.3.6.1.6.3.10.2.1.1.0 \"$engine_id_prepend$securityEngineID\"\n";
     }
     if ($securityName ne "") {
       print ".1.3.6.1.6.3.18.1.1.1.3 \"$securityName\"\n";
     }
     if ($contextEngineID ne "") {
-      print ".1.3.6.1.6.3.18.1.1.1.4 \"0x$contextEngineID\"\n";
+      print ".1.3.6.1.6.3.18.1.1.1.4 \"$engine_id_prepend$contextEngineID\"\n";
     }
     if ($contextName ne "") {
       print ".1.3.6.1.6.3.18.1.1.1.5 \"$contextName\"\n";
@@ -332,6 +345,12 @@ sub loadsnmpttini {
   
   # DaemonMode
   $spool_directory = $cfg->val('DaemonMode', 'spool_directory');
+
+  # Other options
+  $engine_id_hex = $cfg->val('snmptthandler', 'engine_id_hex');
+  if (! defined $engine_id_hex) {
+    $engine_id_hex = 0;  # Default to 0
+  }
   
   # Debugging
   if ($debug eq '') {
