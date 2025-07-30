@@ -1,13 +1,14 @@
 Jul 29, 2025: Alex Burger <alex_b@users.sourceforge.net>
 - Added snmptt.ini option engine_id_hex to allow you to disable pre-pending
   the securityEngineID ($Be) and contextEngineID ($BE) with 0x (issue #19).
+- Fixed 'Use of uninitialized value $match_type' warning (bug #51).
 
 Jul 28, 2025: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed bug in snmpttconvertmib that would cause NOTIFICATION-TYPE or TRAP-TYPE
   in comments to be treated as a NOTIFICATION or TRAP.  Cleaned up logic.
 - Added --overwrite option to snmpttconvertmib to force the output file to be
   overwritten instead of appended to.
-- Clean up snmpttconvertmib indentation.
+- Cleaned up snmpttconvertmib indentation.
 
 Jul 26, 2025: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a bug where snmptt may try to read a spool file that is currently locked

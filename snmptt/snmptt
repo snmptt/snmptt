@@ -1772,7 +1772,7 @@ sub processtrap
     if ($nodesmatch == 1 && defined($event2[7][0]))  # Only if NODES has matched and 
     {                                                 # we have some MATCH statements
       my @match = ();
-      my $match_type;
+      my $match_type = "";
 
       for (my $i=0; defined($event2[7][$i]); $i++)
       {
