@@ -721,6 +721,10 @@ my $g_total_traps_translated = 0;
 my $g_total_traps_ignored = 0;
 my $g_total_traps_unknown = 0;
 my $g_total_traps_skipped = 0;
+my $g_total_traps_corrupt = 0;   # Spool files discarded as corrupt (e.g. blank / partially-written)
+my $g_total_traps_deferred = 0;  # Spool files skipped for re-read (possibly still being written)
+my $g_corrupt_reason = "";       # Reason the most recently rejected spool file failed validation
+my $corrupt_trap_max_age = 2;    # How many seconds to give an unreadable trap file until it's declared as corrupted
 my $g_last_statistics_logged = $g_start_time;
 
 # Global variables for SQL
@@ -1290,7 +1294,7 @@ if ($daemon == 1)
           next;
         }
 
-        next if (! ($file =~ /\#.*/));    # Must start with # (for file locking change)
+        next if (! ($file =~ /^\#snmptt-trap-/));
 
         if ($DEBUGGING >= 1)
         {
@@ -1342,8 +1346,36 @@ if ($daemon == 1)
         my $readtrap_result = readtrap();      # Read trap from STDIN or file
 
         if ($readtrap_result == 0) {
-          if ($DEBUGGING >= 1) {
-          print "  Error processing trap file $file.  Skipping...\n";
+          close $fh_FILE;
+
+          my $file_age = time() - (stat($file))[9];
+
+          if ($file_age < $corrupt_trap_max_age) {
+            $g_total_traps_deferred++;
+            if ($DEBUGGING >= 1) {
+              print "  Trap file $file failed validation ($g_corrupt_reason).  Age ${file_age}s - deferring for re-read\n";
+            }
+          }
+          else {
+            $g_total_traps_corrupt++;
+            my $corrupt_msg = "Corrupt trap file $file discarded after ${file_age}s: $g_corrupt_reason";
+            if ($DEBUGGING >= 1) {
+              print "  $corrupt_msg\n";
+            }
+            warn "$corrupt_msg\n";
+            if ($syslog_system_enable == 1) {
+              syslog_system($corrupt_msg);
+            }
+            if ($log_system_enable == 1) {
+              log_system($corrupt_msg);
+            }
+
+            unless (rename($file, "corrupt-".$file)) {
+              if ($DEBUGGING >= 1) {
+                print "  Unable to quarantine corrupt trap file $file ($!).  Deleting instead.\n";
+              }
+              unlink($file);
+            }
           }
           next;
         }
@@ -1500,6 +1532,16 @@ if ($daemon == 1)
     else {
       log_system("Total traps received=$g_total_traps_received,Total traps translated=$g_total_traps_translated,Total traps ignored=$g_total_traps_ignored,Total unknown traps=$g_total_traps_unknown");
     }
+  }
+  if ($DEBUGGING >= 1 && $daemon == 1) {
+    print "Total corrupt trap files:  $g_total_traps_corrupt\n";
+    print "Total deferred trap files: $g_total_traps_deferred\n";
+  }
+  if ($syslog_system_enable == 1 && $daemon == 1) {
+    syslog_system("Total corrupt trap files=$g_total_traps_corrupt,Total deferred trap files=$g_total_traps_deferred");
+  }
+  if ($log_system_enable == 1 && $daemon == 1) {
+    log_system("Total corrupt trap files=$g_total_traps_corrupt,Total deferred trap files=$g_total_traps_deferred");
   }
   if ($eventlog_system_enable == 1 &&  $daemon == 1)
   {
@@ -3496,10 +3538,11 @@ sub readtrap
     chomp($trap_date_time_epoch = (<$input>));	# Pull time trap was spooled
     push(@rawtrap, $trap_date_time_epoch);
     if ($trap_date_time_epoch eq "") {
+      $g_corrupt_reason = "blank first line - expected the spooled epoch time (likely a partially-written spool file)";
       if ($DEBUGGING >= 1) {
         print "  Invalid trap file.  Expected a serial time on the first line but got nothing\n";
-        return 0;
       }
+      return 0;
     }
      
     $trap_date_time_epoch =~ s/[^0-9]//g;  # Sanitize / Remove non numeric characters
@@ -3573,10 +3616,11 @@ sub readtrap
   }
 
   if ($tempvar[0] eq "") {
+    $g_corrupt_reason = "blank hostname on line 2 (likely a partially-written spool file)";
     if ($DEBUGGING >= 1) {
       print "  Invalid trap file.  Expected a hostname on line 2 but got nothing\n";
-      return 0;
     }
+    return 0;
   }
 
   # IPv6_TODO_DONE
@@ -3642,10 +3686,11 @@ sub readtrap
   # Should only be IPs, but also allow for hostname characters, just in case.
 
   if ($tempvar[1] eq "") {
+    $g_corrupt_reason = "blank IP address on line 3 (likely a partially-written spool file)";
     if ($DEBUGGING >= 1) {
       print "  Invalid trap file.  Expected an IP address on line 3 but got nothing\n";
-      return 0;
     }
+    return 0;
   }
 
   # IPv6_TODO_DONE
@@ -6229,17 +6274,32 @@ sub log_statistics {
       "Total traps translated:  $g_total_traps_translated\n" .
       "Total traps ignored:     $g_total_traps_ignored:\n" .
       "Total traps skipped:     $g_total_traps_skipped:\n" .
-      "Total unknown traps:     $g_total_traps_unknown\n";
+      "Total unknown traps:     $g_total_traps_unknown\n" .
+      "Total corrupt trap files:  $g_total_traps_corrupt\n" .
+      "Total deferred trap files: $g_total_traps_deferred\n";
     }
     else {
       $message = "" .
       "Total traps received:    $g_total_traps_received\n" .
       "Total traps translated:  $g_total_traps_translated\n" .
       "Total traps ignored:     $g_total_traps_ignored:\n" .
-      "Total unknown traps:     $g_total_traps_unknown\n";
+      "Total unknown traps:     $g_total_traps_unknown\n" .
+      "Total corrupt trap files:  $g_total_traps_corrupt\n" .
+      "Total deferred trap files: $g_total_traps_deferred\n";
     }
 
     eventlog_system($message,1,$eventlog_information);
+  }
+
+  if ($DEBUGGING >= 1) {
+    print "Total corrupt trap files:  $g_total_traps_corrupt\n";
+    print "Total deferred trap files: $g_total_traps_deferred\n";
+  }
+  if ($syslog_system_enable == 1) {
+    syslog_system("Total corrupt trap files=$g_total_traps_corrupt,Total deferred trap files=$g_total_traps_deferred");
+  }
+  if ($log_system_enable == 1) {
+    log_system("Total corrupt trap files=$g_total_traps_corrupt,Total deferred trap files=$g_total_traps_deferred");
   }
 
   if ($mysql_dbi_enable == 1 && defined ($dbh_mysql) && $mysql_dbi_table_statistics ne "")
