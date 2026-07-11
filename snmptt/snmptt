@@ -1298,6 +1298,7 @@ if ($daemon == 1)
 
         if ($DEBUGGING >= 1)
         {
+          print "==========================================================\n";
           print "Processing file: $file\n";
         }
 
@@ -3913,23 +3914,6 @@ sub readtrap
     $linenum++;
   }
 
-  # Structural validation:  a complete trap always contains at least the
-  # hostname, IP address, uptime and trap OID varbind.  $tempvar[5] holds the
-  # trap OID value (the first value after the uptime).  If the spool file was
-  # read while snmptthandler was still writing it - or is otherwise truncated
-  # after the hostname / IP / uptime line - $tempvar[5] is missing.  The blank
-  # first-line / hostname / IP checks above do NOT catch this case, which is the
-  # one that produces "shifted field" unknown traps.  Return 0 so the file is
-  # deferred / quarantined instead of logged as a bogus unknown trap.
-  if (!defined($tempvar[5]))
-  {
-    $g_corrupt_reason = "missing trap OID (truncated after the hostname/IP - likely a partially-written spool file)";
-    if ($DEBUGGING >= 1) {
-      print "  Invalid or truncated trap file.  No trap OID found (possible partial spool file read).\n";
-    }
-    return 0;
-  }
-
   # Statistics - count as received only now that the file is structurally
   # complete (past every "return 0" validation above).
   $g_total_traps_received++;
@@ -3958,9 +3942,8 @@ sub readtrap
   $var[0] = $tempvar[0];		# hostname
   $var[1] = $tempvar[1];		# ip address
   $var[2] = $tempvar[3];		# uptime
-  $var[3] = $tempvar[5];		# trapname / OID - assume first value after uptime is
-          # the trap OID (value for .1.3.6.1.6.3.1.1.4.1.0)
 
+  $var[3] = "";	 # Clear trapname / OID
   $var[4] = "";	 # Clear ip address from trap agent
   $var[5] = "";	 # Clear trap community string
   $var[6] = "";	 # Clear enterprise
@@ -3969,16 +3952,21 @@ sub readtrap
   $var[9] = "";	 # Clear contextEngineID
   $var[10] = ""; # Clear contextName
 
-  # Make sure trap OID is numerical as event lookups are done using numerical OIDs only
-  $var[3] = translate_symbolic_to_oid($var[3]);
-
-  # Cycle through remaining variables searching for for agent IP (.1.3.6.1.6.3.18.1.3.0),
+  # Cycle through remaining variables searching for for trap name (.1.3.6.1.6.3.1.1.4.1.0), agent IP (.1.3.6.1.6.3.18.1.3.0),
   # community name (.1.3.6.1.6.3.18.1.4.0) and enterpise (.1.3.6.1.6.3.1.1.4.3.0)
   # All others found are regular passed variables
   my $j=0;
-  for (my $i=6;$i <= $#tempvar; $i+=2)
+  for (my $i=2;$i <= $#tempvar; $i+=2)
   {
-    if ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.3.0$/)		# ip address from trap agent
+    if ($tempvar[$i] =~ /^.1.3.6.1.6.3.1.1.4.1.0$/)	# trap name / OID
+    {
+      $var[3] = $tempvar[$i+1];
+    }
+    elsif ($tempvar[$i] =~ /^.1.3.6.1.2.1.1.3.0$/)	# Uptime
+    {
+      # Do nothing.  We already have it in $var[2] from above and we don't want it to appear as an enterprise variable.
+    }
+    elsif ($tempvar[$i] =~ /^.1.3.6.1.6.3.18.1.3.0$/)		# ip address from trap agent
     {
       $var[4] = $tempvar[$i+1];
 
@@ -4042,6 +4030,36 @@ sub readtrap
       $j++;
     }
   }
+
+  # If the trap OID was not found, then use the first value after the uptime as the trap OID
+  if ($var[3] eq "") {
+    # Structural validation:  a complete trap always contains at least the
+    # hostname, IP address, uptime and trap OID varbind.  $tempvar[5] holds the
+    # trap OID value (the first value after the uptime).  If the spool file was
+    # read while snmptthandler was still writing it - or is otherwise truncated
+    # after the hostname / IP / uptime line - $tempvar[5] is missing.  The blank
+    # first-line / hostname / IP checks above do NOT catch this case, which is the
+    # one that produces "shifted field" unknown traps.  Return 0 so the file is
+    # deferred / quarantined instead of logged as a bogus unknown trap.
+    if (!defined($tempvar[5]))
+    {
+      $g_corrupt_reason = "missing trap OID (truncated after the hostname/IP - likely a partially-written spool file)";
+      if ($DEBUGGING >= 1) {
+        print "  Invalid or truncated trap file.  No trap OID found (possible partial spool file read).\n";
+      }
+      return 0;
+    }
+    else {
+      $var[3] = $tempvar[5];		# trapname / OID - assume first value after uptime is
+      if ($DEBUGGING >= 1) {
+        print "  Trap OID not found in trap, so using first value after uptime as the trap OID: $var[3]\n";
+        # the trap OID (value for .1.3.6.1.6.3.1.1.4.1.0)
+      }
+    }
+  }
+
+  # Make sure trap OID is numerical as event lookups are done using numerical OIDs only
+  $var[3] = translate_symbolic_to_oid($var[3]);
 
   #if ($dns_enable == 1 && $var[0] =~  /^\d+\.\d+\.\d+\.\d+$/) # Only if it's not already resolved
   if ($dns_enable == 1 && ($var[0] =~ /^\d+\.\d+\.\d+\.\d+$/ || $var[0] =~ /\:/)) # Only if it's not already resolved

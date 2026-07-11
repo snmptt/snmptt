@@ -60,6 +60,10 @@ my $configfile;
 my $spool_directory;
 my $locking_method = 0; # 0 = flock, 1 = rename
 my $engine_id_hex = 0;  # Default to 0, prepend 0x to engine ID in spool file
+my $spool_counter = 0;  # Incremented per trap.  snmptthandler-embedded is a
+                        # persistent process, so the PID is constant and cannot
+                        # make the spool filename unique on its own; the counter
+                        # disambiguates traps handled within the same microsecond.
 
 if ($debug >= 1)
 {
@@ -187,12 +191,18 @@ sub snmptt_trap_receiver {
     print "Data received:\n\n";
   }
   
-  my $spoolfile_final = $spool_directory.'#snmptt-trap-'.$s_pad.$usec_pad;
+  # Append PID + a per-process counter to guarantee a unique filename even when
+  # two traps are handled within the same microsecond.  Keep them after the
+  # zero-padded timestamp so the daemon's lexical filename sort still processes
+  # traps in the order they were received.
+  $spool_counter++;
+  my $unique = $$.'-'.$spool_counter;
+  my $spoolfile_final = $spool_directory.'#snmptt-trap-'.$s_pad.$usec_pad.'-'.$unique;
   my $spoolfile = $spoolfile_final;
 
   if ($locking_method) {
     # Rename
-    $spoolfile = $spool_directory.'x#snmptt-trap-'.$s_pad.$usec_pad;
+    $spoolfile = $spool_directory.'x#snmptt-trap-'.$s_pad.$usec_pad.'-'.$unique;
   }
   
   my $fh_SPOOL;
