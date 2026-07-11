@@ -2709,9 +2709,10 @@ sub substitute
   substitute2 ("\$e", $var[6]);
 
   # $j - Enterprise number
-  $var[6] =~ /.*\.(\d+)/;
-  my $enterpriseInteger = $1;
-  substitute2 ("\$j", $enterpriseInteger);
+  if ($var[6] =~ /.*\.(\d+)/) {
+    my $enterpriseInteger = $1;
+    substitute2 ("\$j", $enterpriseInteger);
+  }
 
   # $N - Event name
   #s(\$N)($event2[0])g;
@@ -2819,8 +2820,10 @@ sub substitute
     # $G - Generic trap number - last #
     my $temp = $_; 		# Save old $_
     $_ = $receivedtrap;
-    /(\d+)$/;
-    my $temp2 = $1;
+    my $temp2 = "";
+    if (/(\d+)$/) {
+      $temp2 = $1;
+    }
     $_ = $temp;		# Restore old $_
     #s(\$G)($temp2)g;
     substitute2 ("\$G", $temp2);
@@ -2832,8 +2835,10 @@ sub substitute
     # $S - Specific trap number - last #
     my $temp = $_; 		# Save old $_
     $_ = $receivedtrap;
-    /(\d+)$/;
-    my $temp2 = $1;
+    my $temp2 = "";
+    if (/(\d+)$/) {
+      $temp2 = $1;
+    }
     $_ = $temp;		# Restore old $_
     #s(\$S)($temp2)g;
     substitute2 ("\$S", $temp2);
@@ -3402,13 +3407,18 @@ sub loadsnmpttconf
         $currentline++; # Increment to the next line
         $line2 = $snmpttconf[$currentline]; # Get next line
       }
-      if ($lineformat ne '' || $exec[0] ne '')
+      if ($lineformat ne '' || (@exec && $exec[0] ne ''))
       {
         # At least the mandatory FORMAT line was defined, so we'll keep it
         # Stuff all elements into a one hash
         # $event{@temp[2]} = [@temp[1],@temp[3],@temp[4],$lineformat,$lineexec,$linenodes];
 
-        if (!defined(@{ $event{$temp[2]} }[0])) 
+        #if (!defined(@{ $event{$temp[2]} }[0]))
+        #if (!exists $event{$temp[2]} || !defined $event{$temp[2]}[0])
+        if (
+          !exists $event{$temp[2]}
+          || ref($event{$temp[2]}) ne 'ARRAY'
+          || !defined $event{$temp[2]}[0])
         {
           @{ $event{$temp[2]} }[0] = 0;
         }
@@ -5345,7 +5355,7 @@ sub checkipv6
     return 0;
   }
   my $node2ip = new Net::IP($node2);
-  if (!$node1ip) {
+  if (!$node2ip) {
     if ($DEBUGGING >= 1) {
       print "  Invalid IPv6 address detected ($node2): " . Net::IP::Error() . "\n";
     }
@@ -6798,11 +6808,11 @@ sub dbd_odbc_ping {
     if (defined ($dbh_odbc)) {
       my $rc = $dbh_odbc->ping;
       if (!$rc) { 
-        dbd_odbc_connect();
+        dbh_odbc_connect();
       }
     }
     else {
-      dbd_odbc_connect();
+      dbh_odbc_connect();
     }
   }
 
@@ -7097,7 +7107,7 @@ sub odbc_insert {
   if (defined ($dbh_odbc)) {
     unless (defined ($dbh_odbc->do($sql_statement)))
     {
-      my $msg = warn "DBI DBD::ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr;
+      my $msg = "DBI DBD::ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr;
       warn $msg, "\n";
 
       if ($DEBUGGING >= 1)
@@ -7203,7 +7213,7 @@ sub sql_win32_odbc_insert {
         dbh_win32_odbc_connect();
         
         $dbh_win32_odbc_retries--;
-        sleep 0.1;
+        select(undef, undef, undef, 0.1); # sleep 0.1 seconds
       }
       else { # No error
         return 1;
