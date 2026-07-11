@@ -1294,7 +1294,7 @@ if ($daemon == 1)
           next;
         }
 
-        next if (! ($file =~ /^\#snmptt-trap-/));
+        next if (! ($file =~ /^\#/)); # Must start with # (for file locking change)
 
         if ($DEBUGGING >= 1)
         {
@@ -1348,7 +1348,16 @@ if ($daemon == 1)
         if ($readtrap_result == 0) {
           close $fh_FILE;
 
-          my $file_age = time() - (stat($file))[9];
+          my $file_mtime = (stat($file))[9];
+          # If the file vanished between readdir and here, don't warn on an
+          # undef mtime or spuriously quarantine - just move on.
+          if (!defined($file_mtime)) {
+            if ($DEBUGGING >= 1) {
+              print "  Trap file $file no longer exists - skipping\n";
+            }
+            next;
+          }
+          my $file_age = time() - $file_mtime;
 
           if ($file_age < $corrupt_trap_max_age) {
             $g_total_traps_deferred++;
@@ -3525,17 +3534,25 @@ sub readtrap
   @preexec_var = ();
   my @rawtrap = ();
 
-  # Statistics
-  $g_total_traps_received++;
+  # Reset the corrupt-reason for this read.  Each "return 0" validation path
+  # below sets its own reason.
+  $g_corrupt_reason = "";
 
-  if ($DEBUGGING >= 2) 
+  # Statistics
+  # Note: $g_total_traps_received is incremented later, after structural
+  # validation passes, so a partial spool file that is deferred and re-read (or
+  # eventually quarantined as corrupt) is not counted multiple times.
+
+  if ($DEBUGGING >= 2)
   {
     print "Reading trap.  Current time: " . scalar(get_time()). "\n";
   }
 
   if ( $daemon == 1)
   {
-    chomp($trap_date_time_epoch = (<$input>));	# Pull time trap was spooled
+    $trap_date_time_epoch = <$input>;
+    $trap_date_time_epoch = '' unless defined($trap_date_time_epoch);
+    chomp($trap_date_time_epoch);	# Pull time trap was spooled
     push(@rawtrap, $trap_date_time_epoch);
     if ($trap_date_time_epoch eq "") {
       $g_corrupt_reason = "blank first line - expected the spooled epoch time (likely a partially-written spool file)";
@@ -3604,7 +3621,9 @@ sub readtrap
   # Net-SNMP examples:
   # UDP: [127.0.0.1]:38249->[127.0.0.1]:162
 
-  chomp($tempvar[0]=<$input>);	# hostname
+  $tempvar[0] = <$input>;
+  $tempvar[0] = '' unless defined($tempvar[0]);
+  chomp($tempvar[0]);	# hostname
   push(@rawtrap, $tempvar[0]);
 
   if ($ipv6_enable == 1) {
@@ -3673,7 +3692,9 @@ sub readtrap
 
 
   # IPv6_TODO_DONE
-  chomp($tempvar[1]=<$input>);	# ip address
+  $tempvar[1] = <$input>;
+  $tempvar[1] = '' unless defined($tempvar[1]);
+  chomp($tempvar[1]);	# ip address
   push(@rawtrap, $tempvar[1]);
 
   if ($ipv6_enable == 1) {
@@ -3891,6 +3912,27 @@ sub readtrap
 
     $linenum++;
   }
+
+  # Structural validation:  a complete trap always contains at least the
+  # hostname, IP address, uptime and trap OID varbind.  $tempvar[5] holds the
+  # trap OID value (the first value after the uptime).  If the spool file was
+  # read while snmptthandler was still writing it - or is otherwise truncated
+  # after the hostname / IP / uptime line - $tempvar[5] is missing.  The blank
+  # first-line / hostname / IP checks above do NOT catch this case, which is the
+  # one that produces "shifted field" unknown traps.  Return 0 so the file is
+  # deferred / quarantined instead of logged as a bogus unknown trap.
+  if (!defined($tempvar[5]))
+  {
+    $g_corrupt_reason = "missing trap OID (truncated after the hostname/IP - likely a partially-written spool file)";
+    if ($DEBUGGING >= 1) {
+      print "  Invalid or truncated trap file.  No trap OID found (possible partial spool file read).\n";
+    }
+    return 0;
+  }
+
+  # Statistics - count as received only now that the file is structurally
+  # complete (past every "return 0" validation above).
+  $g_total_traps_received++;
 
   if ($DEBUGGING >= 2)
   {

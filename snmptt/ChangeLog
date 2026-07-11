@@ -1,3 +1,11 @@
+Jul 11, 2026: Alex Burger
+- Fixed a bug with the race condition fix from 2016 which would cause valid
+  traps to be sent to the unknown trap log on systems without flock() support.
+  Enhanced the solution by adding the ability to retry spool files that appear
+  to be corrupted.  New counters Total corrupt trap files and Total deferred 
+  trap files will be logged to syslog.  Thanks to Chris (s1sfa) for the patch
+  (PR #31).
+
 Jul 29, 2025: Alex Burger <alex_b@users.sourceforge.net>
 - Added snmptt.ini option engine_id_hex to allow you to disable pre-pending
   the securityEngineID ($Be) and contextEngineID ($BE) with 0x (issue #19).
