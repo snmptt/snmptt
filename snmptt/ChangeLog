@@ -14,6 +14,11 @@ Jul 11, 2026: Alex Burger
 - For snmptthandler and snmptthandler-embedded, append a unique value to the
   trap filename as an extra precaution against overwriting a trap file with a
   new file.
+- Various bug fixes including ODBC ping not reconnecting to the database if
+  the connection was dropped, sleep timer not working for win32_odbc
+  connection, Perl warnings for some regex statements, prevent possibility
+  of a value from another variable leaking to $G and $S and an IPv6 nodes
+  match issue.
 
 Jul 29, 2025: Alex Burger <alex_b@users.sourceforge.net>
 - Added snmptt.ini option engine_id_hex to allow you to disable pre-pending
