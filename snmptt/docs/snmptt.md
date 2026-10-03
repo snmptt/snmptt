@@ -573,14 +573,14 @@ To upgrade from v1.4 to v1.4,1, you should:
     *   If you are not currently using daemon mode and are running as root, please switch to daemon mode or run as different user such as **snmptt**.
     *   Secure the spool folder with:
     
-    *   **chown -R snmptt.snmptt /var/spool/snmptt**
+    *   **chown -R snmptt:snmptt /var/spool/snmptt**
     *   **chmod -R 750 /var/spool/snmptt**
     
     *   Secure the /etc/snmp folder with
     
     *   **chown -R root.root /etc/snmp**
     *   **chmod 755 /etc/snmp**
-    *   **chown snmptt.snmptt /etc/snmp/snmptt\***
+    *   **chown snmptt:snmptt /etc/snmp/snmptt\***
     *   **chmod 660 /etc/snmp/snmptt\***
 
 ## **v1.3 to v1.4**
@@ -746,7 +746,7 @@ Packages are available for most Linux distributions and FreeBSD.  Check your pac
 1. Create /etc/snmptt and set permissions.  Note: Starting with v1.5, you can use /etc/snmptt/ instead of /etc/snmp/ for your snmptt.ini file.m
 
         mkdir /etc/snmptt
-        chown -R snmptt.snmptt /etc/snmptt
+        chown -R snmptt:snmptt /etc/snmptt
         chmod 750 /etc/snmptt
 
 3. Copy **snmptt.ini** to **/etc/snmptt** and edit the options inside the file:
@@ -768,13 +768,13 @@ Packages are available for most Linux distributions and FreeBSD.  Check your pac
 5. Create the log folder **/var/log/snmptt/**:
 
         mkdir /var/log/snmptt
-        chown -R snmptt.snmptt /var/log/snmptt
+        chown -R snmptt:snmptt /var/log/snmptt
         chmod -R 750 /var/log/snmptt
 
 2. Create the spool folder **/var/spool/snmptt/**:
 
         mkdir /var/spool/snmptt/
-        chown -R snmptt.snmptt /var/spool/snmptt
+        chown -R snmptt:snmptt /var/spool/snmptt
         chmod -R 750 /var/spool/snmptt
 
 3. Startup scripts are included for SystemD (uses **systemctl** to control services) and SysVinit systems.  Select one depending on your distribution.
@@ -1297,24 +1297,24 @@ If **snmptrapd** is run as a non root / administrator, it should be configured w
 
 Grant access and secure the spool folder with:
 
-        chown -R snmptt.snmptt /var/spool/snmptt
+        chown -R snmptt:snmptt /var/spool/snmptt
         chmod -R 750 /var/spool/snmptt
 
 Grant access and secure the log folder with:
 
-        chown -R snmptt.snmptt /var/log/snmptt
+        chown -R snmptt:snmptt /var/log/snmptt
         chmod -R 750 /var/log/snmptt
 
 If you are using **/etc/snmp** to store the SNMPTT configuration files, secure the folder with:
 
         chown -R root.root /etc/snmp
         chmod 755 /etc/snmp
-        chown snmptt.snmptt /etc/snmp/snmptt*
+        chown snmptt:snmptt /etc/snmp/snmptt*
         chmod 660 /etc/snmp/snmptt*
 
 If you are using **/etc/snmptt** to store the SNMPTT configuration files, secure folder with:
 
-        chown -R snmptt.snmptt /etc/snmptt
+        chown -R snmptt:snmptt /etc/snmptt
         chmod 750 /etc/snmptt
 
 Note:  Starting with v1.5, you can use **/etc/snmptt/** instead of **/etc/snmp/** for your **snmptt.ini** file:
