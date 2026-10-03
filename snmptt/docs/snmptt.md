@@ -908,7 +908,21 @@ Steps:
 
 10. Permanently change snmptrapd to use the **-On** option by modifying the startup script:
   
-    1. Systemd:  
+    1. Systemd (Debian 12+, Ubuntu 22.04+ which use **snmptrapd.socket** instead of **snmptrapd.service**):
+
+        Edit the unit file and add the **-On** option:
+
+            systemctl edit --full snmptrapd.service
+
+        Change:
+
+            ExecStart=/usr/sbin/snmptrapd -LOw -f udp:162 udp6:162
+
+        to:
+
+            ExecStart=/usr/sbin/snmptrapd -Lsd -On -f udp:162 udp6:162
+
+    1. Systemd (other):
   
         Edit the unit file and add the **-On** option:
   
@@ -923,9 +937,8 @@ Steps:
             Environment="OPTIONS=-Lsd -On"
 
         Note:  Move the first quote to before OPTIONS.
-  
-  
-    2. SysVinit:  
+
+    2. Sysvinit:
   
         Edit the **/etc/rc.d/init.d/snmptrapd** file and add **"-On"** to **OPTIONS**:
 
@@ -943,15 +956,15 @@ Steps:
 
      As an alternative, you can edit the Net-SNMP configuration file **/etc/snmp/snmp.conf** to include the line: **printNumericOids 1**.  This setting will take effect no matter what is used on the command line.
 
-10.  Start / restart snmptrapd using systemctl or service:
+1.  Start / restart snmptrapd using systemctl or service:
 
-        systemctl restart snmptrapd
-        service snmptrapd restart
+        systemctl restart snmptrapd   # (SystemD)
+        service snmptrapd restart     # (Sysvinit)
 
 8. Check syslog to ensure SNMPTT started properly:
 
-        grep snmptrapd /var/log/messages
-        grep snmptrapd /var/log/syslog
+        grep snmptrapd /var/log/messages  # (RHEL+)
+        grep snmptrapd /var/log/syslog    # (Debian+)
 
 10. Follow the steps in the section [Securing SNMPTT](#SecuringSNMPTT) to ensure SNMPTT has been configured securely.
 
