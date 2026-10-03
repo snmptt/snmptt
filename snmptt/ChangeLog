@@ -1,3 +1,8 @@
+Oct 3, 2026: Alex Burger
+- Fixed a 'Use of uninitialized value' warning which also fixes a bug with
+  handling traps that only contain a value for the varbinds instead of both a
+  name and value (rare).  Thanks to ymkins for the patch (PR #32).
+
 Jul 11, 2026: Alex Burger
 - Fixed a bug with the race condition fix from 2016 which would cause valid
   traps to be sent to the unknown trap log on systems without flock() support.
