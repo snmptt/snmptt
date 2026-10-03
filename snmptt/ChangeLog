@@ -2,6 +2,8 @@ Oct 3, 2026: Alex Burger
 - Fixed a 'Use of uninitialized value' warning which also fixes a bug with
   handling traps that only contain a value for the varbinds instead of both a
   name and value (rare).  Thanks to ymkins for the patch (PR #32).
+- Fixed an issue where blank lines could be written to the spool file which
+  interfered with the PR #32 fix.
 
 Jul 11, 2026: Alex Burger
 - Fixed a bug with the race condition fix from 2016 which would cause valid

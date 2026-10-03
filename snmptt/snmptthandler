@@ -236,7 +236,7 @@ while (defined(my $line = <>))
 	if ($DEBUGGING >= 1)
 	{
 		# Print out item passed from snmptrapd
-		print $line."\n";
+		print $line."\n" if $line ne '';
 	}
 
 }
