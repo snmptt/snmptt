@@ -1088,6 +1088,7 @@ Note:  The default snmptt.ini enables logging to snmptt.log and also syslog for 
 
 3.  Generate a **linkDown** trap using **snmptrap**:
 
+        export MIBS=ALL
         snmptrap -v 2c -c public 127.0.0.1 .1.3.6.1.6.3.1.1.5.3 .1.3.6.1.6.3.1.1.5.3 ifIndex i 2 ifAdminStatus i 1 ifOperStatus i 2
 
 2.  Check the syslog file for the trap from **snmptrapd**:

@@ -159,7 +159,7 @@ sub snmptt_trap_receiver {
       $trapname = $oid . " " . $value;
     }
     else {
-      $other_varbinds .= $oid . " " . $value . "\n" if defined $value && $value ne '';
+      $other_varbinds .= $oid . " " . $value . "\n" if (defined $oid && $oid ne '') || (defined $value && $value ne '');
     }
   }
 
@@ -219,10 +219,10 @@ sub snmptt_trap_receiver {
     flock $fh_SPOOL, 2 | 4;           # LOCK_EX | LOCK_NB
   }
 
-  print $fh_SPOOL time()."\n";
-  print $fh_SPOOL $hostname . "\n" if defined $hostname && $hostname ne '';
-  print $fh_SPOOL $ip_address . "\n" if defined $ip_address && $ip_address ne '';
-  print $fh_SPOOL $uptime . "\n" if defined $uptime && $uptime ne '';
+  print $fh_SPOOL time()."\n";  # First line of the trap file is the epoch time that the trap was spooled by snmptrapd
+  print $fh_SPOOL $hostname . "\n";  # Second line of the trap file is the hostname of the system that sent the trap
+  print $fh_SPOOL $ip_address . "\n";  # Third line of the trap file is the IP address of the system that sent the trap
+  print $fh_SPOOL $uptime . "\n" if defined $uptime && $uptime ne '';  # Fourth line of the trap file is the uptime of the system that sent the trap.  Ex: .1.3.6.1.2.1.1.3.0 31:18:27:02.00
   print $fh_SPOOL $trapname . "\n" if defined $trapname && $trapname ne '';
   print $fh_SPOOL ".1.3.6.1.6.3.18.1.4.0 $community\n" if defined $community && $community ne '';
   print $fh_SPOOL $other_varbinds if defined $other_varbinds && $other_varbinds ne '';
