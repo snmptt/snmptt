@@ -194,7 +194,7 @@ table {
 
 | R/O | Program / Module | rpm | deb
 | :--- | :--- | :--- | :--- |
-| Required | [Net-SNMP](http://www.net-snmp.org) (formerly known as UCD-SNMP).  Specifically **snmptrapd.** | net-snmp, net-snmp-utils | snmp, snmptrapd |
+| Required | [Net-SNMP](http://www.net-snmp.org) (formerly known as UCD-SNMP).  Specifically **snmptrapd.** | net-snmp, net-snmp-utils | snmp, snmptrapd, snmp-mibs-downloader |
 | Optional | [Net-SNMP Perl module](http://www.net-snmp.org/FAQ.html#How_do_I_install_the_Perl_SNMP_modules_).  Only required for features that perform conversions between symbolic and numeric OIDs.  This is NOT the same as the Net::SNMP module availabe from CPAN. | net-snmp-perl | libsnmp-perl |
 | Required | [Text::ParseWords](https://metacpan.org/pod/Text::ParseWords) module (included with most distributions) | perl-Text-ParseWords |  |
 | Required | [Getopt::Long](https://metacpan.org/pod/Getopt::Long) module (included with most distributions) |  |  |
