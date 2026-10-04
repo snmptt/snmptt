@@ -1,3 +1,7 @@
+Oct 4, 2026: Alex Burger
+- Improvements for ODBC and Win32::ODBC to protect against SQL Injection.
+- Sanitize system hostname.
+
 Oct 3, 2026: Alex Burger
 - Fixed a 'Use of uninitialized value' warning which also fixes a bug with
   handling traps that only contain a value for the varbinds instead of both a
@@ -59,7 +63,7 @@ Dec 17, 2022: Alex Burger <alex_b@users.sourceforge.net>
 
 Sept 3, 2022: Alex Burger <alex_b@users.sourceforge.net>
 - Fixed a bug with snmptthandler-embedded that prevented spool files from being
-   created properly when snmptrapd isn't using the -On option (bug #49).
+  created properly when snmptrapd isn't using the -On option (bug #49).
 - Fixed undefined variables warnings for preexec in snmpttconvertmib.
 
 Aug 24, 2022: Alex Burger <alex_b@users.sourceforge.net>

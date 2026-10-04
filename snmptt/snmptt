@@ -2293,16 +2293,14 @@ sub processtrap
           }
         }
 
-        if ($dbd_odbc_enable == 1)                       
+        if ($dbd_odbc_enable == 1)
         {
           $trap_attempted_to_log++;
 
-          # Double any single quotes
+          # Values are bound as ? placeholders in odbc_insert(), so pass them raw.
+          # (Do NOT pre-escape quotes here or the escaping would be stored literally.)
           my $message_short2 = $message_short;
-          $message_short2 =~ s(\')('')g;     #'
-
           my $community = $var[5];
-          $community =~ s(\')('')g;   #'
 
           my @t_sql_custom_columns = ();
           
@@ -2344,12 +2342,10 @@ sub processtrap
         {
           $trap_attempted_to_log++;
 
-          # Double any single quotes
+          # Single quotes are escaped centrally in sql_win32_odbc_insert(), so
+          # pass values raw here (avoids double-escaping).
           my $message_short2 = $message_short;
-          $message_short2 =~ s(\')('')g;     #'
-
           my $community = $var[5];
-          $community =~ s(\')('')g;   #'
 
           my @t_sql_custom_columns = ();
           
@@ -4624,12 +4620,9 @@ sub searchfortrap
 
       if ($dbd_odbc_enable == 1 && defined ($dbh_odbc) && $dbd_odbc_table_unknown ne "")
       {
-        # Double any single quotes
+        # Values are bound as ? placeholders in odbc_insert(), so pass them raw.
         my $message_short2 = $message_short;
-        $message_short2 =~ s(\')('')g;     #'
-
         my $community = $var[5];
-        $community =~ s(\')('')g;   #'
 
         my @t_sql_custom_columns_unknown = ();
           
@@ -4664,12 +4657,10 @@ sub searchfortrap
 
       if ($sql_win32_odbc_enable == 1 && defined ($dbh_win32_odbc) && $sql_win32_odbc_table_unknown ne "")
       {
-        # Double any single quotes
+        # Single quotes are escaped centrally in sql_win32_odbc_insert(), so
+        # pass values raw here (avoids double-escaping).
         my $message_short2 = $message_short;
-        $message_short2 =~ s(\')('')g;     #'
-
         my $community = $var[5];
-        $community =~ s(\')('')g;   #'
 
         my @t_sql_custom_columns_unknown = ();
           
@@ -7078,39 +7069,42 @@ sub odbc_insert {
   
   my $sql_statement = "INSERT INTO $table (";
   my @sql_values;
-  
+
   for (my $i = 0; $i < $#data;) {
     $sql_statement .= $data[$i];
     push (@sql_values, $data[$i+1]);
-    
+
     $i+=2;
-    
+
     if ($i < ($#data)) {
       $sql_statement .= ",";
-      }    
+      }
   }
   $sql_statement .= ") VALUES (";
 
+  # Use ? placeholders and bind the values so the trap data cannot break out of
+  # the string literal.  The values are never interpolated into $sql_statement.
+  # See mysql_insert()/postgresql_insert().
   for (my $i = 0; $i <= $#sql_values;) {
-    $sql_statement .= "\'" . $sql_values[$i] . "\'";
+    $sql_statement .= "?";
     $i++;
-    
+
     if ($i <= ($#sql_values)) {
       $sql_statement .= ",";
-     }    
+     }
   }
 
   $sql_statement .= ")";
-  
+
   #print "sql_statement: $sql_statement\n";
-  
+
   # Make sure the connection is up
    if ($dbd_odbc_ping_on_insert == 1) {
     dbd_odbc_ping();
   }
-  
+
   if (defined ($dbh_odbc)) {
-    unless (defined ($dbh_odbc->do($sql_statement)))
+    unless (defined ($dbh_odbc->do($sql_statement, undef, @sql_values)))
     {
       my $msg = "DBI DBD::ODBC error: Unable to perform INSERT INTO: ".$dbh_odbc->errstr;
       warn $msg, "\n";
@@ -7170,19 +7164,26 @@ sub sql_win32_odbc_insert {
   }
   $sql_statement .= ") VALUES (";
 
+  # Win32::ODBC has no bind-parameter API, so values are interpolated into the
+  # statement.  Escape single quotes (double them) on every value so the
+  # trap data cannot break out of the string literal. Do it here rather than in
+  # the callers so no field is missed.
   for (my $i = 0; $i <= $#sql_values;) {
-    $sql_statement .= "\'" . $sql_values[$i] . "\'";
+    my $sql_value = $sql_values[$i];
+    $sql_value = '' unless defined $sql_value;
+    $sql_value =~ s/'/''/g;
+    $sql_statement .= "\'" . $sql_value . "\'";
     $i++;
-    
+
     if ($i <= ($#sql_values)) {
       $sql_statement .= ",";
-     }    
+     }
   }
 
   $sql_statement .= ")";
-  
+
   #print "sql_statement: $sql_statement\n";
-   
+
   if (defined ($dbh_win32_odbc)) {
     my $dbh_win32_odbc_retries = 3;
     while ($dbh_win32_odbc_retries) {
@@ -7375,6 +7376,15 @@ sub ip_to_name {
     }
 
     if ($hostname) {
+      # Sanitize the DNS-derived name.  A PTR record is controlled by whoever
+      # owns the reverse zone for the sending IP (or can spoof the reply), so the
+      # returned name is untrusted input just like a varbind value.  It overwrites
+      # $var[0] / $agent_dns_name *after* the allowlist pass in readtrap() and then
+      # flows into EXEC/PREEXEC ($A, $R, $r -> system) and into the ODBC 'hostname'
+      # column, so clean it here to the same character set used for host names
+      # elsewhere (see readtrap()).
+      $hostname =~ s/[^a-zA-Z0-9.\-_:]//g;
+
       if ($dns_normalise_case == 1) {
         $hostname = lc $hostname;
         if ($DEBUGGING >= 2) {
